@@ -5,7 +5,11 @@
         "carina"
     ],
     "scripts": {
-        "build": "yarn workspaces foreach -vt run build"
+        "build": "yarn workspaces foreach -vt run build",
+        "clean": "yarn workspaces foreach -vt run clean"
     },
-    "packageManager": "yarn@3.3.0"
+    "packageManager": "yarn@3.3.0",
+    "devDependencies": {
+        "rimraf": "^4.1.0"
+    }
 }

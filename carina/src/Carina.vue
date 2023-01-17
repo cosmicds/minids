@@ -6,15 +6,15 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
 
-    <v-fade-transition>
       <v-overlay
-        v-if="showSplashScreen"
+        :model-value="showSplashScreen"
         absolute
         opacity="0.6"
+        id="splash-overlay"
       >
         <img
           id="splash-screen"
-          :src="imageLocation"
+          :src="require(`./assets/Carina_Nebula_Splash_Screen${mobile ? '_Mobile' : ''}_Close.png`)"
           v-click-outside="closeSplashScreen"
           max-width="70vw"
           max-height="70vh"
@@ -25,7 +25,6 @@
           @click="closeSplashScreen">
         </a>
       </v-overlay>
-    </v-fade-transition>
 
     <transition name="fade">
       <div
@@ -42,23 +41,21 @@
 
     <div id="top-content">
       <v-tooltip
-        :model-value="showTooltip.video"
+        v-model="showVideoTooltip"
         :open-on-click="false"
         :open-on-focus="false"
         :open-on-hover="true"
-        :location="smallSize ? 'bottom' : 'right'"
+        close-on-content-click
+        :location="smallSize ? 'bottom' : 'end'"
       >
         <template v-slot:activator="{ props }">
           <div
-            @mouseover="showTooltip.video = true"
-            @mouseleave="showTooltip.video = false"
+            @mouseover="showVideoTooltip = true"
+            @mouseleave="showVideoTooltip = false"
             id="video-icon-wrapper"
             class="control-icon-wrapper"
             v-bind="props"
-            @click="() => {
-              selectBottomSheet('video');
-              showTooltip.video = false;
-            }"
+            @click="showVideoSheet = true"
           >
             <font-awesome-icon
               id="video-icon"
@@ -79,22 +76,22 @@
           {{ showLayers ? "Hide Images" : "Show Images" }}
         </button>
         <v-tooltip
-          bottom
+          location="bottom"
           :open-on-click="false"
           :open-on-focus="false"
           :open-on-hover="true"
-          v-model="showTooltip.reset"
+          v-model="showResetTooltip"
         >
           <template v-slot:activator="{ props }">
             <div
-              @mouseover="showTooltip.reset = true"
-              @mouseleave="showTooltip.reset = false"
+              @mouseover="showResetTooltip = true"
+              @mouseleave="showResetTooltip = false"
               id="reset-icon-wrapper"
               class="control-icon-wrapper"
               v-bind="props"
               @click="() => {
                 resetView(false);
-                showTooltip.reset = false;
+                showResetTooltip = false;
               }"
             >
               <font-awesome-icon
@@ -109,22 +106,22 @@
         </v-tooltip>
       </div>
       <v-tooltip
-        :left="!smallSize"
-        :bottom="smallSize"
+        :location="smallSize ? 'bottom' : 'start'"
         :open-on-click="false"
         :open-on-focus="false"
         :open-on-hover="true"
-        v-model="showTooltip.text"
+        v-model="showTextTooltip"
+        :offset="smallSize ? 0 : '45px'"
       >
         <template v-slot:activator="{ props }">
           <div
             id="text-icon-wrapper"
             class="control-icon-wrapper"
-            @mouseover="showTooltip.text = true"
-            @mouseleave="showTooltip.text = false"
+            @mouseover="showTextTooltip = true"
+            @mouseleave="showTextTooltip = false"
             v-bind="props"
             @click="() => {
-              selectBottomSheet('text');
+              selectSheet('text');
               showTooltip['text'] = false;
             }"
           >
@@ -213,10 +210,9 @@
       </div>
     </div>
 
-    <v-dialog
-      id="video-dialog"
-      fullscreen
-      v-model="showVideoSheet"
+    <v-container
+      id="video-container"
+      v-show="showVideoSheet"
       transition="slide-y-transition"
     >
       <div class="video-wrapper">
@@ -227,10 +223,10 @@
           @click="showVideoSheet = false"
         ></font-awesome-icon>
         <video controls id="info-video">
-          <source src="assets/Carina Final.mp4" type="video/mp4">
+          <source src="./assets/CarinaFinal.mp4" type="video/mp4">
         </video>
       </div>
-    </v-dialog>
+    </v-container>
 
     <v-navigation-drawer
       id="text-bottom-sheet"  
@@ -472,7 +468,9 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
       showSplashScreen: false,
       showLayers: true,
-      showTooltip: { text: false, video: false, reset: false },
+      showResetTooltip: false,
+      showTextTooltip: false,
+      showVideoTooltip: false,
       sheet: null as SheetType,
       currentTool: "crossfade" as ToolType,
       tab: 0,
@@ -598,10 +596,6 @@ export default defineComponent({
       return this.hashtags.join(",");
     },
 
-    imageLocation(): string {
-      return new URL(`./assets/Carina Nebula Splash Screen${this.mobile ? ' Mobile' : ''} Close.png`).href;
-    },
-
     isLoading(): boolean {
       return !this.ready;
     },
@@ -619,7 +613,7 @@ export default defineComponent({
         return this.sheet === 'text';
       },
       set(_value: boolean) {
-        this.selectBottomSheet('text');
+        this.selectSheet('text');
       }
     },
 
@@ -628,11 +622,12 @@ export default defineComponent({
         return this.sheet === "video";
       },
       set(value: boolean) {
-        this.selectBottomSheet('video');
+        this.selectSheet('video');
         if (!value) {
           const video = document.querySelector("#info-video") as HTMLVideoElement;
           video.pause();
         }
+        this.showVideoTooltip = false;
       }
     },
 
@@ -665,7 +660,7 @@ export default defineComponent({
       this.showSplashScreen = false;
     },
 
-    selectBottomSheet(name: SheetType) {
+    selectSheet(name: SheetType) {
       if (this.sheet == name) {
         this.sheet = null;
         this.$nextTick(() => {
@@ -704,6 +699,16 @@ export default defineComponent({
       }
       if (this.jwstLayer) {
         applyImageSetLayerSetting(this.jwstLayer, ["enabled", show]);
+      }
+    },
+    layersLoaded(loaded: boolean) {
+      if (loaded) {
+        this.ready = true;
+      }
+    },
+    ready(r: boolean) {
+      if (r) {
+        this.showSplashScreen = true;
       }
     }
   }
@@ -1037,6 +1042,10 @@ video {
   height: 40% !important;
 }
 
+.v-navigation-drawer__scrim {
+  display: none;
+}
+
 #tabs {
   width: calc(100% - 3em);
   align-self: left;
@@ -1077,12 +1086,16 @@ video {
   object-fit: contain;
 }
 
-.v-overlay__content {
+#splash-overlay .v-overlay__content {
   position: fixed;
   margin: auto;
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
+
+  a:hover {
+    cursor: pointer;
+  }
 }
 
 #splash-close {
@@ -1099,6 +1112,15 @@ video {
   pointer-events: auto;
 }
 
+#video-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+}
+
 // This prevents the tabs from having some extra space to the left when the screen is small
 // (around 400px or less)
 .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
@@ -1110,7 +1132,7 @@ video {
     display: block;
   }
 
-  #video-dialog {
+  #video-container {
     display: inherit;
   }
 

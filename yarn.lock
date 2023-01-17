@@ -303,13 +303,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/vue-fontawesome@npm:^2.0.9":
-  version: 2.0.9
-  resolution: "@fortawesome/vue-fontawesome@npm:2.0.9"
+"@fortawesome/vue-fontawesome@npm:^3":
+  version: 3.0.2
+  resolution: "@fortawesome/vue-fontawesome@npm:3.0.2"
   peerDependencies:
     "@fortawesome/fontawesome-svg-core": ~1 || ~6
-    vue: ~2
-  checksum: 18c35058ebc76472073d225565ce36d1bc80e818b9d586e47eb20cbdcc8cab1bcc80a118e6052f6d7528ae5d23918a4ec9e537db71c5de0255f0cd67db780b37
+    vue: ">= 3.0.0 < 4"
+  checksum: a67aff78d994d73dcd110b8554af0aefb516410be2c22ea09f665592f56af3c7e715291ff6d50993e507facd3a7c2c5808ba8ca08472101b6b3fb0f71254c232
   languageName: node
   linkType: hard
 
@@ -1257,6 +1257,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vuetify/loader-shared@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "@vuetify/loader-shared@npm:1.7.0"
+  dependencies:
+    find-cache-dir: ^3.3.2
+    upath: ^2.0.1
+  peerDependencies:
+    vue: ^3.0.0
+    vuetify: ^3.0.0-beta.4
+  checksum: 986dae84049c5ffebd6f00a70463a10785beaf9c6d13b8ad7c5a22a5fb243b64b06937bcd18f35fa681dfa0a0197c71cc32e9c7f52cc6a45094ca6a814135dc1
+  languageName: node
+  linkType: hard
+
 "@webassemblyjs/ast@npm:1.11.1":
   version: 1.11.1
   resolution: "@webassemblyjs/ast@npm:1.11.1"
@@ -1985,6 +1998,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"callsite@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "callsite@npm:1.0.0"
+  checksum: 569686d622a288a4f0a827466c2f967b6d7a98f2ee1e6ada9dcf5a6802267a5e2a995d40f07113b5f95c7b2b2d5cbff4fdde590195f2a8bed24b829d048688f8
+  languageName: node
+  linkType: hard
+
 "callsites@npm:^3.0.0":
   version: 3.1.0
   resolution: "callsites@npm:3.1.0"
@@ -2028,7 +2048,7 @@ __metadata:
     "@fortawesome/fontawesome-svg-core": ^6.2.1
     "@fortawesome/free-brands-svg-icons": ^6.2.1
     "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/vue-fontawesome": ^2.0.9
+    "@fortawesome/vue-fontawesome": ^3
     "@typescript-eslint/eslint-plugin": ^5.48.1
     "@typescript-eslint/parser": ^5.48.1
     "@vue/cli-plugin-eslint": ^5.0.8
@@ -2043,7 +2063,8 @@ __metadata:
     screenfull: ^6.0.2
     typescript: ^4.9.4
     vue: ^3
-    vuetify: ^3
+    vuetify: ^3.1.1
+    webpack-plugin-vuetify: ^2.0.0
   languageName: unknown
   linkType: soft
 
@@ -2684,6 +2705,15 @@ __metadata:
   dependencies:
     ms: ^2.1.1
   checksum: b3d8c5940799914d30314b7c3304a43305fd0715581a919dacb8b3176d024a782062368405b47491516d2091d6462d4d11f2f4974a405048094f8bfebfa3071c
+  languageName: node
+  linkType: hard
+
+"decache@npm:^4.6.0":
+  version: 4.6.1
+  resolution: "decache@npm:4.6.1"
+  dependencies:
+    callsite: ^1.0.0
+  checksum: 3e8cf879ecad1ebc1a0fed782d008ea4f331c2a3688de3b3f18fca03e51b3aa829be90ee0b7c6e1ebc0b0a0f4e911529efdfb3cef28d69b9605131b7c69daea9
   languageName: node
   linkType: hard
 
@@ -3403,6 +3433,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-loader@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "file-loader@npm:6.2.0"
+  dependencies:
+    loader-utils: ^2.0.0
+    schema-utils: ^3.0.0
+  peerDependencies:
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: faf43eecf233f4897b0150aaa874eeeac214e4f9de49738a9e0ef734a30b5260059e85b7edadf852b98e415f875bd5f12587768a93fd52aaf2e479ecf95fab20
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
@@ -3427,7 +3469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-cache-dir@npm:^3.3.1":
+"find-cache-dir@npm:^3.3.1, find-cache-dir@npm:^3.3.2":
   version: 3.3.2
   resolution: "find-cache-dir@npm:3.3.2"
   dependencies:
@@ -4916,6 +4958,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minids@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "minids@workspace:."
+  dependencies:
+    rimraf: ^4.1.0
+  languageName: unknown
+  linkType: soft
+
 "minimalistic-assert@npm:^1.0.0":
   version: 1.0.1
   resolution: "minimalistic-assert@npm:1.0.1"
@@ -5307,6 +5357,18 @@ __metadata:
   dependencies:
     boolbase: ^1.0.0
   checksum: 5afc3dafcd1573b08877ca8e6148c52abd565f1d06b1eb08caf982e3fa289a82f2cae697ffb55b5021e146d60443f1590a5d6b944844e944714a5b549675bcd3
+  languageName: node
+  linkType: hard
+
+"null-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "null-loader@npm:4.0.1"
+  dependencies:
+    loader-utils: ^2.0.0
+    schema-utils: ^3.0.0
+  peerDependencies:
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: eeb4c4dd2f8f41e46f5665e4500359109e95ec1028a178a60e0161984906572da7dd87644bcc3cb29f0125d77e2b2508fb4f3813cfb1c6604a15865beb4b987b
   languageName: node
   linkType: hard
 
@@ -6435,11 +6497,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"root-workspace-0b6124@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "root-workspace-0b6124@workspace:."
-  languageName: unknown
-  linkType: soft
+"rimraf@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "rimraf@npm:4.1.0"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: da4849802779a8c8cbe3aa1fbdf817b1ec41f7e95fb82074de3129e0030cd4e6e1f512a732344f0062c1cea59569c8113c78c3f50267cc469e8e9bfbe7622cb5
+  languageName: node
+  linkType: hard
 
 "run-parallel@npm:^1.1.9":
   version: 1.2.0
@@ -7342,6 +7407,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"upath@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "upath@npm:2.0.1"
+  checksum: 2db04f24a03ef72204c7b969d6991abec9e2cb06fb4c13a1fd1c59bc33b46526b16c3325e55930a11ff86a77a8cbbcda8f6399bf914087028c5beae21ecdb33c
+  languageName: node
+  linkType: hard
+
 "update-browserslist-db@npm:^1.0.9":
   version: 1.0.10
   resolution: "update-browserslist-db@npm:1.0.10"
@@ -7500,7 +7572,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vuetify@npm:^3":
+"vuetify@npm:^3.1.1":
   version: 3.1.1
   resolution: "vuetify@npm:3.1.1"
   peerDependencies:
@@ -7649,6 +7721,26 @@ __metadata:
     clone-deep: ^4.0.1
     wildcard: ^2.0.0
   checksum: 88786ab91013f1bd2a683834ff381be81c245a4b0f63304a5103e90f6653f44dab496a0768287f8531761f8ad957d1f9f3ccb2cb55df0de1bd9ee343e079da26
+  languageName: node
+  linkType: hard
+
+"webpack-plugin-vuetify@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "webpack-plugin-vuetify@npm:2.0.0"
+  dependencies:
+    "@vuetify/loader-shared": ^1.7.0
+    decache: ^4.6.0
+    file-loader: ^6.2.0
+    find-cache-dir: ^3.3.2
+    loader-utils: ^2.0.0
+    mkdirp: ^1.0.4
+    null-loader: ^4.0.1
+    upath: ^2.0.1
+  peerDependencies:
+    "@vue/compiler-sfc": ^3.2.6
+    vuetify: ^3.0.0-beta.4
+    webpack: ^5.0.0
+  checksum: b5325d2fbe9f6bf0bb8273c26f98be924f712a4a1b409d30f5fd9c6b566cf49289a6e9c9813b6167eb70002f153db0491a305d9523954b4a61f131e052def4f7
   languageName: node
   linkType: hard
 

@@ -13,9 +13,6 @@ import { en } from 'vuetify/locale';
 import 'vuetify/styles';
 
 export default createVuetify({
-  //components,
-  //directives,
-
   // Icon Fonts
   icons: {
     defaultSet: 'mdi',
