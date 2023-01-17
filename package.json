@@ -1,0 +1,11 @@
+{
+    "name": "minids",
+    "private": true,
+    "workspaces": [
+        "carina"
+    ],
+    "scripts": {
+        "build": "yarn workspaces foreach -vt run build"
+    },
+    "packageManager": "yarn@3.3.0"
+}

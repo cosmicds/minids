@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Folder Browseable="True" Group="Explorer" Name="JWST SMACS 0723" Searchable="True">
+  <Place Angle="0" AngularSize="0" Constellation="VOL" DataSetType="Sky" Dec="-73.45389956415659" Magnitude="0" Name="JWST SMACS 0723" Opacity="100" RA="7.388518370448916" Rotation="0" Thumbnail="http://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/thumb.jpg" ZoomLevel="0.39337455578028513">
+    <ForegroundImageSet>
+      <ImageSet BandPass="Visible" BaseDegreesPerTile="0.06824517526732732" BaseTileLevel="0" BottomsUp="False" CenterX="110.785677941" CenterY="-73.4497732804" DataSetType="Sky" ElevationModel="False" FileType=".png" Generic="False" Name="Webb Delivers Deepest Infrared Image of Universe Yet: SMACS 0723" OffsetX="-0.0074597408661543655" OffsetY="-0.010255996337093122" Projection="Tan" QuadTreeMap="" Rotation="-34.968546008628586" Sparse="True" StockSet="False" TileLevels="5" Url="http://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/{1}/{3}/{3}_{2}.png" WidthFactor="2">
+        <Credits>NASA, ESA, CSA, STScI, Webb ERO Production Team</Credits>
+        <CreditsUrl>https://webbtelescope.org/contents/news-releases/2022/news-2022-035</CreditsUrl>
+        <ThumbnailUrl>http://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/thumb.jpg</ThumbnailUrl>
+      </ImageSet>
+    </ForegroundImageSet>
+  </Place>
+</Folder>

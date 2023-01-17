@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Folder Browseable="True" Group="Explorer" Name="JWST First Images" Searchable="True">
+  <Place Angle="0" AngularSize="0" Constellation="CAR" DataSetType="Sky" Dec="-58.620167596399455" Magnitude="0" Name="JWST Carina NIRCam" Opacity="100" RA="10.614202486602357" Rotation="0" Thumbnail="http://data1.wwtassets.org/packages/2022/07_jwst/carina_nircam/thumb.jpg" ZoomLevel="0.7175138317174115">
+    <ForegroundImageSet>
+      <ImageSet BandPass="Visible" BaseDegreesPerTile="0.13653881984592092" BaseTileLevel="0" BottomsUp="False" CenterX="159.21261854583" CenterY="-58.62001801087" DataSetType="Sky" ElevationModel="False" FileType=".png" Generic="False" Name="JWST Carina NIRCam" OffsetX="-9.676683405186081e-05" OffsetY="0.0002460841694251934" Projection="Tan" QuadTreeMap="" Rotation="102.98491848225136" Sparse="True" StockSet="False" TileLevels="6" Url="http://data1.wwtassets.org/packages/2022/07_jwst/carina_nircam/{1}/{3}/{3}_{2}.png" WidthFactor="2">
+        <Credits>NASA, ESA, CSA, STScI, Webb ERO Production Team</Credits>
+        <CreditsUrl>https://webbtelescope.org/contents/news-releases/2022/news-2022-031</CreditsUrl>
+        <Description>What looks much like craggy mountains on a moonlit evening is actually the edge of a nearby, young, star-forming region NGC 3324 in the Carina Nebula. Captured in infrared light by the Near-Infrared Camera (NIRCam) on NASA’s James Webb Space Telescope, this image reveals previously obscured areas of star birth.
+Called the Cosmic Cliffs, the region is actually the edge of a gigantic, gaseous cavity within NGC 3324, roughly 7,600 light-years away. The cavernous area has been carved from the nebula by the intense ultraviolet radiation and stellar winds from extremely massive, hot, young stars located in the center of the bubble, above the area shown in this image. The high-energy radiation from these stars is sculpting the nebula’s wall by slowly eroding it away.  
+NIRCam – with its crisp resolution and unparalleled sensitivity – unveils hundreds of previously hidden stars, and even numerous background galaxies. Several prominent features in this image are described below.
+•	The “steam” that appears to rise from the celestial “mountains” is actually hot, ionized gas and hot dust streaming away from the nebula due to intense, ultraviolet radiation. 
+•	Dramatic pillars rise above the glowing wall of gas, resisting the blistering ultraviolet radiation from the young stars.
+•	Bubbles and cavities are being blown by the intense radiation and stellar winds of newborn stars.
+•	Protostellar jets and outflows, which appear in gold, shoot from dust-enshrouded, nascent stars.
+•	A “blow-out” erupts at the top-center of the ridge, spewing gas and dust into the interstellar medium. 
+•	An unusual “arch” appears, looking like a bent-over cylinder.
+This period of very early star formation is difficult to capture because, for an individual star, it lasts only about 50,000 to 100,000 years – but Webb’s extreme sensitivity and exquisite spatial resolution have chronicled this rare event.
+Located roughly 7,600 light-years away, NGC 3324 was first catalogued by James Dunlop in 1826. Visible from the Southern Hemisphere, it is located at the northwest corner of the Carina Nebula (NGC 3372), which resides in the constellation Carina. The Carina Nebula is home to the Keyhole Nebula and the active, unstable supergiant star called Eta Carinae. 
+NIRCam was built by a team at the University of Arizona and Lockheed Martin’s Advanced Technology Center.</Description>
+        <ThumbnailUrl>http://data1.wwtassets.org/packages/2022/07_jwst/carina_nircam/thumb.jpg</ThumbnailUrl>
+      </ImageSet>
+    </ForegroundImageSet>
+  </Place>
+</Folder
