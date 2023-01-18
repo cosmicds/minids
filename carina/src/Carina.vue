@@ -285,7 +285,7 @@
                 The Hubble Space Telescope takes pictures in visible light, like our eyes. The James Webb Space Telescope takes pictures in infrared light. Some “night vision” cameras image objects in the dark using infrared light. Animals and people “glow” in infrared in the dark because we usually have higher temperatures than our surroundings.
                 <br><br><br>
                 <h3>Credits:</h3>
-                <h4>CosmicDS Mini Stories Team:</h4>
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
                 Jon Carifio<br>
                 John Lewis<br>
                 Pat Udomprasert<br>
@@ -349,7 +349,7 @@
                   <v-row>
                     <v-col cols="12">
                       <h3>Credits:</h3>
-                      <h4>CosmicDS Mini Stories Team:</h4>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
                       Jon Carifio<br>
                       John Lewis<br>
                       Pat Udomprasert<br>
