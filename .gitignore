@@ -1,4 +1,6 @@
-**/dist/
+*/dist/*
+!./dist/index.html
+
 node_modules/
 tsconfig.tsbuildinfo
 /.vs/
