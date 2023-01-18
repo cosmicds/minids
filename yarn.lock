@@ -2041,7 +2041,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"carina@workspace:carina":
+"carina@workspace:*, carina@workspace:carina":
   version: 0.0.0-use.local
   resolution: "carina@workspace:carina"
   dependencies:
@@ -4962,6 +4962,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "minids@workspace:."
   dependencies:
+    carina: "workspace:*"
     rimraf: ^4.1.0
   languageName: unknown
   linkType: soft
