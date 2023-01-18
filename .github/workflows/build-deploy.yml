@@ -1,0 +1,47 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+    
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+
+      - name: Yarn install
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Make global dist dir
+        run: mkdir -p dist
+      
+      # This command descends one level down into all our directories,
+      # finds any dist folders (e.g carina/dist), and moves them into the
+      # appropriate folder in the top-level dist
+      # i.e. carina/dist -> dist/carina
+      - name: Rearrange for Pages
+        run: |
+          DISTPATHS=$(find . -mindepth 2 -maxdepth 2 -type d -name "dist")
+          for pth in $DISTPATHS
+          do
+            name=$(echo $DISTPATH | cut -f 2 -d "/")
+            mv ${pth} dist/${name}
+          done
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: dist
