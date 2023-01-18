@@ -120,10 +120,7 @@
             @mouseover="showTextTooltip = true"
             @mouseleave="showTextTooltip = false"
             v-bind="props"
-            @click="() => {
-              selectSheet('text');
-              showTooltip['text'] = false;
-            }"
+            @click="showTextSheet = true"
           >
             <font-awesome-icon
               id="text-icon"
@@ -422,12 +419,8 @@ export default defineComponent({
   extends: WWTAwareComponent,
 
   props: {
-    jwstWtml: {
-      type: String,
-      required: true
-    },
-    hubbleWtml: {
-      type: String,
+    wtml: {
+      type: Object,
       required: true
     },
     wwtNamespace: {
@@ -454,8 +447,7 @@ export default defineComponent({
 
   data() {
     return {
-      hubbleLayer: null as ImageSetLayer | null,
-      jwstLayer: null as ImageSetLayer | null,
+      layers: {} as Record<string,ImageSetLayer>,
       cfOpacity: 50, // out of 100
       fullscreenModeActive: false,
       windowShape: defaultWindowShape,
@@ -468,6 +460,7 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
       showSplashScreen: false,
       showLayers: true,
+      layersLoaded: false,
       showResetTooltip: false,
       showTextTooltip: false,
       showVideoTooltip: false,
@@ -488,8 +481,9 @@ export default defineComponent({
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.loadImageCollection({
-          url: this.hubbleWtml,
+      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
+        this.loadImageCollection({
+          url: value,
           loadChildFolders: false
         }).then((folder) => {
           const children = folder.get_children();
@@ -500,34 +494,19 @@ export default defineComponent({
           this.addImageSetLayer({
             url: imageset.get_url(),
             mode: "autodetect",
-            name: "Hubble Carina",
+            name: key,
             goto: false
-          }).then((layer) => {
-            this.hubbleLayer = layer;
-            applyImageSetLayerSetting(layer , ["opacity", 0.5]);
-          });
-        });
-
-      this.loadImageCollection({
-        url: this.jwstWtml,
-        loadChildFolders: false
-      }).then((folder) => {
-        const children = folder.get_children();
-        if (children == null) { return; }
-        const item = children[0] as Place;
-        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-        if (imageset === null) { return; }
-        this.addImageSetLayer({
-          url: imageset.get_url(),
-          mode: "autodetect",
-          name: "Hubble Carina",
-          goto: false
         }).then((layer) => {
-          this.jwstLayer = layer;
-          this.resetView();
-          applyImageSetLayerSetting(layer , ["opacity", 0.5]);
+          this.layers[key] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
         });
+      }));
+
+      Promise.all(layerPromises).then(() => {
+        this.resetView();
+        this.layersLoaded = true;
       });
+      
 
       this.loadImageCollection({
         url: this.bgWtml,
@@ -568,11 +547,11 @@ export default defineComponent({
         return this.cfOpacity;
       },
       set(o: number) {
-        if (this.hubbleLayer) {
-          applyImageSetLayerSetting(this.hubbleLayer, ["opacity", 1 - 0.01 * o]);
+        if (this.layers.hubble) {
+          applyImageSetLayerSetting(this.layers.hubble, ["opacity", 1 - 0.01 * o]);
         }
-        if (this.jwstLayer) {
-          applyImageSetLayerSetting(this.jwstLayer, ["opacity", 0.01 * o]);
+        if (this.layers.jwst) {
+          applyImageSetLayerSetting(this.layers.jwst, ["opacity", 0.01 * o]);
         }
         this.cfOpacity = o;
       }
@@ -600,10 +579,6 @@ export default defineComponent({
       return !this.ready;
     },
 
-    layersLoaded(): boolean {
-      return this.hubbleLayer != null && this.jwstLayer != null;
-    },
-
     mobile(): boolean {
       return this.smallSize && this.touchscreen
     },
@@ -614,6 +589,7 @@ export default defineComponent({
       },
       set(_value: boolean) {
         this.selectSheet('text');
+        this.showTextTooltip = false;
       }
     },
 
@@ -680,8 +656,7 @@ export default defineComponent({
 
     resetView(instant = true) {
       const D2R = Math.PI / 180.0;
-      if (this.jwstLayer === null) { return; }
-      const imageset = this.jwstLayer.get_imageSet();
+      const imageset = this.layers.jwst.get_imageSet();
       this.gotoRADecZoom({
         raRad: D2R * imageset.get_centerX(),
         decRad: D2R * imageset.get_centerY(),
@@ -694,12 +669,9 @@ export default defineComponent({
 
   watch: {
     showLayers(show: boolean) {
-      if (this.hubbleLayer) {
-        applyImageSetLayerSetting(this.hubbleLayer, ["enabled", show]);
-      }
-      if (this.jwstLayer) {
-        applyImageSetLayerSetting(this.jwstLayer, ["enabled", show]);
-      }
+      Object.values(this.layers).forEach(layer => {
+        applyImageSetLayerSetting(layer, ["enabled", show]);
+      });
     },
     layersLoaded(loaded: boolean) {
       if (loaded) {
@@ -761,7 +733,7 @@ body {
   opacity: 0;
 }
 
-modal {
+.modal {
   position: absolute;
   top: 0px;
   left: 0px;
