@@ -35,7 +35,7 @@ jobs:
           DISTPATHS=$(find . -mindepth 2 -maxdepth 2 -type d -name "dist")
           for pth in $DISTPATHS
           do
-            name=$(echo $DISTPATH | cut -f 2 -d "/")
+            name=$(echo $pth | rev | cut -f 2 -d "/" | rev)
             mv ${pth} dist/${name}
           done
 
