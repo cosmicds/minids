@@ -62,8 +62,10 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 
 createApp(Carina, {
   wwtNamespace: "wwt-minids-carina",
-  jwstWtml: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml",
-  hubbleWtml: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml",
+  wtml: {
+    jwst: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml",
+    hubble: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml",
+  },
   url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
   thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
   bgWtml: "https://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/jwst_smacs0723.wtml",
