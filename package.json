@@ -1,5 +1,5 @@
 {
-    "name": "minids",
+    "name": "minids-monorepo",
     "private": true,
     "workspaces": [
         "carina",
