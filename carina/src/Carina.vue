@@ -225,15 +225,19 @@
       </div>
     </v-container>
 
-    <v-navigation-drawer
+    <v-dialog
+      class="bottom-sheet"
       id="text-bottom-sheet"  
       hide-overlay
       persistent
       absolute
+      width="100%"
+      :scrim="false"
       location="bottom"
       v-model="showTextSheet"
+      transition="dialog-bottom-transition"
     >
-      <v-card>
+      <v-card height="100%">
       <!-- <v-container height="11px">
         <font-awesome-icon
           class="close-icon"
@@ -294,6 +298,7 @@
                 Peter Williams<br>
                 A. David Weigel<br>
                 Jon Carifio<br>
+                <v-spacer class="end-spacer"></v-spacer>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -358,6 +363,7 @@
                       Peter Williams<br>
                       A. David Weigel<br>
                       Jon Carifio<br>
+                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                 </v-container>              
@@ -366,7 +372,7 @@
           </v-window-item>
         </v-window>
       </v-card>
-    </v-navigation-drawer>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -630,16 +636,17 @@ export default defineComponent({
 
 <style lang="less">
 html {
-  height: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
   background-color: #000;
+  overflow: hidden;
 }
 
 body {
+  position: fixed;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  height: 100vh;
   margin: 0;
   padding: 0;
 
@@ -652,10 +659,10 @@ body {
   margin: 0;
 
   .wwtelescope-component {
-    position: relative;
+    position: absolute;
     top: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     border-style: none;
     border-width: 0;
     margin: 0;
@@ -895,8 +902,13 @@ body {
   }
 }
 
-.v-bottom-sheet {
-  background: black;
+.bottom-sheet {
+  .v-overlay__content {
+    align-self: flex-end;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+  }
 }
 
 .v-dialog--fullscreen {
@@ -906,6 +918,7 @@ body {
 
 .info-text {
   height: 35vh;
+  padding-bottom: 25px;
 
   & a {
     text-decoration: none;
@@ -958,6 +971,10 @@ video {
   display: none;
 }
 
+.v-window-item {
+  height: fit-content;
+}
+
 #tabs {
   width: calc(100% - 3em);
   align-self: left;
@@ -966,11 +983,15 @@ video {
 #tab-items {
   // padding-bottom: 2px !important;
 
-  .v-card__text {
+  .v-card-text {
     font-size: ~"max(14px, calc(0.8em + 0.3vw))";
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
+
+    .end-spacer {
+      height: 25px;
+    }
   }
 
 }
@@ -1050,6 +1071,10 @@ video {
 
   #tabs h3 {
     font-size: 1em;
+  }
+
+  #tab-items .v-card-text .end-spacer {
+    height: 70px;
   }
 }
 
