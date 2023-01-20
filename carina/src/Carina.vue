@@ -232,8 +232,10 @@
       persistent
       absolute
       width="100%"
+      :scrim="false"
       location="bottom"
       v-model="showTextSheet"
+      transition="dialog-bottom-transition"
     >
       <v-card height="100%">
       <!-- <v-container height="11px">
