@@ -233,7 +233,7 @@
       location="bottom"
       v-model="showTextSheet"
     >
-      <v-card>
+      <v-card height="100%">
       <!-- <v-container height="11px">
         <font-awesome-icon
           class="close-icon"
@@ -294,6 +294,7 @@
                 Peter Williams<br>
                 A. David Weigel<br>
                 Jon Carifio<br>
+                <br><br><br><br>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -358,6 +359,7 @@
                       Peter Williams<br>
                       A. David Weigel<br>
                       Jon Carifio<br>
+                      <br><br><br><br>
                     </v-col>
                   </v-row>
                 </v-container>              
@@ -630,16 +632,17 @@ export default defineComponent({
 
 <style lang="less">
 html {
-  height: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
   background-color: #000;
+  overflow: hidden;
 }
 
 body {
+  position: fixed;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  height: 100vh;
   margin: 0;
   padding: 0;
 
@@ -652,10 +655,10 @@ body {
   margin: 0;
 
   .wwtelescope-component {
-    position: relative;
+    position: absolute;
     top: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     border-style: none;
     border-width: 0;
     margin: 0;
@@ -958,6 +961,10 @@ video {
   display: none;
 }
 
+.v-window-item {
+  height: fit-content;
+}
+
 #tabs {
   width: calc(100% - 3em);
   align-self: left;
@@ -971,6 +978,7 @@ video {
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
+    padding-bottom: ~"max(4vw, 25px)";
   }
 
 }
