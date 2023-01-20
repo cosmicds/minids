@@ -373,12 +373,8 @@
 <script lang="ts">
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
-import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
-import screenfull from "screenfull";
+import { MiniDSBase } from "@minids/common";
 import { defineComponent } from "vue";
-
-type Shape = { width: number; height: number };
-const defaultWindowShape: Shape = { width: 1200, height: 900 };
 
 class BackgroundImageset {
   public imagesetName: string;
@@ -416,7 +412,7 @@ type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
 
 export default defineComponent({
-  extends: WWTAwareComponent,
+  extends: MiniDSBase,
 
   props: {
     wtml: {
@@ -449,14 +445,10 @@ export default defineComponent({
     return {
       layers: {} as Record<string,ImageSetLayer>,
       cfOpacity: 50, // out of 100
-      fullscreenModeActive: false,
-      windowShape: defaultWindowShape,
       title: "Compare JWST and Hubble images of Carina!",
       description: "Pan, zoom, and compare the images using AAS WorldWide Telescope.",
       hashtags: ["jwst", "hubble", "wwt", "carina", "unfoldtheuniverse"],
-      resizeObserver: null as ResizeObserver | null,
       ready: false,
-      touchscreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
       showSplashScreen: false,
       showLayers: true,
@@ -475,8 +467,6 @@ export default defineComponent({
   },
 
   created() {
-    this.touchscreen = matchMedia('(hover: none)').matches;
-
     this.waitForReady().then(() => {
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -521,26 +511,6 @@ export default defineComponent({
     });
   },
 
-  mounted() {
-    if (screenfull.isEnabled) {
-      screenfull.on("change", this.onFullscreenEvent);
-    }
-
-    // ResizeObserver not yet in TypeScript but we should start using it when
-    // available. If we're in an iframe, our shape might change spontaneously.
-    this.resizeObserver = new ResizeObserver(_entries => this.onResizeEvent());
-    this.resizeObserver.observe(this.$el);
-    this.onResizeEvent();
-  },
-
-  destroyed() {
-    if (screenfull.isEnabled) {
-      screenfull.off("change", this.onFullscreenEvent);
-    }
-
-    this.resizeObserver?.unobserve(this.$el);
-  },
-
   computed: {
     crossfadeOpacity: {
       get(): number {
@@ -567,10 +537,6 @@ export default defineComponent({
       }
     },
 
-    fullscreenAvailable(): boolean {
-      return screenfull.isEnabled;
-    },
-
     hashtagString() {
       return this.hashtags.join(",");
     },
@@ -580,7 +546,7 @@ export default defineComponent({
     },
 
     mobile(): boolean {
-      return this.smallSize && this.touchscreen
+      return this.smallSize && this.touchscreen;
     },
 
     showTextSheet: {
@@ -613,25 +579,6 @@ export default defineComponent({
   },
 
   methods: {
-    onFullscreenEvent() {
-      // NB: we need the isEnabled check to make TypeScript happy even though it
-      // is not necessary in practice here.
-      if (screenfull.isEnabled) {
-        this.fullscreenModeActive = screenfull.isFullscreen;
-      }
-    },
-
-    onResizeEvent() {
-      const width = this.$el.clientWidth;
-      const height = this.$el.clientHeight;
-
-      if (width > 0 && height > 0) {
-        this.windowShape = { width, height };
-      } else {
-        this.windowShape = defaultWindowShape;
-      }
-    },
-
     closeSplashScreen() {
       this.showSplashScreen = false;
     },
@@ -644,13 +591,6 @@ export default defineComponent({
         });
       } else {
         this.sheet = name;
-      }
-    },
-
-    blurActiveElement() {
-      const active = document.activeElement;
-      if (active instanceof HTMLElement) {
-        active.blur();
       }
     },
 

@@ -430,6 +430,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@minids/carina@workspace:*, @minids/carina@workspace:carina":
+  version: 0.0.0-use.local
+  resolution: "@minids/carina@workspace:carina"
+  dependencies:
+    "@fortawesome/fontawesome-svg-core": ^6.2.1
+    "@fortawesome/free-brands-svg-icons": ^6.2.1
+    "@fortawesome/free-solid-svg-icons": ^6.2.1
+    "@fortawesome/vue-fontawesome": ^3
+    "@minids/common": "workspace:0.0.0"
+    "@typescript-eslint/eslint-plugin": ^5.48.1
+    "@typescript-eslint/parser": ^5.48.1
+    "@vue/cli-plugin-eslint": ^5.0.8
+    "@vue/cli-plugin-typescript": ^5.0.8
+    "@vue/cli-service": ^5.0.8
+    "@vue/compiler-sfc": ^3.2.45
+    "@vue/eslint-config-typescript": ^11.0.2
+    eslint: ^8.31.0
+    eslint-plugin-vue: ^9.8.0
+    less: ^4.1.3
+    less-loader: ^11.1.0
+    typescript: ^4.9.4
+    vue: ^3
+    vuetify: ^3.1.1
+    webpack: ^5.75.0
+    webpack-plugin-vuetify: ^2.0.0
+  languageName: unknown
+  linkType: soft
+
+"@minids/common@workspace:*, @minids/common@workspace:0.0.0, @minids/common@workspace:common":
+  version: 0.0.0-use.local
+  resolution: "@minids/common@workspace:common"
+  dependencies:
+    "@wwtelescope/engine-pinia": ^0.2.0
+    screenfull: ^6.0.2
+    typescript: ^4.9.4
+    vue: ^3
+    webpack: ^5.75.0
+  languageName: unknown
+  linkType: soft
+
 "@node-ipc/js-queue@npm:2.0.3":
   version: 2.0.3
   resolution: "@node-ipc/js-queue@npm:2.0.3"
@@ -1094,7 +1134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compiler-sfc@npm:3.2.45":
+"@vue/compiler-sfc@npm:3.2.45, @vue/compiler-sfc@npm:^3.2.45":
   version: 3.2.45
   resolution: "@vue/compiler-sfc@npm:3.2.45"
   dependencies:
@@ -1428,28 +1468,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/engine-helpers@npm:>=0.8.0":
-  version: 0.8.3
-  resolution: "@wwtelescope/engine-helpers@npm:0.8.3"
+"@wwtelescope/engine-helpers@npm:>=0.9.0":
+  version: 0.9.0
+  resolution: "@wwtelescope/engine-helpers@npm:0.9.0"
   dependencies:
     "@wwtelescope/astro": ">=0.1.0"
-    "@wwtelescope/engine": ^7.14.0
+    "@wwtelescope/engine": ^7.18.0
     "@wwtelescope/engine-types": ">=0.6.0"
-  checksum: caae941e1b0836b477fbd32d97cf324501425ab1fe55f68df43bfdd6c16099d38b8283a98643f27eec959fc0af5652f3e26d0f5d47e3dfd240e76ffa61ef6222
+  checksum: 4e45c56df8490e6337e42ec306f971f39d263fee9c2e02f05df0725ec27e1b1967007f69913ad9483da2ed9a14a3149719f784889db53919386d43040657ca3a
   languageName: node
   linkType: hard
 
-"@wwtelescope/engine-pinia@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@wwtelescope/engine-pinia@npm:0.1.0"
+"@wwtelescope/engine-pinia@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@wwtelescope/engine-pinia@npm:0.2.0"
   dependencies:
     "@wwtelescope/astro": ">=0.2.2"
-    "@wwtelescope/engine": ^7.17.0
-    "@wwtelescope/engine-helpers": ">=0.8.0"
+    "@wwtelescope/engine": ^7.18.0
+    "@wwtelescope/engine-helpers": ">=0.9.0"
     "@wwtelescope/engine-types": ">=0.6.3"
     pinia: ^2.0.22
     vue: ^3
-  checksum: 015022d3f0ebae28db9869fde7ad66e8088c072f7adcf7be4acad0924bcad67ff066b9afd6399ffe28682fedf18277c990f964b4bb4574861fdedc9d84d974e0
+  checksum: f08e770189d6cc806bb8b56d961fa91c952324b47c52eecec9173a12741767664751c9ed6deec3ef29e97eb1f40a0eece3534574f92bb32a9a918cfeab31fe0c
   languageName: node
   linkType: hard
 
@@ -1460,14 +1500,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/engine@npm:^7.14.0, @wwtelescope/engine@npm:^7.17.0":
-  version: 7.17.2
-  resolution: "@wwtelescope/engine@npm:7.17.2"
+"@wwtelescope/engine@npm:^7.18.0":
+  version: 7.18.0
+  resolution: "@wwtelescope/engine@npm:7.18.0"
   dependencies:
     "@wwtelescope/engine-types": ">=0.6.0"
     pako: ^1.0.11
     uuid: ^8.3.2
-  checksum: a49cd2de7e8f3a852bc3f82ec49773df32de798e0765dbddc40db28f2056c946eb10dc0093f8686e4f49aa47e2adf77619bc27c85d083b48707a9c5240ff6969
+  checksum: 22b95b7032274a449d34fbd5515778168e038975c0b96bffea51c81aad5375794600f56860dbebbcceb168328fae834f74cfc7af37e2466ed3080e41018245ff
   languageName: node
   linkType: hard
 
@@ -2040,33 +2080,6 @@ __metadata:
   checksum: f98ca67829c3c52af5af0a62b8510432b2ad9594437d24ad460a6eb1a23d93e7a31631b1f550fbbe482ad05c467aa00da710a41699eb13d1f246d7db4147ab79
   languageName: node
   linkType: hard
-
-"carina@workspace:*, carina@workspace:carina":
-  version: 0.0.0-use.local
-  resolution: "carina@workspace:carina"
-  dependencies:
-    "@fortawesome/fontawesome-svg-core": ^6.2.1
-    "@fortawesome/free-brands-svg-icons": ^6.2.1
-    "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/vue-fontawesome": ^3
-    "@typescript-eslint/eslint-plugin": ^5.48.1
-    "@typescript-eslint/parser": ^5.48.1
-    "@vue/cli-plugin-eslint": ^5.0.8
-    "@vue/cli-plugin-typescript": ^5.0.8
-    "@vue/cli-service": ^5.0.8
-    "@vue/eslint-config-typescript": ^11.0.2
-    "@wwtelescope/engine-pinia": ^0.1.0
-    eslint: ^8.31.0
-    eslint-plugin-vue: ^9.8.0
-    less: ^4.1.3
-    less-loader: ^11.1.0
-    screenfull: ^6.0.2
-    typescript: ^4.9.4
-    vue: ^3
-    vuetify: ^3.1.1
-    webpack-plugin-vuetify: ^2.0.0
-  languageName: unknown
-  linkType: soft
 
 "case-sensitive-paths-webpack-plugin@npm:^2.3.0":
   version: 2.4.0
@@ -4958,11 +4971,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minids@workspace:.":
+"minids-monorepo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "minids@workspace:."
+  resolution: "minids-monorepo@workspace:."
   dependencies:
-    carina: "workspace:*"
+    "@minids/carina": "workspace:*"
+    "@minids/common": "workspace:*"
     rimraf: ^4.1.0
   languageName: unknown
   linkType: soft
@@ -7759,7 +7773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.54.0":
+"webpack@npm:^5.54.0, webpack@npm:^5.75.0":
   version: 5.75.0
   resolution: "webpack@npm:5.75.0"
   dependencies:

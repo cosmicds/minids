@@ -1,0 +1,19 @@
+{
+  "name": "@minids/common",
+  "version": "0.0.0",
+  "dependencies": {
+    "@wwtelescope/engine-pinia": "^0.2.0",
+    "screenfull": "^6.0.2",
+    "vue": "^3"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0"
+  },
+  "main": "./dist/src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist"
+  },
+  "types": "./dist/src/index.d.ts"
+}

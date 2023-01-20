@@ -35,7 +35,10 @@ jobs:
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in $workspaces
           do
-            mv ${ws}/dist dist/${ws}
+            if [ $ws != 'common' ]
+            then
+              mv ${ws}/dist dist/${ws}
+            fi
           done
 
       - name: Deploy to GitHub Pages
