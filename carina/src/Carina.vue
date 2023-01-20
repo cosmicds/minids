@@ -376,7 +376,7 @@
 <script lang="ts">
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
-import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
+import MiniDSBase from "../../components/MiniDSBase";
 import screenfull from "screenfull";
 import { defineComponent } from "vue";
 
@@ -419,7 +419,7 @@ type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
 
 export default defineComponent({
-  extends: WWTAwareComponent,
+  extends: MiniDSBase,
 
   props: {
     jwstWtml: {
