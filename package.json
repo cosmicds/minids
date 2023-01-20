@@ -2,14 +2,16 @@
     "name": "minids",
     "private": true,
     "workspaces": [
-        "carina"
+        "carina",
+        "common"
     ],
     "scripts": {
         "build": "yarn workspaces foreach -vt run build",
         "clean": "yarn workspaces foreach -vt run clean"
     },
     "dependencies": {
-        "carina": "workspace:*"
+        "@minids/carina": "workspace:*",
+        "@minids/common": "workspace:*"
     },
     "packageManager": "yarn@3.3.0",
     "devDependencies": {
