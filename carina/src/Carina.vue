@@ -225,11 +225,13 @@
       </div>
     </v-container>
 
-    <v-navigation-drawer
+    <v-dialog
+      class="bottom-sheet"
       id="text-bottom-sheet"  
       hide-overlay
       persistent
       absolute
+      width="100%"
       location="bottom"
       v-model="showTextSheet"
     >
@@ -294,7 +296,7 @@
                 Peter Williams<br>
                 A. David Weigel<br>
                 Jon Carifio<br>
-                <br><br><br><br>
+                <v-spacer class="end-spacer"></v-spacer>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -359,7 +361,7 @@
                       Peter Williams<br>
                       A. David Weigel<br>
                       Jon Carifio<br>
-                      <br><br><br><br>
+                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                 </v-container>              
@@ -368,7 +370,7 @@
           </v-window-item>
         </v-window>
       </v-card>
-    </v-navigation-drawer>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -898,8 +900,13 @@ body {
   }
 }
 
-.v-bottom-sheet {
-  background: black;
+.bottom-sheet {
+  .v-overlay__content {
+    align-self: flex-end;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+  }
 }
 
 .v-dialog--fullscreen {
@@ -909,6 +916,7 @@ body {
 
 .info-text {
   height: 35vh;
+  padding-bottom: 25px;
 
   & a {
     text-decoration: none;
@@ -973,12 +981,15 @@ video {
 #tab-items {
   // padding-bottom: 2px !important;
 
-  .v-card__text {
+  .v-card-text {
     font-size: ~"max(14px, calc(0.8em + 0.3vw))";
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
-    padding-bottom: ~"max(4vw, 25px)";
+
+    .end-spacer {
+      height: 25px;
+    }
   }
 
 }
@@ -1058,6 +1069,10 @@ video {
 
   #tabs h3 {
     font-size: 1em;
+  }
+
+  #tab-items .v-card-text .end-spacer {
+    height: 70px;
   }
 }
 
