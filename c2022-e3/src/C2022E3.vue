@@ -76,16 +76,17 @@ export default defineComponent({
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
       const poly1 = new Poly();
-      const dec = -0.01;
+      const dec = 0;
+      const color = '#5C4033';
       poly1.addPoint(0, dec);
       poly1.addPoint(100, dec);
       poly1.addPoint(200, dec);
       poly1.addPoint(300, dec);
       poly1.addPoint(360, -90);
       poly1.addPoint(0, -90);
-      poly1.set_lineColor('black');
+      poly1.set_lineColor(color);
       poly1.set_fill(true);
-      poly1.set_fillColor('black');
+      poly1.set_fillColor(color);
       this.addAnnotation(poly1);
 
       const poly2 = new Poly();
@@ -93,9 +94,9 @@ export default defineComponent({
       poly2.addPoint(0, -90);
       poly2.addPoint(300, -90);
       poly2.addPoint(300, dec);
-      poly2.set_lineColor('black');
+      poly2.set_lineColor(color);
       poly2.set_fill(true);
-      poly2.set_fillColor('black');
+      poly2.set_fillColor(color);
       this.addAnnotation(poly2);
 
       this.gotoRADecZoom({
