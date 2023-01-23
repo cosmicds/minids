@@ -3,7 +3,8 @@
     "private": true,
     "workspaces": [
         "carina",
-        "common"
+        "common",
+        "c2022-e3"
     ],
     "scripts": {
         "build": "yarn workspaces foreach -vt run build",
