@@ -1,6 +1,6 @@
 <template>
   <v-app
-    id="#app"
+    id="app"
   >
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
