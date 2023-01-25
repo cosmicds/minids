@@ -56,6 +56,13 @@ import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { defineComponent } from 'vue';
 
+const D2R = Math.PI / 180;
+
+type LocationDeg = {
+  longitudeDeg: number;
+  latitudeDeg: number;
+}
+
 export default defineComponent({
   extends: MiniDSBase,
 
@@ -63,11 +70,19 @@ export default defineComponent({
     return {
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
+
+      // Harvard Observatory
+      location: {
+        latitudeDeg: 42.3814,
+        longitudeDeg: 71.1281
+      }
     }
   },
 
   created() {
     this.waitForReady().then(() => {
+
+      console.log(this);
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -99,6 +114,8 @@ export default defineComponent({
       poly2.set_fillColor(color);
       this.addAnnotation(poly2);
 
+      this.getLocation();
+
       this.gotoRADecZoom({
         raRad: 0,
         decRad: this.decRadLowerBound,
@@ -108,6 +125,24 @@ export default defineComponent({
 
     });
 
+  },
+
+  methods: {
+    getLocation() {
+      const options = { timeout: 10000, enableHighAccuracy: true };
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Got position!");
+          console.log(position);
+          this.location = {
+            longitudeDeg: position.coords.longitude,
+            latitudeDeg: position.coords.latitude
+          }
+      },
+      (error) => {
+        console.log(error)
+      }, options);
+    }
   },
 
   watch: {
@@ -120,6 +155,14 @@ export default defineComponent({
           instant: true
         });
       }
+    },
+    location(loc: LocationDeg) {
+      this.gotoRADecZoom({
+        raRad: D2R * loc.longitudeDeg,
+        decRad: D2R * loc.latitudeDeg,
+        zoomDeg: this.wwtZoomDeg,
+        instant: true
+      });
     }
   }
 })
