@@ -57,10 +57,28 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { defineComponent } from 'vue';
 
 const D2R = Math.PI / 180;
+const H2R = Math.PI / 12;
+const R2D = 180 / Math.PI;
+const H2D = 180 / 12;
 
 type LocationDeg = {
   longitudeDeg: number;
   latitudeDeg: number;
+}
+
+type LocationRad = {
+  longitudeRad: number;
+  latitudeRad: number;
+}
+
+type EquatorialRad = {
+  raRad: number;
+  decRad: number;
+}
+
+type HorizontalRad = {
+  altRad: number;
+  azRad: number;
 }
 
 export default defineComponent({
@@ -73,9 +91,9 @@ export default defineComponent({
 
       // Harvard Observatory
       location: {
-        latitudeDeg: 42.3814,
-        longitudeDeg: 71.1281
-      }
+        latitudeRad: D2R * 42.3814,
+        longitudeRad: D2R * 71.1281
+      } as LocationRad
     }
   },
 
@@ -90,30 +108,6 @@ export default defineComponent({
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      const poly1 = new Poly();
-      const dec = 0;
-      const color = '#5C4033';
-      poly1.addPoint(0, dec);
-      poly1.addPoint(100, dec);
-      poly1.addPoint(200, dec);
-      poly1.addPoint(300, dec);
-      poly1.addPoint(360, -90);
-      poly1.addPoint(0, -90);
-      poly1.set_lineColor(color);
-      poly1.set_fill(true);
-      poly1.set_fillColor(color);
-      this.addAnnotation(poly1);
-
-      const poly2 = new Poly();
-      poly2.addPoint(0, dec);
-      poly2.addPoint(0, -90);
-      poly2.addPoint(300, -90);
-      poly2.addPoint(300, dec);
-      poly2.set_lineColor(color);
-      poly2.set_fill(true);
-      poly2.set_fillColor(color);
-      this.addAnnotation(poly2);
-
       this.getLocation();
 
       this.gotoRADecZoom({
@@ -127,39 +121,176 @@ export default defineComponent({
 
   },
 
+  computed: {
+    altAz() {
+      return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
+    }
+  },
+
   methods: {
     getLocation() {
       const options = { timeout: 10000, enableHighAccuracy: true };
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log("Got position!");
           console.log(position);
           this.location = {
-            longitudeDeg: position.coords.longitude,
-            latitudeDeg: position.coords.latitude
+            longitudeRad: D2R * position.coords.longitude,
+            latitudeRad: D2R * position.coords.latitude
           }
-      },
-      (error) => {
-        console.log(error)
-      }, options);
-    }
+        },
+        (error) => {
+          console.log(error)
+        },
+        options
+      );
+    },
+
+    // WWT does have all of this functionality built in
+    // but it doesn't seem to be exposed
+    // We should do that, but for now we just copy the web engine code
+    altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
+      azRad = Math.PI - azRad;
+      if (azRad < 0) {
+        azRad += 2 * Math.PI;
+      }
+      let ra = Math.atan2(Math.sin(azRad), Math.cos(azRad) * Math.sin(latRad) + Math.tan(altRad) * Math.cos(latRad));
+      if (ra < 0) {
+        ra += 2 * Math.PI;
+      }
+      const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
+      return { ra, dec };
+    },
+
+    mstFromUTC2(utc: Date, longRad: number): number {
+
+        const lng = longRad * R2D;
+
+        let year = utc.getUTCFullYear();
+        let month = utc.getUTCMonth()+1;
+        const day = utc.getUTCDate();
+        const hour = utc.getUTCHours();
+        const minute = utc.getUTCMinutes();
+        const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
+
+        if (month == 1 || month == 2)
+        {
+            year -= 1;
+            month += 12;
+        }
+
+        const a = year / 100;
+        const b = 2 - a + Math.floor(a / 4.0);
+        const c = Math.floor(365.25 * year);
+        const d = Math.floor(30.6001 * (month + 1));
+
+        const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+
+        const julianCenturies = julianDays / 36525.0;
+        let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+
+        if (mst > 0.0) {
+          while (mst > 360.0) {
+            mst = mst - 360.0;
+          }
+        } else {
+          while (mst < 0.0) {
+            mst = mst + 360.0;
+          }
+        }
+
+        return mst;
+    },
+
+    horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
+      let hourAngle = this.mstFromUTC2(utc, longRad);
+
+      const raDec = this.altAzToRADec(altRad, azRad, latRad);
+      const ha = raDec.ra * R2D;
+
+      hourAngle += ha;
+      if (hourAngle < 0) {
+        hourAngle += 360;
+      }
+      if (hourAngle > 360) {
+        hourAngle -= 360;
+      }
+      hourAngle -= 180;
+
+      return { raRad: D2R * hourAngle, decRad: raDec.dec };
+    },
+
+    equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
+      let hourAngle = this.mstFromUTC2(utc, R2D * longRad) - R2D * raRad;
+      if (hourAngle < 0) {
+        hourAngle += 360;
+      }
+
+      const ha = D2R * hourAngle;
+      const dec = decRad;
+      const lat = latRad;
+      
+      const sinAlt = Math.sin(dec) * Math.sin(lat) + Math.cos(dec) * Math.cos(lat) * Math.cos(ha);
+      const altitude = Math.asin(sinAlt);
+      const cosAz = (Math.sin(dec) - Math.sin(altitude) * Math.sin(lat)) / (Math.cos(altitude) * Math.cos(lat));
+      let azimuth = Math.acos(cosAz);
+
+      if (Math.sin(ha) > 0) {
+        azimuth = Math.PI - azimuth;
+      }
+      return { altRad: altitude, azRad: azimuth };
+
+    },
+
+    createHorizon() {
+      this.clearAnnotations();
+      
+      const color = '#5C4033';
+      const now = new Date();
+
+      // The initial coordinates are given in Alt/Az, then converted
+      // Use N annotations to cover below the horizon
+      const N = 6;
+      const delta = 2 * Math.PI / N;
+      for (let i = 0; i < N; i++) {
+        let points: [number, number][] = [
+          [0, i * delta], [-Math.PI/2, i * delta], [0, (i + 1) * delta]
+        ];
+        points = points.map((point) => {
+          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, now);
+          return [R2D * raDec.raRad, R2D * raDec.decRad];
+        });
+        const poly = new Poly();
+        points.forEach(point => poly.addPoint(...point));
+        poly.set_lineColor(color);
+        poly.set_fill(true);
+        poly.set_fillColor(color);
+        this.addAnnotation(poly);
+      }
+    },
   },
 
   watch: {
-    wwtDecRad(dec: number) {
-      if (dec < this.decRadLowerBound) {
-        this.gotoRADecZoom({
-          raRad: this.wwtRARad,
-          decRad: this.decRadLowerBound,
-          zoomDeg: this.wwtZoomDeg,
-          instant: true
-        });
-      }
-    },
-    location(loc: LocationDeg) {
+    // altAz(coords: { altitude: number; azimuth: number }) {
+    //   if (coords.altitude < 0) {
+    //     const pos = this.horizontalToEquatorial(coords.altitude, coords.azimuth, D2R * this.location.latitudeDeg, D2R * this.location.longitudeDeg, new Date());
+    //     this.gotoRADecZoom({
+    //       raRad: D2R * pos.raDeg,
+    //       decRad: D2R * pos.decDeg,
+    //       zoomDeg: this.wwtZoomDeg,
+    //       instant: true
+    //     });
+    //   }
+    // },
+    location(loc: LocationRad) {
+      const now = new Date();
+      const raDec = this.horizontalToEquatorial(Math.PI/2, 0, this.location.latitudeRad, this.location.longitudeRad, now);
+      console.log(raDec);
+      this.createHorizon();
       this.gotoRADecZoom({
-        raRad: D2R * loc.longitudeDeg,
-        decRad: D2R * loc.latitudeDeg,
+        raRad: raDec.raRad,
+        decRad: raDec.decRad,
         zoomDeg: this.wwtZoomDeg,
         instant: true
       });
