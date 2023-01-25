@@ -64,11 +64,6 @@ const H2R = Math.PI / 12;
 const R2D = 180 / Math.PI;
 const H2D = 180 / 12;
 
-type LocationDeg = {
-  longitudeDeg: number;
-  latitudeDeg: number;
-}
-
 type LocationRad = {
   longitudeRad: number;
   latitudeRad: number;
@@ -124,8 +119,6 @@ export default defineComponent({
         referenceFrame: "Sky",
         dataCsv: atob(ephemerisFullWeekly)
       }).then((layer) => {
-        console.log("Here");
-        console.log(layer);
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
         this.applyTableLayerSettings({
@@ -144,8 +137,6 @@ export default defineComponent({
         referenceFrame: "Sky",
         dataCsv: atob(ephemeris2023Daily)
       }).then((layer) => {
-        console.log("Here");
-        console.log(layer);
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
         this.applyTableLayerSettings({
@@ -303,12 +294,15 @@ export default defineComponent({
       const delta = 2 * Math.PI / N;
       for (let i = 0; i < N; i++) {
         let points: [number, number][] = [
-          [0, i * delta], [-Math.PI/2, i * delta], [0, (i + 1) * delta]
+          [0, i * delta],
+          [-Math.PI/2, i * delta],
+          [0, (i + 1) * delta]
         ];
         points = points.map((point) => {
           const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
           return [R2D * raDec.raRad, R2D * raDec.decRad];
         });
+        console.log(points);
         const poly = new Poly();
         points.forEach(point => poly.addPoint(...point));
         poly.set_lineColor(color);
