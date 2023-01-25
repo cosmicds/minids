@@ -55,7 +55,9 @@ import { Circle, Color, ImageSetLayer, Poly, PolyLine, Place } from "@wwtelescop
 import { applyImageSetLayerSetting, applySpreadSheetLayerSetting } from "@wwtelescope/engine-helpers";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { defineComponent } from 'vue';
-import { PlotTypes, RAUnits } from "@wwtelescope/engine-types";
+import { PlotTypes, RAUnits } from "@wwtelescope/engine-types"; 
+
+import { ephemerisFullWeekly, ephemeris2023Daily } from "./data";
 
 const D2R = Math.PI / 180;
 const H2R = Math.PI / 12;
@@ -111,9 +113,14 @@ export default defineComponent({
 
       this.getLocation();
 
-      const ephemerisFullWeekly = `RGF0ZSxSQSxEZWMsVG1hZw0KMjAyMi1KYW4tMDEgMDA6MDAsMjkwLjk5Mzk2LC0zLjc1NzU3LDE3LjMwMA0KMjAyMi1KYW4tMDggMDA6MDAsMjkxLjk5NTkwLC0zLjM1NjE2LDE3LjI1Mw0KMjAyMi1KYW4tMTUgMDA6MDAsMjkzLjAyNDY0LC0yLjg5NjUzLDE3LjIwMQ0KMjAyMi1KYW4tMjIgMDA6MDAsMjk0LjA2OTgyLC0yLjM3NjY0LDE3LjE0Mw0KMjAyMi1KYW4tMjkgMDA6MDAsMjk1LjEyMTU5LC0xLjc5MzkyLDE3LjA3OA0KMjAyMi1GZWItMDUgMDA6MDAsMjk2LjE2ODg0LC0xLjE0NTQ2LDE3LjAwOA0KMjAyMi1GZWItMTIgMDA6MDAsMjk3LjE5OTQ1LC0wLjQyODc1LDE2LjkzMg0KMjAyMi1GZWItMTkgMDA6MDAsMjk4LjIwMjE2LDAuMzU4ODQsMTYuODUwDQoyMDIyLUZlYi0yNiAwMDowMCwyOTkuMTY1NzUsMS4yMjA4MCwxNi43NjENCjIwMjItTWFyLTA1IDAwOjAwLDMwMC4wNzY5OCwyLjE2MTE5LDE2LjY2Ng0KMjAyMi1NYXItMTIgMDA6MDAsMzAwLjkyMDk1LDMuMTgzNjgsMTYuNTY0DQoyMDIyLU1hci0xOSAwMDowMCwzMDEuNjgyOTMsNC4yOTIzMywxNi40NTYNCjIwMjItTWFyLTI2IDAwOjAwLDMwMi4zNDcxNiw1LjQ5MjM1LDE2LjM0MQ0KMjAyMi1BcHItMDIgMDA6MDAsMzAyLjg5NDM4LDYuNzg5NTIsMTYuMjIwDQoyMDIyLUFwci0wOSAwMDowMCwzMDMuMzAyMzAsOC4xODg5MywxNi4wOTINCjIwMjItQXByLTE2IDAwOjAwLDMwMy41NDcyNiw5LjY5NTcxLDE1Ljk1OA0KMjAyMi1BcHItMjMgMDA6MDAsMzAzLjYwMjY2LDExLjMxNTYyLDE1LjgxOA0KMjAyMi1BcHItMzAgMDA6MDAsMzAzLjQzNTY3LDEzLjA1MzU2LDE1LjY3Mw0KMjAyMi1NYXktMDcgMDA6MDAsMzAzLjAwODI5LDE0LjkxMTEzLDE1LjUyMw0KMjAyMi1NYXktMTQgMDA6MDAsMzAyLjI3OTMyLDE2Ljg4NjQ1LDE1LjM2OA0KMjAyMi1NYXktMjEgMDA6MDAsMzAxLjIwMjgyLDE4Ljk3MzQxLDE1LjIxMg0KMjAyMi1NYXktMjggMDA6MDAsMjk5LjcyNTY5LDIxLjE1NzU2LDE1LjA1Mw0KMjAyMi1KdW4tMDQgMDA6MDAsMjk3Ljc5MjYxLDIzLjQxMDY2LDE0Ljg5Ng0KMjAyMi1KdW4tMTEgMDA6MDAsMjk1LjM1MzQwLDI1LjY4OTMzLDE0Ljc0MQ0KMjAyMi1KdW4tMTggMDA6MDAsMjkyLjM2ODI2LDI3LjkzMzk0LDE0LjU5Mg0KMjAyMi1KdW4tMjUgMDA6MDAsMjg4LjgxNTY2LDMwLjA2NTc4LDE0LjQ1Mg0KMjAyMi1KdWwtMDIgMDA6MDAsMjg0LjcxMjU0LDMxLjk4ODc2LDE0LjMyMg0KMjAyMi1KdWwtMDkgMDA6MDAsMjgwLjEzMTMzLDMzLjYwMzYxLDE0LjIwNg0KMjAyMi1KdWwtMTYgMDA6MDAsMjc1LjIwMjMwLDM0LjgyNTM0LDE0LjEwNQ0KMjAyMi1KdWwtMjMgMDA6MDAsMjcwLjEwMzMzLDM1LjU5NjQ5LDE0LjAxOA0KMjAyMi1KdWwtMzAgMDA6MDAsMjY1LjA0MzYzLDM1Ljg5OTE0LDEzLjk0NQ0KMjAyMi1BdWctMDYgMDA6MDAsMjYwLjIyNzE5LDM1Ljc2MjkxLDEzLjg4NA0KMjAyMi1BdWctMTMgMDA6MDAsMjU1LjgxMzc4LDM1LjI1NTMzLDEzLjgzMg0KMjAyMi1BdWctMjAgMDA6MDAsMjUxLjkwMjg1LDM0LjQ2MDk1LDEzLjc4Ng0KMjAyMi1BdWctMjcgMDA6MDAsMjQ4LjU0MTIxLDMzLjQ2NzI5LDEzLjc0Mw0KMjAyMi1TZXAtMDMgMDA6MDAsMjQ1LjcyOTg2LDMyLjM1NzY0LDEzLjY5OQ0KMjAyMi1TZXAtMTAgMDA6MDAsMjQzLjQzNDc0LDMxLjIwMjc1LDEzLjY1MQ0KMjAyMi1TZXAtMTcgMDA6MDAsMjQxLjYwNDYzLDMwLjA1NTQ5LDEzLjU5Nw0KMjAyMi1TZXAtMjQgMDA6MDAsMjQwLjE4NTkwLDI4Ljk1NTI1LDEzLjUzNQ0KMjAyMi1PY3QtMDEgMDA6MDAsMjM5LjEyMzYxLDI3LjkzMzM1LDEzLjQ2Mg0KMjAyMi1PY3QtMDggMDA6MDAsMjM4LjM2MjExLDI3LjAxMzMyLDEzLjM3Nw0KMjAyMi1PY3QtMTUgMDA6MDAsMjM3Ljg1MDg4LDI2LjIxMDQwLDEzLjI3OA0KMjAyMi1PY3QtMjIgMDA6MDAsMjM3LjU0Nzc5LDI1LjUzNjc5LDEzLjE2NA0KMjAyMi1PY3QtMjkgMDA6MDAsMjM3LjQxMzg1LDI1LjAwNTUzLDEzLjAzNA0KMjAyMi1Ob3YtMDUgMDA6MDAsMjM3LjQxMDM4LDI0LjYyOTY5LDEyLjg4NQ0KMjAyMi1Ob3YtMTIgMDA6MDAsMjM3LjUwMzE2LDI0LjQyMDk3LDEyLjcxNw0KMjAyMi1Ob3YtMTkgMDA6MDAsMjM3LjY2MzgyLDI0LjM5NDg3LDEyLjUyOA0KMjAyMi1Ob3YtMjYgMDA6MDAsMjM3Ljg2NDA5LDI0LjU3NTE0LDEyLjMxNQ0KMjAyMi1EZWMtMDMgMDA6MDAsMjM4LjA3MjUyLDI0Ljk5NTEzLDEyLjA3Nw0KMjAyMi1EZWMtMTAgMDA6MDAsMjM4LjI1ODg1LDI1LjcwMTQ4LDExLjgxMQ0KMjAyMi1EZWMtMTcgMDA6MDAsMjM4LjM5MzEzLDI2Ljc3MTQ1LDExLjUxMg0KMjAyMi1EZWMtMjQgMDA6MDAsMjM4LjQzMzEyLDI4LjM0MTcyLDExLjE3Mw0KMjAyMi1EZWMtMzEgMDA6MDAsMjM4LjMwMzA0LDMwLjY2MTk2LDEwLjc4MQ0KMjAyMy1KYW4tMDcgMDA6MDAsMjM3Ljg1MTc3LDM0LjIyNTAxLDEwLjMxNg0KMjAyMy1KYW4tMTQgMDA6MDAsMjM2LjY3ODI5LDQwLjEzNzg4LDkuNzQ2DQoyMDIzLUphbi0yMSAwMDowMCwyMzMuMTY1NTcsNTEuMjE4MzksOS4wMjUNCjIwMjMtSmFuLTI4IDAwOjAwLDIwOS43NzE0Niw3My44NzI2NCw4LjIxMQ0KMjAyMy1GZWItMDQgMDA6MDAsODIuMzAwNjcsNTcuODA4NTUsOC4wNDUNCjIwMjMtRmViLTExIDAwOjAwLDcyLjA0MTMzLDI2LjE4MzI4LDguODc5DQoyMDIzLUZlYi0xOCAwMDowMCw2OS45NjA0OCwxMS40NjQzMSw5Ljc2OA0K`;
+      // The data for the ephemera is stored as base64-encoded strings
+      // which we then decode to pass into the web engine
+      // Due to some implementation details (likely carried over from the
+      // Windows client), the table string needs to have CRLF line separators.
+      // Having the strings encoded ensures we don't need to worry about that
+      // when reading out of a file, etc.
       this.createTableLayer({
-        name: "Data",
+        name: "Full Weekly",
         referenceFrame: "Sky",
         dataCsv: atob(ephemerisFullWeekly)
       }).then((layer) => {
@@ -124,15 +131,33 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 25],
+            ["scaleFactor", 50],
             ["color", Color.fromArgb(255, 0, 255, 0)],
             ["plotType", PlotTypes.circle],
             ["sizeColumn", 3]
           ]
         })
       });
-      
 
+      this.createTableLayer({
+        name: "2023 Daily",
+        referenceFrame: "Sky",
+        dataCsv: atob(ephemeris2023Daily)
+      }).then((layer) => {
+        console.log("Here");
+        console.log(layer);
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 25],
+            ["color", Color.fromArgb(255, 0, 255, 0)],
+            ["sizeColumn", 3]
+          ]
+        })
+      });
+      
       this.gotoRADecZoom({
         raRad: 0,
         decRad: this.decRadLowerBound,
@@ -266,11 +291,11 @@ export default defineComponent({
 
     },
 
-    createHorizon() {
+    createHorizon(when: Date | null = null) {
       this.clearAnnotations();
 
       const color = '#5C4033';
-      const now = new Date();
+      const date = when || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
@@ -281,7 +306,7 @@ export default defineComponent({
           [0, i * delta], [-Math.PI/2, i * delta], [0, (i + 1) * delta]
         ];
         points = points.map((point) => {
-          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, now);
+          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
           return [R2D * raDec.raRad, R2D * raDec.decRad];
         });
         const poly = new Poly();
@@ -308,9 +333,9 @@ export default defineComponent({
     // },
     location(loc: LocationRad) {
       const now = new Date();
-      const raDec = this.horizontalToEquatorial(Math.PI/2, 0, this.location.latitudeRad, this.location.longitudeRad, now);
+      const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
       console.log(raDec);
-      this.createHorizon();
+      this.createHorizon(now);
       this.gotoRADecZoom({
         raRad: raDec.raRad,
         decRad: raDec.decRad,
