@@ -148,12 +148,17 @@ export default defineComponent({
           ]
         })
       });
-      
-      this.gotoRADecZoom({
-        raRad: 0,
-        decRad: this.decRadLowerBound,
-        zoomDeg: 360,
-        instant: true
+
+      this.addImageSetLayer({
+        url: "https://ffb4-2a01-6f01-b206-da40-9892-5abd-8083-225c.eu.ngrok.io/689_2022E3_28_12-ngc.png",
+        mode: "autodetect",
+        name: "Test",
+        goto: true
+      }).then((layer) => {
+        console.log("Added image!");
+        console.log(layer);
+      }).catch((error) => {
+        console.log(error);
       });
 
     });
