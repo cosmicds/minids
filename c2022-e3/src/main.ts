@@ -1,6 +1,7 @@
 import Vue, { createApp } from "vue";
 
 import C2022E3 from "./C2022E3.vue";
+import FolderView from "./FolderView.vue";
 
 import vuetify from "../plugins/vuetify"
 
@@ -95,6 +96,7 @@ createApp(C2022E3, {
 // Components
 .component("WorldWideTelescope", WWTComponent)
 .component('font-awesome-icon', FontAwesomeIcon)
+.component('folder-view', FolderView)
 
 // Mount
 .mount("#app");
