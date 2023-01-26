@@ -3,6 +3,8 @@ import Vue, { createApp } from "vue";
 import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
 
+import VueSlider from "vue-slider-component";
+
 import vuetify from "../plugins/vuetify"
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -97,6 +99,7 @@ createApp(C2022E3, {
 .component("WorldWideTelescope", WWTComponent)
 .component('font-awesome-icon', FontAwesomeIcon)
 .component('folder-view', FolderView)
+.component('vue-slider', VueSlider)
 
 // Mount
 .mount("#app");

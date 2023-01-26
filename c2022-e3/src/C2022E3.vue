@@ -47,15 +47,18 @@
       </div>
     </div>
 
+    <div id="#bottom-content"></div>
+
   </v-app>
 </template>
 
 <script lang="ts">
-import { Circle, Color, ImageSetLayer, Poly, PolyLine, Place, SpreadSheetLayer } from "@wwtelescope/engine";
-import { applyImageSetLayerSetting, applySpreadSheetLayerSetting } from "@wwtelescope/engine-helpers";
-import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { defineComponent } from 'vue';
-import { PlotTypes, RAUnits } from "@wwtelescope/engine-types"; 
+
+import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
+import { PlotTypes } from "@wwtelescope/engine-types"; 
+
+import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import { ephemerisFullWeekly, ephemeris2023Daily } from "./data";
 
@@ -87,6 +90,7 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
       dateLayer: null as SpreadSheetLayer | null,
+      selectedDate: new Date(2023, 0, 28),
 
       // Harvard Observatory
       location: {
@@ -154,7 +158,7 @@ export default defineComponent({
         })
       });
 
-      this.createDateLayer(new Date(2023, 1, 28));
+      this.updateDateLayer();
 
     });
 
@@ -186,7 +190,17 @@ export default defineComponent({
       );
     },
 
-    async createDateLayer(date: Date) {
+    async updateDateLayer() {
+
+      // If a date layer already exists,
+      // delete it first
+      if (this.dateLayer !== null) {
+        this.deleteLayer(this.dateLayer.id);
+        this.dateLayer = null;
+      }
+
+      this.setTime(this.selectedDate);
+
       this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
@@ -195,7 +209,7 @@ export default defineComponent({
         this.dateLayer = layer;
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
-        const endRange = new Date(date.getDate() - 1);
+        const endRange = new Date(this.selectedDate.getDate() - 1);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
@@ -205,11 +219,12 @@ export default defineComponent({
             ["sizeColumn", 3],
             //["beginRange", date],
             //["endRange", endRange],
-            ["startDateColumn", 4],
+            ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
+            ["decay", 1]
           ]
-        })
+        });
       });
     },
 

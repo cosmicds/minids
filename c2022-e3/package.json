@@ -4,6 +4,7 @@
   "dependencies": {
     "@minids/common": "workspace:0.0.0",
     "vue": "^3",
+    "vue-slider-component": "next",
     "vuetify": "^3.1.1",
     "webpack-plugin-vuetify": "^2.0.0"
   },

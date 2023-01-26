@@ -448,6 +448,7 @@ __metadata:
     less-loader: ^11.1.0
     typescript: ^4.9.4
     vue: ^3
+    vue-slider-component: next
     vuetify: ^3.1.1
     webpack: ^5.75.0
     webpack-plugin-vuetify: ^2.0.0
@@ -7578,6 +7579,13 @@ __metadata:
     vue:
       optional: true
   checksum: 42cc8c8ff032dcac774f6f098723d4bc8000579ff4ecf9e0e72a4193e60234e6582ad4b6c43d0a9c76f59e510cf6d676070de67f2cd26588210cb51219845c27
+  languageName: node
+  linkType: hard
+
+"vue-slider-component@npm:next":
+  version: 4.1.0-beta.7
+  resolution: "vue-slider-component@npm:4.1.0-beta.7"
+  checksum: 1da351e3a9e9005326a2510ed9e8711e87982a150b62ba1c0dbd4b489679da7a89d80e6c573d36a5071df104b7b82380a3b84eed41ee2c276c2fa8de2b31309a
   languageName: node
   linkType: hard
 
