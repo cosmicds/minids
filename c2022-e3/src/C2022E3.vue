@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { Circle, Color, ImageSetLayer, Poly, PolyLine, Place } from "@wwtelescope/engine";
+import { Circle, Color, ImageSetLayer, Poly, PolyLine, Place, SpreadSheetLayer } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting, applySpreadSheetLayerSetting } from "@wwtelescope/engine-helpers";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { defineComponent } from 'vue';
@@ -86,6 +86,7 @@ export default defineComponent({
     return {
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
+      dateLayer: null as SpreadSheetLayer | null,
 
       // Harvard Observatory
       location: {
@@ -100,9 +101,11 @@ export default defineComponent({
 
       console.log(this);
 
+      // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      window.wwt = this;
+      window.wwt = this; window.applySettings = this.applyTableLayerSettings;
+      
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
@@ -114,23 +117,23 @@ export default defineComponent({
       // Windows client), the table string needs to have CRLF line separators.
       // Having the strings encoded ensures we don't need to worry about that
       // when reading out of a file, etc.
-      this.createTableLayer({
-        name: "Full Weekly",
-        referenceFrame: "Sky",
-        dataCsv: atob(ephemerisFullWeekly)
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 50],
-            ["color", Color.fromArgb(255, 0, 255, 0)],
-            ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3]
-          ]
-        })
-      });
+      // this.createTableLayer({
+      //   name: "Full Weekly",
+      //   referenceFrame: "Sky",
+      //   dataCsv: atob(ephemerisFullWeekly)
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 50],
+      //       ["color", Color.fromArgb(255, 255, 255, 255)],
+      //       ["plotType", PlotTypes.circle],
+      //       ["sizeColumn", 3]
+      //     ]
+      //   })
+      // });
 
       this.createTableLayer({
         name: "2023 Daily",
@@ -143,23 +146,15 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 25],
-            ["color", Color.fromArgb(255, 0, 255, 0)],
-            ["sizeColumn", 3]
+            ["color", Color.fromArgb(255, 255, 255, 255)],
+            ["sizeColumn", 3],
+            ["timeSeries", true],
+            ["decay", 0.00001]
           ]
         })
       });
 
-      this.addImageSetLayer({
-        url: "https://ffb4-2a01-6f01-b206-da40-9892-5abd-8083-225c.eu.ngrok.io/689_2022E3_28_12-ngc.png",
-        mode: "autodetect",
-        name: "Test",
-        goto: true
-      }).then((layer) => {
-        console.log("Added image!");
-        console.log(layer);
-      }).catch((error) => {
-        console.log(error);
-      });
+      this.createDateLayer(new Date(2023, 1, 28));
 
     });
 
@@ -189,6 +184,33 @@ export default defineComponent({
         },
         options
       );
+    },
+
+    async createDateLayer(date: Date) {
+      this.createTableLayer({
+        name: "Full Weekly",
+        referenceFrame: "Sky",
+        dataCsv: atob(ephemerisFullWeekly)
+      }).then((layer) => {
+        this.dateLayer = layer;
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        const endRange = new Date(date.getDate() - 1);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 100],
+            ["color", Color.fromArgb(255, 0, 255, 0)],
+            ["plotType", PlotTypes.circle],
+            ["sizeColumn", 3],
+            //["beginRange", date],
+            //["endRange", endRange],
+            ["startDateColumn", 4],
+            ["endDateColumn", 0],
+            ["timeSeries", true],
+          ]
+        })
+      });
     },
 
     // WWT does have all of this functionality built in
