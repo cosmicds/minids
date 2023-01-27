@@ -14,22 +14,23 @@
       <div id="tools">
         <span class="tool-container">
           <vue-slider
-            style="width: 500px;"
+            absorb
+            id="slider"
             v-model="selectedTime"
+            tooltip="always"
             :data="dates"
-            :marks="(value: number) => {
-              if (value === dates[0] || value === dates[dates.length-1]) {
-                return {
-                  label: (new Date(value)).toLocaleDateString('en-us')
-                }
-              } else {
-                return false;
-              }
-            }"
+            :included="true"
+            :marks="true"
             :tooltip-formatter="(v: number) => 
               (new Date(v)).toLocaleDateString('en-us')
             "
             >
+              <template v-slot:mark="{ pos, value }">
+                <div
+                  :class="['mark-line', { tall: weeklyDates.includes(value) }]"
+                  :style="{ left: `${pos}%` }">
+                </div>
+              </template>
             </vue-slider>
           </span>
       </div>
@@ -82,7 +83,7 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
 import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
-import { PlotTypes } from "@wwtelescope/engine-types";
+import { PlotTypes, PointScaleTypes } from "@wwtelescope/engine-types";
 
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
@@ -197,7 +198,7 @@ export default defineComponent({
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      window.wwt = this; window.applySettings = this.applyTableLayerSettings;
+      window.wwt = this;
       
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -632,6 +633,7 @@ body {
 #tools {
   z-index: 10;
   color: #fff;
+  width: 100%;
 
   .opacity-range {
     width: 50vw;
@@ -669,6 +671,7 @@ body {
 
 .tool-container {
   display: flex;
+  width: 100%;
   flex-direction: row;
   align-items: center;
   gap: 5px;
@@ -727,6 +730,10 @@ body {
 }
 
 // Styling the slider
+#slider {
+  width: 100% !important;
+  margin: 5px 50px;
+}
 .vue-slider-process,
 .vue-slider-dot-tooltip-inner
 {
@@ -734,9 +741,15 @@ body {
 }
 
 .mark-line {
-  height: 10px;
+  position: absolute;
+  height: 18px;
   width: 2px;
   margin: 0;
-  background-color: '#FFFFFF';
+  background-color: #FFFFFF;
+  transform: translateX(-50%) translateY(calc(-50% + 1px));
+
+  &.tall {
+    height: 25px;
+  }
 }
 </style>
