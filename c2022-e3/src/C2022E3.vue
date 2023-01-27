@@ -11,14 +11,22 @@
         <span class="tool-container">
           <vue-slider
             style="width: 500px;"
-            :data="weeklyDates"
-            :tooltip-formatter="(v) => {
+            :data="dates"
+            :marks="dates"
+            :tooltip-formatter="(v: number) => {
               return (new Date(v)).toISOString().split('T')[0]
             }"
-            @change="(value, _index) => {
+            @change="(value: number, _index: number) => {
               selectedDate = new Date(value);
             }"
-            />
+            >
+            <template v-slot:mark="{ pos }">
+              <span
+                class="custom-mark" :style="{ left: `${pos}%` }">
+                <span class="mark-line"></span>
+              </span>
+            </template>
+            </vue-slider>
           </span>
       </div>
       <div id="credits" class="ui-text">
@@ -113,12 +121,18 @@ function formatCsvTable(table: typeof fullWeeklyTable): string {
           d.nextDate.toISOString()
         ];
     }))).replace(/\n/g, '\r\n');
+    // By using a regex, we replace all instances.
+    // For WWT implementation reasons (left over from 
+    // the Windows client?), we need the line endings 
+    // to be CRLF
 }
 
 const fullWeeklyString = formatCsvTable(fullWeeklyTable);
 const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
+const dailyDates = daily2023Table.map(r => r.date.getTime());
+const dates = [...weeklyDates, ...dailyDates].sort();
 
 type LocationRad = {
   longitudeRad: number;
@@ -142,10 +156,12 @@ export default defineComponent({
     return {
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
-      dateLayer: null as SpreadSheetLayer | null,
+      dateLayers: [] as SpreadSheetLayer[],
       weeklyLayer: null as SpreadSheetLayer | null,
       selectedDate: new Date(2023, 0, 28),
+      dailyDates: dailyDates,
       weeklyDates: weeklyDates,
+      dates: dates,
       greenColor: "#00FF00",
 
       // Harvard Observatory
@@ -170,13 +186,8 @@ export default defineComponent({
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
       this.getLocation();
+      this.setClockSync(false);
 
-      // The data for the ephemera is stored as base64-encoded strings
-      // which we then decode to pass into the web engine
-      // Due to some implementation details (likely carried over from the
-      // Windows client), the table string needs to have CRLF line separators.
-      // Having the strings encoded ensures we don't need to worry about that
-      // when reading out of a file, etc.
       this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
@@ -191,7 +202,8 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromArgb(128, 255, 255, 255)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3]
+            ["sizeColumn", 3],
+            ["opacity", 0.7]
           ]
         })
       });
@@ -209,14 +221,12 @@ export default defineComponent({
             ["scaleFactor", 25],
             ["color", Color.fromArgb(128, 128, 128, 128)],
             ["sizeColumn", 3],
-            ["timeSeries", true],
-            ["decay", 0.00001],
-            ["opacity", 0.5]
+            ["opacity", 0.7]
           ]
         })
       });
 
-      this.updateDateLayer();
+      this.updateDateLayers();
 
     });
 
@@ -248,43 +258,71 @@ export default defineComponent({
       );
     },
 
-    async updateDateLayer() {
+    async updateDateLayers() {
 
-      // If a date layer already exists,
-      // delete it first
-      if (this.dateLayer !== null) {
-        this.deleteLayer(this.dateLayer.id);
-        this.dateLayer = null;
+      // If any date layers already exist,
+      // delete them first
+      this.dateLayers.forEach(layer => {
+        this.deleteLayer(layer.id);
+      });
+      this.dateLayers = [];
+
+      const time = this.selectedDate.getTime()
+      const weekly = this.weeklyDates.includes(time);
+      const daily = this.dailyDates.includes(time);
+
+      const proms = []
+      if (weekly) {
+        proms.push(this.createTableLayer({
+          name: "Weekly Date Layer",
+          referenceFrame: "Sky",
+          dataCsv: fullWeeklyString
+        }).then((layer) => {
+          this.dateLayers.push(layer);
+          layer.set_lngColumn(1);
+          layer.set_latColumn(2);
+          this.applyTableLayerSettings({
+            id: layer.id.toString(),
+            settings: [
+              ["scaleFactor", 50],
+              ["color", Color.fromArgb(255, 0, 255, 0)],
+              ["plotType", PlotTypes.circle],
+              ["sizeColumn", 3],
+              ["startDateColumn", 0],
+              ["endDateColumn", 0],
+              ["timeSeries", true],
+              ["opacity", 1],
+              ["decay", 1]
+            ]
+          });
+        }));
       }
 
-      this.setTime(this.selectedDate);
+      if (daily) {
+        proms.push(this.createTableLayer({
+          name: "Daily Date Layer",
+          referenceFrame: "Sky",
+          dataCsv: daily2023String
+        }).then((layer) => {
+          this.dateLayers.push(layer);
+          layer.set_lngColumn(1);
+          layer.set_latColumn(2);
+          this.applyTableLayerSettings({
+            id: layer.id.toString(),
+            settings: [
+              ["scaleFactor", 25],
+              ["color", Color.fromArgb(255, 0, 255, 0)],
+              ["sizeColumn", 3],
+              ["startDateColumn", 0],
+              ["endDateColumn", 0],
+              ["timeSeries", true],
+              ["opacity", 1],
+              ["decay", 1]
+            ]
+          });
+        }));
+      }
 
-      this.createTableLayer({
-        name: "Full Weekly",
-        referenceFrame: "Sky",
-        dataCsv: fullWeeklyString
-      }).then((layer) => {
-        this.dateLayer = layer;
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        const endRange = new Date(this.selectedDate.getDate() - 1);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 50],
-            ["color", Color.fromArgb(255, 0, 255, 0)],
-            ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
-            //["beginRange", date],
-            //["endRange", endRange],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 1]
-          ]
-        });
-      });
     },
 
     // WWT does have all of this functionality built in
@@ -439,7 +477,8 @@ export default defineComponent({
       });
     },
     selectedDate(date: Date) {
-      this.updateDateLayer();
+      this.updateDateLayers();
+      this.setTime(date);
     }
   }
 })
@@ -595,5 +634,12 @@ body {
 .vue-slider-dot-tooltip-inner
 {
   background-color: #00FF00 !important;
+}
+
+.mark-line {
+  height: 10px;
+  width: 2px;
+  margin: 0;
+  background-color: '#FFFFFF';
 }
 </style>
