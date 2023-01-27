@@ -14,21 +14,25 @@
       <div id="tools">
         <span class="tool-container">
           <vue-slider
-            absorb
             id="slider"
+            adsorb
+            included
+            :marks="(d: number) => {
+              return weeklyDates.includes(d) || dailyDates.includes(d)
+            }"
+            :order="false"
             v-model="selectedTime"
-            tooltip="always"
             :data="dates"
-            :included="true"
-            :marks="true"
+            tooltip="always"
+            :style="cssVars"
             :tooltip-formatter="(v: number) => 
               (new Date(v)).toLocaleDateString('en-us')
             "
             >
-              <template v-slot:mark="{ pos, value }">
+              <template v-slot:mark="{ value }">
                 <div
                   :class="['mark-line', { tall: weeklyDates.includes(value) }]"
-                  :style="{ left: `${pos}%` }">
+                  :style="{ left: `${datePos(value)}%` }">
                 </div>
               </template>
             </vue-slider>
@@ -117,7 +121,7 @@ type TableRow = typeof fullWeeklyTable[number];
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
         "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
-      ]].concat(table.map((d, i) => {
+      ]].concat(table.map((d, _i) => {
         return [
           d.date.toISOString(),
           d.ra.toString(),
@@ -136,7 +140,17 @@ const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
 const dailyDates = daily2023Table.map(r => r.date.getTime());
-const dates = [...new Set([...weeklyDates, ...dailyDates])].sort();
+const minDate = Math.min(Math.min(...weeklyDates), Math.min(...dailyDates));
+const maxDate = Math.max(Math.max(...weeklyDates), Math.max(...dailyDates));
+const dates: number[] = [];
+
+const d = new Date(minDate);
+let t = d.getTime();
+while (t <= maxDate) {
+  dates.push(t);
+  d.setDate(d.getDate() + 1);
+  t = d.getTime();
+}
 
 type LocationRad = {
   longitudeRad: number;
@@ -291,7 +305,18 @@ export default defineComponent({
   computed: {
     selectedDate() {
       return new Date(this.selectedTime);
-    }
+    },
+    smallSize(): boolean {
+      return this.$vuetify.display.smAndDown;
+    },
+    mobile(): boolean {
+      return this.smallSize && this.touchscreen;
+    },
+    cssVars() {
+      return {
+        '--comet-color': this.cometColor
+      }
+    },
   //   altAz() {
   //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
   //   }
@@ -311,7 +336,8 @@ export default defineComponent({
           }
         },
         (error) => {
-          console.log(error)
+          console.log(error);
+          this.createHorizon();
         },
         options
       );
@@ -518,6 +544,10 @@ export default defineComponent({
       const weekly = weeklyDates.includes(this.selectedTime);
       const daily = !weekly && dailyDates.includes(this.selectedTime);
 
+    },
+
+    datePos(date: number) {
+      return 100 * (date - this.dates[0]) / (this.dates[this.dates.length-1] - this.dates[0]);
     }
   },
 
@@ -711,7 +741,7 @@ body {
 .vue-slider-process,
 .vue-slider-dot-tooltip-inner
 {
-  background-color: #04D6B0 !important;
+  background-color: var(--comet-color) !important;
 }
 
 .mark-line {
@@ -720,12 +750,18 @@ body {
   width: 2px;
   margin: 0;
   background-color: #FFFFFF;
-  transform: translateX(-50%) translateY(calc(-50% + 1px));
+  transform: translateY(calc(-50% + 1px));
 
   &.tall {
     height: 25px;
     background-color: #000000;
     border: solid 1px white;
+  }
+}
+
+@media(max-width: 600px) {
+  .mark-line {
+    display: none;
   }
 }
 </style>
