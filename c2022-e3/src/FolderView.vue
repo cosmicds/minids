@@ -22,7 +22,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Folder, FolderUp, Place, Imageset } from "@wwtelescope/engine";
-import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
 import { ImageSetType, Thumbnail } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
 
