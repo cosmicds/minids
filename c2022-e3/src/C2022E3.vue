@@ -5,7 +5,9 @@
   <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
       :class="{ pointer: lastClosePt !== null }"
-      @pointermove="updateLastClosePoint"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointerdown="onPointerDown"
     ></WorldWideTelescope>
 
     <div id="bottom-content">
@@ -13,6 +15,7 @@
         <span class="tool-container">
           <vue-slider
             style="width: 500px;"
+            v-model="selectedTime"
             :data="dates"
             :marks="(value: number) => {
               if (value === dates[0] || value === dates[dates.length-1]) {
@@ -26,9 +29,6 @@
             :tooltip-formatter="(v: number) => 
               (new Date(v)).toLocaleDateString('en-us')
             "
-            @change="(value: number, _index: number) => {
-              selectedDate = new Date(value);
-            }"
             >
             </vue-slider>
           </span>
@@ -169,13 +169,17 @@ export default defineComponent({
       decRadLowerBound: 0.2,
       dateLayers: [] as SpreadSheetLayer[],
       weeklyLayer: null as SpreadSheetLayer | null,
-      selectedDate: new Date(2023, 0, 28),
+      selectedTime: (new Date(2023, 0, 28)).getTime(),
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
       lastClosePt: null as TableRow | null,
       greenColor: "#00FF00",
+
       selectionProximity: 4,
+      pointerMoveThreshold: 6,
+      isPointerMoving: false,
+      pointerStartPosition: null as { x: number; y: number } | null,
 
       // Harvard Observatory
       location: {
@@ -240,12 +244,16 @@ export default defineComponent({
       });
 
       this.updateDateLayers();
+      this.setTime(this.selectedDate);
 
     });
 
   },
 
   computed: {
+    selectedDate() {
+      return new Date(this.selectedTime);
+    }
   //   altAz() {
   //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
   //   }
@@ -496,7 +504,7 @@ export default defineComponent({
       return null;
     },
 
-    updateLastClosePoint(event: PointerEvent): void {
+    updateLastClosePoint(event: PointerEvent) {
       const pt = { x: event.offsetX, y: event.offsetY };
       const closestPt = this.closestDailyPoint(pt, this.selectionProximity);
       if (closestPt == null && this.lastClosePt == null) {
@@ -510,6 +518,30 @@ export default defineComponent({
       if (needsUpdate) {
         this.lastClosePt = closestPt;
       }
+    },
+
+    onPointerMove(event: PointerEvent) {
+      if (!this.isPointerMoving && this.pointerStartPosition !== null) {
+        const dist = Math.sqrt((event.pageX - this.pointerStartPosition.x) ** 2 + (event.pageY - this.pointerStartPosition.y) ** 2);
+        if (dist > this.pointerMoveThreshold) {
+          this.isPointerMoving = true;
+        }
+      }
+
+      this.updateLastClosePoint(event);
+    },
+
+    onPointerDown(event: PointerEvent) {
+      this.isPointerMoving = false;
+      this.pointerStartPosition = { x: event.pageX, y: event.pageY };
+    },
+
+    onPointerUp(event: PointerEvent) {
+      if (!this.isPointerMoving) {
+        this.updateLastClosePoint(event);
+      }
+      this.pointerStartPosition = null;
+      this.isPointerMoving = false;
     }
   },
 
@@ -538,8 +570,8 @@ export default defineComponent({
       });
     },
     selectedDate(date: Date) {
-      this.updateDateLayers();
       this.setTime(date);
+      this.updateDateLayers();
     }
   }
 })
