@@ -4,6 +4,7 @@ import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
 
 import VueSlider from "vue-slider-component";
+import 'vue-slider-component/theme/default.css'
 
 import vuetify from "../plugins/vuetify"
 

@@ -7,6 +7,20 @@
     ></WorldWideTelescope>
 
     <div id="bottom-content">
+      <div id="tools">
+        <span class="tool-container">
+          <vue-slider
+            style="width: 500px;"
+            :data="weeklyDates"
+            :tooltip-formatter="(v) => {
+              return (new Date(v)).toISOString().split('T')[0]
+            }"
+            @change="(value, _index) => {
+              selectedDate = new Date(value);
+            }"
+            />
+          </span>
+      </div>
       <div id="credits" class="ui-text">
         <div>
           Powered by
@@ -47,8 +61,6 @@
       </div>
     </div>
 
-    <div id="#bottom-content"></div>
-
   </v-app>
 </template>
 
@@ -85,10 +97,10 @@ function parseCsvTable(csv: string) {
     };
   });
 }
-const ephemerisFullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
-const ephemeris2023DailyTable = parseCsvTable(ephemeris2023DailyCsv);
+const fullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
+const daily2023Table = parseCsvTable(ephemeris2023DailyCsv);
 
-function formatCsvTable(table: typeof ephemerisFullWeeklyTable): string {
+function formatCsvTable(table: typeof fullWeeklyTable): string {
   return csvFormatRows([[
         "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
       ]].concat(table.map((d, i) => {
@@ -103,8 +115,10 @@ function formatCsvTable(table: typeof ephemerisFullWeeklyTable): string {
     }))).replace(/\n/g, '\r\n');
 }
 
-const ephemerisFullWeeklyString = formatCsvTable(ephemerisFullWeeklyTable);
-const ephemeris2023DailyString = formatCsvTable(ephemeris2023DailyTable);
+const fullWeeklyString = formatCsvTable(fullWeeklyTable);
+const daily2023String = formatCsvTable(daily2023Table);
+
+const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
 
 type LocationRad = {
   longitudeRad: number;
@@ -131,6 +145,8 @@ export default defineComponent({
       dateLayer: null as SpreadSheetLayer | null,
       weeklyLayer: null as SpreadSheetLayer | null,
       selectedDate: new Date(2023, 0, 28),
+      weeklyDates: weeklyDates,
+      greenColor: "#00FF00",
 
       // Harvard Observatory
       location: {
@@ -164,7 +180,7 @@ export default defineComponent({
       this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
-        dataCsv: ephemerisFullWeeklyString
+        dataCsv: fullWeeklyString
       }).then((layer) => {
         this.weeklyLayer = layer;
         layer.set_lngColumn(1);
@@ -183,7 +199,7 @@ export default defineComponent({
       this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
-        dataCsv: ephemeris2023DailyString
+        dataCsv: daily2023String
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -246,7 +262,7 @@ export default defineComponent({
       this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
-        dataCsv: ephemerisFullWeeklyString
+        dataCsv: fullWeeklyString
       }).then((layer) => {
         this.dateLayer = layer;
         layer.set_lngColumn(1);
@@ -421,6 +437,9 @@ export default defineComponent({
         zoomDeg: this.wwtZoomDeg,
         instant: true
       });
+    },
+    selectedDate(date: Date) {
+      this.updateDateLayer();
     }
   }
 })
@@ -493,6 +512,33 @@ body {
   }
 }
 
+#tools {
+  z-index: 10;
+  color: #fff;
+
+  .opacity-range {
+    width: 50vw;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  select {
+    background: white;
+    color: black;
+    border-radius: 3px;
+  }
+}
+
+.tool-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  pointer-events: auto;
+}
+
 #credits {
   color: #ddd;
   font-size: calc(0.7em + 0.2vw);
@@ -542,5 +588,12 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
+}
+
+// Styling the slider
+.vue-slider-process,
+.vue-slider-dot-tooltip-inner
+{
+  background-color: #00FF00 !important;
 }
 </style>
