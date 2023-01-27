@@ -12,20 +12,22 @@
           <vue-slider
             style="width: 500px;"
             :data="dates"
-            :marks="dates"
-            :tooltip-formatter="(v: number) => {
-              return (new Date(v)).toISOString().split('T')[0]
+            :marks="(value: number) => {
+              if (value === dates[0] || value === dates[dates.length-1]) {
+                return {
+                  label: (new Date(value)).toLocaleDateString('en-us')
+                }
+              } else {
+                return false;
+              }
             }"
+            :tooltip-formatter="(v: number) => 
+              (new Date(v)).toLocaleDateString('en-us')
+            "
             @change="(value: number, _index: number) => {
               selectedDate = new Date(value);
             }"
             >
-            <template v-slot:mark="{ pos }">
-              <span
-                class="custom-mark" :style="{ left: `${pos}%` }">
-                <span class="mark-line"></span>
-              </span>
-            </template>
             </vue-slider>
           </span>
       </div>
@@ -232,11 +234,11 @@ export default defineComponent({
 
   },
 
-  // computed: {
+  computed: {
   //   altAz() {
   //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
   //   }
-  // },
+  },
 
   methods: {
     getLocation() {
