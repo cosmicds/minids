@@ -144,7 +144,7 @@ const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
 const dailyDates = daily2023Table.map(r => r.date.getTime());
-const dates = [...weeklyDates, ...dailyDates].sort();
+const dates = [...new Set([...weeklyDates, ...dailyDates])].sort();
 
 type LocationRad = {
   longitudeRad: number;
@@ -543,6 +543,12 @@ export default defineComponent({
       }
       this.pointerStartPosition = null;
       this.isPointerMoving = false;
+    },
+
+    updateViewForDate() {
+      const weekly = weeklyDates.includes(this.selectedTime);
+      const daily = !weekly && dailyDates.includes(this.selectedTime);
+
     }
   },
 
@@ -750,6 +756,8 @@ body {
 
   &.tall {
     height: 25px;
+    background-color: #000000;
+    border: solid 1px white;
   }
 }
 </style>
