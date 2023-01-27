@@ -54,18 +54,57 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { csvFormatRows, csvParse, DSVParsedArray } from "d3-dsv";
 
 import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
-import { PlotTypes } from "@wwtelescope/engine-types"; 
+import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
-import { ephemerisFullWeekly, ephemeris2023Daily } from "./data";
+import {
+  ephemerisFullWeekly,
+  ephemeris2023Daily,
+  ephemerisFullWeeklyCsv,
+  ephemeris2023DailyCsv
+} from "./data";
 
 const D2R = Math.PI / 180;
 const H2R = Math.PI / 12;
 const R2D = 180 / Math.PI;
 const H2D = 180 / 12;
+
+function parseCsvTable(csv: string) {
+  return csvParse(csv, (d) => {
+    return {
+      date: new Date(d.Date!),
+      ra: +d.RA!,
+      dec: +d.Dec!,
+      tMag: +d.Tmag!,
+      prevDate: new Date(d.PrevDate!),
+      nextDate: new Date(d.NextDate!)
+    };
+  });
+}
+const ephemerisFullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
+const ephemeris2023DailyTable = parseCsvTable(ephemeris2023DailyCsv);
+
+function formatCsvTable(table: typeof ephemerisFullWeeklyTable): string {
+  return csvFormatRows([[
+        "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
+      ]].concat(table.map((d, i) => {
+        return [
+          d.date.toISOString(),
+          d.ra.toString(),
+          d.dec.toString(),
+          d.tMag.toString(),
+          d.prevDate.toISOString(),
+          d.nextDate.toISOString()
+        ];
+    }))).replace(/\n/g, '\r\n');
+}
+
+const ephemerisFullWeeklyString = formatCsvTable(ephemerisFullWeeklyTable);
+const ephemeris2023DailyString = formatCsvTable(ephemeris2023DailyTable);
 
 type LocationRad = {
   longitudeRad: number;
@@ -90,6 +129,7 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
       dateLayer: null as SpreadSheetLayer | null,
+      weeklyLayer: null as SpreadSheetLayer | null,
       selectedDate: new Date(2023, 0, 28),
 
       // Harvard Observatory
@@ -121,28 +161,29 @@ export default defineComponent({
       // Windows client), the table string needs to have CRLF line separators.
       // Having the strings encoded ensures we don't need to worry about that
       // when reading out of a file, etc.
-      // this.createTableLayer({
-      //   name: "Full Weekly",
-      //   referenceFrame: "Sky",
-      //   dataCsv: atob(ephemerisFullWeekly)
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 50],
-      //       ["color", Color.fromArgb(255, 255, 255, 255)],
-      //       ["plotType", PlotTypes.circle],
-      //       ["sizeColumn", 3]
-      //     ]
-      //   })
-      // });
+      this.createTableLayer({
+        name: "Full Weekly",
+        referenceFrame: "Sky",
+        dataCsv: ephemerisFullWeeklyString
+      }).then((layer) => {
+        this.weeklyLayer = layer;
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 50],
+            ["color", Color.fromArgb(128, 255, 255, 255)],
+            ["plotType", PlotTypes.circle],
+            ["sizeColumn", 3]
+          ]
+        })
+      });
 
       this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
-        dataCsv: atob(ephemeris2023Daily)
+        dataCsv: ephemeris2023DailyString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -150,10 +191,11 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 25],
-            ["color", Color.fromArgb(255, 255, 255, 255)],
+            ["color", Color.fromArgb(128, 128, 128, 128)],
             ["sizeColumn", 3],
             ["timeSeries", true],
-            ["decay", 0.00001]
+            ["decay", 0.00001],
+            ["opacity", 0.5]
           ]
         })
       });
@@ -204,7 +246,7 @@ export default defineComponent({
       this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
-        dataCsv: atob(ephemerisFullWeekly)
+        dataCsv: ephemerisFullWeeklyString
       }).then((layer) => {
         this.dateLayer = layer;
         layer.set_lngColumn(1);
@@ -213,7 +255,7 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 100],
+            ["scaleFactor", 50],
             ["color", Color.fromArgb(255, 0, 255, 0)],
             ["plotType", PlotTypes.circle],
             ["sizeColumn", 3],
@@ -222,6 +264,7 @@ export default defineComponent({
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
+            ["opacity", 1],
             ["decay", 1]
           ]
         });
