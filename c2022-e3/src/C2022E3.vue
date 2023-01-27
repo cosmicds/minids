@@ -83,21 +83,17 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
 import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
-import { PlotTypes, PointScaleTypes } from "@wwtelescope/engine-types";
+import { PlotTypes } from "@wwtelescope/engine-types";
 
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import {
-  ephemerisFullWeekly,
-  ephemeris2023Daily,
   ephemerisFullWeeklyCsv,
   ephemeris2023DailyCsv
 } from "./data";
 
 const D2R = Math.PI / 180;
-const H2R = Math.PI / 12;
 const R2D = 180 / Math.PI;
-const H2D = 180 / 12;
 
 function parseCsvTable(csv: string) {
   return csvParse(csv, (d) => {
@@ -175,7 +171,8 @@ export default defineComponent({
       weeklyDates: weeklyDates,
       dates: dates,
       lastClosePt: null as TableRow | null,
-      greenColor: "#00FF00",
+      ephemerisColor: "#FFFFFF",
+      cometColor: "#04D6B0",
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -200,7 +197,6 @@ export default defineComponent({
       // @ts-ignore
       window.wwt = this;
       
-
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
       this.getLocation();
@@ -211,14 +207,14 @@ export default defineComponent({
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
       }).then((layer) => {
-        this.weeklyLayer = layer;
+        console.log(layer);
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 50],
-            ["color", Color.fromArgb(128, 255, 255, 255)],
+            ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
             ["sizeColumn", 3],
             ["opacity", 0.7]
@@ -237,14 +233,59 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 50],
-            ["color", Color.fromArgb(128, 128, 128, 128)],
+            ["color", Color.fromHex(this.ephemerisColor)],
             ["sizeColumn", 3],
             ["opacity", 1]
           ]
         })
       });
 
-      this.updateDateLayers();
+      this.createTableLayer({
+        name: "Weekly Date Layer",
+        referenceFrame: "Sky",
+        dataCsv: fullWeeklyString
+      }).then((layer) => {
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 50],
+            ["color", Color.fromHex(this.cometColor)],
+            ["plotType", PlotTypes.circle],
+            ["sizeColumn", 3],
+            ["startDateColumn", 0],
+            ["endDateColumn", 0],
+            ["timeSeries", true],
+            ["opacity", 1],
+            ["decay", 1]
+          ]
+        });
+      });
+
+      this.createTableLayer({
+        name: "Daily Date Layer",
+        referenceFrame: "Sky",
+        dataCsv: daily2023String
+      }).then((layer) => {
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 75],
+            ["color", Color.fromHex(this.cometColor)],
+            ["sizeColumn", 3],
+            ["startDateColumn", 0],
+            ["endDateColumn", 0],
+            ["timeSeries", true],
+            ["opacity", 1],
+            ["decay", 1]
+          ]
+        });
+      });
+
+
       this.setTime(this.selectedDate);
 
     });
@@ -278,73 +319,6 @@ export default defineComponent({
         },
         options
       );
-    },
-
-    async updateDateLayers() {
-
-      // If any date layers already exist,
-      // delete them first
-      this.dateLayers.forEach(layer => {
-        this.deleteLayer(layer.id);
-      });
-      this.dateLayers = [];
-
-      const time = this.selectedDate.getTime()
-      const weekly = this.weeklyDates.includes(time);
-      const daily = this.dailyDates.includes(time);
-
-      const proms = []
-      if (weekly) {
-        proms.push(this.createTableLayer({
-          name: "Weekly Date Layer",
-          referenceFrame: "Sky",
-          dataCsv: fullWeeklyString
-        }).then((layer) => {
-          this.dateLayers.push(layer);
-          layer.set_lngColumn(1);
-          layer.set_latColumn(2);
-          this.applyTableLayerSettings({
-            id: layer.id.toString(),
-            settings: [
-              ["scaleFactor", 50],
-              ["color", Color.fromSimpleHex("#04D6B0")],
-              ["plotType", PlotTypes.circle],
-              ["sizeColumn", 3],
-              ["startDateColumn", 0],
-              ["endDateColumn", 0],
-              ["timeSeries", true],
-              ["opacity", 1],
-              ["decay", 1]
-            ]
-          });
-        }));
-      }
-
-      if (daily) {
-        proms.push(this.createTableLayer({
-          name: "Daily Date Layer",
-          referenceFrame: "Sky",
-          dataCsv: daily2023String
-        }).then((layer) => {
-          this.dateLayers.push(layer);
-          layer.set_lngColumn(1);
-          layer.set_latColumn(2);
-          this.applyTableLayerSettings({
-            id: layer.id.toString(),
-            settings: [
-              ["scaleFactor", 75],
-              ["color", Color.fromSimpleHex("#04D6B0")],
-              ["sizeColumn", 3],
-              ["startDateColumn", 0],
-              ["endDateColumn", 0],
-              ["timeSeries", true],
-              ["opacity", 1],
-              ["decay", 1]
-            ]
-          });
-        }));
-      }
-
     },
 
     // WWT does have all of this functionality built in
@@ -463,7 +437,6 @@ export default defineComponent({
           const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
           return [R2D * raDec.raRad, R2D * raDec.decRad];
         });
-        console.log(points);
         const poly = new Poly();
         points.forEach(point => poly.addPoint(...point));
         poly.set_lineColor(color);
@@ -567,7 +540,6 @@ export default defineComponent({
     location(loc: LocationRad) {
       const now = new Date();
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
-      console.log(raDec);
       this.createHorizon(now);
       this.gotoRADecZoom({
         raRad: raDec.raRad,
@@ -578,7 +550,6 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
-      this.updateDateLayers();
     }
   }
 })
@@ -740,10 +711,11 @@ body {
   width: 100% !important;
   margin: 5px 50px;
 }
+
 .vue-slider-process,
 .vue-slider-dot-tooltip-inner
 {
-  background-color: #00FF00 !important;
+  background-color: #04D6B0 !important;
 }
 
 .mark-line {
