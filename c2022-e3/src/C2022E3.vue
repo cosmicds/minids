@@ -1,6 +1,7 @@
 <template>
   <v-app
     id="app"
+    :style="cssVars"
   >
   <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
@@ -9,6 +10,37 @@
       @pointerup="onPointerUp"
       @pointerdown="onPointerDown"
     ></WorldWideTelescope>
+
+    <div id="top-content">
+      <div></div>
+      <v-tooltip
+        :location="smallSize ? 'bottom' : 'start'"
+        :open-on-click="false"
+        :open-on-focus="false"
+        :open-on-hover="true"
+        v-model="showTextTooltip"
+        :offset="smallSize ? 0 : '45px'"
+      >
+        <template v-slot:activator="{ props }">
+          <div
+            id="text-icon-wrapper"
+            class="control-icon-wrapper"
+            @mouseover="showTextTooltip = true"
+            @mouseleave="showTextTooltip = false"
+            v-bind="props"
+            @click="showTextSheet = true"
+          >
+            <font-awesome-icon
+              id="text-icon"
+              class="control-icon"
+              icon="book-open"
+              size="lg"
+            ></font-awesome-icon>
+          </div>
+        </template>
+        <span>Learn more</span>
+      </v-tooltip>
+    </div>
 
     <div id="bottom-content">
       <div id="tools">
@@ -24,7 +56,6 @@
             v-model="selectedTime"
             :data="dates"
             tooltip="always"
-            :style="cssVars"
             :tooltip-formatter="(v: number) => 
               (new Date(v)).toLocaleDateString('en-us')
             "
@@ -77,6 +108,140 @@
         </div>
       </div>
     </div>
+
+    <v-dialog
+      class="bottom-sheet"
+      id="text-bottom-sheet"  
+      hide-overlay
+      persistent
+      absolute
+      width="100%"
+      :scrim="false"
+      location="bottom"
+      v-model="showTextSheet"
+      transition="dialog-bottom-transition"
+    >
+      <v-card height="100%">
+      <!-- <v-container height="11px">
+        <font-awesome-icon
+          class="close-icon"
+          icon="times"
+          @click="showTextSheet = false"
+        ></font-awesome-icon>
+      </v-container> -->
+      <v-tabs
+        v-model="tab"
+        height="32px"
+        slider-color="white"
+        id="tabs"
+        dense
+        grow
+      >
+        <!-- <v-tabs-slider color="white"></v-tabs-slider> -->
+
+        <v-tab><h3>Information</h3></v-tab>
+        <v-tab><h3>Using WWT</h3></v-tab>
+      </v-tabs>
+      <font-awesome-icon
+        id="close-text-icon"
+        class="control-icon"
+        icon="times"
+        size="lg"
+        @click="showTextSheet = false"
+      ></font-awesome-icon>
+        <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
+          <v-window-item>
+            <v-card class="no-bottom-border-radius scrollable">
+              <v-card-text class="info-text no-bottom-border-radius">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <br><br><br>
+                <h3>Credits:</h3>
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
+                Jon Carifio<br>
+                John Lewis<br>
+                Pat Udomprasert<br>
+                Alyssa Goodman<br>
+                Mary Dussault<br>
+                Evaluator: Sue Sunbury<br>
+                <br>
+                <h4>WorldWide Telescope Team:</h4>
+                Peter Williams<br>
+                A. David Weigel<br>
+                Jon Carifio<br>
+                <br>
+                The material contained on this website is based upon work supported by NASA under award No. 80NSSC21M0002. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Aeronautics and Space Administration.
+                <v-spacer class="end-spacer"></v-spacer>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item>
+            <v-card class="no-bottom-border-radius scrollable" style="height: 100%;">
+              <v-card-text class="info-text no-bottom-border-radius">
+                <v-container>
+                  <v-row align="center">
+                    <v-col cols="4">
+                      <v-chip
+                        label
+                        outlined
+                      >
+                        Pan
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="8" class="pt-2">
+                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong><br>
+                
+                    </v-col>
+                  </v-row>
+                  <v-row align="center">
+                    <v-col cols="4">
+                      <v-chip
+                        label
+                        outlined
+                      >
+                        Zoom
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="8" class="pt-2">
+                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong><br>
+                      
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <div
+                        style="min-height: 120px;"
+                      >
+                        <p>
+                          The frame above provides an <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
+                        </p>
+                      </div>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <h3>Credits:</h3>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
+                      Jon Carifio<br>
+                      John Lewis<br>
+                      Pat Udomprasert<br>
+                      Alyssa Goodman<br>
+                      Mary Dussault<br>
+                      Evaluator: Sue Sunbury<br>
+                      <br>
+                      <h4>WorldWide Telescope Team:</h4>
+                      Peter Williams<br>
+                      A. David Weigel<br>
+                      Jon Carifio<br>
+                      <v-spacer class="end-spacer"></v-spacer>
+                    </v-col>
+                  </v-row>
+                </v-container>              
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </v-dialog>
 
   </v-app>
 </template>
@@ -167,6 +332,8 @@ type HorizontalRad = {
   azRad: number;
 }
 
+type SheetType = "text" | "video" | null;
+
 export default defineComponent({
   extends: MiniDSBase,
 
@@ -183,6 +350,10 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
+
+      sheet: null as SheetType,
+      showTextTooltip: false,
+      tab: 0,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -317,12 +488,32 @@ export default defineComponent({
         '--comet-color': this.cometColor
       }
     },
+    showTextSheet: {
+      get(): boolean {
+        return this.sheet === 'text';
+      },
+      set(_value: boolean) {
+        this.selectSheet('text');
+        this.showTextTooltip = false;
+      }
+    },
   //   altAz() {
   //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
   //   }
   },
 
   methods: {
+    selectSheet(name: SheetType) {
+      if (this.sheet == name) {
+        this.sheet = null;
+        this.$nextTick(() => {
+          this.blurActiveElement();
+        });
+      } else {
+        this.sheet = name;
+      }
+    },
+
     getLocation() {
       const options = { timeout: 10000, enableHighAccuracy: true };
 
@@ -617,6 +808,39 @@ body {
   cursor: pointer;
 }
 
+.control-icon {
+  pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.control-icon-wrapper {
+  color: var(--comet-color);
+  background: #040404;
+  padding: 6px;
+  border: 1px solid var(--comet-color);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+#top-content {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: calc(100% - 1rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 #bottom-content {
   display: flex;
   flex-direction: column;
@@ -726,6 +950,73 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
+}
+
+.bottom-sheet {
+  .v-overlay__content {
+    align-self: flex-end;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+  }
+}
+
+#tabs {
+  width: calc(100% - 3em);
+  align-self: left;
+}
+
+.info-text {
+  height: 35vh;
+  padding-bottom: 25px;
+
+  & a {
+    text-decoration: none;
+  }
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.scrollable {
+  overflow-y: auto;
+}
+
+#tab-items {
+  // padding-bottom: 2px !important;
+
+  .v-card-text {
+    font-size: ~"max(14px, calc(0.8em + 0.3vw))";
+    padding-top: ~"max(2vw, 16px)";
+    padding-left: ~"max(4vw, 16px)";
+    padding-right: ~"max(4vw, 16px)";
+
+    .end-spacer {
+      height: 25px;
+    }
+  }
+
+}
+
+#close-text-icon {
+  position: absolute;
+  top: 0.25em;
+  right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
+  color: white;
+}
+
+// This prevents the tabs from having some extra space to the left when the screen is small
+// (around 400px or less)
+.v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
+  display: none;
 }
 
 // Styling the slider
