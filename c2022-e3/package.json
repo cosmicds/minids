@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@minids/common": "workspace:0.0.0",
+    "@wwtelescope/astro": "^0.2.2",
     "d3-dsv": "^3.0.1",
     "vue": "^3",
     "vue-slider-component": "next",

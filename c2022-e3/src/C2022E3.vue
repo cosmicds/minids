@@ -4,6 +4,8 @@
   >
   <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
+      :class="{ pointer: lastClosePt !== null }"
+      @pointermove="updateLastClosePoint"
     ></WorldWideTelescope>
 
     <div id="bottom-content">
@@ -76,8 +78,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { csvFormatRows, csvParse, DSVParsedArray } from "d3-dsv";
+import { csvFormatRows, csvParse } from "d3-dsv";
 
+import { distance } from "@wwtelescope/astro";
 import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
@@ -110,7 +113,13 @@ function parseCsvTable(csv: string) {
 const fullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
 const daily2023Table = parseCsvTable(ephemeris2023DailyCsv);
 
-function formatCsvTable(table: typeof fullWeeklyTable): string {
+// NB: The two tables have identical structures.
+// We aren't exporting these types anywhere, so
+// generic names are fine
+type Table = typeof fullWeeklyTable;
+type TableRow = typeof fullWeeklyTable[number];
+
+function formatCsvTable(table: Table): string {
   return csvFormatRows([[
         "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
       ]].concat(table.map((d, i) => {
@@ -164,7 +173,9 @@ export default defineComponent({
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
+      lastClosePt: null as TableRow | null,
       greenColor: "#00FF00",
+      selectionProximity: 4,
 
       // Harvard Observatory
       location: {
@@ -452,6 +463,54 @@ export default defineComponent({
         this.addAnnotation(poly);
       }
     },
+
+    closestDailyPoint(
+      point: { x: number; y: number; },
+      threshold?: number
+    ): TableRow | null {
+      const raDecDeg = this.findRADecForScreenPoint(point);
+      const target = { ra: D2R * raDecDeg.ra, dec: D2R * raDecDeg.dec };
+
+      let minDist = Infinity;
+      let closestPt = null as TableRow | null;
+
+      daily2023Table.forEach(row => {
+        const raRad = row.ra * D2R;
+        const decRad = row.dec * D2R;
+
+        const dist = distance(target.ra, target.dec, raRad, decRad);
+        if (dist < minDist) {
+          closestPt = row;
+          minDist = dist;
+        }
+
+      });
+
+      if (closestPt !== null) {
+        const closestScreenPoint = this.findScreenPointForRADec(closestPt);
+        const pixelDist = Math.sqrt((point.x - closestScreenPoint.x) ** 2 + (point.y - closestScreenPoint.y) ** 2);
+        if (!threshold || pixelDist < threshold) {
+          return closestPt;
+        }
+      }
+      return null;
+    },
+
+    updateLastClosePoint(event: PointerEvent): void {
+      const pt = { x: event.offsetX, y: event.offsetY };
+      const closestPt = this.closestDailyPoint(pt, this.selectionProximity);
+      if (closestPt == null && this.lastClosePt == null) {
+        return;
+      }
+      const needsUpdate =
+        closestPt == null ||
+        this.lastClosePt == null ||
+        this.lastClosePt.ra != closestPt.ra ||
+        this.lastClosePt.dec != closestPt.dec;
+      if (needsUpdate) {
+        this.lastClosePt = closestPt;
+      }
+    }
   },
 
   watch: {
@@ -520,6 +579,10 @@ body {
     margin: 0;
     padding: 0;
   }
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 #bottom-content {

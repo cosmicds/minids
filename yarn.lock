@@ -443,6 +443,7 @@ __metadata:
     "@vue/cli-service": ^5.0.8
     "@vue/compiler-sfc": ^3.2.45
     "@vue/eslint-config-typescript": ^11.0.2
+    "@wwtelescope/astro": ^0.2.2
     d3-dsv: ^3.0.1
     eslint: ^8.31.0
     eslint-plugin-vue: ^9.8.0
@@ -1495,7 +1496,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/astro@npm:>=0.1.0, @wwtelescope/astro@npm:>=0.2.2":
+"@wwtelescope/astro@npm:>=0.1.0, @wwtelescope/astro@npm:>=0.2.2, @wwtelescope/astro@npm:^0.2.2":
   version: 0.2.2
   resolution: "@wwtelescope/astro@npm:0.2.2"
   checksum: c75b4ebffab3396afc81073b47a9d6a299d11c8e5704779f13e73ebf06ba013f84f08a644a680b97138e32133dea1a864d591ef49435c28f92c453ad22d856cb
