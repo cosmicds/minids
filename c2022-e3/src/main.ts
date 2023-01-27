@@ -10,53 +10,13 @@ import vuetify from "../plugins/vuetify"
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faAdjust,
   faBookOpen,
-  faCompress,
-  faHeart,
-  faExpand,
-  faFileAlt,
-  faMountain,
-  faQuestion,
-  faPlay,
-  faPause,
-  faRedo,
-  faSearchMinus,
-  faSearchPlus,
-  faSlidersH,
-  faStar,
-  faTextHeight,
-  faTimes,
-  faUndoAlt,
-  faVideo,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  faFacebook,
-  faTwitter
-} from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-library.add(faAdjust);
-library.add(faCompress);
-library.add(faExpand);
-library.add(faHeart);
-library.add(faMountain);
-library.add(faPlay);
-library.add(faPause);
-library.add(faRedo);
-library.add(faSearchMinus);
-library.add(faSearchPlus);
-library.add(faSlidersH);
-library.add(faStar);
-library.add(faUndoAlt);
-library.add(faFacebook);
-library.add(faTwitter);
-library.add(faVideo);
-library.add(faTextHeight);
-library.add(faTimes);
-library.add(faFileAlt);
 library.add(faBookOpen);
-library.add(faQuestion);
+library.add(faTimes);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
