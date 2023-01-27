@@ -102,8 +102,6 @@ function parseCsvTable(csv: string) {
       ra: +d.RA!,
       dec: +d.Dec!,
       tMag: +d.Tmag!,
-      prevDate: new Date(d.PrevDate!),
-      nextDate: new Date(d.NextDate!)
     };
   });
 }
@@ -125,8 +123,6 @@ function formatCsvTable(table: Table): string {
           d.ra.toString(),
           d.dec.toString(),
           d.tMag.toString(),
-          d.prevDate.toISOString(),
-          d.nextDate.toISOString()
         ];
     }))).replace(/\n/g, '\r\n');
     // By using a regex, we replace all instances.
