@@ -29,10 +29,10 @@
               (new Date(v)).toLocaleDateString('en-us')
             "
             >
-              <template v-slot:mark="{ value }">
+              <template v-slot:mark="{ pos, value }">
                 <div
                   :class="['mark-line', { tall: weeklyDates.includes(value) }]"
-                  :style="{ left: `${datePos(value)}%` }">
+                  :style="{ left: `${pos}%` }">
                 </div>
               </template>
             </vue-slider>
@@ -545,10 +545,6 @@ export default defineComponent({
       const daily = !weekly && dailyDates.includes(this.selectedTime);
 
     },
-
-    datePos(date: number) {
-      return 100 * (date - this.dates[0]) / (this.dates[this.dates.length-1] - this.dates[0]);
-    }
   },
 
   watch: {
@@ -750,7 +746,7 @@ body {
   width: 2px;
   margin: 0;
   background-color: #FFFFFF;
-  transform: translateY(calc(-50% + 1px));
+  transform: translateX(-50%) translateY(calc(-50% + 1px));
 
   &.tall {
     height: 25px;
