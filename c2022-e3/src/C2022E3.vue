@@ -236,10 +236,10 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 25],
+            ["scaleFactor", 50],
             ["color", Color.fromArgb(128, 128, 128, 128)],
             ["sizeColumn", 3],
-            ["opacity", 0.7]
+            ["opacity", 1]
           ]
         })
       });
@@ -307,7 +307,7 @@ export default defineComponent({
             id: layer.id.toString(),
             settings: [
               ["scaleFactor", 50],
-              ["color", Color.fromArgb(255, 0, 255, 0)],
+              ["color", Color.fromSimpleHex("#04D6B0")],
               ["plotType", PlotTypes.circle],
               ["sizeColumn", 3],
               ["startDateColumn", 0],
@@ -332,8 +332,8 @@ export default defineComponent({
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 25],
-              ["color", Color.fromArgb(255, 0, 255, 0)],
+              ["scaleFactor", 75],
+              ["color", Color.fromSimpleHex("#04D6B0")],
               ["sizeColumn", 3],
               ["startDateColumn", 0],
               ["endDateColumn", 0],
