@@ -523,7 +523,8 @@ export default defineComponent({
 
       this.setTime(this.selectedDate);
 
-      
+      // this.getSettings().set_localHorizonMode(true);
+      // this.updateWWTLocation();
 
     });
 
@@ -553,12 +554,24 @@ export default defineComponent({
         this.showTextTooltip = false;
       }
     },
-  //   altAz() {
-  //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
-  //   }
+    // altAz() {
+    //   return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, this.selectedDate || new Date());
+    // }
   },
 
   methods: {
+    getSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+
+    updateWWTLocation() {
+      const settings = this.getSettings();
+      settings.set_locationLat(R2D * this.location.latitudeRad);
+      settings.set_locationLng(R2D * this.location.longitudeRad);
+    },
+
     selectSheet(name: SheetType) {
       if (this.sheet == name) {
         this.sheet = null;
@@ -572,7 +585,7 @@ export default defineComponent({
 
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
-      const map = L.map("map-container").setView(locationDeg, 13);
+      const map = L.map("map-container").setView(locationDeg, 8);
       /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -600,7 +613,7 @@ export default defineComponent({
       this.location = {
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: e.latlng.lng * D2R
-      }
+      };
       this.showLocationSelector = false;
     },
 
@@ -627,6 +640,7 @@ export default defineComponent({
     // WWT does have all of this functionality built in
     // but it doesn't seem to be exposed
     // We should do that, but for now we just copy the web engine code
+    // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
     altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
       azRad = Math.PI - azRad;
       if (azRad < 0) {
@@ -642,42 +656,42 @@ export default defineComponent({
 
     mstFromUTC2(utc: Date, longRad: number): number {
 
-        const lng = longRad * R2D;
+      const lng = longRad * R2D;
 
-        let year = utc.getUTCFullYear();
-        let month = utc.getUTCMonth()+1;
-        const day = utc.getUTCDate();
-        const hour = utc.getUTCHours();
-        const minute = utc.getUTCMinutes();
-        const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
+      let year = utc.getUTCFullYear();
+      let month = utc.getUTCMonth()+1;
+      const day = utc.getUTCDate();
+      const hour = utc.getUTCHours();
+      const minute = utc.getUTCMinutes();
+      const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
-        if (month == 1 || month == 2)
-        {
-            year -= 1;
-            month += 12;
+      if (month == 1 || month == 2)
+      {
+          year -= 1;
+          month += 12;
+      }
+
+      const a = year / 100;
+      const b = 2 - a + Math.floor(a / 4.0);
+      const c = Math.floor(365.25 * year);
+      const d = Math.floor(30.6001 * (month + 1));
+
+      const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+
+      const julianCenturies = julianDays / 36525.0;
+      let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+
+      if (mst > 0.0) {
+        while (mst > 360.0) {
+          mst = mst - 360.0;
         }
-
-        const a = year / 100;
-        const b = 2 - a + Math.floor(a / 4.0);
-        const c = Math.floor(365.25 * year);
-        const d = Math.floor(30.6001 * (month + 1));
-
-        const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-
-        const julianCenturies = julianDays / 36525.0;
-        let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
-
-        if (mst > 0.0) {
-          while (mst > 360.0) {
-            mst = mst - 360.0;
-          }
-        } else {
-          while (mst < 0.0) {
-            mst = mst + 360.0;
-          }
+      } else {
+        while (mst < 0.0) {
+          mst = mst + 360.0;
         }
+      }
 
-        return mst;
+      return mst;
     },
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
@@ -699,7 +713,7 @@ export default defineComponent({
     },
 
     equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
-      let hourAngle = this.mstFromUTC2(utc, R2D * longRad) - R2D * raRad;
+      let hourAngle = this.mstFromUTC2(utc, longRad) - R2D * raRad;
       if (hourAngle < 0) {
         hourAngle += 360;
       }
@@ -713,8 +727,29 @@ export default defineComponent({
       const cosAz = (Math.sin(dec) - Math.sin(altitude) * Math.sin(lat)) / (Math.cos(altitude) * Math.cos(lat));
       let azimuth = Math.acos(cosAz);
 
+      // public Coordinates(double ascention, double declination)
+      // {
+      //     this.ascention = ascention + (Math.PI * 80) % (Math.PI * 2);
+      //     this.declination = declination;
+      // }
+
+      // public double Az
+      // {
+      //     get
+      //     {
+      //         return ascention / RC;
+
+      //     }
+      //     set
+      //     {
+      //         ascention = value * RC;
+      //     }
+      // }
+
+      azimuth = azimuth + (Math.PI * 80) % (Math.PI * 2);
+
       if (Math.sin(ha) > 0) {
-        azimuth = Math.PI - azimuth;
+        azimuth = 2 * Math.PI - azimuth;
       }
       return { altRad: altitude, azRad: azimuth };
 
@@ -724,7 +759,7 @@ export default defineComponent({
       this.clearAnnotations();
 
       const color = '#5C4033';
-      const date = when || new Date();
+      const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
@@ -822,8 +857,28 @@ export default defineComponent({
     },
 
     updateViewForDate() {
-      const weekly = weeklyDates.includes(this.selectedTime);
-      const daily = !weekly && dailyDates.includes(this.selectedTime);
+
+      let position = null as TableRow | null;
+
+      const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
+      
+      if (dailyIndex > -1) {
+        position = daily2023Table[dailyIndex]
+      } else {
+        const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
+        if (weeklyIndex > -1) {
+          position = fullWeeklyTable[weeklyIndex];
+        }
+      }
+
+      if (position !== null) {
+        this.gotoRADecZoom({
+          raRad: D2R * position.ra,
+          decRad: D2R * position.dec,
+          zoomDeg: this.wwtZoomDeg,
+          instant: false
+        });
+      }
 
     },
   },
@@ -841,9 +896,10 @@ export default defineComponent({
     //   }
     // },
     location(loc: LocationRad) {
-      const now = new Date();
+      const now = this.selectedDate;
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
       this.createHorizon(now);
+      //this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
         decRad: raDec.decRad,
