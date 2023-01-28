@@ -11,14 +11,20 @@ import vuetify from "../plugins/vuetify"
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookOpen,
+  faLocationPin,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(faBookOpen);
+library.add(faLocationPin);
 library.add(faTimes);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
+
+import "leaflet/dist/leaflet.css";
+import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
+import Popper from "vue3-popper";
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -61,6 +67,9 @@ createApp(C2022E3, {
 .component('font-awesome-icon', FontAwesomeIcon)
 .component('folder-view', FolderView)
 .component('vue-slider', VueSlider)
+.component('l-map', LMap)
+.component('l-tile-layer', LTileLayer)
+.component('v-popper', Popper)
 
 // Mount
 .mount("#app");

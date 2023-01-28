@@ -436,6 +436,7 @@ __metadata:
   dependencies:
     "@minids/common": "workspace:0.0.0"
     "@types/d3-dsv": ^3.0.1
+    "@types/leaflet": ^1.9.0
     "@typescript-eslint/eslint-plugin": ^5.48.1
     "@typescript-eslint/parser": ^5.48.1
     "@vue/cli-plugin-eslint": ^5.0.8
@@ -452,6 +453,7 @@ __metadata:
     typescript: ^4.9.4
     vue: ^3
     vue-slider-component: next
+    vue3-popper: ^1.5.0
     vuetify: ^3.1.1
     webpack: ^5.75.0
     webpack-plugin-vuetify: ^2.0.0
@@ -558,6 +560,13 @@ __metadata:
   version: 1.0.0-next.21
   resolution: "@polka/url@npm:1.0.0-next.21"
   checksum: c7654046d38984257dd639eab3dc770d1b0340916097b2fac03ce5d23506ada684e05574a69b255c32ea6a144a957c8cd84264159b545fca031c772289d88788
+  languageName: node
+  linkType: hard
+
+"@popperjs/core@npm:^2.9.2":
+  version: 2.11.6
+  resolution: "@popperjs/core@npm:2.11.6"
+  checksum: 47fb328cec1924559d759b48235c78574f2d71a8a6c4c03edb6de5d7074078371633b91e39bbf3f901b32aa8af9b9d8f82834856d2f5737a23475036b16817f0
   languageName: node
   linkType: hard
 
@@ -721,6 +730,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/geojson@npm:*":
+  version: 7946.0.10
+  resolution: "@types/geojson@npm:7946.0.10"
+  checksum: 12c407c2dc93ecb26c08af533ee732f1506a9b29456616ba7ba1d525df96206c28ddf44a528f6a5415d7d22893e9d967420940a9c095ee5e539c1eba5fefc1f4
+  languageName: node
+  linkType: hard
+
 "@types/html-minifier-terser@npm:^6.0.0":
   version: 6.1.0
   resolution: "@types/html-minifier-terser@npm:6.1.0"
@@ -741,6 +757,15 @@ __metadata:
   version: 7.0.11
   resolution: "@types/json-schema@npm:7.0.11"
   checksum: 527bddfe62db9012fccd7627794bd4c71beb77601861055d87e3ee464f2217c85fca7a4b56ae677478367bbd248dbde13553312b7d4dbc702a2f2bbf60c4018d
+  languageName: node
+  linkType: hard
+
+"@types/leaflet@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "@types/leaflet@npm:1.9.0"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: f3ee2e2fc8bd3480d77667471c8f774a3726ff7694a7d08d2423c05b40e28f00379c7d469b4cbd3b53a1bc96c75970c92f9da7908fc477cbac0eda2a9d17b6ad
   languageName: node
   linkType: hard
 
@@ -968,6 +993,16 @@ __metadata:
     "@typescript-eslint/types": 5.48.2
     eslint-visitor-keys: ^3.3.0
   checksum: 4d83d1e4b39ad76fe865b0580dbfcad6d6f9e936de3d40c1c13d552d40e394eab390a7f9d1172ba59ce457853b93ed0ec253642e6d07cd6cf4fa0b5ec006f0c4
+  languageName: node
+  linkType: hard
+
+"@vue-leaflet/vue-leaflet@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@vue-leaflet/vue-leaflet@npm:0.8.0"
+  peerDependencies:
+    leaflet: ^1.6.0
+    vue: ^3.0.0
+  checksum: f693715d88d0bfd930161889bbebce93a5e0b7741ba30b83b835eba91f75a8e0dda64c3423edb9bf53fed6ed7744bc4c4771610fafd7eb93bb3399ef218f5be8
   languageName: node
   linkType: hard
 
@@ -2744,6 +2779,13 @@ __metadata:
     tsv2csv: bin/dsv2dsv.js
     tsv2json: bin/dsv2json.js
   checksum: 5fc0723647269d5dccd181d74f2265920ab368a2868b0b4f55ffa2fecdfb7814390ea28622cd61ee5d9594ab262879509059544e9f815c54fe76fbfb4ffa4c8a
+  languageName: node
+  linkType: hard
+
+"debounce@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "debounce@npm:1.2.1"
+  checksum: 682a89506d9e54fb109526f4da255c5546102fbb8e3ae75eef3b04effaf5d4853756aee97475cd4650641869794e44f410eeb20ace2b18ea592287ab2038519e
   languageName: node
   linkType: hard
 
@@ -4630,6 +4672,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"leaflet@npm:^1.9.3":
+  version: 1.9.3
+  resolution: "leaflet@npm:1.9.3"
+  checksum: f8bc33215e6aed8488cb3d32511b943ff093c1747bcda8a39116e24fe714e12525f1a6843b6a79940ece4cf8d2a86e2cb1d7b80fc550344b3182659b19231a04
+  languageName: node
+  linkType: hard
+
 "less-loader@npm:^11.1.0":
   version: 11.1.0
   resolution: "less-loader@npm:11.1.0"
@@ -5033,6 +5082,8 @@ __metadata:
   dependencies:
     "@minids/carina": "workspace:*"
     "@minids/common": "workspace:*"
+    "@vue-leaflet/vue-leaflet": ^0.8.0
+    leaflet: ^1.9.3
     rimraf: ^4.1.0
   languageName: unknown
   linkType: soft
@@ -7641,6 +7692,18 @@ __metadata:
   version: 1.9.1
   resolution: "vue-template-es2015-compiler@npm:1.9.1"
   checksum: ad1e85662783be3ee262c323b05d12e6a5036fca24f16dc0f7ab92736b675919cb4fa4b79b28753eac73119b709d1b36789bf60e8ae423f50c4db35de9370e8b
+  languageName: node
+  linkType: hard
+
+"vue3-popper@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "vue3-popper@npm:1.5.0"
+  dependencies:
+    "@popperjs/core": ^2.9.2
+    debounce: ^1.2.1
+  peerDependencies:
+    vue: ^3.2.20
+  checksum: 56b6dfe28a9632c50c5062251aad8e32ef81c4e8fc23bd93b06b4e02f4c8f98ba1d9e51c4e16c516347659f322e989b2f57f6098cd312cce3d3e5beb5fd54748
   languageName: node
   linkType: hard
 

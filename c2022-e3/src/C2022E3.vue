@@ -13,6 +13,47 @@
 
     <div id="top-content">
       <div></div>
+      <div>
+        <v-popper
+          arrow
+          interactive
+          placement="bottom"
+        >
+          <v-tooltip
+          :location="smallSize ? 'bottom' : 'start'"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showMapTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="text-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showMapTooltip = true"
+              @mouseleave="showMapTooltip = false"
+              v-bind="props"
+              @click="showLocationSelector = true"
+            >
+              <font-awesome-icon
+                id="location-icon"
+                class="control-icon"
+                icon="location-pin"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Select location</span>
+        </v-tooltip>
+        <template #content>
+          <!-- <div id="location-selector">
+            <div>Move around using the map<br>Double-click to select your location</div>
+            <div id="map-container"></div>
+          </div> -->
+        </template>
+      </v-popper>
+      </div>
       <v-tooltip
         :location="smallSize ? 'bottom' : 'start'"
         :open-on-click="false"
@@ -108,6 +149,15 @@
         </div>
       </div>
     </div>
+
+    <v-dialog
+      v-model="showLocationSelector"
+    >
+      <v-card id="location-selector">
+        <div>Move around using the map. Double-click to select your location</div>
+        <div id="map-container"></div>
+      </v-card>
+    </v-dialog>
 
     <v-dialog
       class="bottom-sheet"
@@ -254,6 +304,7 @@ import { distance } from "@wwtelescope/astro";
 import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
+import L, { LeafletMouseEvent } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import {
@@ -353,7 +404,10 @@ export default defineComponent({
 
       sheet: null as SheetType,
       showTextTooltip: false,
+      showMapTooltip: false,
+      showLocationSelector: false,
       tab: 0,
+      map: null as L.Map | null,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -363,7 +417,7 @@ export default defineComponent({
       // Harvard Observatory
       location: {
         latitudeRad: D2R * 42.3814,
-        longitudeRad: D2R * 71.1281
+        longitudeRad: D2R * -71.1281
       } as LocationRad
     }
   },
@@ -511,6 +565,25 @@ export default defineComponent({
         });
       } else {
         this.sheet = name;
+      }
+    },
+
+    setupLocationSelector() {
+      const map = L.map("map-container").setView([R2D * this.location.latitudeRad, R2D * this.location.longitudeRad], 5);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        className: 'map-tiles'
+      }).addTo(map);
+
+      map.on('dblclick', this.onMapSelect);
+      this.map = map;
+    },
+
+    onMapSelect(e: LeafletMouseEvent) {
+      this.location = {
+        latitudeRad: e.latlng.lat * R2D,
+        longitudeRad: e.latlng.lng * R2D
       }
     },
 
@@ -763,6 +836,15 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
+    },
+    showLocationSelector(show: boolean) {
+      if (show) {
+        this.$nextTick(() => {
+          this.setupLocationSelector();
+        });
+      } else {
+        this.map?.remove();
+      }
     }
   }
 })
@@ -1013,6 +1095,19 @@ body {
   color: white;
 }
 
+#map-container {
+  width: 700px;
+  height: 500px;
+  max-width: 90%;
+  max-height: 90%;
+  margin: auto;
+}
+
+.leaflet-pane {
+  width: 500px;
+  height: 100px;
+}
+
 // This prevents the tabs from having some extra space to the left when the screen is small
 // (around 400px or less)
 .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
@@ -1049,6 +1144,16 @@ body {
 @media(max-width: 600px) {
   .mark-line {
     display: none;
+  }
+}
+
+:root {
+  --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  .map-tiles {
+    filter:var(--map-tiles-filter, none);
   }
 }
 </style>
