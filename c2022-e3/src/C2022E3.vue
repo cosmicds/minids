@@ -480,7 +480,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.getLocation();
+      this.getLocation(true);
       this.setClockSync(false);
 
       const proms: Promise<SpreadSheetLayer | void>[] = [];
@@ -640,11 +640,11 @@ export default defineComponent({
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
       const map = L.map("map-container").setView(locationDeg, 8);
-      /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        className: 'map-tiles'
-      }).addTo(map); */
+      // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      //   maxZoom: 19,
+      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      //   className: 'map-tiles'
+      // }).addTo(map);
       L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
@@ -675,7 +675,7 @@ export default defineComponent({
       });
     },
 
-    getLocation() {
+    getLocation(_startup = false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
 
       navigator.geolocation.getCurrentPosition(
