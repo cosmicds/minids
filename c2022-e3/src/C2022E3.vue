@@ -154,7 +154,7 @@
       v-model="showLocationSelector"
     >
       <v-card id="location-selector">
-        <div>Move around using the map. Double-click to select your location</div>
+        <div>Move around the map and double-click to change your location</div>
         <div id="map-container"></div>
       </v-card>
     </v-dialog>
@@ -301,10 +301,10 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Color, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
-import L, { LeafletMouseEvent } from "leaflet";
+import L, { LeafletMouseEvent,  } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import {
@@ -523,6 +523,8 @@ export default defineComponent({
 
       this.setTime(this.selectedDate);
 
+      
+
     });
 
   },
@@ -569,7 +571,8 @@ export default defineComponent({
     },
 
     setupLocationSelector() {
-      const map = L.map("map-container").setView([R2D * this.location.latitudeRad, R2D * this.location.longitudeRad], 5);
+      const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
+      const map = L.map("map-container").setView(locationDeg, 13);
       /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -579,7 +582,14 @@ export default defineComponent({
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
         className: 'map-tiles'
-    }).addTo(map);
+      }).addTo(map);
+
+      L.circle(locationDeg, {
+        color: "#FF0000",
+        fillColor: "#FF0033",
+        fillOpacity: 0.5,
+        radius: 200
+      }).addTo(map);
 
       map.doubleClickZoom.disable();
       map.on('dblclick', this.onMapSelect);
