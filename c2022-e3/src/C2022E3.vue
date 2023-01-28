@@ -11,7 +11,7 @@
       @pointerdown="onPointerDown"
     ></WorldWideTelescope>
 
-    <div id="top-content">
+    <div class="top-content">
       <div></div>
       <v-tooltip
         v-model="showMapTooltip"
@@ -68,7 +68,14 @@
       </v-tooltip>
     </div>
 
-    <div id="bottom-content">
+    <div class="bottom-content">
+      <div
+        id="center-view-button"
+        class="ui-button clickable"
+        @click="updateViewForDate"
+      >
+        Center View on Date
+      </div>
       <div id="tools">
         <span class="tool-container">
           <vue-slider
@@ -974,17 +981,18 @@ body {
   }
 }
 
-#top-content {
+.top-content {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
   width: calc(100% - 1rem);
+  pointer-events: none;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-#bottom-content {
+.bottom-content {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -1087,12 +1095,30 @@ body {
 }
 
 .ui-text {
-  color: #F0AB52;
+  color: var(--comet-color);
   background: black;
   padding: 5px 5px;
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
+}
+
+.ui-button {
+  color: var(--comet-color);
+  background: black;
+  padding: 5px 5px;
+  border: 2px solid var(--comet-color);
+  border-radius: 10px;
+  font-size: calc(0.7em + 0.2vw);
+  user-select: none;
+}
+
+.clickable {
+  pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .bottom-sheet {
