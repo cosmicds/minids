@@ -154,7 +154,16 @@
       v-model="showLocationSelector"
     >
       <v-card id="location-selector">
-        <div>Move around the map and double-click to change your location</div>
+        <div
+          class="text-center"
+        >
+          Move around the map and double-click to change location
+        </div>
+        <v-btn
+          @click="getLocation"
+        >
+          Use My Location
+        </v-btn>
         <div id="map-container"></div>
       </v-card>
     </v-dialog>
@@ -304,7 +313,7 @@ import { distance } from "@wwtelescope/astro";
 import { Color, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
-import L, { LeafletMouseEvent,  } from "leaflet";
+import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import {
@@ -407,7 +416,9 @@ export default defineComponent({
       showMapTooltip: false,
       showLocationSelector: false,
       tab: 0,
-      map: null as L.Map | null,
+
+      circle: null as L.Circle | null,
+      map: null as Map | null,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -423,9 +434,8 @@ export default defineComponent({
   },
 
   created() {
-    this.waitForReady().then(() => {
 
-      console.log(this);
+    this.waitForReady().then(() => {
 
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -442,7 +452,6 @@ export default defineComponent({
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
       }).then((layer) => {
-        console.log(layer);
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
         this.applyTableLayerSettings({
@@ -594,15 +603,11 @@ export default defineComponent({
       L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
+        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
         className: 'map-tiles'
       }).addTo(map);
 
-      L.circle(locationDeg, {
-        color: "#FF0000",
-        fillColor: "#FF0033",
-        fillOpacity: 0.5,
-        radius: 200
-      }).addTo(map);
+      this.circle = this.circleForLocation(...locationDeg).addTo(map);
 
       map.doubleClickZoom.disable();
       map.on('dblclick', this.onMapSelect);
@@ -614,7 +619,15 @@ export default defineComponent({
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: e.latlng.lng * D2R
       };
-      this.showLocationSelector = false;
+    },
+
+    circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
+      return L.circle([latDeg, lonDeg], {
+        color: "#FF0000",
+        fillColor: "#FF0033",
+        fillOpacity: 0.5,
+        radius: 200
+      });
     },
 
     getLocation() {
@@ -726,25 +739,6 @@ export default defineComponent({
       const altitude = Math.asin(sinAlt);
       const cosAz = (Math.sin(dec) - Math.sin(altitude) * Math.sin(lat)) / (Math.cos(altitude) * Math.cos(lat));
       let azimuth = Math.acos(cosAz);
-
-      // public Coordinates(double ascention, double declination)
-      // {
-      //     this.ascention = ascention + (Math.PI * 80) % (Math.PI * 2);
-      //     this.declination = declination;
-      // }
-
-      // public double Az
-      // {
-      //     get
-      //     {
-      //         return ascention / RC;
-
-      //     }
-      //     set
-      //     {
-      //         ascention = value * RC;
-      //     }
-      // }
 
       azimuth = azimuth + (Math.PI * 80) % (Math.PI * 2);
 
@@ -898,6 +892,14 @@ export default defineComponent({
     location(loc: LocationRad) {
       const now = this.selectedDate;
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
+
+      if (this.map) {
+        this.circle?.remove();
+
+        const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
+        this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
+      }
+
       this.createHorizon(now);
       //this.updateWWTLocation();
       this.gotoRADecZoom({
@@ -917,6 +919,7 @@ export default defineComponent({
         });
       } else {
         this.map?.remove();
+        this.circle = null;
       }
     }
   }
@@ -1168,22 +1171,23 @@ body {
   color: white;
 }
 
+.v-overlay__content {
+  width: fit-content !important;
+}
+
 #location-selector {
   align-items: center;
+  margin: auto;
+  width: 70vw;
+  height: fit-content;
 }
 
 #map-container {
-  width: 700px;
-  height: 500px;
-  max-width: 90%;
-  max-height: 90%;
+  width: 60vw;
+  height: 70vh;
   margin: auto;
   padding: 5px 0px;
-}
-
-.leaflet-pane {
-  width: 500px;
-  height: 100px;
+  border-radius: 5px;
 }
 
 // This prevents the tabs from having some extra space to the left when the screen is small
@@ -1222,6 +1226,15 @@ body {
 @media(max-width: 600px) {
   .mark-line {
     display: none;
+  }
+
+  #location-selector {
+    width: 80vw;
+    height: 85vh;
+  }
+
+  #map-container {
+    width: 70vw;
   }
 }
 
