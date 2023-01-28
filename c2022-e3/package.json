@@ -7,7 +7,6 @@
     "d3-dsv": "^3.0.1",
     "vue": "^3",
     "vue-slider-component": "next",
-    "vue3-popper": "^1.5.0",
     "vuetify": "^3.1.1",
     "webpack-plugin-vuetify": "^2.0.0"
   },

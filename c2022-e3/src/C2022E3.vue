@@ -13,47 +13,32 @@
 
     <div id="top-content">
       <div></div>
-      <div>
-        <v-popper
-          arrow
-          interactive
-          placement="bottom"
-        >
-          <v-tooltip
-          :location="smallSize ? 'bottom' : 'start'"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showMapTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="text-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showMapTooltip = true"
-              @mouseleave="showMapTooltip = false"
-              v-bind="props"
-              @click="showLocationSelector = true"
-            >
-              <font-awesome-icon
-                id="location-icon"
-                class="control-icon"
-                icon="location-pin"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Select location</span>
-        </v-tooltip>
-        <template #content>
-          <!-- <div id="location-selector">
-            <div>Move around using the map<br>Double-click to select your location</div>
-            <div id="map-container"></div>
-          </div> -->
+      <v-tooltip
+        v-model="showMapTooltip"
+        location="bottom"
+        :open-on-click="false"
+        :open-on-focus="false"
+        :open-on-hover="true"
+      >
+        <template v-slot:activator="{ props }">
+          <div
+            id="text-icon-wrapper"
+            class="control-icon-wrapper"
+            @mouseover="showMapTooltip = true"
+            @mouseleave="showMapTooltip = false"
+            v-bind="props"
+            @click="showLocationSelector = true"
+          >
+            <font-awesome-icon
+              id="location-icon"
+              class="control-icon"
+              icon="location-pin"
+              size="lg"
+            ></font-awesome-icon>
+          </div>
         </template>
-      </v-popper>
-      </div>
+        <span>Select location</span>
+      </v-tooltip>
       <v-tooltip
         :location="smallSize ? 'bottom' : 'start'"
         :open-on-click="false"
