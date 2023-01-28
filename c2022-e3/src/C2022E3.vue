@@ -196,6 +196,7 @@
         >
           Use My Location
         </v-btn>
+        <div class="text-center red--text">{{  locationErrorMessage  }}</div>
         <div id="map-container"></div>
       </v-card>
     </v-dialog>
@@ -464,7 +465,8 @@ export default defineComponent({
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
-      } as LocationRad
+      } as LocationRad,
+      locationErrorMessage: ""
     }
   },
 
@@ -679,15 +681,18 @@ export default defineComponent({
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log("Got position!");
-          console.log(position);
           this.location = {
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
+
+          if (this.map) {
+            this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
+          }
         },
         (error) => {
           console.log(error);
+          this.locationErrorMessage = "Unable to detect location. Please check your browser and/or OS settings."
           this.createHorizon();
         },
         options
@@ -958,6 +963,7 @@ export default defineComponent({
     },
     showLocationSelector(show: boolean) {
       if (show) {
+        this.locationErrorMessage = "";
         this.$nextTick(() => {
           this.setupLocationSelector();
         });
