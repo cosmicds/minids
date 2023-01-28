@@ -570,21 +570,28 @@ export default defineComponent({
 
     setupLocationSelector() {
       const map = L.map("map-container").setView([R2D * this.location.latitudeRad, R2D * this.location.longitudeRad], 5);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         className: 'map-tiles'
-      }).addTo(map);
+      }).addTo(map); */
+      L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3'],
+        className: 'map-tiles'
+    }).addTo(map);
 
+      map.doubleClickZoom.disable();
       map.on('dblclick', this.onMapSelect);
       this.map = map;
     },
 
     onMapSelect(e: LeafletMouseEvent) {
       this.location = {
-        latitudeRad: e.latlng.lat * R2D,
-        longitudeRad: e.latlng.lng * R2D
+        latitudeRad: e.latlng.lat * D2R,
+        longitudeRad: e.latlng.lng * D2R
       }
+      this.showLocationSelector = false;
     },
 
     getLocation() {
@@ -1095,12 +1102,17 @@ body {
   color: white;
 }
 
+#location-selector {
+  align-items: center;
+}
+
 #map-container {
   width: 700px;
   height: 500px;
   max-width: 90%;
   max-height: 90%;
   margin: auto;
+  padding: 5px 0px;
 }
 
 .leaflet-pane {
@@ -1147,13 +1159,13 @@ body {
   }
 }
 
-:root {
-  --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-}
+// :root {
+//   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+// }
 
-@media (prefers-color-scheme: dark) {
-  .map-tiles {
-    filter:var(--map-tiles-filter, none);
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   .map-tiles {
+//     filter:var(--map-tiles-filter, none);
+//   }
+// }
 </style>
