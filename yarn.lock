@@ -423,6 +423,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kyvg/vue3-notification@npm:^2.8.0":
+  version: 2.8.0
+  resolution: "@kyvg/vue3-notification@npm:2.8.0"
+  peerDependencies:
+    vue: ^3.0.0
+  checksum: c46350f4fcf92657ffbbfcec644d5552634c5e02f7346d41551ef421feea53f15d202302ce939f03ad54bb7a891fbcef9f9e62af8068ca82b545933dfb6799ff
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -434,6 +443,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@minids/c2022-e3@workspace:c2022-e3"
   dependencies:
+    "@kyvg/vue3-notification": ^2.8.0
     "@minids/common": "workspace:0.0.0"
     "@types/d3-dsv": ^3.0.1
     "@types/leaflet": ^1.9.0

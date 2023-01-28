@@ -24,6 +24,8 @@ library.add(faVideo);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
+import Notifications from '@kyvg/vue3-notification';
+
 import "leaflet/dist/leaflet.css";
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
@@ -45,6 +47,7 @@ createApp(C2022E3, {
 // Plugins
 .use(wwtPinia)
 .use(vuetify)
+.use(Notifications)
 
 // Directives
 .directive(

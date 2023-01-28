@@ -675,7 +675,7 @@ export default defineComponent({
       });
     },
 
-    getLocation(_startup = false) {
+    getLocation(startup = false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
 
       navigator.geolocation.getCurrentPosition(
@@ -691,7 +691,17 @@ export default defineComponent({
         },
         (error) => {
           console.log(error);
-          this.locationErrorMessage = "Unable to detect location. Please check your browser and/or OS settings."
+          let msg = "Unable to detect location. Please check your browser and/or OS settings.";
+          if (startup) {
+            msg += "\nUse our location selector to manually input your location";
+            this.$notify({
+              group: "startup-location-error",
+              type: "error",
+              text: msg
+            });
+          } else {
+            this.locationErrorMessage = msg;
+          }
           this.createHorizon();
         },
         options
