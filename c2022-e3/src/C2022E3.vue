@@ -40,7 +40,6 @@
             id="video-icon-wrapper"
             class="control-icon-wrapper"
             v-bind="props"
-            style="{ visibility: hidden !important; pointer-events: auto; }"
           >
             <font-awesome-icon
               id="video-icon"
@@ -183,6 +182,7 @@
     </div>
 
     <v-dialog
+      id="location-dialog"
       v-model="showLocationSelector"
     >
       <v-card id="location-selector">
@@ -224,13 +224,12 @@
       <v-tabs
         v-model="tab"
         height="32px"
-        slider-color="white"
+        :color="cometColor"
+        :slider-color="cometColor"
         id="tabs"
         dense
         grow
       >
-        <!-- <v-tabs-slider color="white"></v-tabs-slider> -->
-
         <v-tab><h3>Information</h3></v-tab>
         <v-tab><h3>Using WWT</h3></v-tab>
       </v-tabs>
@@ -1290,8 +1289,10 @@ body {
   color: white;
 }
 
-.v-overlay__content {
-  width: fit-content !important;
+#location-dialog {
+  .v-overlay__content {
+    width: fit-content !important;
+  }
 }
 
 #location-selector {
