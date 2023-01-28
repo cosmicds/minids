@@ -12,7 +12,9 @@
     },
     "dependencies": {
         "@minids/carina": "workspace:*",
-        "@minids/common": "workspace:*"
+        "@minids/common": "workspace:*",
+        "@vue-leaflet/vue-leaflet": "^0.8.0",
+        "leaflet": "^1.9.3"
     },
     "packageManager": "yarn@3.3.0",
     "devDependencies": {

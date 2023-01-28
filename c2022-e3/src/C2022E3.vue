@@ -14,6 +14,32 @@
     <div id="top-content">
       <div></div>
       <v-tooltip
+        v-model="showMapTooltip"
+        location="bottom"
+        :open-on-click="false"
+        :open-on-focus="false"
+        :open-on-hover="true"
+      >
+        <template v-slot:activator="{ props }">
+          <div
+            id="text-icon-wrapper"
+            class="control-icon-wrapper"
+            @mouseover="showMapTooltip = true"
+            @mouseleave="showMapTooltip = false"
+            v-bind="props"
+            @click="showLocationSelector = true"
+          >
+            <font-awesome-icon
+              id="location-icon"
+              class="control-icon"
+              icon="location-pin"
+              size="lg"
+            ></font-awesome-icon>
+          </div>
+        </template>
+        <span>Select location</span>
+      </v-tooltip>
+      <v-tooltip
         :location="smallSize ? 'bottom' : 'start'"
         :open-on-click="false"
         :open-on-focus="false"
@@ -108,6 +134,24 @@
         </div>
       </div>
     </div>
+
+    <v-dialog
+      v-model="showLocationSelector"
+    >
+      <v-card id="location-selector">
+        <div
+          class="text-center"
+        >
+          Move around the map and double-click to change location
+        </div>
+        <v-btn
+          @click="getLocation"
+        >
+          Use My Location
+        </v-btn>
+        <div id="map-container"></div>
+      </v-card>
+    </v-dialog>
 
     <v-dialog
       class="bottom-sheet"
@@ -251,9 +295,10 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Poly, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Color, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
+import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import {
@@ -353,7 +398,12 @@ export default defineComponent({
 
       sheet: null as SheetType,
       showTextTooltip: false,
+      showMapTooltip: false,
+      showLocationSelector: false,
       tab: 0,
+
+      circle: null as L.Circle | null,
+      map: null as Map | null,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -363,15 +413,14 @@ export default defineComponent({
       // Harvard Observatory
       location: {
         latitudeRad: D2R * 42.3814,
-        longitudeRad: D2R * 71.1281
+        longitudeRad: D2R * -71.1281
       } as LocationRad
     }
   },
 
   created() {
-    this.waitForReady().then(() => {
 
-      console.log(this);
+    this.waitForReady().then(() => {
 
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -388,7 +437,6 @@ export default defineComponent({
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
       }).then((layer) => {
-        console.log(layer);
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
         this.applyTableLayerSettings({
@@ -469,6 +517,9 @@ export default defineComponent({
 
       this.setTime(this.selectedDate);
 
+      // this.getSettings().set_localHorizonMode(true);
+      // this.updateWWTLocation();
+
     });
 
   },
@@ -497,12 +548,24 @@ export default defineComponent({
         this.showTextTooltip = false;
       }
     },
-  //   altAz() {
-  //     return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
-  //   }
+    // altAz() {
+    //   return this.equatorialToHorizontal(this.wwtRARad, this.wwtDecRad, this.location.latitudeRad, this.location.longitudeRad, this.selectedDate || new Date());
+    // }
   },
 
   methods: {
+    getSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+
+    updateWWTLocation() {
+      const settings = this.getSettings();
+      settings.set_locationLat(R2D * this.location.latitudeRad);
+      settings.set_locationLng(R2D * this.location.longitudeRad);
+    },
+
     selectSheet(name: SheetType) {
       if (this.sheet == name) {
         this.sheet = null;
@@ -512,6 +575,44 @@ export default defineComponent({
       } else {
         this.sheet = name;
       }
+    },
+
+    setupLocationSelector() {
+      const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
+      const map = L.map("map-container").setView(locationDeg, 8);
+      /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        className: 'map-tiles'
+      }).addTo(map); */
+      L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3'],
+        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+        className: 'map-tiles'
+      }).addTo(map);
+
+      this.circle = this.circleForLocation(...locationDeg).addTo(map);
+
+      map.doubleClickZoom.disable();
+      map.on('dblclick', this.onMapSelect);
+      this.map = map;
+    },
+
+    onMapSelect(e: LeafletMouseEvent) {
+      this.location = {
+        latitudeRad: e.latlng.lat * D2R,
+        longitudeRad: e.latlng.lng * D2R
+      };
+    },
+
+    circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
+      return L.circle([latDeg, lonDeg], {
+        color: "#FF0000",
+        fillColor: "#FF0033",
+        fillOpacity: 0.5,
+        radius: 200
+      });
     },
 
     getLocation() {
@@ -537,6 +638,7 @@ export default defineComponent({
     // WWT does have all of this functionality built in
     // but it doesn't seem to be exposed
     // We should do that, but for now we just copy the web engine code
+    // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
     altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
       azRad = Math.PI - azRad;
       if (azRad < 0) {
@@ -552,42 +654,42 @@ export default defineComponent({
 
     mstFromUTC2(utc: Date, longRad: number): number {
 
-        const lng = longRad * R2D;
+      const lng = longRad * R2D;
 
-        let year = utc.getUTCFullYear();
-        let month = utc.getUTCMonth()+1;
-        const day = utc.getUTCDate();
-        const hour = utc.getUTCHours();
-        const minute = utc.getUTCMinutes();
-        const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
+      let year = utc.getUTCFullYear();
+      let month = utc.getUTCMonth()+1;
+      const day = utc.getUTCDate();
+      const hour = utc.getUTCHours();
+      const minute = utc.getUTCMinutes();
+      const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
-        if (month == 1 || month == 2)
-        {
-            year -= 1;
-            month += 12;
+      if (month == 1 || month == 2)
+      {
+          year -= 1;
+          month += 12;
+      }
+
+      const a = year / 100;
+      const b = 2 - a + Math.floor(a / 4.0);
+      const c = Math.floor(365.25 * year);
+      const d = Math.floor(30.6001 * (month + 1));
+
+      const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+
+      const julianCenturies = julianDays / 36525.0;
+      let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+
+      if (mst > 0.0) {
+        while (mst > 360.0) {
+          mst = mst - 360.0;
         }
-
-        const a = year / 100;
-        const b = 2 - a + Math.floor(a / 4.0);
-        const c = Math.floor(365.25 * year);
-        const d = Math.floor(30.6001 * (month + 1));
-
-        const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-
-        const julianCenturies = julianDays / 36525.0;
-        let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
-
-        if (mst > 0.0) {
-          while (mst > 360.0) {
-            mst = mst - 360.0;
-          }
-        } else {
-          while (mst < 0.0) {
-            mst = mst + 360.0;
-          }
+      } else {
+        while (mst < 0.0) {
+          mst = mst + 360.0;
         }
+      }
 
-        return mst;
+      return mst;
     },
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
@@ -609,7 +711,7 @@ export default defineComponent({
     },
 
     equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
-      let hourAngle = this.mstFromUTC2(utc, R2D * longRad) - R2D * raRad;
+      let hourAngle = this.mstFromUTC2(utc, longRad) - R2D * raRad;
       if (hourAngle < 0) {
         hourAngle += 360;
       }
@@ -623,8 +725,10 @@ export default defineComponent({
       const cosAz = (Math.sin(dec) - Math.sin(altitude) * Math.sin(lat)) / (Math.cos(altitude) * Math.cos(lat));
       let azimuth = Math.acos(cosAz);
 
+      azimuth = azimuth + (Math.PI * 80) % (Math.PI * 2);
+
       if (Math.sin(ha) > 0) {
-        azimuth = Math.PI - azimuth;
+        azimuth = 2 * Math.PI - azimuth;
       }
       return { altRad: altitude, azRad: azimuth };
 
@@ -634,7 +738,7 @@ export default defineComponent({
       this.clearAnnotations();
 
       const color = '#5C4033';
-      const date = when || new Date();
+      const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
@@ -732,8 +836,28 @@ export default defineComponent({
     },
 
     updateViewForDate() {
-      const weekly = weeklyDates.includes(this.selectedTime);
-      const daily = !weekly && dailyDates.includes(this.selectedTime);
+
+      let position = null as TableRow | null;
+
+      const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
+      
+      if (dailyIndex > -1) {
+        position = daily2023Table[dailyIndex]
+      } else {
+        const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
+        if (weeklyIndex > -1) {
+          position = fullWeeklyTable[weeklyIndex];
+        }
+      }
+
+      if (position !== null) {
+        this.gotoRADecZoom({
+          raRad: D2R * position.ra,
+          decRad: D2R * position.dec,
+          zoomDeg: this.wwtZoomDeg,
+          instant: false
+        });
+      }
 
     },
   },
@@ -751,9 +875,18 @@ export default defineComponent({
     //   }
     // },
     location(loc: LocationRad) {
-      const now = new Date();
+      const now = this.selectedDate;
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
+
+      if (this.map) {
+        this.circle?.remove();
+
+        const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
+        this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
+      }
+
       this.createHorizon(now);
+      //this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
         decRad: raDec.decRad,
@@ -763,6 +896,16 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
+    },
+    showLocationSelector(show: boolean) {
+      if (show) {
+        this.$nextTick(() => {
+          this.setupLocationSelector();
+        });
+      } else {
+        this.map?.remove();
+        this.circle = null;
+      }
     }
   }
 })
@@ -1013,6 +1156,25 @@ body {
   color: white;
 }
 
+.v-overlay__content {
+  width: fit-content !important;
+}
+
+#location-selector {
+  align-items: center;
+  margin: auto;
+  width: 70vw;
+  height: fit-content;
+}
+
+#map-container {
+  width: 60vw;
+  height: 70vh;
+  margin: auto;
+  padding: 5px 0px;
+  border-radius: 5px;
+}
+
 // This prevents the tabs from having some extra space to the left when the screen is small
 // (around 400px or less)
 .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
@@ -1050,5 +1212,24 @@ body {
   .mark-line {
     display: none;
   }
+
+  #location-selector {
+    width: 80vw;
+    height: 85vh;
+  }
+
+  #map-container {
+    width: 70vw;
+  }
 }
+
+// :root {
+//   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+// }
+
+// @media (prefers-color-scheme: dark) {
+//   .map-tiles {
+//     filter:var(--map-tiles-filter, none);
+//   }
+// }
 </style>
