@@ -12,13 +12,15 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookOpen,
   faLocationPin,
-  faTimes
+  faTimes,
+  faVideo
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(faBookOpen);
 library.add(faLocationPin);
 library.add(faTimes);
+library.add(faVideo);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 

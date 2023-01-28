@@ -11,8 +11,48 @@
       @pointerdown="onPointerDown"
     ></WorldWideTelescope>
 
+    <transition name="fade">
+      <div
+        class="modal"
+        id="modal-loading"
+        v-show="isLoading"
+      >
+        <div class="container">
+          <div class="spinner"></div>
+          <p>Loading …</p>
+        </div>
+      </div>
+    </transition>
+
     <div class="top-content">
-      <div></div>
+      <v-tooltip
+        v-model="showVideoTooltip"
+        :open-on-click="false"
+        :open-on-focus="false"
+        :open-on-hover="true"
+        close-on-content-click
+        :location="smallSize ? 'bottom' : 'end'"
+      >
+        <template v-slot:activator="{ props }">
+          <div
+            @mouseover="showVideoTooltip = true"
+            @mouseleave="showVideoTooltip = false"
+            id="video-icon-wrapper"
+            class="control-icon-wrapper"
+            v-bind="props"
+            style="{ visibility: hidden !important; pointer-events: auto; }"
+          >
+            <font-awesome-icon
+              id="video-icon"
+              class="control-icon"
+              icon="video"
+              size="lg"
+              
+            ></font-awesome-icon>
+          </div>
+        </template>
+        <span>Watch video</span>
+      </v-tooltip>
       <v-tooltip
         v-model="showMapTooltip"
         location="bottom"
@@ -393,19 +433,21 @@ export default defineComponent({
     return {
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
-      dateLayers: [] as SpreadSheetLayer[],
-      weeklyLayer: null as SpreadSheetLayer | null,
-      selectedTime: (new Date(2023, 0, 28)).getTime(),
+
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
+
+      ready: false,
+
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
 
       sheet: null as SheetType,
-      showTextTooltip: false,
       showMapTooltip: false,
+      showTextTooltip: false,
+      showVideoTooltip: false,
       showLocationSelector: false,
       tab: 0,
 
@@ -418,6 +460,7 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,
 
       // Harvard Observatory
+      selectedTime: (new Date(2023, 0, 28)).getTime(),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -439,7 +482,9 @@ export default defineComponent({
       this.getLocation();
       this.setClockSync(false);
 
-      this.createTableLayer({
+      const proms: Promise<SpreadSheetLayer | void>[] = [];
+
+      proms.push(this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -456,9 +501,9 @@ export default defineComponent({
             ["opacity", 0.7]
           ]
         })
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -474,9 +519,9 @@ export default defineComponent({
             ["opacity", 1]
           ]
         })
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "Weekly Date Layer",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -497,9 +542,9 @@ export default defineComponent({
             ["decay", 1]
           ]
         });
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "Daily Date Layer",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -519,10 +564,14 @@ export default defineComponent({
             ["decay", 1]
           ]
         });
-      });
+      }));
 
 
       this.setTime(this.selectedDate);
+
+      Promise.all(proms).then((_layers) => {
+        this.ready = true;
+      });
 
       // this.getSettings().set_localHorizonMode(true);
       // this.updateWWTLocation();
@@ -532,7 +581,10 @@ export default defineComponent({
   },
 
   computed: {
-    selectedDate() {
+    isLoading(): boolean {
+      return !this.ready;
+    },
+    selectedDate(): Date {
       return new Date(this.selectedTime);
     },
     smallSize(): boolean {
@@ -954,6 +1006,51 @@ body {
   }
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.modal {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-loading {
+  background-color: #000;
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    .spinner {
+      background-image: url("../../assets/lunar_loader.gif");
+      background-repeat: no-repeat;
+      background-size: contain;
+      width: 3rem;
+      height: 3rem;
+    }
+    p {
+      margin: 0 0 0 1rem;
+      padding: 0;
+      font-size: 150%;
+    }
+  }
+}
+
 .pointer {
   cursor: pointer;
 }
@@ -989,7 +1086,7 @@ body {
   pointer-events: none;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .bottom-content {
@@ -1119,6 +1216,11 @@ body {
   &:hover {
     cursor: pointer;
   }
+}
+
+#center-view-button {
+  align-self: flex-end;
+  margin-bottom: 25px;
 }
 
 .bottom-sheet {
