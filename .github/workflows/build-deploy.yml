@@ -33,7 +33,7 @@ jobs:
       - name: Rearrange for Pages
         run: |
           workspaces=(${{ steps.workspaces.outputs.value }})
-          for ws in $workspaces
+          for ws in "${workspaces[@]}"
           do
             if [ $ws != 'common' ]
             then
