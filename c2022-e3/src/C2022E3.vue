@@ -1093,6 +1093,11 @@ body {
   }
 }
 
+#video-icon-wrapper {
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .top-content {
   position: absolute;
   top: 0.5rem;
