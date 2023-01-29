@@ -2,6 +2,7 @@
   "name": "@minids/c2022-e3",
   "version": "0.0.0",
   "dependencies": {
+    "@kyvg/vue3-notification": "^2.8.0",
     "@minids/common": "workspace:0.0.0",
     "@wwtelescope/astro": "^0.2.2",
     "d3-dsv": "^3.0.1",

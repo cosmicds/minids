@@ -11,8 +11,47 @@
       @pointerdown="onPointerDown"
     ></WorldWideTelescope>
 
-    <div id="top-content">
-      <div></div>
+    <transition name="fade">
+      <div
+        class="modal"
+        id="modal-loading"
+        v-show="isLoading"
+      >
+        <div class="container">
+          <div class="spinner"></div>
+          <p>Loading …</p>
+        </div>
+      </div>
+    </transition>
+
+    <div class="top-content">
+      <v-tooltip
+        v-model="showVideoTooltip"
+        :open-on-click="false"
+        :open-on-focus="false"
+        :open-on-hover="true"
+        close-on-content-click
+        :location="smallSize ? 'bottom' : 'end'"
+      >
+        <template v-slot:activator="{ props }">
+          <div
+            @mouseover="showVideoTooltip = true"
+            @mouseleave="showVideoTooltip = false"
+            id="video-icon-wrapper"
+            class="control-icon-wrapper"
+            v-bind="props"
+          >
+            <font-awesome-icon
+              id="video-icon"
+              class="control-icon"
+              icon="video"
+              size="lg"
+              
+            ></font-awesome-icon>
+          </div>
+        </template>
+        <span>Watch video</span>
+      </v-tooltip>
       <v-tooltip
         v-model="showMapTooltip"
         location="bottom"
@@ -68,7 +107,14 @@
       </v-tooltip>
     </div>
 
-    <div id="bottom-content">
+    <div class="bottom-content">
+      <div
+        id="center-view-button"
+        class="ui-button clickable"
+        @click="updateViewForDate"
+      >
+        Center View on Date
+      </div>
       <div id="tools">
         <span class="tool-container">
           <vue-slider
@@ -136,6 +182,7 @@
     </div>
 
     <v-dialog
+      id="location-dialog"
       v-model="showLocationSelector"
     >
       <v-card id="location-selector">
@@ -149,6 +196,7 @@
         >
           Use My Location
         </v-btn>
+        <div class="text-center red--text">{{  locationErrorMessage  }}</div>
         <div id="map-container"></div>
       </v-card>
     </v-dialog>
@@ -176,13 +224,12 @@
       <v-tabs
         v-model="tab"
         height="32px"
-        slider-color="white"
+        :color="cometColor"
+        :slider-color="cometColor"
         id="tabs"
         dense
         grow
       >
-        <!-- <v-tabs-slider color="white"></v-tabs-slider> -->
-
         <v-tab><h3>Information</h3></v-tab>
         <v-tab><h3>Using WWT</h3></v-tab>
       </v-tabs>
@@ -386,19 +433,21 @@ export default defineComponent({
     return {
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
-      dateLayers: [] as SpreadSheetLayer[],
-      weeklyLayer: null as SpreadSheetLayer | null,
-      selectedTime: (new Date(2023, 0, 28)).getTime(),
+
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
+
+      ready: false,
+
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
 
       sheet: null as SheetType,
-      showTextTooltip: false,
       showMapTooltip: false,
+      showTextTooltip: false,
+      showVideoTooltip: false,
       showLocationSelector: false,
       tab: 0,
 
@@ -411,10 +460,12 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,
 
       // Harvard Observatory
+      selectedTime: (new Date(2023, 0, 28)).getTime(),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
-      } as LocationRad
+      } as LocationRad,
+      locationErrorMessage: ""
     }
   },
 
@@ -429,10 +480,12 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.getLocation();
+      this.getLocation(true);
       this.setClockSync(false);
 
-      this.createTableLayer({
+      const proms: Promise<SpreadSheetLayer | void>[] = [];
+
+      proms.push(this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -449,9 +502,9 @@ export default defineComponent({
             ["opacity", 0.7]
           ]
         })
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -467,9 +520,9 @@ export default defineComponent({
             ["opacity", 1]
           ]
         })
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "Weekly Date Layer",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -490,9 +543,9 @@ export default defineComponent({
             ["decay", 1]
           ]
         });
-      });
+      }));
 
-      this.createTableLayer({
+      proms.push(this.createTableLayer({
         name: "Daily Date Layer",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -512,10 +565,14 @@ export default defineComponent({
             ["decay", 1]
           ]
         });
-      });
+      }));
 
 
       this.setTime(this.selectedDate);
+
+      Promise.all(proms).then((_layers) => {
+        this.ready = true;
+      });
 
       // this.getSettings().set_localHorizonMode(true);
       // this.updateWWTLocation();
@@ -525,7 +582,10 @@ export default defineComponent({
   },
 
   computed: {
-    selectedDate() {
+    isLoading(): boolean {
+      return !this.ready;
+    },
+    selectedDate(): Date {
       return new Date(this.selectedTime);
     },
     smallSize(): boolean {
@@ -580,12 +640,12 @@ export default defineComponent({
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
       const map = L.map("map-container").setView(locationDeg, 8);
-      /* L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        className: 'map-tiles'
-      }).addTo(map); */
-      L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+      // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      //   maxZoom: 19,
+      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      //   className: 'map-tiles'
+      // }).addTo(map);
+      L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
         attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
@@ -615,20 +675,33 @@ export default defineComponent({
       });
     },
 
-    getLocation() {
+    getLocation(startup = false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log("Got position!");
-          console.log(position);
           this.location = {
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
+
+          if (this.map) {
+            this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
+          }
         },
         (error) => {
           console.log(error);
+          let msg = "Unable to detect location. Please check your browser and/or OS settings.";
+          if (startup) {
+            msg += "\nUse our location selector to manually input your location";
+            this.$notify({
+              group: "startup-location-error",
+              type: "error",
+              text: msg
+            });
+          } else {
+            this.locationErrorMessage = msg;
+          }
           this.createHorizon();
         },
         options
@@ -899,6 +972,7 @@ export default defineComponent({
     },
     showLocationSelector(show: boolean) {
       if (show) {
+        this.locationErrorMessage = "";
         this.$nextTick(() => {
           this.setupLocationSelector();
         });
@@ -947,6 +1021,51 @@ body {
   }
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.modal {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-loading {
+  background-color: #000;
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    .spinner {
+      background-image: url("../../assets/lunar_loader.gif");
+      background-repeat: no-repeat;
+      background-size: contain;
+      width: 3rem;
+      height: 3rem;
+    }
+    p {
+      margin: 0 0 0 1rem;
+      padding: 0;
+      font-size: 150%;
+    }
+  }
+}
+
 .pointer {
   cursor: pointer;
 }
@@ -974,17 +1093,23 @@ body {
   }
 }
 
-#top-content {
+#video-icon-wrapper {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.top-content {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
   width: calc(100% - 1rem);
+  pointer-events: none;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
-#bottom-content {
+.bottom-content {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -1087,12 +1212,35 @@ body {
 }
 
 .ui-text {
-  color: #F0AB52;
+  color: var(--comet-color);
   background: black;
   padding: 5px 5px;
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
+}
+
+.ui-button {
+  color: var(--comet-color);
+  background: black;
+  padding: 5px 5px;
+  border: 2px solid var(--comet-color);
+  border-radius: 10px;
+  font-size: calc(0.7em + 0.2vw);
+  user-select: none;
+}
+
+.clickable {
+  pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+#center-view-button {
+  align-self: flex-end;
+  margin-bottom: 25px;
 }
 
 .bottom-sheet {
@@ -1156,8 +1304,10 @@ body {
   color: white;
 }
 
-.v-overlay__content {
-  width: fit-content !important;
+#location-dialog {
+  .v-overlay__content {
+    width: fit-content !important;
+  }
 }
 
 #location-selector {
