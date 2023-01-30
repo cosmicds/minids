@@ -1,5 +1,5 @@
-<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="690_2022E3_29_12" Group="Explorer" Searchable="False">
-  <Place Name="690_2022E3_29_12" DataSetType="Sky" RA="15.870840298697768" Dec="30.304865576062944" Rotation="0" ZoomLevel="10">
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="688_2022E3_27_12" Group="Explorer" Searchable="False">
+  <Place Name="688_2022E3_27_12" DataSetType="Sky" RA="15.885267696119373" Dec="29.594694500528576" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -8,24 +8,24 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/assets/690_2022E3_29_12_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/src/assets/688_2022E3_27_12_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
-                Rotation="0.7362467748864256"
+                Rotation="91.21368995984798"
                 QuadTreeMap=""
                 Projection="SkyImage"
-                Name="690_2022E3_29_12"
+                Name="688_2022E3_27_12"
                 FileType=".jpg"
-                CenterY="30.304865576062944"
-                CenterX="238.06260448046652"
+                CenterY="29.594694500528576"
+                CenterX="238.2790154417906"
                 BottomsUp="False"
                 StockSet="False"
                 ElevationModel="False"
                 OffsetX="400.5"
-                OffsetY="455.5"
+                OffsetY="305.0"
                 BaseTileLevel="0"
-                BaseDegreesPerTile="0.001368677231666053"
+                BaseDegreesPerTile="0.0018081717090626251"
                 ReferenceFrame=""
                 MeanRadius="0">
         <Description>description</Description>

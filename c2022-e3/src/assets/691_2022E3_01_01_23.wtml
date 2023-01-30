@@ -1,5 +1,5 @@
-<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="700_2022E3_20_01_23_6" Group="Explorer" Searchable="False">
-  <Place Name="700_2022E3_20_01_23_6" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="691_2022E3_01_01_23" Group="Explorer" Searchable="False">
+  <Place Name="691_2022E3_01_01_23" DataSetType="Sky" RA="15.85905648442954" Dec="31.55074617443531" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -8,24 +8,24 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/assets/700_2022E3_20_01_23_6_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/src/assets/691_2022E3_01_01_23_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
-                Rotation="-0.9027085450059396"
+                Rotation="-89.09917483854268"
                 QuadTreeMap=""
                 Projection="SkyImage"
-                Name="700_2022E3_20_01_23_6"
+                Name="691_2022E3_01_01_23"
                 FileType=".jpg"
-                CenterY="49.65237468877651"
-                CenterX="232.68166188062"
+                CenterY="31.55074617443531"
+                CenterX="237.8858472664431"
                 BottomsUp="False"
                 StockSet="False"
                 ElevationModel="False"
                 OffsetX="400.5"
-                OffsetY="356.0"
+                OffsetY="287.5"
                 BaseTileLevel="0"
-                BaseDegreesPerTile="0.002311407615484201"
+                BaseDegreesPerTile="0.0019585642820656654"
                 ReferenceFrame=""
                 MeanRadius="0">
         <Description>description</Description>

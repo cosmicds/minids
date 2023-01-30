@@ -1,5 +1,5 @@
-<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="692_2022E3_02_01_23" Group="Explorer" Searchable="False">
-  <Place Name="692_2022E3_02_01_23" DataSetType="Sky" RA="15.849510268431588" Dec="32.04764555280646" Rotation="0" ZoomLevel="10">
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="697_2022E3_20_01_23_3" Group="Explorer" Searchable="False">
+  <Place Name="697_2022E3_20_01_23_3" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -8,24 +8,24 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/assets/692_2022E3_02_01_23_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/src/assets/697_2022E3_20_01_23_3_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
-                Rotation="-89.06309314604557"
+                Rotation="-89.90375771431269"
                 QuadTreeMap=""
                 Projection="SkyImage"
-                Name="692_2022E3_02_01_23"
+                Name="697_2022E3_20_01_23_3"
                 FileType=".jpg"
-                CenterY="32.04764555280646"
-                CenterX="237.74265402647382"
+                CenterY="49.459378041612034"
+                CenterX="233.33334365949213"
                 BottomsUp="False"
                 StockSet="False"
                 ElevationModel="False"
                 OffsetX="400.5"
-                OffsetY="284.0"
+                OffsetY="272.0"
                 BaseTileLevel="0"
-                BaseDegreesPerTile="0.0020139332190545426"
+                BaseDegreesPerTile="0.0021215482033951198"
                 ReferenceFrame=""
                 MeanRadius="0">
         <Description>description</Description>

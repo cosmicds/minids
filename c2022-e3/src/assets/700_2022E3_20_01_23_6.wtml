@@ -1,5 +1,5 @@
-<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="693_2022E3_11_01_23" Group="Explorer" Searchable="False">
-  <Place Name="693_2022E3_11_01_23" DataSetType="Sky" RA="15.787004849413922" Dec="37.68700994275855" Rotation="0" ZoomLevel="10">
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="700_2022E3_20_01_23_6" Group="Explorer" Searchable="False">
+  <Place Name="700_2022E3_20_01_23_6" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -8,24 +8,24 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/assets/693_2022E3_11_01_23_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/src/assets/700_2022E3_20_01_23_6_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
-                Rotation="-90.00271612149828"
+                Rotation="-0.9027085450059396"
                 QuadTreeMap=""
                 Projection="SkyImage"
-                Name="693_2022E3_11_01_23"
+                Name="700_2022E3_20_01_23_6"
                 FileType=".jpg"
-                CenterY="37.68700994275855"
-                CenterX="236.80507274120882"
+                CenterY="49.65237468877651"
+                CenterX="232.68166188062"
                 BottomsUp="False"
                 StockSet="False"
                 ElevationModel="False"
                 OffsetX="400.5"
-                OffsetY="276.0"
+                OffsetY="356.0"
                 BaseTileLevel="0"
-                BaseDegreesPerTile="0.0021657823342681013"
+                BaseDegreesPerTile="0.002311407615484201"
                 ReferenceFrame=""
                 MeanRadius="0">
         <Description>description</Description>
