@@ -8,7 +8,7 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/johnarban/wwt_interactives/main/c2022-e3/assets/692_2022E3_02_01_23_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/johnarban/minids/main/c2022-e3/assets/692_2022E3_02_01_23_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
