@@ -14,3 +14,7 @@ tsconfig.tsbuildinfo
 !**/.yarn/versions
 
 .pnp.*
+
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
