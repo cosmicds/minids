@@ -1,0 +1,38 @@
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="697_2022E3_20_01_23_3" Group="Explorer" Searchable="False">
+  <Place Name="697_2022E3_20_01_23_3" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
+    <ForegroundImageSet>
+      <ImageSet       DemUrl=""
+                MSRCommunityId="0"
+                MSRComponentId="0"
+                Permission="0"
+                Generic="False"
+                DataSetType="Sky"
+                BandPass="Visible"
+                Url="https://raw.githubusercontent.com/johnarban/wwt_interactives/main/c2022-e3/assets/697_2022E3_20_01_23_3_inverted_tagged.jpg"
+                TileLevels="0"
+                WidthFactor="2"
+                Sparse="True"
+                Rotation="-89.90375771431269"
+                QuadTreeMap=""
+                Projection="SkyImage"
+                Name="697_2022E3_20_01_23_3"
+                FileType=".jpg"
+                CenterY="49.459378041612034"
+                CenterX="233.33334365949213"
+                BottomsUp="False"
+                StockSet="False"
+                ElevationModel="False"
+                OffsetX="400.5"
+                OffsetY="272.0"
+                BaseTileLevel="0"
+                BaseDegreesPerTile="0.0021215482033951198"
+                ReferenceFrame=""
+                MeanRadius="0">
+        <Description>description</Description>
+        <Credits>credits</Credits>
+        <CreditsUrl>credits_url</CreditsUrl>
+        <ThumbnailUrl>https://nova.astrometry.net/image/16942765</ThumbnailUrl>
+      </ImageSet>
+    </ForegroundImageSet>
+  </Place>
+</Folder>

@@ -348,6 +348,10 @@ import { PlotTypes } from "@wwtelescope/engine-types";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
+import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
+
+
 import {
   ephemerisFullWeeklyCsv,
   ephemeris2023DailyCsv
@@ -428,9 +432,37 @@ type SheetType = "text" | "video" | null;
 
 export default defineComponent({
   extends: MiniDSBase,
-
+  
+  props: {
+    wtml: {
+      type: Object,
+      required: true
+    },
+    wwtNamespace: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    },
+    thumbnailUrl: {
+      type: String,
+      required: true
+    },
+    bgWtml: {
+      type: String,
+      required: true
+    },
+    bgName: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
+      layers: {} as Record<string, ImageSetLayer>, // from carina
+      layersLoaded: false, // from carina
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
 
@@ -477,6 +509,40 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.wwt = this;
+
+      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
+        this.loadImageCollection({
+          url: value,
+          loadChildFolders: false
+        }).then((folder) => {
+          const children = folder.get_children();
+          if (children == null) { return; }
+          const item = children[0] as Place;
+          const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+          if (imageset === null) { return; }
+          this.addImageSetLayer({
+            url: imageset.get_url(),
+            mode: "autodetect",
+            name: key,
+            goto: false
+        }).then((layer) => {
+          this.layers[key] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 1]);
+        });
+      }));
+
+      Promise.all(layerPromises).then(() => {
+        this.layersLoaded = true;
+      });
+      
+
+      this.loadImageCollection({
+        url: this.bgWtml,
+        loadChildFolders: true,
+      }).then((_folder) => {
+        console.log('IMAGES LOADED')
+
+      });
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
@@ -582,6 +648,7 @@ export default defineComponent({
   },
 
   computed: {
+
     isLoading(): boolean {
       return !this.ready;
     },
