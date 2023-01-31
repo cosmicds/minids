@@ -635,7 +635,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -653,7 +653,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 1]
           ]
         })
@@ -672,7 +672,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
@@ -694,7 +694,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 75],
             ["color", Color.fromHex(this.cometColor)],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
