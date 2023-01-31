@@ -146,6 +146,7 @@ export default defineComponent({
   width: auto;
   overflow-x: auto;
   overflow-y: auto;
+  pointer-events: auto;
   background: black;
   &::-webkit-scrollbar {
     padding: 1px;
