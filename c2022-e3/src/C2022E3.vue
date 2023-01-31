@@ -146,11 +146,22 @@
 
     <div class="bottom-content">
       <div
-        id="center-view-button"
-        class="ui-button clickable"
-        @click="updateViewForDate"
+        id="buttons-container"
       >
-        Center View on Date
+        <div
+          id="toggle-altaz-button"
+          class="ui-button clickable"
+          @click="showAltAzGrid = !showAltAzGrid"
+        >
+          {{ (showAltAzGrid ? 'Hide' : 'Show') + ' Grid' }} 
+        </div>
+        <div
+          id="center-view-button"
+          class="ui-button clickable"
+          @click="updateViewForDate"
+        >
+          Center View on Date
+        </div>
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -404,7 +415,8 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Color, Folder, Grids, Poly, RenderContext, Settings, WWTControl } from "@wwtelescope/engine";
+import { engineStore } from "@wwtelescope/engine-pinia";
 import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -530,6 +542,8 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
 
+      showAltAzGrid: true,
+
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
@@ -570,7 +584,7 @@ export default defineComponent({
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      window.wwt = this; window.settings = this.getSettings();
+      window.wwt = this; window.settings = this.wwtSettings;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
@@ -703,8 +717,25 @@ export default defineComponent({
         this.layersLoaded = true;
       });
 
-      this.getSettings().set_localHorizonMode(true);
+      this.wwtSettings.set_localHorizonMode(true);
+      this.wwtSettings.set_showAltAzGrid(true);
+
+      // This is kinda horrible, but it works!
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl._drawSkyOverlays = function() {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (Settings.get_active().get_showAltAzGrid()) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
+        }
+      }
+
       this.updateWWTLocation();
+      
 
     });
 
@@ -739,6 +770,17 @@ export default defineComponent({
         '--comet-color': this.cometColor
       }
     },
+    wwtControl(): WWTControl {
+      return WWTControl.singleton;
+    },
+    wwtRenderContext() {
+      return this.wwtControl.renderContext;
+    },
+    wwtSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -757,17 +799,10 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false;
     },
-    
-    getSettings(): Settings {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return Settings.get_active();
-    },
-
+  
     updateWWTLocation() {
-      const settings = this.getSettings();
-      settings.set_locationLat(R2D * this.location.latitudeRad);
-      settings.set_locationLng(R2D * this.location.longitudeRad + 90);
+      this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad + 90);
     },
 
     logLocation() {
@@ -1015,7 +1050,7 @@ export default defineComponent({
       }
     },
 
-    closestDailyPoint(
+    closestPoint(
       point: { x: number; y: number; },
       threshold?: number
     ): TableRow | null {
@@ -1025,16 +1060,18 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      daily2023Table.forEach(row => {
-        const raRad = row.ra * D2R;
-        const decRad = row.dec * D2R;
+      [daily2023Table, fullWeeklyTable].forEach((table) => {
+        table.forEach(row => {
+          const raRad = row.ra * D2R;
+          const decRad = row.dec * D2R;
 
-        const dist = distance(target.ra, target.dec, raRad, decRad);
-        if (dist < minDist) {
-          closestPt = row;
-          minDist = dist;
-        }
+          const dist = distance(target.ra, target.dec, raRad, decRad);
+          if (dist < minDist) {
+            closestPt = row;
+            minDist = dist;
+          }
 
+        });
       });
 
       if (closestPt !== null) {
@@ -1049,7 +1086,7 @@ export default defineComponent({
 
     updateLastClosePoint(event: PointerEvent) {
       const pt = { x: event.offsetX, y: event.offsetY };
-      const closestPt = this.closestDailyPoint(pt, this.selectionProximity);
+      const closestPt = this.closestPoint(pt, this.selectionProximity);
       if (closestPt == null && this.lastClosePt == null) {
         return;
       }
@@ -1082,6 +1119,9 @@ export default defineComponent({
     onPointerUp(event: PointerEvent) {
       if (!this.isPointerMoving) {
         this.updateLastClosePoint(event);
+        if (this.lastClosePt !== null) {
+          this.selectedTime = this.lastClosePt.date.getTime();
+        }
       }
       this.pointerStartPosition = null;
       this.isPointerMoving = false;
@@ -1127,6 +1167,9 @@ export default defineComponent({
     //     });
     //   }
     // },
+    showAltAzGrid(show: boolean) {
+      this.wwtSettings.set_showAltAzGrid(show);
+    },
     location(loc: LocationRad) {
       const now = this.selectedDate;
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
@@ -1383,6 +1426,7 @@ body {
 }
 
 .ui-button {
+  text-align: center;
   color: var(--comet-color);
   background: black;
   padding: 5px 5px;
@@ -1400,8 +1444,14 @@ body {
   }
 }
 
-#center-view-button {
+#buttons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   align-self: flex-end;
+}
+
+#center-view-button {
   margin-bottom: 25px;
 }
 
