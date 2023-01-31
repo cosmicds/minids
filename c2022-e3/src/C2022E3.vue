@@ -1070,6 +1070,9 @@ export default defineComponent({
     onPointerUp(event: PointerEvent) {
       if (!this.isPointerMoving) {
         this.updateLastClosePoint(event);
+        if (this.lastClosePt !== null) {
+          this.selectedTime = this.lastClosePt.date.getTime();
+        }
       }
       this.pointerStartPosition = null;
       this.isPointerMoving = false;
