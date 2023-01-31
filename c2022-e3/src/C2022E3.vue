@@ -42,6 +42,21 @@
       </div>
     </transition>
 
+    <div class="left-content">
+      <folder-view
+        v-if="imagesetFolder !== null"
+        instant-move
+        sliders
+        :thumbnails="false"
+        :root-folder="imagesetFolder"
+        :wwt-namespace="wwtNamespace"
+        flex-direction="column"
+        @select="onItemSelected"
+        @opacity="updateImageOpacity"
+      ></folder-view>
+    </div>
+    
+
     <div class="top-content">
       <v-tooltip
         v-model="showVideoTooltip"
@@ -378,7 +393,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Color, Folder, Imageset, Poly, Settings } from "@wwtelescope/engine";
 import { PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -498,16 +513,15 @@ export default defineComponent({
   data() {
     return {
       showSplashScreen: true,
-      layers: {} as Record<string, ImageSetLayer>, // from carina
-      layersLoaded: false, // from carina
+      imagesetLayers: {} as Record<string, ImageSetLayer>,
+      layersLoaded: false,
+      imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
-
-      ready: false,
 
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
@@ -546,31 +560,34 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.wwt = this;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.applyISLSetting = applyImageSetLayerSetting;
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
-          url: value,
+          url: value as string,
           loadChildFolders: false
         }).then((folder) => {
+          this.imagesetFolder = folder;
           const children = folder.get_children();
           if (children == null) { return; }
-          const item = children[0] as Place;
-          const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-          if (imageset === null) { return; }
-          this.addImageSetLayer({
-            url: imageset.get_url(),
-            mode: "autodetect",
-            name: key,
-            goto: false
-        }).then((layer) => {
-          this.layers[key] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 1]);
+          children.forEach((item) => {
+            if (!(item instanceof Place)) { return; }
+            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+            if (imageset === null) { return; }
+            const name = imageset.get_name();
+            this.addImageSetLayer({
+              url: imageset.get_url(),
+              mode: "autodetect",
+              name: name,
+              goto: false
+            }).then((layer) => {
+              this.imagesetLayers[name] = layer;
+              applyImageSetLayerSetting(layer, ["opacity", 1]);
+            });
         });
       }));
-
-      Promise.all(layerPromises).then(() => {
-        this.layersLoaded = true;
-      });
       
 
       this.loadImageCollection({
@@ -586,9 +603,7 @@ export default defineComponent({
       this.getLocation(true);
       this.setClockSync(false);
 
-      const proms: Promise<SpreadSheetLayer | void>[] = [];
-
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -607,7 +622,7 @@ export default defineComponent({
         })
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -625,7 +640,7 @@ export default defineComponent({
         })
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Weekly Date Layer",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -648,7 +663,7 @@ export default defineComponent({
         });
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Daily Date Layer",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -670,11 +685,11 @@ export default defineComponent({
         });
       }));
 
-
       this.setTime(this.selectedDate);
 
-      Promise.all(proms).then((_layers) => {
-        this.ready = true;
+      Promise.all(layerPromises).then(() => {
+        console.log(this.imagesetFolder);
+        this.layersLoaded = true;
       });
 
       // this.getSettings().set_localHorizonMode(true);
@@ -688,6 +703,9 @@ export default defineComponent({
 
     isLoading(): boolean {
       return !this.ready;
+    },
+    ready(): boolean {
+      return this.layersLoaded;
     },
     selectedDate(): Date {
       return new Date(this.selectedTime);
@@ -743,6 +761,24 @@ export default defineComponent({
       } else {
         this.sheet = name;
       }
+    },
+
+    onItemSelected(place: Place) {
+      console.log(place);
+      this.gotoTarget({
+        place: place,
+        noZoom: false,
+        instant: true,
+        trackObject: false
+      });
+    },
+
+    updateImageOpacity(place: Place, opacity: number) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      const layer = this.imagesetLayers[iset.get_name()];
+      if (layer == null) { return; }
+      applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
     },
 
     setupLocationSelector() {
@@ -1249,25 +1285,6 @@ body {
   }
 }
 
-#tools {
-  z-index: 10;
-  color: #fff;
-
-  .opacity-range {
-    width: 50vw;
-  }
-
-  .clickable {
-    cursor: pointer;
-  }
-
-  select {
-    background: white;
-    color: black;
-    border-radius: 3px;
-  }
-}
-
 .tool-container {
   display: flex;
   width: 100%;
@@ -1475,6 +1492,17 @@ body {
   }
 }
 
+.left-content {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  pointer-events: none;
+  height: calc(100% - 2rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 @media(max-width: 600px) {
   .mark-line {
     display: none;
@@ -1516,6 +1544,10 @@ body {
   height:8%;
   top: 4%;
   left: 80.5%;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 // :root {

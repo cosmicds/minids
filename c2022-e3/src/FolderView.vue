@@ -9,20 +9,33 @@
       v-for="item of items"
       :key="item.get_name()"
       :title="item.get_name()"
-      @click="() => selectItem(item)"
     >
-      <img :src="item.get_thumbnailUrl()" :alt="item.get_name()" />
+      <img
+        v-if="thumbnails"
+        :src="item.get_thumbnailUrl()"
+        :alt="item.get_name()"
+      />
       <div
         class="item-name"
-      >{{item.get_name()}}</div>
+        @click="() => selectItem(item)"
+      >
+        {{item.get_name()}}
+      </div>
+      <input
+        v-if="sliders"
+        class="opacity-range"
+        type="range"
+        value="100"
+        @input="(e) => onSliderInputChanged(e, item)"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, isProxy, toRaw, PropType } from "vue";
 import { Folder, FolderUp, Place, Imageset } from "@wwtelescope/engine";
-import { ImageSetType, Thumbnail } from "@wwtelescope/engine-types";
+import { Thumbnail } from "@wwtelescope/engine-types";
 import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
 
 type FlexDirection = "row" | "column";
@@ -39,53 +52,62 @@ export default defineComponent({
       type: String as PropType<FlexDirection>,
       default: "column"
     },
+    instantMove: {
+      type: Boolean,
+      default: false
+    },
+    sliders: {
+      type: Boolean,
+      default: false
+    },
     startFirstSelected: {
       type: Boolean,
       default: false
-    }
+    },
+    thumbnails: {
+      type: Boolean,
+      default: true
+    },
   },
 
   data() {
     return {
       items: [] as Thumbnail[],
-      lastSelectedItem: null as Thumbnail | null
+      lastSelectedItem: null as Thumbnail | null,
+      opacities: {} as Record<string,number>
     }
   },
 
   created() {
-    for (const c of this.rootFolder.get_children() ?? []) {
-      if (c instanceof Place) {
-        this.items.push(c);
-      }
-    }
-    if (this.startFirstSelected && this.items?.length > 0) {
-      this.selectItem(this.items[0]);
-    }
+    this.populate();
   },
 
   methods: {
+    populate(): void {
+      for (const c of this.rootFolder.get_children() ?? []) {
+        const cr = isProxy(c) ? toRaw(c) : c;
+        if (cr instanceof Place) {
+          this.items.push(cr);
+        }
+      }
+      if (this.startFirstSelected && this.items?.length > 0) {
+        this.selectItem(this.items[0]);
+      }
+    },
+    showSlider(item: Thumbnail | null): boolean {
+      return item instanceof Imageset;
+    },
     selectItem(item: Thumbnail): void {
+      console.log(item);
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
-      } else if (item instanceof Imageset) {
-        const type = item.get_dataSetType();
-        this.setForegroundImageByName(item.get_name());
-        if (type === ImageSetType.planet) {
-          this.setBackgroundImageByName(item.get_name());
-        }
-      } else if (item instanceof Place) {
-        const imageset = item.get_backgroundImageset();
-        if (imageset !== null) {
-          this.setForegroundImageByName(imageset.get_name());
-        }
-        this.gotoTarget({
-          place: item,
-          noZoom: false,
-          instant: false,
-          trackObject: true
-        });
+      } else {
+        this.$emit('select', item);
       }
+    },
+    onSliderInputChanged(e: Event, item: Thumbnail) {
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value)
     }
   },
 
@@ -94,8 +116,8 @@ export default defineComponent({
       return {
         "--flex-direction": this.flexDirection
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -105,6 +127,7 @@ export default defineComponent({
   flex-direction: var(--flex-direction);
   width: auto;
   overflow-x: auto;
+  overflow-y: auto;
   background: black;
   &::-webkit-scrollbar {
     padding: 1px;
@@ -121,10 +144,12 @@ export default defineComponent({
   //justify-content: space-around;
 }
 .item {
+  display: flex;
+  flex-direction: column;
   padding: 3px;
   border: 1px solid #444;
   border-radius: 2px;
-  width: ~"min(96px, 16vw)";
+  width: fit-content;
   cursor: pointer;
   pointer-events: auto;
   & img {
@@ -132,6 +157,10 @@ export default defineComponent({
     height: ~"min(45px, 7.5vw)";
     object-fit: cover;
     border-radius: 2px;
+  }
+
+  & input[type=range] {
+    width: calc(min(10vh, 150px))
   }
   &.selected {
     border: 1px solid dodgerblue;
