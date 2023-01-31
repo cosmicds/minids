@@ -752,9 +752,7 @@ export default defineComponent({
       }
     },
     wwtControl(): WWTControl {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return WWTControl.singleton
+      return WWTControl.singleton;
     },
     wwtRenderContext() {
       return this.wwtControl.renderContext;
