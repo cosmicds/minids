@@ -251,7 +251,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/14/2023 (1)" DataSetType="Sky" RA="15.740159544593755" Dec="40.72867893611561" Rotation="0" ZoomLevel="10">
+  <Place Name="1/14/2023" DataSetType="Sky" RA="15.740159544593755" Dec="40.72867893611561" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -287,7 +287,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023 (2)" DataSetType="Sky" RA="15.550222193697863" Dec="49.65126976298125" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (1)" DataSetType="Sky" RA="15.550222193697863" Dec="49.65126976298125" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -323,7 +323,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023 (3)" DataSetType="Sky" RA="15.494946142412063" Dec="49.598571220367006" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (2)" DataSetType="Sky" RA="15.494946142412063" Dec="49.598571220367006" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -359,7 +359,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023 (4)" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (3)" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -395,7 +395,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023 (5)" DataSetType="Sky" RA="15.54907641833187" Dec="49.655992068261156" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (4)" DataSetType="Sky" RA="15.54907641833187" Dec="49.655992068261156" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -431,7 +431,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023" DataSetType="Sky" RA="15.555750308790959" Dec="49.437596647464815" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (5)" DataSetType="Sky" RA="15.555750308790959" Dec="49.437596647464815" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -467,7 +467,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="1/23/2023 (6)" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (6)" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
