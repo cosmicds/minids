@@ -144,18 +144,18 @@
       <div id="credits" class="ui-text">
         <div>
           Powered by
-          <a href="https://worldwidetelescope.org/home/"
+          <a href="https://worldwidetelescope.org/home/" target="_blank"
             >WorldWide Telescope</a
           >
         </div>
         <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/"
+          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
           /></a>
-          <a href="https://worldwidetelescope.org/home/"
+          <a href="https://worldwidetelescope.org/home/" target="_blank"
             ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
           /></a>
-          <a href="https://science.nasa.gov/learners"
+          <a href="https://science.nasa.gov/learners" target="_blank"
             ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
           /></a>
           <!-- <ShareNetwork
@@ -244,15 +244,32 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                
+                Comets are dusty snowballs, large clumps of rock and ice, that originate in the outer solar system. The “Green Comet” (or <a href="https://science.nasa.gov/comet-2022-e3-ztf" target="_blank">C/2022 E3</a>) makes its closest approach to the Sun (and to Earth) in early 2023. The comet images in this interactive view were taken on different dates from December 2022 through January 2023 by astrophotographer <a href="http://www.astrostudio.at/" target="_blank">Gerald Rhemann</a>.
+                <br><br>
+
+                <h3>Explore!</h3>
+                 • Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)<br>
+                
+                 • Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet? 
+                <br><br>
+
+                <h3>Why is the Comet Green?</h3>
+                Visually, comets have three parts: the bright coma and two tails. The coma is material being vaporized off the comet’s surface by radiation from the Sun. The green color of the comet is due to dicarbon (a molecule made of two carbon atoms, C2) in the comet’s coma. When excited by ultraviolet light from the sun, dicarbon fluoresces with a blue-green light. 
+                <br><br>
+
+                <h3>A Comet’s Tail</h3>
+                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet as it moves in space!
+
                 <br><br><br>
                 <h3>Credits:</h3>
-                <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
                 Jon Carifio<br>
                 John Lewis<br>
                 Pat Udomprasert<br>
                 Alyssa Goodman<br>
                 Mary Dussault<br>
+                Harry Houghton<br>
                 Evaluator: Sue Sunbury<br>
                 <br>
                 <h4>WorldWide Telescope Team:</h4>
@@ -311,12 +328,13 @@
                   <v-row>
                     <v-col cols="12">
                       <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/">CosmicDS</a> Mini Stories Team:</h4>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
                       Jon Carifio<br>
                       John Lewis<br>
                       Pat Udomprasert<br>
                       Alyssa Goodman<br>
                       Mary Dussault<br>
+                      Harry Houghton<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -1404,10 +1422,19 @@ body {
   margin: 5px 50px;
 }
 
-.vue-slider-process,
+.vue-slider-process
+{
+  background-color: white !important;
+}
+
 .vue-slider-dot-tooltip-inner
 {
   background-color: var(--comet-color) !important;
+}
+
+.vue-slider-dot-style
+{
+  color: var(--comet-color) !important;
 }
 
 .mark-line {
