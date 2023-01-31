@@ -7,11 +7,11 @@
       v-if="expandable"
       id="expand-row"
       class="bordered"
+      @click="expanded = !expanded"
     >
       <font-awesome-icon
         id="expand-icon"
         :icon="expanded ? 'chevron-up' : 'chevron-down'"
-        @click="expanded = !expanded"
       />
     </div>
     <transition-expand>
@@ -205,5 +205,9 @@ export default defineComponent({
   justify-content: flex-end;
   padding: 3px;
   pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>
