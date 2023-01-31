@@ -8,7 +8,7 @@
                 Generic="False"
                 DataSetType="Sky"
                 BandPass="Visible"
-                Url="https://raw.githubusercontent.com/minids/minids/main/c2022-e3/src/assets/690_2022E3_29_12_inverted_tagged.jpg"
+                Url="https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/690_2022E3_29_12_inverted_tagged.jpg"
                 TileLevels="0"
                 WidthFactor="2"
                 Sparse="True"
