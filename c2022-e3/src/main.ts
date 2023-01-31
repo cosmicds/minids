@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
+import TransitionExpand from "./TransitionExpand.vue";
 
 import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css'
@@ -11,6 +12,8 @@ import vuetify from "../plugins/vuetify"
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookOpen,
+  faChevronDown,
+  faChevronUp,
   faLocationPin,
   faTimes,
   faVideo
@@ -21,6 +24,8 @@ library.add(faBookOpen);
 library.add(faLocationPin);
 library.add(faTimes);
 library.add(faVideo);
+library.add(faChevronDown);
+library.add(faChevronUp);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
@@ -35,20 +40,7 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 createApp(C2022E3, {
   wwtNamespace: "wwt-minids-c2022e3",
   wtml: { // images are listed in chronological order earliest to latest
-    comet1 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/687_2022E3_18_12.wtml",
-    comet2 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/688_2022E3_27_12.wtml",
-    comet3 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/689_2022E3_28_12.wtml",
-    comet4 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/690_2022E3_29_12.wtml",
-    comet5 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/691_2022E3_01_01_23.wtml",
-    comet6 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/692_2022E3_02_01_23.wtml",
-    comet7 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/693_2022E3_11_01_23.wtml",
-    comet8 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/694_2022E3_14_01_23.wtml",
-    comet9 : "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/700_2022E3_20_01_23_6.wtml",
-    comet10: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/695_2022E3_20_01_23_1.wtml",
-    comet11: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/698_2022E3_20_01_23_4.wtml",
-    comet12: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/699_2022E3_20_01_23_5.wtml",
-    comet13: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/697_2022E3_20_01_23_3.wtml",
-    comet14: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/696_2022E3_20_01_23_2.wtml",
+    c2022e3: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/C2022_E3.wtml",
   },
   url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
   thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
@@ -82,6 +74,7 @@ createApp(C2022E3, {
 .component('font-awesome-icon', FontAwesomeIcon)
 .component('folder-view', FolderView)
 .component('vue-slider', VueSlider)
+.component('transition-expand', TransitionExpand)
 
 // Mount
 .mount("#app");

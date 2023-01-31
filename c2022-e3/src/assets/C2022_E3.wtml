@@ -1,5 +1,5 @@
 <Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="687_2022E3_18_12" Group="Explorer" Searchable="False">
-  <Place Name="687_2022E3_18_12" DataSetType="Sky" RA="15.889722339073499" Dec="27.435348234401395" Rotation="0" ZoomLevel="10">
+  <Place Name="12/18/2022" DataSetType="Sky" RA="15.889722339073499" Dec="27.435348234401395" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -35,7 +35,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="688_2022E3_27_12" DataSetType="Sky" RA="15.885267696119373" Dec="29.594694500528576" Rotation="0" ZoomLevel="10">
+  <Place Name="12/27/2022" DataSetType="Sky" RA="15.885267696119373" Dec="29.594694500528576" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -71,7 +71,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="689_2022E3_28_12" DataSetType="Sky" RA="15.876823348284313" Dec="30.06135235969306" Rotation="0" ZoomLevel="10">
+  <Place Name="12/28/2022" DataSetType="Sky" RA="15.876823348284313" Dec="30.06135235969306" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -107,7 +107,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="690_2022E3_29_12" DataSetType="Sky" RA="15.870840298697768" Dec="30.304865576062944" Rotation="0" ZoomLevel="10">
+  <Place Name="12/29/2022" DataSetType="Sky" RA="15.870840298697768" Dec="30.304865576062944" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -143,7 +143,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="691_2022E3_01_01_23" DataSetType="Sky" RA="15.85905648442954" Dec="31.55074617443531" Rotation="0" ZoomLevel="10">
+  <Place Name="1/1/2023" DataSetType="Sky" RA="15.85905648442954" Dec="31.55074617443531" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -179,7 +179,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-    <Place Name="692_2022E3_02_01_23" DataSetType="Sky" RA="15.849510268431588" Dec="32.04764555280646" Rotation="0" ZoomLevel="10">
+    <Place Name="1/2/2023" DataSetType="Sky" RA="15.849510268431588" Dec="32.04764555280646" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -215,7 +215,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="693_2022E3_11_01_23" DataSetType="Sky" RA="15.787004849413922" Dec="37.68700994275855" Rotation="0" ZoomLevel="10">
+  <Place Name="1/11/2023" DataSetType="Sky" RA="15.787004849413922" Dec="37.68700994275855" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -251,7 +251,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="694_2022E3_14_01_23" DataSetType="Sky" RA="15.740159544593755" Dec="40.72867893611561" Rotation="0" ZoomLevel="10">
+  <Place Name="1/14/2023" DataSetType="Sky" RA="15.740159544593755" Dec="40.72867893611561" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -287,7 +287,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="695_2022E3_20_01_23_1" DataSetType="Sky" RA="15.550222193697863" Dec="49.65126976298125" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (1)" DataSetType="Sky" RA="15.550222193697863" Dec="49.65126976298125" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -323,7 +323,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="696_2022E3_20_01_23_2" DataSetType="Sky" RA="15.494946142412063" Dec="49.598571220367006" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (2)" DataSetType="Sky" RA="15.494946142412063" Dec="49.598571220367006" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -359,7 +359,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="697_2022E3_20_01_23_3" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (3)" DataSetType="Sky" RA="15.555556243966143" Dec="49.459378041612034" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -395,7 +395,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="698_2022E3_20_01_23_4" DataSetType="Sky" RA="15.54907641833187" Dec="49.655992068261156" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (4)" DataSetType="Sky" RA="15.54907641833187" Dec="49.655992068261156" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -431,7 +431,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="699_2022E3_20_01_23_5" DataSetType="Sky" RA="15.555750308790959" Dec="49.437596647464815" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (5)" DataSetType="Sky" RA="15.555750308790959" Dec="49.437596647464815" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
@@ -467,7 +467,7 @@
       </ImageSet>
     </ForegroundImageSet>
   </Place>
-  <Place Name="700_2022E3_20_01_23_6" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
+  <Place Name="1/20/2023 (6)" DataSetType="Sky" RA="15.512110792041334" Dec="49.65237468877651" Rotation="0" ZoomLevel="10">
     <ForegroundImageSet>
       <ImageSet       DemUrl=""
                 MSRCommunityId="0"
