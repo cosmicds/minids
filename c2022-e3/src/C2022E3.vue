@@ -398,7 +398,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Color, Folder, Poly, Settings } from "@wwtelescope/engine";
 import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -437,7 +437,7 @@ type TableRow = typeof fullWeeklyTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-        "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
+        "Date", "RA", "Dec", "Tmag"
       ]].concat(table.map((d, _i) => {
         return [
           d.date.toISOString(),
@@ -453,6 +453,7 @@ function formatCsvTable(table: Table): string {
 }
 
 const fullWeeklyString = formatCsvTable(fullWeeklyTable);
+console.log(fullWeeklyString);
 const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
@@ -1142,6 +1143,7 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
+      this.updateViewForDate();
     },
     showLocationSelector(show: boolean) {
       if (show) {
