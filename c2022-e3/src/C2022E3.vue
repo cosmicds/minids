@@ -904,7 +904,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          this.createHorizon();
+          //this.createHorizon();
         },
         options
       );
@@ -1169,7 +1169,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      this.createHorizon(now);
+      //this.createHorizon(now);
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
