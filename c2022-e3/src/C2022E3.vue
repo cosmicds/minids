@@ -961,9 +961,10 @@ export default defineComponent({
 
       const bad_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
       // const julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
-      const julianDays = bad_julianDays - 42.3 / (60 * 24) //2 * 0.01166666663812066;
+      const julianDays = bad_julianDays - 42.27 / (60 * 24) //2 * 0.01166666663812066;
 
       const julianCenturies = julianDays / 36525.0;
+      // this form wants julianDays - 2451545
       let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
 
       if (mst > 0.0) {
