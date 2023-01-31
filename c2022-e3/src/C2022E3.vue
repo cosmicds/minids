@@ -898,6 +898,10 @@ export default defineComponent({
       return { ra, dec };
     },
 
+    get_julian(date: Date): number {
+        return (date.valueOf() / 86400000) - (date.getTimezoneOffset() / 1440) + 2440587.5;
+      },
+  
     mstFromUTC2(utc: Date, longRad: number): number {
 
       const lng = longRad * R2D;
@@ -920,7 +924,9 @@ export default defineComponent({
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      const bad_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // const julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
+      const julianDays = bad_julianDays - 42.3 / (60 * 24) //2 * 0.01166666663812066;
 
       const julianCenturies = julianDays / 36525.0;
       let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
@@ -940,7 +946,7 @@ export default defineComponent({
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
       let hourAngle = this.mstFromUTC2(utc, longRad);
-
+  
       const raDec = this.altAzToRADec(altRad, azRad, latRad);
       const ha = raDec.ra * R2D;
 
@@ -982,7 +988,7 @@ export default defineComponent({
 
     createHorizon(when: Date | null = null) {
       this.clearAnnotations();
-
+  
       const color = '#5C4033';
       const date = when || this.selectedDate || new Date();
 
@@ -1143,6 +1149,7 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
+      this.createHorizon(date);
     },
     showLocationSelector(show: boolean) {
       if (show) {
