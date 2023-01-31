@@ -1003,7 +1003,7 @@ export default defineComponent({
       }
     },
 
-    closestDailyPoint(
+    closestPoint(
       point: { x: number; y: number; },
       threshold?: number
     ): TableRow | null {
@@ -1013,16 +1013,18 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      daily2023Table.forEach(row => {
-        const raRad = row.ra * D2R;
-        const decRad = row.dec * D2R;
+      [daily2023Table, fullWeeklyTable].forEach((table) => {
+        table.forEach(row => {
+          const raRad = row.ra * D2R;
+          const decRad = row.dec * D2R;
 
-        const dist = distance(target.ra, target.dec, raRad, decRad);
-        if (dist < minDist) {
-          closestPt = row;
-          minDist = dist;
-        }
+          const dist = distance(target.ra, target.dec, raRad, decRad);
+          if (dist < minDist) {
+            closestPt = row;
+            minDist = dist;
+          }
 
+        });
       });
 
       if (closestPt !== null) {
@@ -1037,7 +1039,7 @@ export default defineComponent({
 
     updateLastClosePoint(event: PointerEvent) {
       const pt = { x: event.offsetX, y: event.offsetY };
-      const closestPt = this.closestDailyPoint(pt, this.selectionProximity);
+      const closestPt = this.closestPoint(pt, this.selectionProximity);
       if (closestPt == null && this.lastClosePt == null) {
         return;
       }
