@@ -10,6 +10,24 @@
       @pointerup="onPointerUp"
       @pointerdown="onPointerDown"
     ></WorldWideTelescope>
+    
+    <v-overlay
+        :model-value="showSplashScreen"
+        absolute
+        opacity="0.6"
+        id="splash-overlay"
+      >
+        <img
+          id="splash-screen"
+          :src="require(`./assets/Green_Comet_Mini_Splashscreen.png`)"
+          v-click-outside="closeSplashScreen"
+          contain
+        />
+        <a
+          id="splash-close"
+          @click="closeSplashScreen">
+        </a>
+      </v-overlay>
 
     <transition name="fade">
       <div
@@ -479,6 +497,7 @@ export default defineComponent({
   },
   data() {
     return {
+      showSplashScreen: true,
       layers: {} as Record<string, ImageSetLayer>, // from carina
       layersLoaded: false, // from carina
       backgroundImagesets: [] as BackgroundImageset[],
@@ -699,6 +718,10 @@ export default defineComponent({
   },
 
   methods: {
+    closeSplashScreen() {
+      this.showSplashScreen = false;
+    },
+    
     getSettings(): Settings {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1465,6 +1488,35 @@ body {
   #map-container {
     width: 70vw;
   }
+}
+
+
+#splash-overlay {
+  position: fixed;
+  //  vue components are flex, so we can easy center
+  align-items: center;
+  justify-content: center;
+}
+
+
+#splash-screen {
+  // for some reason the view props don't work
+  // for max-width and max-height
+  outline: 1px solid red;
+  // splash image size 1908 × 2040 px
+  max-width: calc(min(90vw,1908px)); 
+  max-height: calc(min(90vh,2040px)); 
+  /* prevent the image from being stretched */
+  object-fit: contain;
+}
+
+#splash-close {
+  outline: 1px solid rgba(255, 255, 255, 0.094);
+  position: absolute;
+  width: 7%;
+  height:8%;
+  top: 4%;
+  left: 80.5%;
 }
 
 // :root {
