@@ -169,7 +169,7 @@
             adsorb
             included
             :marks="(d: number) => {
-              return weeklyDates.includes(d) || dailyDates.includes(d)
+              return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
             :order="false"
             v-model="selectedTime"
@@ -468,15 +468,15 @@ const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
 const dailyDates = daily2023Table.map(r => r.date.getTime());
-const minDate = Math.min(Math.min(...weeklyDates), Math.min(...dailyDates));
-const maxDate = Math.max(Math.max(...weeklyDates), Math.max(...dailyDates));
+const minDate = Math.min(...weeklyDates, ...dailyDates);
+const maxDate = Math.max(...weeklyDates, ...dailyDates);
 const dates: number[] = [];
 
 const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
-  d.setDate(d.getDate() + 1);
+  d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
 
@@ -1129,6 +1129,7 @@ export default defineComponent({
           raRad: D2R * position.ra,
           decRad: D2R * position.dec,
           zoomDeg: this.wwtZoomDeg,
+          rollRad: this.wwtRollRad,
           instant: false
         });
       }
