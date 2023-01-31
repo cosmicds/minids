@@ -724,7 +724,7 @@ export default defineComponent({
         if (Settings.get_active().get_showAltAzGrid()) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
+          Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 126, 42, 99));
         }
       }
 
@@ -1544,11 +1544,6 @@ body {
 .vue-slider-dot-tooltip-inner
 {
   background-color: var(--comet-color) !important;
-}
-
-.vue-slider-dot-style
-{
-  color: var(--comet-color) !important;
 }
 
 .mark-line {
