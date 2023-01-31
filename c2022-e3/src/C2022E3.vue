@@ -45,8 +45,8 @@
     <div class="left-content">
       <folder-view
         v-if="imagesetFolder !== null"
-        instant-move
         sliders
+        expandable
         :thumbnails="false"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
@@ -56,6 +56,9 @@
       ></folder-view>
     </div>
     
+    <div id="overlays">
+      <p>{{ coordText }}</p>
+    </div>
 
     <div class="top-content">
       <v-tooltip
@@ -385,6 +388,8 @@
       </v-card>
     </v-dialog>
 
+    <notifications group="startup-location" position="top right" />
+
   </v-app>
 </template>
 
@@ -392,9 +397,9 @@
 import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
-import { distance } from "@wwtelescope/astro";
-import { Color, Folder, Imageset, Poly, Settings } from "@wwtelescope/engine";
-import { PlotTypes } from "@wwtelescope/engine-types";
+import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { Color, Folder, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
+import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -522,7 +527,7 @@ export default defineComponent({
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
-
+      
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
@@ -559,7 +564,7 @@ export default defineComponent({
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      window.wwt = this;
+      window.wwt = this; window.settings = this.getSettings();
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
@@ -692,14 +697,21 @@ export default defineComponent({
         this.layersLoaded = true;
       });
 
-      // this.getSettings().set_localHorizonMode(true);
-      // this.updateWWTLocation();
+      this.getSettings().set_localHorizonMode(true);
+      this.updateWWTLocation();
 
     });
 
   },
 
   computed: {
+
+    coordText() {
+      if (this.wwtRenderType == ImageSetType.sky) {
+        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+      }
+      return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    },
 
     isLoading(): boolean {
       return !this.ready;
@@ -749,7 +761,15 @@ export default defineComponent({
     updateWWTLocation() {
       const settings = this.getSettings();
       settings.set_locationLat(R2D * this.location.latitudeRad);
-      settings.set_locationLng(R2D * this.location.longitudeRad);
+      settings.set_locationLng(R2D * this.location.longitudeRad + 90);
+    },
+
+    logLocation() {
+      console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
+    },
+
+    logPosition() {
+      console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
     selectSheet(name: SheetType) {
@@ -783,7 +803,7 @@ export default defineComponent({
 
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
-      const map = L.map("map-container").setView(locationDeg, 8);
+      const map = L.map("map-container").setView(locationDeg, 4);
       // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   maxZoom: 19,
       //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -835,13 +855,16 @@ export default defineComponent({
         },
         (error) => {
           console.log(error);
+          console.log(startup);
           let msg = "Unable to detect location. Please check your browser and/or OS settings.";
           if (startup) {
             msg += "\nUse our location selector to manually input your location";
+            console.log("Here");
             this.$notify({
-              group: "startup-location-error",
+              group: "startup-location",
               type: "error",
-              text: msg
+              text: msg,
+              duration: 3000
             });
           } else {
             this.locationErrorMessage = msg;
@@ -1080,12 +1103,13 @@ export default defineComponent({
   },
 
   watch: {
-    // altAz(coords: { altitude: number; azimuth: number }) {
-    //   if (coords.altitude < 0) {
-    //     const pos = this.horizontalToEquatorial(coords.altitude, coords.azimuth, D2R * this.location.latitudeDeg, D2R * this.location.longitudeDeg, new Date());
+    // altAz(coords: { altRad: number; azRad: number }) {
+    //   console.log(coords);
+    //   if (coords.altRad < 0) {
+    //     const pos = this.horizontalToEquatorial(coords.altRad, coords.azRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
     //     this.gotoRADecZoom({
-    //       raRad: D2R * pos.raDeg,
-    //       decRad: D2R * pos.decDeg,
+    //       raRad: pos.raRad,
+    //       decRad: pos.decRad,
     //       zoomDeg: this.wwtZoomDeg,
     //       instant: true
     //     });
@@ -1103,7 +1127,7 @@ export default defineComponent({
       }
 
       this.createHorizon(now);
-      //this.updateWWTLocation();
+      this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
         decRad: raDec.decRad,
@@ -1548,6 +1572,13 @@ body {
   &:hover {
     cursor: pointer;
   }
+}
+
+#overlays {
+  margin: 5px;
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
 }
 
 // :root {

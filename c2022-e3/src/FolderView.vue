@@ -1,34 +1,51 @@
 <template>
   <div
     class="fv-root"
-    v-if="items !== null"
     :style="cssVars"
   >
     <div
-      :class="['item', lastSelectedItem === item ? 'selected' : '']"
-      v-for="item of items"
-      :key="item.get_name()"
-      :title="item.get_name()"
+      v-if="expandable"
+      id="expand-row"
+      class="bordered"
     >
-      <img
-        v-if="thumbnails"
-        :src="item.get_thumbnailUrl()"
-        :alt="item.get_name()"
-      />
-      <div
-        class="item-name"
-        @click="() => selectItem(item)"
-      >
-        {{item.get_name()}}
-      </div>
-      <input
-        v-if="sliders"
-        class="opacity-range"
-        type="range"
-        value="100"
-        @input="(e) => onSliderInputChanged(e, item)"
+      <font-awesome-icon
+        id="expand-icon"
+        :icon="expanded ? 'chevron-up' : 'chevron-down'"
+        @click="expanded = !expanded"
       />
     </div>
+    <transition-expand>
+      <div
+        v-if="items !== null && expanded"
+        
+      >
+        <div
+          :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
+          v-for="item of items"
+          :key="item.get_name()"
+          :title="item.get_name()"
+        >
+          <img
+            v-if="thumbnails"
+            :src="item.get_thumbnailUrl()"
+            :alt="item.get_name()"
+          />
+          <div
+            class="item-name"
+            @click="() => selectItem(item)"
+          >
+            {{item.get_name()}}
+          </div>
+          <input
+            v-if="sliders"
+            class="opacity-range"
+            type="range"
+            value="100"
+            @input="(e) => onSliderInputChanged(e, item)"
+          />
+        </div>
+      </div>
+    </transition-expand>
   </div>
 </template>
 
@@ -52,7 +69,7 @@ export default defineComponent({
       type: String as PropType<FlexDirection>,
       default: "column"
     },
-    instantMove: {
+    expandable: {
       type: Boolean,
       default: false
     },
@@ -74,7 +91,8 @@ export default defineComponent({
     return {
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
-      opacities: {} as Record<string,number>
+      opacities: {} as Record<string,number>,
+      expanded: true
     }
   },
 
@@ -143,13 +161,12 @@ export default defineComponent({
   //width: 100%;
   //justify-content: space-around;
 }
+
 .item {
   display: flex;
   flex-direction: column;
   padding: 3px;
-  border: 1px solid #444;
-  border-radius: 2px;
-  width: fit-content;
+  width: 100%;
   cursor: pointer;
   pointer-events: auto;
   & img {
@@ -160,12 +177,13 @@ export default defineComponent({
   }
 
   & input[type=range] {
-    width: calc(min(10vh, 150px))
+    width: calc(min(12vh, 100px));
   }
   &.selected {
     border: 1px solid dodgerblue;
   }
 }
+
 .item-name {
   color: white;
   width: 100%;
@@ -173,5 +191,18 @@ export default defineComponent({
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.bordered {
+  border: 1px solid #444;
+  border-radius: 2px;
+}
+
+#expand-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 3px;
+  pointer-events: auto;
 }
 </style>

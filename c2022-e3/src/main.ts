@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
+import TransitionExpand from "./TransitionExpand.vue";
 
 import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css'
@@ -11,6 +12,8 @@ import vuetify from "../plugins/vuetify"
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookOpen,
+  faChevronDown,
+  faChevronUp,
   faLocationPin,
   faTimes,
   faVideo
@@ -21,6 +24,8 @@ library.add(faBookOpen);
 library.add(faLocationPin);
 library.add(faTimes);
 library.add(faVideo);
+library.add(faChevronDown);
+library.add(faChevronUp);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
@@ -69,6 +74,7 @@ createApp(C2022E3, {
 .component('font-awesome-icon', FontAwesomeIcon)
 .component('folder-view', FolderView)
 .component('vue-slider', VueSlider)
+.component('transition-expand', TransitionExpand)
 
 // Mount
 .mount("#app");
