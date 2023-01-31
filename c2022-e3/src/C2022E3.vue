@@ -145,11 +145,22 @@
 
     <div class="bottom-content">
       <div
-        id="center-view-button"
-        class="ui-button clickable"
-        @click="updateViewForDate"
+        id="buttons-container"
       >
-        Center View on Date
+        <div
+          id="toggle-altaz-button"
+          class="ui-button clickable"
+          @click="showAltAzGrid = !showAltAzGrid"
+        >
+          {{ (showAltAzGrid ? 'Hide' : 'Show') + ' Grid' }} 
+        </div>
+        <div
+          id="center-view-button"
+          class="ui-button clickable"
+          @click="updateViewForDate"
+        >
+          Center View on Date
+        </div>
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -524,6 +535,8 @@ export default defineComponent({
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
+
+      showAltAzGrid: true,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
@@ -1142,6 +1155,9 @@ export default defineComponent({
     //     });
     //   }
     // },
+    showAltAzGrid(show: boolean) {
+      this.wwtSettings.set_showAltAzGrid(show);
+    },
     location(loc: LocationRad) {
       const now = this.selectedDate;
       const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
@@ -1397,6 +1413,7 @@ body {
 }
 
 .ui-button {
+  text-align: center;
   color: var(--comet-color);
   background: black;
   padding: 5px 5px;
@@ -1414,8 +1431,14 @@ body {
   }
 }
 
-#center-view-button {
+#buttons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   align-self: flex-end;
+}
+
+#center-view-button {
   margin-bottom: 25px;
 }
 
