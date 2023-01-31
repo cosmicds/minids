@@ -1,0 +1,38 @@
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="693_2022E3_11_01_23" Group="Explorer" Searchable="False">
+  <Place Name="693_2022E3_11_01_23" DataSetType="Sky" RA="15.787004849413922" Dec="37.68700994275855" Rotation="0" ZoomLevel="10">
+    <ForegroundImageSet>
+      <ImageSet       DemUrl=""
+                MSRCommunityId="0"
+                MSRComponentId="0"
+                Permission="0"
+                Generic="False"
+                DataSetType="Sky"
+                BandPass="Visible"
+                Url="https://raw.githubusercontent.com/minids/minids/main/c2022-e3/src/assets/693_2022E3_11_01_23_inverted_tagged.jpg"
+                TileLevels="0"
+                WidthFactor="2"
+                Sparse="True"
+                Rotation="-90.00271612149828"
+                QuadTreeMap=""
+                Projection="SkyImage"
+                Name="693_2022E3_11_01_23"
+                FileType=".jpg"
+                CenterY="37.68700994275855"
+                CenterX="236.80507274120882"
+                BottomsUp="False"
+                StockSet="False"
+                ElevationModel="False"
+                OffsetX="400.5"
+                OffsetY="276.0"
+                BaseTileLevel="0"
+                BaseDegreesPerTile="0.0021657823342681013"
+                ReferenceFrame=""
+                MeanRadius="0">
+        <Description>description</Description>
+        <Credits>credits</Credits>
+        <CreditsUrl>credits_url</CreditsUrl>
+        <ThumbnailUrl>https://nova.astrometry.net/image/16942765</ThumbnailUrl>
+      </ImageSet>
+    </ForegroundImageSet>
+  </Place>
+</Folder>
