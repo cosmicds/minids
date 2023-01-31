@@ -698,9 +698,8 @@ export default defineComponent({
         this.layersLoaded = true;
       });
 
-      //settings.set_localHorizonMode(true);
+      this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(true);
-
 
       // This is kinda horrible, but it works!
 
