@@ -1502,7 +1502,6 @@ body {
 #splash-screen {
   // for some reason the view props don't work
   // for max-width and max-height
-  outline: 1px solid red;
   // splash image size 1908 × 2040 px
   max-width: calc(min(90vw,1908px)); 
   max-height: calc(min(90vh,2040px)); 
