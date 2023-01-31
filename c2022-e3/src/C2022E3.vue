@@ -42,6 +42,24 @@
       </div>
     </transition>
 
+    <div class="left-content">
+      <folder-view
+        v-if="imagesetFolder !== null"
+        sliders
+        expandable
+        :thumbnails="false"
+        :root-folder="imagesetFolder"
+        :wwt-namespace="wwtNamespace"
+        flex-direction="column"
+        @select="onItemSelected"
+        @opacity="updateImageOpacity"
+      ></folder-view>
+    </div>
+    
+    <div id="overlays">
+      <p>{{ coordText }}</p>
+    </div>
+
     <div class="top-content">
       <v-tooltip
         v-model="showVideoTooltip"
@@ -370,6 +388,8 @@
       </v-card>
     </v-dialog>
 
+    <notifications group="startup-location" position="top right" />
+
   </v-app>
 </template>
 
@@ -377,9 +397,9 @@
 import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
-import { distance } from "@wwtelescope/astro";
-import { Color, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
-import { PlotTypes } from "@wwtelescope/engine-types";
+import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { Color, Folder, Poly, Settings, SpreadSheetLayer } from "@wwtelescope/engine";
+import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -498,17 +518,16 @@ export default defineComponent({
   data() {
     return {
       showSplashScreen: true,
-      layers: {} as Record<string, ImageSetLayer>, // from carina
-      layersLoaded: false, // from carina
+      imagesetLayers: {} as Record<string, ImageSetLayer>,
+      layersLoaded: false,
+      imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
       dates: dates,
-
-      ready: false,
-
+      
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
@@ -545,32 +564,35 @@ export default defineComponent({
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      window.wwt = this;
+      window.wwt = this; window.settings = this.getSettings();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.applyISLSetting = applyImageSetLayerSetting;
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
-          url: value,
+          url: value as string,
           loadChildFolders: false
         }).then((folder) => {
+          this.imagesetFolder = folder;
           const children = folder.get_children();
           if (children == null) { return; }
-          const item = children[0] as Place;
-          const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-          if (imageset === null) { return; }
-          this.addImageSetLayer({
-            url: imageset.get_url(),
-            mode: "autodetect",
-            name: key,
-            goto: false
-        }).then((layer) => {
-          this.layers[key] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 1]);
+          children.forEach((item) => {
+            if (!(item instanceof Place)) { return; }
+            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+            if (imageset === null) { return; }
+            const name = imageset.get_name();
+            this.addImageSetLayer({
+              url: imageset.get_url(),
+              mode: "autodetect",
+              name: name,
+              goto: false
+            }).then((layer) => {
+              this.imagesetLayers[name] = layer;
+              applyImageSetLayerSetting(layer, ["opacity", 1]);
+            });
         });
       }));
-
-      Promise.all(layerPromises).then(() => {
-        this.layersLoaded = true;
-      });
       
 
       this.loadImageCollection({
@@ -586,9 +608,7 @@ export default defineComponent({
       this.getLocation(true);
       this.setClockSync(false);
 
-      const proms: Promise<SpreadSheetLayer | void>[] = [];
-
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Full Weekly",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -607,7 +627,7 @@ export default defineComponent({
         })
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "2023 Daily",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -625,7 +645,7 @@ export default defineComponent({
         })
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Weekly Date Layer",
         referenceFrame: "Sky",
         dataCsv: fullWeeklyString
@@ -648,7 +668,7 @@ export default defineComponent({
         });
       }));
 
-      proms.push(this.createTableLayer({
+      layerPromises.push(this.createTableLayer({
         name: "Daily Date Layer",
         referenceFrame: "Sky",
         dataCsv: daily2023String
@@ -670,15 +690,15 @@ export default defineComponent({
         });
       }));
 
-
       this.setTime(this.selectedDate);
 
-      Promise.all(proms).then((_layers) => {
-        this.ready = true;
+      Promise.all(layerPromises).then(() => {
+        console.log(this.imagesetFolder);
+        this.layersLoaded = true;
       });
 
-      // this.getSettings().set_localHorizonMode(true);
-      // this.updateWWTLocation();
+      this.getSettings().set_localHorizonMode(true);
+      this.updateWWTLocation();
 
     });
 
@@ -686,8 +706,18 @@ export default defineComponent({
 
   computed: {
 
+    coordText() {
+      if (this.wwtRenderType == ImageSetType.sky) {
+        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+      }
+      return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    },
+
     isLoading(): boolean {
       return !this.ready;
+    },
+    ready(): boolean {
+      return this.layersLoaded;
     },
     selectedDate(): Date {
       return new Date(this.selectedTime);
@@ -731,7 +761,15 @@ export default defineComponent({
     updateWWTLocation() {
       const settings = this.getSettings();
       settings.set_locationLat(R2D * this.location.latitudeRad);
-      settings.set_locationLng(R2D * this.location.longitudeRad);
+      settings.set_locationLng(R2D * this.location.longitudeRad + 90);
+    },
+
+    logLocation() {
+      console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
+    },
+
+    logPosition() {
+      console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
     selectSheet(name: SheetType) {
@@ -745,9 +783,27 @@ export default defineComponent({
       }
     },
 
+    onItemSelected(place: Place) {
+      console.log(place);
+      this.gotoTarget({
+        place: place,
+        noZoom: false,
+        instant: true,
+        trackObject: false
+      });
+    },
+
+    updateImageOpacity(place: Place, opacity: number) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      const layer = this.imagesetLayers[iset.get_name()];
+      if (layer == null) { return; }
+      applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+    },
+
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
-      const map = L.map("map-container").setView(locationDeg, 8);
+      const map = L.map("map-container").setView(locationDeg, 4);
       // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   maxZoom: 19,
       //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -799,13 +855,16 @@ export default defineComponent({
         },
         (error) => {
           console.log(error);
+          console.log(startup);
           let msg = "Unable to detect location. Please check your browser and/or OS settings.";
           if (startup) {
             msg += "\nUse our location selector to manually input your location";
+            console.log("Here");
             this.$notify({
-              group: "startup-location-error",
+              group: "startup-location",
               type: "error",
-              text: msg
+              text: msg,
+              duration: 3000
             });
           } else {
             this.locationErrorMessage = msg;
@@ -1044,12 +1103,13 @@ export default defineComponent({
   },
 
   watch: {
-    // altAz(coords: { altitude: number; azimuth: number }) {
-    //   if (coords.altitude < 0) {
-    //     const pos = this.horizontalToEquatorial(coords.altitude, coords.azimuth, D2R * this.location.latitudeDeg, D2R * this.location.longitudeDeg, new Date());
+    // altAz(coords: { altRad: number; azRad: number }) {
+    //   console.log(coords);
+    //   if (coords.altRad < 0) {
+    //     const pos = this.horizontalToEquatorial(coords.altRad, coords.azRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
     //     this.gotoRADecZoom({
-    //       raRad: D2R * pos.raDeg,
-    //       decRad: D2R * pos.decDeg,
+    //       raRad: pos.raRad,
+    //       decRad: pos.decRad,
     //       zoomDeg: this.wwtZoomDeg,
     //       instant: true
     //     });
@@ -1067,7 +1127,7 @@ export default defineComponent({
       }
 
       this.createHorizon(now);
-      //this.updateWWTLocation();
+      this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
         decRad: raDec.decRad,
@@ -1233,25 +1293,6 @@ body {
   z-index: 10;
   color: #fff;
   width: 100%;
-
-  .opacity-range {
-    width: 50vw;
-  }
-
-  .clickable {
-    cursor: pointer;
-  }
-
-  select {
-    background: white;
-    color: black;
-    border-radius: 3px;
-  }
-}
-
-#tools {
-  z-index: 10;
-  color: #fff;
 
   .opacity-range {
     width: 50vw;
@@ -1475,6 +1516,17 @@ body {
   }
 }
 
+.left-content {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  pointer-events: none;
+  height: calc(100% - 2rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 @media(max-width: 600px) {
   .mark-line {
     display: none;
@@ -1516,6 +1568,17 @@ body {
   height:8%;
   top: 4%;
   left: 80.5%;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+#overlays {
+  margin: 5px;
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
 }
 
 // :root {
