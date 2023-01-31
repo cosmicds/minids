@@ -1,3 +1,4 @@
+
 <template>
   <v-app
     id="app"
@@ -285,19 +286,21 @@
                 <br><br>
 
                 <h3>Explore!</h3>
-                 • Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)<br>
-                
-                 • Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet? 
-                <br><br>
+                <ul class="text-list">
+                  <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
+                  <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
+                </ul>
+                <br>
 
                 <h3>Why is the Comet Green?</h3>
-                Visually, comets have three parts: the bright coma and two tails. The coma is material being vaporized off the comet’s surface by radiation from the Sun. The green color of the comet is due to dicarbon (a molecule made of two carbon atoms, C2) in the comet’s coma. When excited by ultraviolet light from the sun, dicarbon fluoresces with a blue-green light. 
+                Visually, comets have three parts: the bright coma and two tails. The coma is material being vaporized off the comet’s surface by radiation from the Sun. The green color of the comet is due to dicarbon (a molecule made of two carbon atoms, C<sub>2</sub>) in the comet’s coma. When excited by ultraviolet light from the sun, dicarbon fluoresces with a blue-green light. 
                 <br><br>
 
                 <h3>A Comet’s Tail</h3>
                 The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet as it moves in space!
 
                 <br><br><br>
+                <div class="credits">
                 <h3>Credits:</h3>
                 <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
                 Jon Carifio<br>
@@ -314,6 +317,7 @@
                 Jon Carifio<br>
                 <br>
                 The material contained on this website is based upon work supported by NASA under award No. 80NSSC21M0002. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Aeronautics and Space Administration.
+                </div>
                 <v-spacer class="end-spacer"></v-spacer>
               </v-card-text>
             </v-card>
@@ -323,7 +327,7 @@
               <v-card-text class="info-text no-bottom-border-radius">
                 <v-container>
                   <v-row align="center">
-                    <v-col cols="4">
+                  <v-col cols="4">
                       <v-chip
                         label
                         outlined
@@ -363,6 +367,7 @@
                   </v-row>
                   <v-row>
                     <v-col cols="12">
+                      <div class="credits">
                       <h3>Credits:</h3>
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
                       Jon Carifio<br>
@@ -377,6 +382,7 @@
                       Peter Williams<br>
                       A. David Weigel<br>
                       Jon Carifio<br>
+                      </div>
                       <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
@@ -1581,6 +1587,13 @@ body {
   left: 0.5rem;
 }
 
+ul.text-list {
+  margin-left:1em;
+}
+
+div.credits {
+  font-size: 0.8em;
+}
 // :root {
 //   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 // }
