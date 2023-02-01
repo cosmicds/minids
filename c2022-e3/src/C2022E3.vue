@@ -1019,7 +1019,7 @@ export default defineComponent({
     createHorizon(when: Date | null = null) {
       this.clearAnnotations();
   
-      const color = '#025042';
+      const color = '#01362C';
       const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1553,21 +1553,29 @@ body {
 
 .vue-slider-dot-tooltip-inner
 {
-  background-color: var(--comet-color) !important;
+  color: white !important;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
+}
+
+.vue-slider-dot-handle {
+  cursor: pointer;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
 }
 
 .mark-line {
   position: absolute;
-  height: 18px;
-  width: 2px;
+  height: 12px;
+  width: 1.25px;
   margin: 0;
-  background-color: #FFFFFF;
+  background-color: #E5E4E2;
   transform: translateX(-50%) translateY(calc(-50% + 1px));
 
   &.tall {
-    height: 25px;
-    background-color: #000000;
-    border: solid 1px white;
+    height: 20px;
+    background-color: #848884;
+    border: solid 0.5px #E5E4E2;
   }
 }
 
