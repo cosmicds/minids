@@ -183,6 +183,12 @@
       </div>
       <div id="tools">
         <span class="tool-container">
+          <v-chip
+            id="sliderlabel"
+            label
+            >
+              Date:
+          </v-chip>
           <vue-slider
             id="slider"
             adsorb
@@ -273,6 +279,7 @@
       id="text-bottom-sheet"  
       hide-overlay
       persistent
+      no-click-animation
       absolute
       width="100%"
       :scrim="false"
@@ -316,6 +323,7 @@
                 <br><br>
 
                 <h3>Explore!</h3>
+                Adjusting the <span class="ui-element-ref-comet">Date</span> slider along the bottom of the screen shows you the position of the comet since it was discovered in March 2022. 
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
                   <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
@@ -339,6 +347,7 @@
                 Alyssa Goodman<br>
                 Mary Dussault<br>
                 Harry Houghton<br>
+                Anna Nolin<br>
                 Evaluator: Sue Sunbury<br>
                 <br>
                 <h4>WorldWide Telescope Team:</h4>
@@ -365,7 +374,7 @@
                         Pan
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong><br>
                 
                     </v-col>
@@ -379,7 +388,7 @@
                         Zoom
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong><br>
                       
                     </v-col>
@@ -389,9 +398,30 @@
                       <div
                         style="min-height: 120px;"
                       >
-                        <p>
-                          The frame above provides an <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
-                        </p>
+                        Explore how the Green Comet moves within this <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
+                        <br><br>
+                        <h4>Tips:</h4>
+                        <ul class="text-list">
+                          <li>
+                            Click <font-awesome-icon
+                                  class="control-icon"
+                                  icon="location-pin"
+                                  size="lg" 
+                                ></font-awesome-icon>
+                            to adjust your location.
+                          </li>
+                          <li>
+                            Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
+                          </li>
+                          <li>
+                            Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
+                          </li>
+                          <li>
+                            Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
+                          </li>
+                        </ul>
+
+
                       </div>
                     </v-col>
                   </v-row>
@@ -406,6 +436,7 @@
                       Alyssa Goodman<br>
                       Mary Dussault<br>
                       Harry Houghton<br>
+                      Anna Nolin<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -434,22 +465,23 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
+import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
-import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import drawSkyOverlays from "./drawSkyOverlays"
+import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
 
 
 import {
   ephemerisFullWeeklyCsv,
   ephemeris2023DailyCsv
 } from "./data";
+import { Script } from 'vm';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -566,7 +598,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showConstellations: true,
       showHorizon: true,
-      centerViewOnDate: true,
+      centerViewOnDate: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -646,9 +678,6 @@ export default defineComponent({
       this.loadImageCollection({
         url: this.bgWtml,
         loadChildFolders: true,
-      }).then((_folder) => {
-        console.log('IMAGES LOADED')
-
       });
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -663,13 +692,14 @@ export default defineComponent({
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -687,7 +717,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 1]
           ]
         })
@@ -706,12 +736,12 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
             ["opacity", 1],
-            ["decay", 1]
+            ["decay", 6]
           ]
         });
       }));
@@ -738,7 +768,7 @@ export default defineComponent({
       //   });
       // }));
 
-      this.setTime(this.selectedDate);
+      this.setTime(this.dateTime);
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
@@ -746,13 +776,17 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
-      this.wwtSettings.set_showConstellationBoundries(this.showConstellations);
+      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
+      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
       // This is kinda horrible, but it works!
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.wwtControl._drawSkyOverlays = drawSkyOverlays;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Constellations.initializeConstellationNames = initializeConstellationNames;
 
       this.updateWWTLocation();
       
@@ -768,6 +802,11 @@ export default defineComponent({
         return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
       }
       return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    },
+
+    dateTime() {
+      const todSeconds = this.dayFrac * 60 * 60 * 24;
+      return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
     },
 
     isLoading(): boolean {
@@ -839,7 +878,7 @@ export default defineComponent({
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
       const row = table[index];
-      const nextRow = table[index + 1];
+      const nextRow = table[index + 1] ?? row;
       const f = this.dayFrac;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
@@ -867,17 +906,14 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
+          console.log(layer);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 75],
+              ["scaleFactor", 100],
               ["color", Color.fromHex(this.cometColor)],
-              ["sizeColumn", 3],
-              ["startDateColumn", 0],
-              ["endDateColumn", 0],
-              ["timeSeries", true],
+              //["sizeColumn", 3],
               ["opacity", 1],
-              ["decay", 1]
             ]
           });
         });
@@ -896,7 +932,7 @@ export default defineComponent({
     logLocation() {
       console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
     },
-
+    
     logPosition() {
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
@@ -912,24 +948,67 @@ export default defineComponent({
       }
     },
 
+    setImageSetLayerOrder(layer_id: string, order: number) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.$pinia._s.get("wwt-engine").$wwt.inst.si.setImageSetLayerOrder(layer_id, order)
+    },
+
+    getImageSetLayerIndex(layer: ImageSetLayer): number {
+      // find layer in this.wwtActiveLayers
+      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
+      // get the key item with the value of layer.id
+      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+        if (value === layer.id.toString()) {
+          return Number(key);
+        }
+      }
+      return -1;
+    },
+
+    resetLayerOrder() {
+      // reset the layer order to the default
+      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
+      // get the key item with the value of layer.id
+      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+        this.setImageSetLayerOrder(value, Number(key));
+      }
+    },
+
+    imageInView(iset: Imageset, zoom: number): boolean {
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curZoom = this.wwtZoomDeg * D2R;
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
+      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
+      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
+    },
+    
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
-      this.gotoRADecZoom({
+      const layer = this.imagesetLayers[iset.get_name()];
+      this.resetLayerOrder();
+      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
+
+      if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        this.gotoRADecZoom({
         raRad: D2R * iset.get_centerX(),
         decRad: D2R * iset.get_centerY(),
-        zoomDeg: place.get_zoomLevel(),
+        zoomDeg: place.get_zoomLevel() * 1.7,
         instant: true
       });
+      }
+      
     },
 
     updateImageOpacity(place: Place, opacity: number) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
-      console.log(layer);
       applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
     },
 
@@ -986,9 +1065,9 @@ export default defineComponent({
           }
         },
         (_error) => {
-          let msg = "Unable to detect location. Please check your browser and/or OS settings.";
+          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or";
           if (startup) {
-            msg += "\nUse our location selector to manually input your location";
+            msg += "\nuse location selector to manually input a location";
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -998,7 +1077,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          this.createHorizon();
+          this.updateHorizon();
         },
         options
       );
@@ -1127,9 +1206,9 @@ export default defineComponent({
 
     createHorizon(when: Date | null = null) {
       this.removeHorizon();
-  
+
       const color = '#01362C';
-      const date = when || this.selectedDate || new Date();
+      const date = when || this.dateTime || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
@@ -1138,7 +1217,7 @@ export default defineComponent({
       for (let i = 0; i < N; i++) {
         let points: [number, number][] = [
           [0, i * delta],
-          [-Math.PI/2, i * delta],
+          [-Math.PI / 2, i * delta],
           [0, (i + 1) * delta]
         ];
         points = points.map((point) => {
@@ -1152,6 +1231,7 @@ export default defineComponent({
         poly.set_fillColor(color);
         this.addAnnotation(poly);
       }
+
     },
 
     closestPoint(
@@ -1242,7 +1322,8 @@ export default defineComponent({
       const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
       
       if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex]
+        position = daily2023Table[dailyIndex];
+        // TODO: Use interpolated point here
       } else {
         const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
         if (weeklyIndex > -1) {
@@ -1263,13 +1344,19 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      const todSeconds = this.dayFrac * 60 * 60 * 24;
-      const dateTime = new Date(this.selectedDate.getTime() + 1000 * todSeconds);
-      this.setTime(dateTime);
-      this.createHorizon(dateTime);
+      this.setTime(this.dateTime);
+      this.updateHorizon(this.dateTime);
       if (this.centerViewOnDate) {
         this.updateViewForDate();
         this.updateLayersForDate();
+      }
+    },
+
+    updateHorizon(when: Date | null = null) {
+      if (this.showHorizon) {
+        this.createHorizon(when);
+      } else {
+        this.removeHorizon();
       }
     }
   },
@@ -1291,14 +1378,11 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
     },
     showConstellations(show: boolean) {
-      this.wwtSettings.set_showConstellationBoundries(show);
+      this.wwtSettings.set_showConstellationLabels(show);
+      this.wwtSettings.set_showConstellationFigures(show);
     },
-    showHorizon(show: boolean) {
-      if (show) {
-        this.createHorizon();
-      } else {
-        this.removeHorizon();
-      }
+    showHorizon(_show: boolean) {
+      this.updateHorizon();
     },
     centerViewOnDate(center: boolean) {
       if (center) {
@@ -1319,7 +1403,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      this.createHorizon(now);
+      this.updateHorizon();
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
@@ -1512,7 +1596,7 @@ body {
 
 .tool-container {
   display: flex;
-  width: 100%;
+  width: 99%;
   flex-direction: row;
   align-items: center;
   gap: 5px;
@@ -1520,7 +1604,7 @@ body {
 }
 
 .folder-view {
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 150px);
 }
 
 #controls {
@@ -1536,6 +1620,7 @@ body {
 
   .v-label {
     color: var(--comet-color);
+    opacity: 1;
   }
 }
 
@@ -1662,7 +1747,7 @@ body {
   // padding-bottom: 2px !important;
 
   .v-card-text {
-    font-size: ~"max(14px, calc(0.8em + 0.3vw))";
+    font-size: ~"max(14px, calc(0.7em + 0.3vw))";
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
@@ -1709,9 +1794,17 @@ body {
 }
 
 // Styling the slider
+
+#sliderlabel {
+  padding:3px 5px;
+  margin:0 5px;
+  color:#fff !important;
+  background-color: rgba(3,134,110,0.5);
+}
+
 #slider {
   width: 100% !important;
-  margin: 5px 50px;
+  margin: 5px 30px;
 }
 
 .vue-slider-process
@@ -1814,6 +1907,7 @@ body {
 
 ul.text-list {
   margin-left:1em;
+  margin-top: 0.5em;
 }
 
 div.credits {
@@ -1844,6 +1938,12 @@ div.credits {
 //     filter:var(--map-tiles-filter, none);
 //   }
 // }
+
+span.ui-element-ref-comet {
+  background-color: #03866E; /* #04D6B0; */
+  padding: 0em 0.1em;
+  border-radius: 0.2em;
+}
 
 /* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
 input[type="range"] {
@@ -1903,4 +2003,9 @@ input[type="range"]::-moz-range-track {
     height:var(--track-height);
     margin-top: 0;
   }
+  
+#sliderlabel {
+  padding-right: 0.75em;
+  padding-left: 0.5em;
+}
 </style>
