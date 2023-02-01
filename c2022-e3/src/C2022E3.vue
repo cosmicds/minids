@@ -4,6 +4,10 @@
     id="app"
     :style="cssVars"
   >
+  <div
+    id="main-content"
+  >
+
   <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
       :class="{ pointer: lastClosePt !== null }"
@@ -440,6 +444,7 @@
 
     <notifications group="startup-location" position="top right" />
 
+  </div>
   </v-app>
 </template>
 
@@ -810,7 +815,7 @@ export default defineComponent({
     cssVars() {
       return{
         '--comet-color': this.cometColor,
-        '--wwt-height': this.showTextSheet ? '60vh' : '100%',
+        '--app-content-height': this.showTextSheet ? '60vh' : '100%',
       };
     },
     wwtControl(): WWTControl {
@@ -1449,6 +1454,12 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+#main-content {
+  position: relative;
+  width: 100%;
+  height: var(--app-content-height);
+}
+
 #app {
   width: 100%;
   height: 100%;
@@ -1458,7 +1469,7 @@ body {
     position: relative;
     top: 0;
     width: 100%;
-    height: var(--wwt-height);
+    height: 100%;
     border-style: none;
     border-width: 0;
     margin: 0;
@@ -1557,7 +1568,7 @@ body {
 .bottom-content {
   display: flex;
   flex-direction: column;
-  position: fixed;
+  position: absolute;
   bottom: 0.5rem;
   right: 0.5rem;
   width: calc(100% - 1rem);
