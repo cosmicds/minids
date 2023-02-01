@@ -61,10 +61,6 @@
         @opacity="updateImageOpacity"
       ></folder-view>
     </div>
-    
-    <div id="overlays">
-      <p>{{ coordText }}</p>
-    </div>
 
     <div class="top-content">
       <v-tooltip
@@ -163,7 +159,7 @@
           />
         </div>
           <transition-expand>
-          <div v-if="showControls">
+          <div v-if="showControls" class="controls-content">
             <date-picker
               dark
               time-picker
@@ -191,7 +187,6 @@
             />
             <v-btn
               :color="cometColor"
-              variant="outlined"
               @click="centerOnCurrentDate"
             >
               Center on Now
@@ -793,13 +788,6 @@ export default defineComponent({
 
   computed: {
 
-    coordText() {
-      if (this.wwtRenderType == ImageSetType.sky) {
-        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
-      }
-      return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
-    },
-
     dateTime() {
       const todSeconds = this.dayFrac * 60 * 60 * 24;
       return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
@@ -908,7 +896,6 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
-          console.log(layer);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
@@ -1635,6 +1622,22 @@ body {
     color: var(--comet-color);
     opacity: 1;
   }
+
+  .controls-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    .v-btn {
+      align-self: center;
+    }
+
+    .v-btn__content {
+      color: black;
+    }
+  }
+
+  
 
   #controls-top-row {
     display: flex;
