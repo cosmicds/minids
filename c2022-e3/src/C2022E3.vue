@@ -4,6 +4,10 @@
     id="app"
     :style="cssVars"
   >
+  <div
+    id="main-content"
+  >
+
   <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
       :class="{ pointer: lastClosePt !== null }"
@@ -56,10 +60,6 @@
         @select="onItemSelected"
         @opacity="updateImageOpacity"
       ></folder-view>
-    </div>
-    
-    <div id="overlays">
-      <p>{{ coordText }}</p>
     </div>
 
     <div class="top-content">
@@ -148,38 +148,51 @@
     <div class="bottom-content">
       <div
         id="controls"
+        class="control-icon-wrapper"
       >
-        <date-picker
-          dark
-          time-picker
-          enable-seconds
-          :is-24="false"
-          v-model="timeOfDay"
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showAltAzGrid"
-          label="Show Grid"
-          hide-details
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showConstellations"
-          label="Show Constellations"
-          hide-details
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showHorizon"
-          label="Show Horizon"
-          hide-details
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="centerViewOnDate"
-          label="Center View on Date"
-          hide-details
+        <div id="controls-top-row">
+          <font-awesome-icon
+            :icon="showControls ? `chevron-up` : `gear`"
+            size="lg"
+            :color="cometColor"
+            @click="showControls = !showControls"
           />
+        </div>
+          <transition-expand>
+          <div v-if="showControls" class="controls-content">
+            <date-picker
+              dark
+              time-picker
+              enable-seconds
+              :is-24="false"
+              v-model="timeOfDay"
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showAltAzGrid"
+              label="Show Grid"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showConstellations"
+              label="Show Constellations"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showHorizon"
+              label="Show Horizon"
+              hide-details
+            />
+            <v-btn
+              :color="cometColor"
+              @click="centerOnCurrentDate"
+            >
+              Center on Now
+            </v-btn>
+          </div>
+        </transition-expand>
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -193,7 +206,6 @@
             id="slider"
             adsorb
             included
-            :value="selectedTime"
             :marks="(d: number) => {
               return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
@@ -202,7 +214,7 @@
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
-              (new Date(v)).toLocaleDateString('en-us')
+              toLocaleUTCDateString(new Date(v))
             "
             >
               <template v-slot:mark="{ pos, value }">
@@ -459,6 +471,7 @@
 
     <notifications group="startup-location" position="top right" />
 
+  </div>
   </v-app>
 </template>
 
@@ -593,6 +606,7 @@ export default defineComponent({
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
+      positionSet: false,
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
@@ -600,7 +614,6 @@ export default defineComponent({
       showAltAzGrid: true,
       showConstellations: true,
       showHorizon: true,
-      centerViewOnDate: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -618,6 +631,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showLocationSelector: false,
+      showControls: true,
       tab: 0,
 
       circle: null as L.Circle | null,
@@ -630,7 +644,7 @@ export default defineComponent({
 
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
-      selectedTime: now.setHours(0, 0, 0, 0),
+      selectedTime: now.setUTCHours(0, 0, 0, 0),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -791,20 +805,20 @@ export default defineComponent({
       Constellations.initializeConstellationNames = initializeConstellationNames;
 
       this.updateWWTLocation();
-      
+
+      // wwtZoomDeg is still 0 if we run this here
+      // and it was the same in nextTick
+      // so give just a bit of a delay
+      setTimeout(() => {
+        this.centerOnCurrentDate();
+        this.positionSet = true;
+      }, 100);
 
     });
 
   },
 
   computed: {
-
-    coordText() {
-      if (this.wwtRenderType == ImageSetType.sky) {
-        return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
-      }
-      return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
-    },
 
     dateTime() {
       const todSeconds = this.dayFrac * 60 * 60 * 24;
@@ -815,7 +829,7 @@ export default defineComponent({
       return !this.ready;
     },
     ready(): boolean {
-      return this.layersLoaded;
+      return this.layersLoaded && this.positionSet;
     },
     selectedDate(): Date {
       return new Date(this.selectedTime);
@@ -827,9 +841,10 @@ export default defineComponent({
       return this.smallSize && this.touchscreen;
     },
     cssVars() {
-      return {
-        '--comet-color': this.cometColor
-      }
+      return{
+        '--comet-color': this.cometColor,
+        '--app-content-height': this.showTextSheet ? '60vh' : '100%',
+      };
     },
     wwtControl(): WWTControl {
       return WWTControl.singleton;
@@ -876,6 +891,11 @@ export default defineComponent({
   },
 
   methods: {
+    toLocaleUTCDateString(date: Date) {
+      const timeDiff = date.getTimezoneOffset() * 60000;
+      const adjustedDate = new Date(date.valueOf() + timeDiff);
+      return adjustedDate.toLocaleDateString();
+    },
     interpolatedTable(table: Table): Table | null {
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
@@ -908,7 +928,6 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
-          console.log(layer);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
@@ -983,7 +1002,6 @@ export default defineComponent({
       const curZoom = this.wwtZoomDeg * D2R;
       const isetRa = iset.get_centerX() * D2R;
       const isetDec = iset.get_centerY() * D2R;
-      console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
       // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
       return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
     },
@@ -993,17 +1011,21 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetLayerOrder();
-      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
+      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1);
+      const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+      this.selectedTime = Date.UTC(year, month - 1, day);
 
-      if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
-        this.gotoRADecZoom({
-        raRad: D2R * iset.get_centerX(),
-        decRad: D2R * iset.get_centerY(),
-        zoomDeg: place.get_zoomLevel() * 1.7,
-        instant: true
+      // Give time for the selectedTime changes to propagate
+      this.$nextTick(() => {
+        if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+          this.gotoRADecZoom({
+            raRad: D2R * iset.get_centerX(),
+            decRad: D2R * iset.get_centerY(),
+            zoomDeg: place.get_zoomLevel() * 1.7,
+            instant: true
+          });
+        }
       });
-      }
-      
     },
 
     updateImageOpacity(place: Place, opacity: number) {
@@ -1345,13 +1367,20 @@ export default defineComponent({
 
     },
 
+    centerOnCurrentDate() {
+      const now = new Date();
+      this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
+      this.selectedTime = now.setUTCHours(0, 0, 0, 0);
+      this.$nextTick(() => {
+        this.updateViewForDate();
+      });
+    },
+
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
-      if (this.centerViewOnDate) {
-        this.updateViewForDate();
-        this.updateLayersForDate();
-      }
+      this.updateViewForDate();
+      this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
@@ -1385,11 +1414,6 @@ export default defineComponent({
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
-    },
-    centerViewOnDate(center: boolean) {
-      if (center) {
-        this.updateViewForDate();
-      }
     },
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
@@ -1457,6 +1481,12 @@ body {
   overflow-y: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+#main-content {
+  position: relative;
+  width: 100%;
+  height: var(--app-content-height);
 }
 
 #app {
@@ -1567,7 +1597,7 @@ body {
 .bottom-content {
   display: flex;
   flex-direction: column;
-  position: fixed;
+  position: absolute;
   bottom: 0.5rem;
   right: 0.5rem;
   width: calc(100% - 1rem);
@@ -1624,6 +1654,33 @@ body {
     color: var(--comet-color);
     opacity: 1;
   }
+
+  .controls-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    .v-btn {
+      align-self: center;
+    }
+
+    .v-btn__content {
+      color: black;
+    }
+  }
+
+  
+
+  #controls-top-row {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+#show-controls {
+  color: var(--comet-color);
 }
 
 #credits {
@@ -1713,6 +1770,7 @@ body {
     padding: 0;
     margin: 0;
     max-width: 100%;
+    height: 40vh;
   }
 }
 
