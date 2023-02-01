@@ -10,6 +10,13 @@
       @click="expanded = !expanded"
     >
       <font-awesome-icon
+        id="camera"
+        icon="images"
+        size="lg"
+        class="mr-10"
+        color="#04D6B0"
+      ></font-awesome-icon>
+      <font-awesome-icon
         id="expand-icon"
         :icon="expanded ? 'chevron-up' : 'chevron-down'"
       />
@@ -156,8 +163,8 @@ export default defineComponent({
     background: black;
   }
   &::-webkit-scrollbar-thumb {
-    background: white;
-    border-radius: 1px;
+    background: rgba(4, 129, 187, 0.5);
+    border-radius: 2px;
   }
   //width: 100%;
   //justify-content: space-around;
@@ -181,7 +188,7 @@ export default defineComponent({
     width: calc(min(12vh, 100px));
   }
   &.selected {
-    border: 1px solid dodgerblue;
+    border: 1px solid #D60493;
   }
 }
 
