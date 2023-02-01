@@ -1188,6 +1188,7 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
+      this.createHorizon(date);
       this.updateViewForDate();
     },
     showLocationSelector(show: boolean) {
