@@ -11,6 +11,7 @@ import { en } from 'vuetify/locale';
 
 // Styles
 import 'vuetify/styles';
+import '@mdi/font/css/materialdesignicons.css';
 
 export default createVuetify({
   // Icon Fonts
