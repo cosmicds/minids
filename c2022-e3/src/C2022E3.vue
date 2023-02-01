@@ -196,7 +196,7 @@
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
-              (new Date(v)).toLocaleDateString('en-us')
+              toLocaleUTCDateString(new Date(v))
             "
             >
               <template v-slot:mark="{ pos, value }">
@@ -844,6 +844,11 @@ export default defineComponent({
   },
 
   methods: {
+    toLocaleUTCDateString(date: Date) {
+      const timeDiff = date.getTimezoneOffset() * 60000;
+      const adjustedDate = new Date(date.valueOf() + timeDiff);
+      return adjustedDate.toLocaleDateString();
+    },
     interpolatedTable(table: Table): Table | null {
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
@@ -866,6 +871,7 @@ export default defineComponent({
         this.deleteLayer(this.currentDailyLayer.id);
         this.currentDailyLayer = null;
       }
+      console.log(interpolatedDailyTable);
 
       if (interpolatedDailyTable !== null) {
         this.createTableLayer({
@@ -1316,9 +1322,9 @@ export default defineComponent({
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
+      this.updateLayersForDate();
       if (this.centerViewOnDate) {
         this.updateViewForDate();
-        this.updateLayersForDate();
       }
     },
 
