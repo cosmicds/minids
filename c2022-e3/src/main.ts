@@ -4,6 +4,8 @@ import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 
+import "./polyfills";
+
 import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css'
 
