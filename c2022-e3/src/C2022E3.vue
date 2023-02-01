@@ -273,6 +273,7 @@
       id="text-bottom-sheet"  
       hide-overlay
       persistent
+      no-click-animation
       absolute
       width="100%"
       :scrim="false"
@@ -703,7 +704,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
@@ -1521,7 +1522,7 @@ body {
 }
 
 .folder-view {
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 150px);
 }
 
 #controls {
@@ -1537,6 +1538,7 @@ body {
 
   .v-label {
     color: var(--comet-color);
+    opacity: 1;
   }
 }
 
