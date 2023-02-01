@@ -194,7 +194,7 @@
               variant="outlined"
               @click="centerOnCurrentDate"
             >
-              Center on Today
+              Center on Now
             </v-btn>
           </div>
         </transition-expand>
@@ -1342,7 +1342,9 @@ export default defineComponent({
     },
 
     centerOnCurrentDate() {
-      this.selectedTime = (new Date()).setUTCHours(0, 0, 0, 0);
+      const now = new Date();
+      this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
+      this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
         this.updateViewForDate();
       });
