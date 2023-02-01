@@ -160,21 +160,24 @@
           :color="cometColor"
           v-model="showAltAzGrid"
           label="Show Grid"
-          fluid
+          hide-details
+        />
+        <v-checkbox
+          :color="cometColor"
+          v-model="showConstellations"
+          label="Show Constellations"
           hide-details
         />
         <v-checkbox
           :color="cometColor"
           v-model="showHorizon"
           label="Show Horizon"
-          fluid
           hide-details
         />
         <v-checkbox
           :color="cometColor"
           v-model="centerViewOnDate"
           label="Center View on Date"
-          fluid
           hide-details
           />
       </div>
@@ -440,6 +443,8 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
+import drawSkyOverlays from "./drawSkyOverlays"
+
 
 import {
   ephemerisFullWeeklyCsv,
@@ -559,6 +564,7 @@ export default defineComponent({
       decRadLowerBound: 0.2,
 
       showAltAzGrid: true,
+      showConstellations: true,
       showHorizon: true,
       centerViewOnDate: true,
 
@@ -739,21 +745,14 @@ export default defineComponent({
       });
 
       this.wwtSettings.set_localHorizonMode(true);
-      this.wwtSettings.set_showAltAzGrid(true);
+      this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showConstellationBoundries(this.showConstellations);
 
       // This is kinda horrible, but it works!
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.wwtControl._drawSkyOverlays = function() {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        if (Settings.get_active().get_showAltAzGrid()) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
-        }
-      }
+      this.wwtControl._drawSkyOverlays = drawSkyOverlays;
 
       this.updateWWTLocation();
       
@@ -1269,6 +1268,10 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+    },
+    showConstellations(show: boolean) {
+      console.log("Here");
+      this.wwtSettings.set_showConstellationBoundries(show);
     },
     showHorizon(show: boolean) {
       if (show) {
