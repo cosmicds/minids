@@ -567,8 +567,8 @@ export default defineComponent({
 
       showAltAzGrid: true,
       showConstellations: true,
-      showHorizon: true,
-      centerViewOnDate: false,
+      showHorizon: false,
+      centerViewOnDate: true,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -1348,25 +1348,25 @@ export default defineComponent({
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
-      imageset_names.forEach(iname => {
-        const selector = `#items div div.bordered.item.selected[title='${iname}'] input`
-        let el = (<HTMLInputElement>document.querySelector(selector))
+      imageset_names.forEach((iname: string) => {
+        const selector = `#items>div>div.bordered.item[title='${iname}']>input`
+        const el = (document.querySelector(selector) as HTMLInputElement)
         if (iname != name) {
           applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
           if (el != null) {
             el.value = '0'
-          }
+        }
         } else {
           applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
           const iset = this.wwtControl.getImagesetByName(iname)
           if (iset == null) { return; }
-          if (el != null) { el.value = '1' }
-          this.gotoRADecZoom({
-            raRad: D2R * iset.get_centerX(),
-            decRad: D2R * iset.get_centerY(),
-            zoomDeg: this.wwtZoomDeg,
-            instant: true
-          });
+          if (el != null) { el.value = '100' }
+          // this.gotoRADecZoom({
+          //   raRad: D2R * iset.get_centerX(),
+          //   decRad: D2R * iset.get_centerY(),
+          //   zoomDeg: this.wwtZoomDeg,
+          //   instant: true
+          // });
         }
       })
       
