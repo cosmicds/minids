@@ -1276,7 +1276,6 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
     },
     showConstellations(show: boolean) {
-      console.log("Here");
       this.wwtSettings.set_showConstellationBoundries(show);
     },
     showHorizon(show: boolean) {
