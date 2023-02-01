@@ -273,6 +273,7 @@
       id="text-bottom-sheet"  
       hide-overlay
       persistent
+      no-click-animation
       absolute
       width="100%"
       :scrim="false"
@@ -434,8 +435,8 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, LayerManager } from "@wwtelescope/engine";
-import { ImageSetType, PlotTypes, MarkerScales } from "@wwtelescope/engine-types";
+import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -443,7 +444,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import drawSkyOverlays from "./drawSkyOverlays"
+import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
 
 
 import {
@@ -668,7 +669,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -686,7 +687,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 1]
           ]
         })
@@ -705,12 +706,12 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
             ["opacity", 1],
-            ["decay", 1]
+            ["decay", 6]
           ]
         });
       }));
@@ -753,6 +754,9 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.wwtControl._drawSkyOverlays = drawSkyOverlays;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Constellations.initializeConstellationNames = initializeConstellationNames;
 
       this.updateWWTLocation();
       
@@ -844,7 +848,7 @@ export default defineComponent({
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
       const row = table[index];
-      const nextRow = table[index + 1];
+      const nextRow = table[index + 1] ?? row;
       const f = this.dayFrac;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
@@ -872,17 +876,14 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
+          console.log(layer);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 75],
+              ["scaleFactor", 100],
               ["color", Color.fromHex(this.cometColor)],
-              ["sizeColumn", 3],
-              ["startDateColumn", 0],
-              ["endDateColumn", 0],
-              ["timeSeries", true],
+              //["sizeColumn", 3],
               ["opacity", 1],
-              ["decay", 1]
             ]
           });
         });
@@ -1291,7 +1292,8 @@ export default defineComponent({
       const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
       
       if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex]
+        position = daily2023Table[dailyIndex];
+        // TODO: Use interpolated point here
       } else {
         const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
         if (weeklyIndex > -1) {
@@ -1371,7 +1373,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      this.updateHorizon(now);
+      this.updateHorizon();
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
@@ -1572,7 +1574,7 @@ body {
 }
 
 .folder-view {
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 150px);
 }
 
 #controls {
@@ -1588,6 +1590,7 @@ body {
 
   .v-label {
     color: var(--comet-color);
+    opacity: 1;
   }
 }
 
