@@ -842,7 +842,7 @@ export default defineComponent({
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
       const row = table[index];
-      const nextRow = table[index + 1];
+      const nextRow = table[index + 1] ?? row;
       const f = this.dayFrac;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
