@@ -646,9 +646,6 @@ export default defineComponent({
       this.loadImageCollection({
         url: this.bgWtml,
         loadChildFolders: true,
-      }).then((_folder) => {
-        console.log('IMAGES LOADED')
-
       });
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -738,7 +735,7 @@ export default defineComponent({
       //   });
       // }));
 
-      this.setTime(this.selectedDate);
+      this.setTime(this.dateTime);
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
@@ -746,7 +743,8 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
-      this.wwtSettings.set_showConstellationBoundries(this.showConstellations);
+      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
+      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
       // This is kinda horrible, but it works!
 
@@ -768,6 +766,11 @@ export default defineComponent({
         return `${fmtHours(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
       }
       return `${fmtDegLon(this.wwtRARad)} ${fmtDegLat(this.wwtDecRad)}`;
+    },
+
+    dateTime() {
+      const todSeconds = this.dayFrac * 60 * 60 * 24;
+      return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
     },
 
     isLoading(): boolean {
@@ -924,12 +927,10 @@ export default defineComponent({
     },
 
     updateImageOpacity(place: Place, opacity: number) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
-      console.log(layer);
       applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
     },
 
@@ -998,7 +999,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          this.createHorizon();
+          this.updateHorizon();
         },
         options
       );
@@ -1129,7 +1130,7 @@ export default defineComponent({
       this.removeHorizon();
   
       const color = '#01362C';
-      const date = when || this.selectedDate || new Date();
+      const date = when || this.dateTime || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
@@ -1263,13 +1264,19 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      const todSeconds = this.dayFrac * 60 * 60 * 24;
-      const dateTime = new Date(this.selectedDate.getTime() + 1000 * todSeconds);
-      this.setTime(dateTime);
-      this.createHorizon(dateTime);
+      this.setTime(this.dateTime);
+      this.updateHorizon(this.dateTime);
       if (this.centerViewOnDate) {
         this.updateViewForDate();
         this.updateLayersForDate();
+      }
+    },
+
+    updateHorizon(when: Date | null = null) {
+      if (this.showHorizon) {
+        this.createHorizon(when);
+      } else {
+        this.removeHorizon();
       }
     }
   },
@@ -1291,14 +1298,11 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
     },
     showConstellations(show: boolean) {
-      this.wwtSettings.set_showConstellationBoundries(show);
+      this.wwtSettings.set_showConstellationLabels(show);
+      this.wwtSettings.set_showConstellationFigures(show);
     },
-    showHorizon(show: boolean) {
-      if (show) {
-        this.createHorizon();
-      } else {
-        this.removeHorizon();
-      }
+    showHorizon(_show: boolean) {
+      this.updateHorizon();
     },
     centerViewOnDate(center: boolean) {
       if (center) {
@@ -1319,7 +1323,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      this.createHorizon(now);
+      this.updateHorizon(now);
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
