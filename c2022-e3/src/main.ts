@@ -18,7 +18,9 @@ import {
   faChevronUp,
   faLocationPin,
   faTimes,
-  faVideo
+  faVideo,
+  faCameraRetro,
+  faImages
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -28,6 +30,8 @@ library.add(faTimes);
 library.add(faVideo);
 library.add(faChevronDown);
 library.add(faChevronUp);
+library.add(faCameraRetro);
+library.add(faImages);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
