@@ -148,39 +148,52 @@
     <div class="bottom-content">
       <div
         id="controls"
+        class="control-icon-wrapper"
       >
-        <date-picker
-          dark
-          time-picker
-          enable-seconds
-          :is-24="false"
-          v-model="timeOfDay"
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showAltAzGrid"
-          label="Show Grid"
-          hide-details
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showConstellations"
-          label="Show Constellations"
-          hide-details
-        />
-        <v-checkbox
-          :color="cometColor"
-          v-model="showHorizon"
-          label="Show Horizon"
-          hide-details
-        />
-        <v-btn
-          :color="cometColor"
-          variant="outlined"
-          @click="centerOnCurrentDate"
-        >
-          Center on Today
-        </v-btn>
+        <div id="controls-top-row">
+          <font-awesome-icon
+            :icon="showControls ? `chevron-up` : `gear`"
+            size="lg"
+            :color="cometColor"
+            @click="showControls = !showControls"
+          />
+        </div>
+          <transition-expand>
+          <div v-if="showControls">
+            <date-picker
+              dark
+              time-picker
+              enable-seconds
+              :is-24="false"
+              v-model="timeOfDay"
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showAltAzGrid"
+              label="Show Grid"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showConstellations"
+              label="Show Constellations"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showHorizon"
+              label="Show Horizon"
+              hide-details
+            />
+            <v-btn
+              :color="cometColor"
+              variant="outlined"
+              @click="centerOnCurrentDate"
+            >
+              Center on Today
+            </v-btn>
+          </div>
+        </transition-expand>
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -585,6 +598,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showLocationSelector: false,
+      showControls: true,
       tab: 0,
 
       circle: null as L.Circle | null,
@@ -1599,6 +1613,17 @@ body {
     color: var(--comet-color);
     opacity: 1;
   }
+
+  #controls-top-row {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+#show-controls {
+  color: var(--comet-color);
 }
 
 #credits {
