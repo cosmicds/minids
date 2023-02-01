@@ -666,7 +666,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -684,7 +684,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            //["sizecolumn", 3],
+            //["sizeColumn", 3],
             ["opacity", 1]
           ]
         })
@@ -708,7 +708,7 @@ export default defineComponent({
             ["endDateColumn", 0],
             ["timeSeries", true],
             ["opacity", 1],
-            ["decay", 1]
+            ["decay", 6]
           ]
         });
       }));
@@ -870,17 +870,14 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
+          console.log(layer);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 75],
+              ["scaleFactor", 100],
               ["color", Color.fromHex(this.cometColor)],
-              ["sizeColumn", 3],
-              ["startDateColumn", 0],
-              ["endDateColumn", 0],
-              ["timeSeries", true],
+              //["sizeColumn", 3],
               ["opacity", 1],
-              ["decay", 1]
             ]
           });
         });
