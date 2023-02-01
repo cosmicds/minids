@@ -803,7 +803,10 @@ export default defineComponent({
     },
     dayFrac: {
       get(): number {
-        return (this.timeOfDay.seconds + 60 * (this.timeOfDay.minutes + 60 * this.timeOfDay.hours)) / (24 * 60 * 60);
+        const dateForTOD = new Date();
+        dateForTOD.setHours(this.timeOfDay.hours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+        const todSeconds = 3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds();
+        return todSeconds / (24 * 60 * 60);
       },
       set(frac: number) {
         let seconds = Math.floor(24 * 60 * 60 * frac);
@@ -811,7 +814,10 @@ export default defineComponent({
         seconds -= 60 * 60 * hours;
         const minutes = Math.floor(seconds / 60);
         seconds -= 60 * minutes;
-        return { hours, minutes, seconds };
+        
+        const d = new Date();
+        d.setUTCHours(hours, minutes, seconds);
+        return { hours: d.getHours(), minutes: d.getMinutes(), seconds: Math.floor(d.getSeconds()) };
       }
     },
     showTextSheet: {
@@ -1242,7 +1248,7 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      const todSeconds = 3600 * this.timeOfDay.hours + 60 * this.timeOfDay.minutes + this.timeOfDay.seconds;
+      const todSeconds = this.dayFrac * 60 * 60 * 24;
       const dateTime = new Date(this.selectedDate.getTime() + 1000 * todSeconds);
       this.setTime(dateTime);
       this.createHorizon(dateTime);
@@ -1285,8 +1291,8 @@ export default defineComponent({
         this.updateViewForDate();
       }
     },
-    timeOfDay(time: { hours: number; minutes: number; seconds: number }) {
-      this.updateLayersForDate();
+    timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+      this.updateForDateTime();
     },
     location(loc: LocationRad) {
       const now = this.selectedDate;
@@ -1308,15 +1314,8 @@ export default defineComponent({
         instant: true
       });
     },
-    selectedDate(date: Date) {
-      const todSeconds = 3600 * this.timeOfDay.hours + 60 * this.timeOfDay.minutes + this.timeOfDay.seconds;
-      const dateTime = new Date(date.getTime() + 1000 * todSeconds);
-      this.setTime(dateTime);
-      this.createHorizon(dateTime);
-      if (this.centerViewOnDate) {
-        this.updateViewForDate();
-        this.updateLayersForDate();
-      }
+    selectedDate(_date: Date) {
+      this.updateForDateTime();
     },
     showLocationSelector(show: boolean) {
       if (show) {
