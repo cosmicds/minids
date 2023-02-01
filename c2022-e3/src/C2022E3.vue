@@ -1921,4 +1921,9 @@ input[type="range"]::-moz-range-track {
     height:var(--track-height);
     margin-top: 0;
   }
+  
+#sliderlabel {
+  padding-right: 0.75em;
+  padding-left: 0.5em;
+}
 </style>
