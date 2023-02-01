@@ -46,7 +46,7 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 createApp(C2022E3, {
   wwtNamespace: "wwt-minids-c2022e3",
   wtml: { // images are listed in chronological order earliest to latest
-    c2022e3: "https://raw.githubusercontent.com/cosmicds/minids/main/c2022-e3/src/assets/C2022_E3.wtml",
+    c2022e3: "https://raw.githubusercontent.com/cosmicds/cds-website/main/public/comet_c2022-e3/C2022_E3.wtml",
   },
   url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
   thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
