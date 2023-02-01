@@ -11,9 +11,11 @@
         "clean": "yarn workspaces foreach -vt run clean"
     },
     "dependencies": {
+        "@mdi/font": "^7.1.96",
         "@minids/carina": "workspace:*",
         "@minids/common": "workspace:*",
         "@vue-leaflet/vue-leaflet": "^0.8.0",
+        "@vuepic/vue-datepicker": "^3.6.5",
         "leaflet": "^1.9.3"
     },
     "packageManager": "yarn@3.3.0",

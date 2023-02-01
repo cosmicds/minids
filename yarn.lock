@@ -439,6 +439,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mdi/font@npm:^7.1.96":
+  version: 7.1.96
+  resolution: "@mdi/font@npm:7.1.96"
+  checksum: db6dce72f553e844d049cc563cf89ae58dfd0f55f99f743ccbf1ca6ab644c940f50fbd78ecd91290a67ebb58fa5bae4983bbab782a6611456bd87566825c1ca4
+  languageName: node
+  linkType: hard
+
 "@minids/c2022-e3@workspace:c2022-e3":
   version: 0.0.0-use.local
   resolution: "@minids/c2022-e3@workspace:c2022-e3"
@@ -1366,6 +1373,18 @@ __metadata:
   version: 1.3.0
   resolution: "@vue/web-component-wrapper@npm:1.3.0"
   checksum: 8cc4d1135990e61ab9d38a7b6460b018703b38b4dd3477390083018bffb93b283fabb7d57d83b3cfb78dd44da4f863167b964fe88dfa9886a54996f308036a94
+  languageName: node
+  linkType: hard
+
+"@vuepic/vue-datepicker@npm:^3.6.5":
+  version: 3.6.5
+  resolution: "@vuepic/vue-datepicker@npm:3.6.5"
+  dependencies:
+    date-fns: ^2.29.3
+    date-fns-tz: ^1.3.7
+  peerDependencies:
+    vue: ">=3.2.0"
+  checksum: 14f132dc40f967845a7c5a98f258c1872ea6e671322edaf0104e9c15e1ccab889757f1fa12679f8ef5f1d8f1d398873fb55e9c8cf4fee085cce3ec3491608586
   languageName: node
   linkType: hard
 
@@ -2781,6 +2800,22 @@ __metadata:
     tsv2csv: bin/dsv2dsv.js
     tsv2json: bin/dsv2json.js
   checksum: 5fc0723647269d5dccd181d74f2265920ab368a2868b0b4f55ffa2fecdfb7814390ea28622cd61ee5d9594ab262879509059544e9f815c54fe76fbfb4ffa4c8a
+  languageName: node
+  linkType: hard
+
+"date-fns-tz@npm:^1.3.7":
+  version: 1.3.8
+  resolution: "date-fns-tz@npm:1.3.8"
+  peerDependencies:
+    date-fns: ">=2.0.0"
+  checksum: dbf17cb88de7c7b71a9f86b815ac62ebdbf725c030e78d2421309456b5001a85284a5b6763f4af0ba660183f12e876c165e725a0723f642edb7846407db03133
+  languageName: node
+  linkType: hard
+
+"date-fns@npm:^2.29.3":
+  version: 2.29.3
+  resolution: "date-fns@npm:2.29.3"
+  checksum: e01cf5b62af04e05dfff921bb9c9933310ed0e1ae9a81eb8653452e64dc841acf7f6e01e1a5ae5644d0337e9a7f936175fd2cb6819dc122fdd9c5e86c56be484
   languageName: node
   linkType: hard
 
@@ -5075,9 +5110,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "minids-monorepo@workspace:."
   dependencies:
+    "@mdi/font": ^7.1.96
     "@minids/carina": "workspace:*"
     "@minids/common": "workspace:*"
     "@vue-leaflet/vue-leaflet": ^0.8.0
+    "@vuepic/vue-datepicker": ^3.6.5
     leaflet: ^1.9.3
     rimraf: ^4.1.0
   languageName: unknown
