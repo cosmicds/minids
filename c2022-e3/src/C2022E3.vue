@@ -1174,32 +1174,32 @@ export default defineComponent({
 
     createHorizon(when: Date | null = null) {
       this.removeHorizon();
-      if (this.showHorizon) {
-        const color = '#01362C';
-        const date = when || this.selectedDate || new Date();
 
-        // The initial coordinates are given in Alt/Az, then converted to RA/Dec
-        // Use N annotations to cover below the horizon
-        const N = 6;
-        const delta = 2 * Math.PI / N;
-        for (let i = 0; i < N; i++) {
-          let points: [number, number][] = [
-            [0, i * delta],
-            [-Math.PI / 2, i * delta],
-            [0, (i + 1) * delta]
-          ];
-          points = points.map((point) => {
-            const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
-            return [R2D * raDec.raRad, R2D * raDec.decRad];
-          });
-          const poly = new Poly();
-          points.forEach(point => poly.addPoint(...point));
-          poly.set_lineColor(color);
-          poly.set_fill(true);
-          poly.set_fillColor(color);
-          this.addAnnotation(poly);
-        }
+      const color = '#01362C';
+      const date = when || this.selectedDate || new Date();
+
+      // The initial coordinates are given in Alt/Az, then converted to RA/Dec
+      // Use N annotations to cover below the horizon
+      const N = 6;
+      const delta = 2 * Math.PI / N;
+      for (let i = 0; i < N; i++) {
+        let points: [number, number][] = [
+          [0, i * delta],
+          [-Math.PI / 2, i * delta],
+          [0, (i + 1) * delta]
+        ];
+        points = points.map((point) => {
+          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
+          return [R2D * raDec.raRad, R2D * raDec.decRad];
+        });
+        const poly = new Poly();
+        points.forEach(point => poly.addPoint(...point));
+        poly.set_lineColor(color);
+        poly.set_fill(true);
+        poly.set_fillColor(color);
+        this.addAnnotation(poly);
       }
+
     },
 
     closestPoint(
