@@ -904,7 +904,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          //this.createHorizon();
+          this.createHorizon();
         },
         options
       );
@@ -1019,7 +1019,7 @@ export default defineComponent({
     createHorizon(when: Date | null = null) {
       this.clearAnnotations();
   
-      const color = '#5C4033';
+      const color = '#025042';
       const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1177,7 +1177,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      //this.createHorizon(now);
+      this.createHorizon(now);
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
