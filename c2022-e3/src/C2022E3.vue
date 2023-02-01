@@ -434,8 +434,8 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
+import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, LayerManager } from "@wwtelescope/engine";
+import { ImageSetType, PlotTypes, MarkerScales } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -450,6 +450,7 @@ import {
   ephemerisFullWeeklyCsv,
   ephemeris2023DailyCsv
 } from "./data";
+import { Script } from 'vm';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -566,7 +567,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showConstellations: true,
       showHorizon: true,
-      centerViewOnDate: true,
+      centerViewOnDate: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -663,6 +664,7 @@ export default defineComponent({
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
@@ -896,7 +898,7 @@ export default defineComponent({
     logLocation() {
       console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
     },
-
+    
     logPosition() {
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
@@ -912,13 +914,44 @@ export default defineComponent({
       }
     },
 
+    setImageSetLayerOrder(layer_id: string, order: number) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.$pinia._s.get("wwt-engine").$wwt.inst.si.setImageSetLayerOrder(layer_id, order)
+    },
+
+    getImageSetLayerIndex(layer: ImageSetLayer): number {
+      // find layer in this.wwtActiveLayers
+      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
+      // get the key item with the value of layer.id
+      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+        if (value === layer.id.toString()) {
+          return Number(key);
+        }
+      }
+      return -1;
+    },
+
+    resetLayerOrder() {
+      // reset the layer order to the default
+      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
+      // get the key item with the value of layer.id
+      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+        this.setImageSetLayerOrder(value, Number(key));
+      }
+    },
+
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
+      const layer = this.imagesetLayers[iset.get_name()];
+      this.resetLayerOrder()
+      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
+
       this.gotoRADecZoom({
         raRad: D2R * iset.get_centerX(),
         decRad: D2R * iset.get_centerY(),
-        zoomDeg: place.get_zoomLevel(),
+        zoomDeg: this.wwtZoomDeg, //place.get_zoomLevel(),
         instant: true
       });
     },
@@ -1127,30 +1160,31 @@ export default defineComponent({
 
     createHorizon(when: Date | null = null) {
       this.removeHorizon();
-  
-      const color = '#01362C';
-      const date = when || this.selectedDate || new Date();
+      if (this.showHorizon) {
+        const color = '#01362C';
+        const date = when || this.selectedDate || new Date();
 
-      // The initial coordinates are given in Alt/Az, then converted to RA/Dec
-      // Use N annotations to cover below the horizon
-      const N = 6;
-      const delta = 2 * Math.PI / N;
-      for (let i = 0; i < N; i++) {
-        let points: [number, number][] = [
-          [0, i * delta],
-          [-Math.PI/2, i * delta],
-          [0, (i + 1) * delta]
-        ];
-        points = points.map((point) => {
-          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
-          return [R2D * raDec.raRad, R2D * raDec.decRad];
-        });
-        const poly = new Poly();
-        points.forEach(point => poly.addPoint(...point));
-        poly.set_lineColor(color);
-        poly.set_fill(true);
-        poly.set_fillColor(color);
-        this.addAnnotation(poly);
+        // The initial coordinates are given in Alt/Az, then converted to RA/Dec
+        // Use N annotations to cover below the horizon
+        const N = 6;
+        const delta = 2 * Math.PI / N;
+        for (let i = 0; i < N; i++) {
+          let points: [number, number][] = [
+            [0, i * delta],
+            [-Math.PI / 2, i * delta],
+            [0, (i + 1) * delta]
+          ];
+          points = points.map((point) => {
+            const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
+            return [R2D * raDec.raRad, R2D * raDec.decRad];
+          });
+          const poly = new Poly();
+          points.forEach(point => poly.addPoint(...point));
+          poly.set_lineColor(color);
+          poly.set_fill(true);
+          poly.set_fillColor(color);
+          this.addAnnotation(poly);
+        }
       }
     },
 
