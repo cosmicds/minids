@@ -25,34 +25,35 @@
         />
     </div>
     <transition-expand>
-      <div
-        v-if="items !== null && expanded"
-        
-      >
+      <div id="items">
         <div
-          :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
-          v-for="item of items"
-          :key="item.get_name()"
-          :title="item.get_name()"
+          v-if="items !== null && expanded"
         >
-          <img
-            v-if="thumbnails"
-            :src="item.get_thumbnailUrl()"
-            :alt="item.get_name()"
-          />
           <div
-            class="item-name"
-            @click="() => selectItem(item)"
+            :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
+            v-for="item of items"
+            :key="item.get_name()"
+            :title="item.get_name()"
           >
-            {{item.get_name()}}
+            <img
+              v-if="thumbnails"
+              :src="item.get_thumbnailUrl()"
+              :alt="item.get_name()"
+            />
+            <div
+              class="item-name"
+              @click="() => selectItem(item)"
+            >
+              {{item.get_name()}}
+            </div>
+            <input
+              v-if="sliders"
+              class="opacity-range"
+              type="range"
+              value="100"
+              @input="(e) => onSliderInputChanged(e, item)"
+            />
           </div>
-          <input
-            v-if="sliders"
-            class="opacity-range"
-            type="range"
-            value="100"
-            @input="(e) => onSliderInputChanged(e, item)"
-          />
         </div>
       </div>
     </transition-expand>
@@ -154,7 +155,7 @@ export default defineComponent({
   flex-direction: var(--flex-direction);
   width: auto;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   pointer-events: auto;
   background: black;
   &::-webkit-scrollbar {
@@ -170,6 +171,11 @@ export default defineComponent({
   }
   //width: 100%;
   //justify-content: space-around;
+}
+
+#items {
+  height: 100%;
+  overflow-y: auto;
 }
 
 .item {
