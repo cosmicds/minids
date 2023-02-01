@@ -1036,10 +1036,14 @@ export default defineComponent({
       const minute = utc.getUTCMinutes();
       const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
+      let jan_or_feb = false
       if (month == 1 || month == 2)
       {
           year -= 1;
           month += 12;
+          jan_or_feb = true
+      } else {
+        jan_or_feb = false;
       }
 
       const a = year / 100;
@@ -1047,9 +1051,20 @@ export default defineComponent({
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const bad_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-      // const julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
-      const julianDays = bad_julianDays - 42.27 / (60 * 24) //2 * 0.01166666663812066;
+      const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // const unix_julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
+      // const is_leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+      // CAUTION: this is a very hacky way to get the correct offset
+      // IT will probably only work for 2022 and 2023, and it uses special numbers
+      const _before_feb_28_2022 = (jan_or_feb) || (month == 14 && day < 28) || (year < 2023);
+      let offset = 0
+      if (_before_feb_28_2022) {
+        offset = - 42.27 / (60 * 24)
+      } else {
+        offset = -28 / (60 * 24)
+      }
+      const julianDays = meeus_julianDays + offset ;
+
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
