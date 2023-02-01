@@ -1323,7 +1323,7 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      this.updateHorizon(now);
+      this.updateHorizon();
       this.updateWWTLocation();
       this.gotoRADecZoom({
         raRad: raDec.raRad,
