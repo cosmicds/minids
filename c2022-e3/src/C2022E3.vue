@@ -398,8 +398,6 @@
                       <div
                         style="min-height: 120px;"
                       >
-                        Explore how the Green Comet moves within this <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
-                        <br><br>
                         <h4>Tips:</h4>
                         <ul class="text-list">
                           <li>
@@ -414,13 +412,17 @@
                             Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
                           </li>
                           <li>
+                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The green moving marker shows the position of the comet at the displayed local time.
+                          </li>
+                          <li>
                             Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
                           </li>
                           <li>
                             Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
                           </li>
                         </ul>
-
+                      <br>
+                      This Mini Data Story is powered by WorldWide Telescope (WWT).
 
                       </div>
                     </v-col>
