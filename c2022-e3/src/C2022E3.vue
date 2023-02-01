@@ -323,6 +323,7 @@
                 <br><br>
 
                 <h3>Explore!</h3>
+                Adjusting the <span class="ui-element-ref-comet">Date</span> slider along the bottom of the screen shows you the position of the comet since it was discovered in March 2022. 
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
                   <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
@@ -346,6 +347,7 @@
                 Alyssa Goodman<br>
                 Mary Dussault<br>
                 Harry Houghton<br>
+                Anna Nolin<br>
                 Evaluator: Sue Sunbury<br>
                 <br>
                 <h4>WorldWide Telescope Team:</h4>
@@ -372,7 +374,7 @@
                         Pan
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong><br>
                 
                     </v-col>
@@ -386,7 +388,7 @@
                         Zoom
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong><br>
                       
                     </v-col>
@@ -396,9 +398,30 @@
                       <div
                         style="min-height: 120px;"
                       >
-                        <p>
-                          The frame above provides an <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
-                        </p>
+                        Explore how the Green Comet moves within this <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
+                        <br><br>
+                        <h4>Tips:</h4>
+                        <ul class="text-list">
+                          <li>
+                            Click <font-awesome-icon
+                                  class="control-icon"
+                                  icon="location-pin"
+                                  size="lg" 
+                                ></font-awesome-icon>
+                            to adjust your location.
+                          </li>
+                          <li>
+                            Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
+                          </li>
+                          <li>
+                            Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
+                          </li>
+                          <li>
+                            Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
+                          </li>
+                        </ul>
+
+
                       </div>
                     </v-col>
                   </v-row>
@@ -413,6 +436,7 @@
                       Alyssa Goodman<br>
                       Mary Dussault<br>
                       Harry Houghton<br>
+                      Anna Nolin<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -1041,9 +1065,9 @@ export default defineComponent({
           }
         },
         (_error) => {
-          let msg = "Unable to detect location. Please check your browser and/or OS settings.";
+          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or";
           if (startup) {
-            msg += "\nUse our location selector to manually input your location";
+            msg += "\nuse location selector to manually input a location";
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -1723,7 +1747,7 @@ body {
   // padding-bottom: 2px !important;
 
   .v-card-text {
-    font-size: ~"max(14px, calc(0.8em + 0.3vw))";
+    font-size: ~"max(14px, calc(0.7em + 0.3vw))";
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
@@ -1883,6 +1907,7 @@ body {
 
 ul.text-list {
   margin-left:1em;
+  margin-top: 0.5em;
 }
 
 div.credits {
@@ -1913,6 +1938,12 @@ div.credits {
 //     filter:var(--map-tiles-filter, none);
 //   }
 // }
+
+span.ui-element-ref-comet {
+  background-color: #03866E; /* #04D6B0; */
+  padding: 0em 0.1em;
+  border-radius: 0.2em;
+}
 
 /* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
 input[type="range"] {
