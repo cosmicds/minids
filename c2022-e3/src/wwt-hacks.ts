@@ -16,7 +16,7 @@ export function drawSkyOverlays() {
     WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false);
   }
   if (Settings.get_active().get_showAltAzGrid()) {
-    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
+    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 126, 42, 99));
   }
 }
 
