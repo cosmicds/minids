@@ -183,6 +183,12 @@
       </div>
       <div id="tools">
         <span class="tool-container">
+          <v-chip
+            id="sliderlabel"
+            label
+            >
+              Date:
+          </v-chip>
           <vue-slider
             id="slider"
             adsorb
@@ -1626,7 +1632,7 @@ body {
 
 .tool-container {
   display: flex;
-  width: 100%;
+  width: 99%;
   flex-direction: row;
   align-items: center;
   gap: 5px;
@@ -1824,9 +1830,17 @@ body {
 }
 
 // Styling the slider
+
+#sliderlabel {
+  padding:3px 5px;
+  margin:0 5px;
+  color:#fff !important;
+  background-color: rgba(3,134,110,0.5);
+}
+
 #slider {
   width: 100% !important;
-  margin: 5px 50px;
+  margin: 5px 30px;
 }
 
 .vue-slider-process
@@ -2018,4 +2032,9 @@ input[type="range"]::-moz-range-track {
     height:var(--track-height);
     margin-top: 0;
   }
+  
+#sliderlabel {
+  padding-right: 0.75em;
+  padding-left: 0.5em;
+}
 </style>
