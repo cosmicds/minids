@@ -669,7 +669,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -687,7 +687,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 1]
           ]
         })
@@ -706,7 +706,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
@@ -1113,7 +1113,7 @@ export default defineComponent({
     createHorizon(when: Date | null = null) {
       this.removeHorizon();
   
-      const color = '#5C4033';
+      const color = '#01362C';
       const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1706,26 +1706,29 @@ body {
 
 .vue-slider-dot-tooltip-inner
 {
-  background-color: var(--comet-color) !important;
+  color: white !important;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
 }
 
-.vue-slider-dot-style
-{
-  color: var(--comet-color) !important;
+.vue-slider-dot-handle {
+  cursor: pointer;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
 }
 
 .mark-line {
   position: absolute;
-  height: 18px;
-  width: 2px;
+  height: 12px;
+  width: 1.25px;
   margin: 0;
-  background-color: #FFFFFF;
+  background-color: #E5E4E2;
   transform: translateX(-50%) translateY(calc(-50% + 1px));
 
   &.tall {
-    height: 25px;
-    background-color: #000000;
-    border: solid 1px white;
+    height: 20px;
+    background-color: #848884;
+    border: solid 0.5px #E5E4E2;
   }
 }
 
@@ -1826,4 +1829,63 @@ div.credits {
 //     filter:var(--map-tiles-filter, none);
 //   }
 // }
+
+/* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
+input[type="range"] {
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
+    margin: 5px;
+    --track-height: 0.3em;
+    --thumb-radius: 0.7em;
+    --thumb-color: rgba(205, 54, 157  , 1);
+    --track-color: rgba(4, 147, 214, 0.7);
+    --thumb-border: 1px solid #899499;
+  }
+  
+  
+  
+  input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: inherit;
+      -moz-appearance: inherit;
+      appearance: inherit;
+    width: var(--thumb-radius);
+    height: var(--thumb-radius);
+    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    border-radius: 50%;
+    background: var(--thumb-color);
+    border: var(--thumb-border);
+    
+    
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
+    width: var(--thumb-radius);
+    height: var(--thumb-radius);
+    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    border-radius: 50%;
+    background: var(--thumb-color);
+    cursor: pointer;
+    border: var(--thumb-border)
+  }
+  
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--track-color);
+    /* outline: 1px solid white; */
+    border-radius: calc(var(--track-height) / 2);
+    height: var(--track-height);
+    margin-top: 0;
+  }
+  
+  
+input[type="range"]::-moz-range-track {
+    background: var(--track-color);
+    /* outline: 1px solid white; */
+    border-radius: calc(var(--track-height) / 2);
+    height:var(--track-height);
+    margin-top: 0;
+  }
 </style>
