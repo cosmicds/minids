@@ -435,7 +435,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -444,7 +444,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import drawSkyOverlays from "./drawSkyOverlays"
+import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
 
 
 import {
@@ -752,6 +752,9 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.wwtControl._drawSkyOverlays = drawSkyOverlays;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Constellations.initializeConstellationNames = initializeConstellationNames;
 
       this.updateWWTLocation();
       
@@ -1241,7 +1244,8 @@ export default defineComponent({
       const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
       
       if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex]
+        position = daily2023Table[dailyIndex];
+        // TODO: Use interpolated point here
       } else {
         const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
         if (weeklyIndex > -1) {
