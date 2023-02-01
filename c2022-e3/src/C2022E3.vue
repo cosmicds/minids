@@ -808,9 +808,10 @@ export default defineComponent({
       return this.smallSize && this.touchscreen;
     },
     cssVars() {
-      return {
-        '--comet-color': this.cometColor
-      }
+      return{
+        '--comet-color': this.cometColor,
+        '--wwt-height': this.showTextSheet ? '60vh' : '100%',
+      };
     },
     wwtControl(): WWTControl {
       return WWTControl.singleton;
@@ -1457,7 +1458,7 @@ body {
     position: relative;
     top: 0;
     width: 100%;
-    height: 100%;
+    height: var(--wwt-height);
     border-style: none;
     border-width: 0;
     margin: 0;
@@ -1713,6 +1714,7 @@ body {
     padding: 0;
     margin: 0;
     max-width: 100%;
+    height: 40vh;
   }
 }
 
