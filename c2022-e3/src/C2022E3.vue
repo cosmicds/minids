@@ -579,6 +579,7 @@ export default defineComponent({
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
+      positionSet: false,
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
       decRadLowerBound: 0.2,
@@ -777,7 +778,14 @@ export default defineComponent({
       Constellations.initializeConstellationNames = initializeConstellationNames;
 
       this.updateWWTLocation();
-      
+
+      // wwtZoomDeg is still 0 if we run this here
+      // and it was the same in nextTick
+      // so give just a bit of a delay
+      setTimeout(() => {
+        this.centerOnCurrentDate();
+        this.positionSet = true;
+      }, 100);
 
     });
 
@@ -801,7 +809,7 @@ export default defineComponent({
       return !this.ready;
     },
     ready(): boolean {
-      return this.layersLoaded;
+      return this.layersLoaded && this.positionSet;
     },
     selectedDate(): Date {
       return new Date(this.selectedTime);
@@ -890,7 +898,6 @@ export default defineComponent({
         this.deleteLayer(this.currentDailyLayer.id);
         this.currentDailyLayer = null;
       }
-      console.log(interpolatedDailyTable);
 
       if (interpolatedDailyTable !== null) {
         this.createTableLayer({
@@ -1353,6 +1360,7 @@ export default defineComponent({
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
+      this.updateViewForDate();
       this.updateLayersForDate();
     },
 
