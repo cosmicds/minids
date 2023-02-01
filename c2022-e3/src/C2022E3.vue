@@ -743,7 +743,8 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
-      this.wwtSettings.set_showConstellationBoundries(this.showConstellations);
+      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
+      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
       // This is kinda horrible, but it works!
 
@@ -1297,7 +1298,8 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
     },
     showConstellations(show: boolean) {
-      this.wwtSettings.set_showConstellationBoundries(show);
+      this.wwtSettings.set_showConstellationLabels(show);
+      this.wwtSettings.set_showConstellationFigures(show);
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
