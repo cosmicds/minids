@@ -1490,12 +1490,12 @@ export default defineComponent({
 
       this.updateHorizon();
       this.updateWWTLocation();
-      this.gotoRADecZoom({
-        raRad: raDec.raRad,
-        decRad: raDec.decRad,
-        zoomDeg: this.wwtZoomDeg,
-        instant: true
-      });
+      // this.gotoRADecZoom({
+      //   raRad: raDec.raRad,
+      //   decRad: raDec.decRad,
+      //   zoomDeg: this.wwtZoomDeg,
+      //   instant: true
+      // });
     },
     selectedDate(_date: Date) {
       this.updateForDateTime();
@@ -2005,7 +2005,7 @@ body {
 }
 
 #splash-close {
-  outline: 1px solid rgba(255, 255, 255, 0.094);
+  // outline: 1px solid rgba(255, 255, 255, 0.094);
   position: absolute;
   width: 7%;
   height:8%;
