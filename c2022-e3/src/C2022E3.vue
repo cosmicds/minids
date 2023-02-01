@@ -639,7 +639,7 @@ export default defineComponent({
               goto: false
             }).then((layer) => {
               this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 1]);
+              applyImageSetLayerSetting(layer, ["opacity", 0]);
             });
         });
       }));
@@ -951,7 +951,7 @@ export default defineComponent({
       const curZoom = this.wwtZoomDeg * D2R;
       const isetRa = iset.get_centerX() * D2R;
       const isetDec = iset.get_centerY() * D2R;
-      console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
+      // console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
       // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
       return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
     },
@@ -1324,7 +1324,6 @@ export default defineComponent({
     },
 
     matchImageSetName(date: Date): string {
-      console.log(date)
       // imageset names are keys in this.imagesetLayers
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
@@ -1337,6 +1336,7 @@ export default defineComponent({
         const name_date = new Date(y, m - 1, d)
         // if the name is after the date we are looking for, return it
         if (name_date.getTime() >= date.getTime()) {
+          // console.log(name)
           return name;
         }
       }
@@ -1349,10 +1349,24 @@ export default defineComponent({
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach(iname => {
+        const selector = `#items div div.bordered.item.selected[title='${iname}'] input`
+        let el = (<HTMLInputElement>document.querySelector(selector))
         if (iname != name) {
-          this.imagesetLayers[iname].set_opacity(0);
+          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
+          if (el != null) {
+            el.value = '0'
+          }
         } else {
-          this.imagesetLayers[iname].set_opacity(1);
+          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
+          const iset = this.wwtControl.getImagesetByName(iname)
+          if (iset == null) { return; }
+          if (el != null) { el.value = '1' }
+          this.gotoRADecZoom({
+            raRad: D2R * iset.get_centerX(),
+            decRad: D2R * iset.get_centerY(),
+            zoomDeg: this.wwtZoomDeg,
+            instant: true
+          });
         }
       })
       
