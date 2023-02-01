@@ -19,6 +19,7 @@ import {
   faBookOpen,
   faChevronDown,
   faChevronUp,
+  faGear,
   faLocationPin,
   faTimes,
   faVideo,
@@ -35,6 +36,7 @@ library.add(faChevronDown);
 library.add(faChevronUp);
 library.add(faCameraRetro);
 library.add(faImages);
+library.add(faGear);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
