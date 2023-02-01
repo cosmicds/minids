@@ -11,6 +11,6 @@ export default function drawSkyOverlays() {
     WWTControl.constellationsBoundries.draw(this.renderContext, Settings.get_active().get_showConstellationSelection(), this.constellation, false);
   }
   if (Settings.get_active().get_showAltAzGrid()) {
-    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
+    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 126, 42, 99));
   }
 }
