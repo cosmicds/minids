@@ -1017,7 +1017,7 @@ export default defineComponent({
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
