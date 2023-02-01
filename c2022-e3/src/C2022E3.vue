@@ -174,12 +174,13 @@
           label="Show Horizon"
           hide-details
         />
-        <v-checkbox
+        <v-btn
           :color="cometColor"
-          v-model="centerViewOnDate"
-          label="Center View on Date"
-          hide-details
-          />
+          variant="outlined"
+          @click="centerOnCurrentDate"
+        >
+          Center on Today
+        </v-btn>
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -567,7 +568,6 @@ export default defineComponent({
       showAltAzGrid: true,
       showConstellations: true,
       showHorizon: true,
-      centerViewOnDate: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -956,7 +956,6 @@ export default defineComponent({
       const curZoom = this.wwtZoomDeg * D2R;
       const isetRa = iset.get_centerX() * D2R;
       const isetDec = iset.get_centerY() * D2R;
-      console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
       // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
       return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
     },
@@ -966,17 +965,21 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetLayerOrder();
-      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
+      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1);
+      const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+      this.selectedTime = Date.UTC(year, month - 1, day);
 
-      if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
-        this.gotoRADecZoom({
-        raRad: D2R * iset.get_centerX(),
-        decRad: D2R * iset.get_centerY(),
-        zoomDeg: place.get_zoomLevel() * 1.7,
-        instant: true
+      // Give time for the selectedTime changes to propagate
+      this.$nextTick(() => {
+        if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+          this.gotoRADecZoom({
+            raRad: D2R * iset.get_centerX(),
+            decRad: D2R * iset.get_centerY(),
+            zoomDeg: place.get_zoomLevel() * 1.7,
+            instant: true
+          });
+        }
       });
-      }
-      
     },
 
     updateImageOpacity(place: Place, opacity: number) {
@@ -1318,13 +1321,17 @@ export default defineComponent({
 
     },
 
+    centerOnCurrentDate() {
+      this.selectedTime = (new Date()).setUTCHours(0, 0, 0, 0);
+      this.$nextTick(() => {
+        this.updateViewForDate();
+      });
+    },
+
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
       this.updateLayersForDate();
-      if (this.centerViewOnDate) {
-        this.updateViewForDate();
-      }
     },
 
     updateHorizon(when: Date | null = null) {
@@ -1358,11 +1365,6 @@ export default defineComponent({
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
-    },
-    centerViewOnDate(center: boolean) {
-      if (center) {
-        this.updateViewForDate();
-      }
     },
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
