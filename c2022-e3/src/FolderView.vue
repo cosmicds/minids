@@ -126,7 +126,6 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
-      console.log(item);
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
