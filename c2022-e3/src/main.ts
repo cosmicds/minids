@@ -9,6 +9,9 @@ import "./polyfills";
 import VueSlider from "vue-slider-component";
 import 'vue-slider-component/theme/default.css'
 
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 import vuetify from "../plugins/vuetify"
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -77,6 +80,7 @@ createApp(C2022E3, {
 .component('folder-view', FolderView)
 .component('vue-slider', VueSlider)
 .component('transition-expand', TransitionExpand)
+.component('date-picker', Datepicker)
 
 // Mount
 .mount("#app");

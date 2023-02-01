@@ -146,21 +146,24 @@
 
     <div class="bottom-content">
       <div
-        id="buttons-container"
+        id="controls"
       >
-        <div
-          id="toggle-altaz-button"
-          class="ui-button clickable"
-          @click="showAltAzGrid = !showAltAzGrid"
-        >
-          {{ (showAltAzGrid ? 'Hide' : 'Show') + ' Grid' }} 
+        <date-picker
+          dark
+          time-picker
+          v-model="timeOfDay"
+        />
+        <div>
+          <input type="checkbox" v-model="showAltAzGrid"/>
+          <span class="ui-text">Show Grid</span>
         </div>
-        <div
-          id="center-view-button"
-          class="ui-button clickable"
-          @click="updateViewForDate"
-        >
-          Center View on Date
+        <div>
+          <input type="checkbox" v-model="showHorizon"/>
+          <span class="ui-text">Show Horizon</span>
+        </div>
+        <div>
+          <input type="checkbox" v-model="centerViewOnDate"/>
+          <span class="ui-text">Center View on Date</span>
         </div>
       </div>
       <div id="tools">
@@ -169,6 +172,7 @@
             id="slider"
             adsorb
             included
+            :value="selectedTime"
             :marks="(d: number) => {
               return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
@@ -533,6 +537,7 @@ export default defineComponent({
     }
   },
   data() {
+    const now = new Date();
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -542,6 +547,8 @@ export default defineComponent({
       decRadLowerBound: 0.2,
 
       showAltAzGrid: true,
+      showHorizon: true,
+      centerViewOnDate: true,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
@@ -567,7 +574,8 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,
 
       // Harvard Observatory
-      selectedTime: (new Date(2023, 0, 28)).getTime(),
+      timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
+      selectedTime: now.setHours(0, 0, 0, 0),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -1017,7 +1025,7 @@ export default defineComponent({
     },
 
     createHorizon(when: Date | null = null) {
-      this.clearAnnotations();
+      this.removeHorizon();
   
       const color = '#5C4033';
       const date = when || this.selectedDate || new Date();
@@ -1079,6 +1087,10 @@ export default defineComponent({
       return null;
     },
 
+    removeHorizon() {
+      this.clearAnnotations();
+    },
+
     updateLastClosePoint(event: PointerEvent) {
       const pt = { x: event.offsetX, y: event.offsetY };
       const closestPt = this.closestPoint(pt, this.selectionProximity);
@@ -1122,7 +1134,7 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate() {
+    updateViewForDate(instant=true) {
 
       let position = null as TableRow | null;
 
@@ -1143,7 +1155,7 @@ export default defineComponent({
           decRad: D2R * position.dec,
           zoomDeg: this.wwtZoomDeg,
           rollRad: this.wwtRollRad,
-          instant: false
+          instant: instant
         });
       }
 
@@ -1165,6 +1177,18 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+    },
+    showHorizon(show: boolean) {
+      if (show) {
+        this.createHorizon();
+      } else {
+        this.removeHorizon();
+      }
+    },
+    centerViewOnDate(center: boolean) {
+      if (center) {
+        this.updateViewForDate();
+      }
     },
     location(loc: LocationRad) {
       const now = this.selectedDate;
@@ -1189,7 +1213,9 @@ export default defineComponent({
     selectedDate(date: Date) {
       this.setTime(date);
       this.createHorizon(date);
-      this.updateViewForDate();
+      if (this.centerViewOnDate) {
+        this.updateViewForDate();
+      }
     },
     showLocationSelector(show: boolean) {
       if (show) {
@@ -1371,6 +1397,18 @@ body {
   pointer-events: auto;
 }
 
+#controls {
+  background: black;
+  padding: 5px;
+  border-radius: 5px;
+  border: solid 1px var(--comet-color);
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  margin-bottom: 30px;
+  pointer-events: auto;
+}
+
 #credits {
   color: #ddd;
   font-size: calc(0.7em + 0.2vw);
@@ -1419,7 +1457,7 @@ body {
   padding: 5px 5px;
   border: 2px solid black;
   border-radius: 10px;
-  font-size: calc(0.7em + 0.2vw);
+  font-size: calc(0.8em + 0.25vw);
 }
 
 .ui-button {
@@ -1648,6 +1686,18 @@ ul.text-list {
 div.credits {
   font-size: 0.8em;
 }
+
+// For styling the time picker
+// See more info here:
+// https://vue3datepicker.com/customization/theming/
+.dp__theme_dark {
+  --dp-background-color: black !important;
+}
+
+.dp__main {
+  width: 175px;
+}
+
 // :root {
 //   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 // }
