@@ -746,10 +746,11 @@ export default defineComponent({
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 50],
+            ["scaleFactor", 75],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
