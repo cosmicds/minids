@@ -613,7 +613,7 @@ export default defineComponent({
 
       showAltAzGrid: true,
       showConstellations: true,
-      showHorizon: true,
+      showHorizon: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
@@ -685,7 +685,7 @@ export default defineComponent({
               goto: false
             }).then((layer) => {
               this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 1]);
+              applyImageSetLayerSetting(layer, ["opacity", 0]);
             });
         });
       }));
@@ -996,7 +996,7 @@ export default defineComponent({
       }
     },
 
-    imageInView(iset: Imageset, zoom: number): boolean {
+    imageInView(iset: Imageset): boolean {
       const curRa = this.wwtRARad;
       const curDec = this.wwtDecRad;
       const curZoom = this.wwtZoomDeg * D2R;
@@ -1017,7 +1017,7 @@ export default defineComponent({
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
@@ -1366,6 +1366,63 @@ export default defineComponent({
       }
 
     },
+    
+    namefromDate(date: Date): string {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${month}/${day}/${year}`;
+    },
+
+    matchImageSetName(date: Date): string {
+      // imageset names are keys in this.imagesetLayers
+      const imageset_names = Object.keys(this.imagesetLayers)
+      // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
+      // that is or comes after the date we are looking for
+      
+      for (let i = 0; i < imageset_names.length; i++) {
+        const name = imageset_names[i];
+        // convert the name to a date
+        const [m, d, y] = name.split('/').map(s => parseInt(s))
+        const name_date = new Date(y, m - 1, d)
+        // if the name is after the date we are looking for, return it
+        const wwt_date_string = this.namefromDate(date)
+        if (name == wwt_date_string) {
+          // console.log(name)
+          return name;
+        }
+      }
+      return ''
+    },
+    
+    showImageForDateTime(date: Date) {
+      // console.log(this.imagesetNamefromDate(date))
+      const name = this.matchImageSetName(date)
+      const imageset_names = Object.keys(this.imagesetLayers)
+      // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
+      imageset_names.forEach((iname: string) => {
+        const selector = `#items>div>div.bordered.item[title='${iname}']>input`
+        const el = (document.querySelector(selector) as HTMLInputElement)
+        if (iname != name) {
+          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
+          if (el != null) {
+            el.value = '0'
+        }
+        } else {
+          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
+          const iset = this.wwtControl.getImagesetByName(iname)
+          if (iset == null) { return; }
+          if (el != null) { el.value = '100' }
+          // this.gotoRADecZoom({
+          //   raRad: D2R * iset.get_centerX(),
+          //   decRad: D2R * iset.get_centerY(),
+          //   zoomDeg: this.wwtZoomDeg,
+          //   instant: true
+          // });
+        }
+      })
+      
+    },
 
     centerOnCurrentDate() {
       const now = new Date();
@@ -1379,6 +1436,7 @@ export default defineComponent({
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
+      this.showImageForDateTime(this.dateTime);
       this.updateViewForDate();
       this.updateLayersForDate();
     },
