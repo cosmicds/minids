@@ -960,7 +960,7 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetLayerOrder();
-      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
+      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 100)
 
       if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
         this.gotoRADecZoom({
@@ -1311,9 +1311,55 @@ export default defineComponent({
 
     },
 
+    imagesetNamefromDate(date: Date): string {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      // if ((month == 1) && (day == 20)) {
+      //   ymd += ' (2)'
+      // }
+      return `${month}/${day}/${year}`;
+    },
+
+    matchImageSetName(date: Date): string {
+      console.log(date)
+      // imageset names are keys in this.imagesetLayers
+      const imageset_names = Object.keys(this.imagesetLayers)
+      // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
+      // that is or comes after the date we are looking for
+      
+      for (let i = 0; i < imageset_names.length; i++) {
+        const name = imageset_names[i];
+        // convert the name to a date
+        const [m, d, y] = name.split('/').map(s => parseInt(s))
+        const name_date = new Date(y, m - 1, d)
+        // if the name is after the date we are looking for, return it
+        if (name_date.getTime() >= date.getTime()) {
+          return name;
+        }
+      }
+      return ''
+    },
+    
+    showImageForDateTime(date: Date) {
+      // console.log(this.imagesetNamefromDate(date))
+      const name = this.matchImageSetName(date)
+      const imageset_names = Object.keys(this.imagesetLayers)
+      // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
+      imageset_names.forEach(iname => {
+        if (iname != name) {
+          this.imagesetLayers[iname].set_opacity(0);
+        } else {
+          this.imagesetLayers[iname].set_opacity(1);
+        }
+      })
+      
+    },
+    
     updateForDateTime() {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
+      this.showImageForDateTime(this.dateTime)
       if (this.centerViewOnDate) {
         this.updateViewForDate();
         this.updateLayersForDate();
