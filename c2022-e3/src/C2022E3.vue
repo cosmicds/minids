@@ -316,6 +316,7 @@
                 <br><br>
 
                 <h3>Explore!</h3>
+                Adjusting the <span class="ui-element-ref-comet">Date</span> slider along the bottom of the screen shows you the position of the comet since it was discovered in February 2022. 
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
                   <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
@@ -1889,6 +1890,7 @@ body {
 
 ul.text-list {
   margin-left:1em;
+  margin-top: 0.5em;
 }
 
 div.credits {
@@ -1919,6 +1921,12 @@ div.credits {
 //     filter:var(--map-tiles-filter, none);
 //   }
 // }
+
+span.ui-element-ref-comet {
+  background-color: #03866E; /* #04D6B0; */
+  padding: 0em 0.1em;
+  border-radius: 0.2em;
+}
 
 /* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
 input[type="range"] {
