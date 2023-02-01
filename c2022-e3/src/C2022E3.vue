@@ -960,6 +960,8 @@ export default defineComponent({
       const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
       // const unix_julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
       // const is_leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+      // CAUTION: this is a very hacky way to get the correct offset
+      // IT will probably only work for 2022 and 2023, and it uses special numbers
       const _before_feb_28_2022 = (jan_or_feb) || (month == 14 && day < 28) || (year < 2023);
       let offset = 0
       if (_before_feb_28_2022) {
