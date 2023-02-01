@@ -908,19 +908,23 @@ export default defineComponent({
     },
 
     onItemSelected(place: Place) {
-      this.gotoTarget({
-        place: place,
-        noZoom: false,
-        instant: true,
-        trackObject: false
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.gotoRADecZoom({
+        raRad: D2R * iset.get_centerX(),
+        decRad: D2R * iset.get_centerY(),
+        zoomDeg: place.get_zoomLevel(),
+        instant: true
       });
     },
 
     updateImageOpacity(place: Place, opacity: number) {
+      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
+      console.log(layer);
       applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
     },
 
@@ -1237,6 +1241,17 @@ export default defineComponent({
       }
 
     },
+
+    updateForDateTime() {
+      const todSeconds = 3600 * this.timeOfDay.hours + 60 * this.timeOfDay.minutes + this.timeOfDay.seconds;
+      const dateTime = new Date(this.selectedDate.getTime() + 1000 * todSeconds);
+      this.setTime(dateTime);
+      this.createHorizon(dateTime);
+      if (this.centerViewOnDate) {
+        this.updateViewForDate();
+        this.updateLayersForDate();
+      }
+    }
   },
 
   watch: {
@@ -1291,8 +1306,10 @@ export default defineComponent({
       });
     },
     selectedDate(date: Date) {
-      this.setTime(date);
-      this.createHorizon(date);
+      const todSeconds = 3600 * this.timeOfDay.hours + 60 * this.timeOfDay.minutes + this.timeOfDay.seconds;
+      const dateTime = new Date(date.getTime() + 1000 * todSeconds);
+      this.setTime(dateTime);
+      this.createHorizon(dateTime);
       if (this.centerViewOnDate) {
         this.updateViewForDate();
         this.updateLayersForDate();
@@ -1310,7 +1327,7 @@ export default defineComponent({
       }
     }
   }
-})
+});
 
 </script>
 
