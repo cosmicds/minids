@@ -440,7 +440,7 @@ import { ImageSetType, PlotTypes, MarkerScales } from "@wwtelescope/engine-types
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
-import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
 import drawSkyOverlays from "./drawSkyOverlays"
@@ -941,19 +941,33 @@ export default defineComponent({
       }
     },
 
+    imageInView(iset: Imageset, zoom: number): boolean {
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curZoom = this.wwtZoomDeg * D2R;
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      console.log(curRa*R2D, curDec*R2D, curZoom*R2D, isetRa*R2D, isetDec*R2D);
+      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
+      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
+    },
+    
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder()
+      this.resetLayerOrder();
       this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
 
-      this.gotoRADecZoom({
+      if (!this.imageInView(iset, this.wwtZoomDeg)) {
+        this.gotoRADecZoom({
         raRad: D2R * iset.get_centerX(),
         decRad: D2R * iset.get_centerY(),
-        zoomDeg: this.wwtZoomDeg, //place.get_zoomLevel(),
+        zoomDeg: place.get_zoomLevel() * 1.2,
         instant: true
       });
+      }
+      
     },
 
     updateImageOpacity(place: Place, opacity: number) {
