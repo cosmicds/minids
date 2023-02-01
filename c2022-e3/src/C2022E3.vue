@@ -1671,7 +1671,7 @@ input[type="range"] {
     --thumb-radius: 0.7em;
     --thumb-color: rgba(205, 54, 157  , 1);
     --track-color: rgba(4, 147, 214, 0.7);
-    --thumb-border: none;
+    --thumb-border: 1px solid #899499;
   }
   
   
