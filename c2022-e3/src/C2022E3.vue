@@ -339,6 +339,7 @@
                 Alyssa Goodman<br>
                 Mary Dussault<br>
                 Harry Houghton<br>
+                Anna Nolin<br>
                 Evaluator: Sue Sunbury<br>
                 <br>
                 <h4>WorldWide Telescope Team:</h4>
@@ -365,7 +366,7 @@
                         Pan
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong><br>
                 
                     </v-col>
@@ -379,7 +380,7 @@
                         Zoom
                       </v-chip>
                     </v-col>
-                    <v-col cols="8" class="pt-2">
+                    <v-col cols="8" class="pt-1">
                       <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong><br>
                       
                     </v-col>
@@ -389,9 +390,30 @@
                       <div
                         style="min-height: 120px;"
                       >
-                        <p>
-                          The frame above provides an <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
-                        </p>
+                        Explore how the Green Comet moves within this <b>interactive view </b>of the night sky, powered by WorldWide Telescope (WWT).
+                        <br><br>
+                        <h4>Tips:</h4>
+                        <ul class="text-list">
+                          <li>
+                            Click <font-awesome-icon
+                                  class="control-icon"
+                                  icon="location-pin"
+                                  size="lg" 
+                                ></font-awesome-icon>
+                            to adjust your location.
+                          </li>
+                          <li>
+                            Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
+                          </li>
+                          <li>
+                            Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
+                          </li>
+                          <li>
+                            Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
+                          </li>
+                        </ul>
+
+
                       </div>
                     </v-col>
                   </v-row>
@@ -406,6 +428,7 @@
                       Alyssa Goodman<br>
                       Mary Dussault<br>
                       Harry Houghton<br>
+                      Anna Nolin<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -1034,9 +1057,9 @@ export default defineComponent({
           }
         },
         (_error) => {
-          let msg = "Unable to detect location. Please check your browser and/or OS settings.";
+          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or";
           if (startup) {
-            msg += "\nUse our location selector to manually input your location";
+            msg += "\nuse location selector to manually input a location";
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -1714,7 +1737,7 @@ body {
   // padding-bottom: 2px !important;
 
   .v-card-text {
-    font-size: ~"max(14px, calc(0.8em + 0.3vw))";
+    font-size: ~"max(14px, calc(0.7em + 0.3vw))";
     padding-top: ~"max(2vw, 16px)";
     padding-left: ~"max(4vw, 16px)";
     padding-right: ~"max(4vw, 16px)";
