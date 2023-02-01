@@ -13,22 +13,22 @@
     ></WorldWideTelescope>
     
     <v-overlay
-        :model-value="showSplashScreen"
-        absolute
-        opacity="0.6"
-        id="splash-overlay"
-      >
-        <img
-          id="splash-screen"
-          :src="require(`./assets/Green_Comet_Mini_Splashscreen.png`)"
-          v-click-outside="closeSplashScreen"
-          contain
-        />
-        <a
-          id="splash-close"
-          @click="closeSplashScreen">
-        </a>
-      </v-overlay>
+      :model-value="showSplashScreen"
+      absolute
+      opacity="0.6"
+      id="splash-overlay"
+    >
+      <img
+        id="splash-screen"
+        :src="require(`./assets/Green_Comet_Mini_Splashscreen.png`)"
+        v-click-outside="closeSplashScreen"
+        contain
+      />
+      <a
+        id="splash-close"
+        @click="closeSplashScreen">
+      </a>
+    </v-overlay>
 
     <transition name="fade">
       <div
@@ -46,6 +46,7 @@
     <div class="left-content">
       <folder-view
         v-if="imagesetFolder !== null"
+        class="folder-view"
         sliders
         expandable
         :thumbnails="false"
@@ -146,22 +147,39 @@
 
     <div class="bottom-content">
       <div
-        id="buttons-container"
+        id="controls"
       >
-        <div
-          id="toggle-altaz-button"
-          class="ui-button clickable"
-          @click="showAltAzGrid = !showAltAzGrid"
-        >
-          {{ (showAltAzGrid ? 'Hide' : 'Show') + ' Grid' }} 
-        </div>
-        <div
-          id="center-view-button"
-          class="ui-button clickable"
-          @click="updateViewForDate"
-        >
-          Center View on Date
-        </div>
+        <date-picker
+          dark
+          time-picker
+          enable-seconds
+          :is-24="false"
+          v-model="timeOfDay"
+        />
+        <v-checkbox
+          :color="cometColor"
+          v-model="showAltAzGrid"
+          label="Show Grid"
+          hide-details
+        />
+        <v-checkbox
+          :color="cometColor"
+          v-model="showConstellations"
+          label="Show Constellations"
+          hide-details
+        />
+        <v-checkbox
+          :color="cometColor"
+          v-model="showHorizon"
+          label="Show Horizon"
+          hide-details
+        />
+        <v-checkbox
+          :color="cometColor"
+          v-model="centerViewOnDate"
+          label="Center View on Date"
+          hide-details
+          />
       </div>
       <div id="tools">
         <span class="tool-container">
@@ -169,6 +187,7 @@
             id="slider"
             adsorb
             included
+            :value="selectedTime"
             :marks="(d: number) => {
               return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
@@ -415,7 +434,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
-import { Color, Folder, Grids, Poly, RenderContext, Settings, WWTControl } from "@wwtelescope/engine";
+import { Color, Folder, Grids, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -423,6 +442,8 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
+
+import drawSkyOverlays from "./drawSkyOverlays"
 
 
 import {
@@ -533,6 +554,7 @@ export default defineComponent({
     }
   },
   data() {
+    const now = new Date();
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -542,6 +564,12 @@ export default defineComponent({
       decRadLowerBound: 0.2,
 
       showAltAzGrid: true,
+      showConstellations: true,
+      showHorizon: true,
+      centerViewOnDate: true,
+
+      currentDailyLayer: null as SpreadSheetLayer | null,
+      currentWeeklyLayer: null as SpreadSheetLayer | null,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
@@ -567,7 +595,8 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,
 
       // Harvard Observatory
-      selectedTime: (new Date(2023, 0, 28)).getTime(),
+      timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
+      selectedTime: now.setHours(0, 0, 0, 0),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -687,27 +716,27 @@ export default defineComponent({
         });
       }));
 
-      layerPromises.push(this.createTableLayer({
-        name: "Daily Date Layer",
-        referenceFrame: "Sky",
-        dataCsv: daily2023String
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 75],
-            ["color", Color.fromHex(this.cometColor)],
-            ["sizeColumn", 3],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 1]
-          ]
-        });
-      }));
+      // layerPromises.push(this.createTableLayer({
+      //   name: "Daily Date Layer",
+      //   referenceFrame: "Sky",
+      //   dataCsv: daily2023String
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 75],
+      //       ["color", Color.fromHex(this.cometColor)],
+      //       ["sizeColumn", 3],
+      //       ["startDateColumn", 0],
+      //       ["endDateColumn", 0],
+      //       ["timeSeries", true],
+      //       ["opacity", 1],
+      //       ["decay", 1]
+      //     ]
+      //   });
+      // }));
 
       this.setTime(this.selectedDate);
 
@@ -716,21 +745,14 @@ export default defineComponent({
       });
 
       this.wwtSettings.set_localHorizonMode(true);
-      this.wwtSettings.set_showAltAzGrid(true);
+      this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showConstellationBoundries(this.showConstellations);
 
       // This is kinda horrible, but it works!
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.wwtControl._drawSkyOverlays = function() {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        if (Settings.get_active().get_showAltAzGrid()) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 100, 136, 234));
-        }
-      }
+      this.wwtControl._drawSkyOverlays = drawSkyOverlays;
 
       this.updateWWTLocation();
       
@@ -779,6 +801,25 @@ export default defineComponent({
       // @ts-ignore
       return Settings.get_active();
     },
+    dayFrac: {
+      get(): number {
+        const dateForTOD = new Date();
+        dateForTOD.setHours(this.timeOfDay.hours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+        const todSeconds = 3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds();
+        return todSeconds / (24 * 60 * 60);
+      },
+      set(frac: number) {
+        let seconds = Math.floor(24 * 60 * 60 * frac);
+        const hours = Math.floor(seconds / 3600);
+        seconds -= 60 * 60 * hours;
+        const minutes = Math.floor(seconds / 60);
+        seconds -= 60 * minutes;
+        
+        const d = new Date();
+        d.setUTCHours(hours, minutes, seconds);
+        return { hours: d.getHours(), minutes: d.getMinutes(), seconds: Math.floor(d.getSeconds()) };
+      }
+    },
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -794,6 +835,55 @@ export default defineComponent({
   },
 
   methods: {
+    interpolatedTable(table: Table): Table | null {
+      const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
+      if (index === -1) { return null; }
+      const row = table[index];
+      const nextRow = table[index + 1];
+      const f = this.dayFrac;
+      const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
+      const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
+      
+      const interpolatedRow: TableRow = { ...row };
+      interpolatedRow.ra = interpolatedRA;
+      interpolatedRow.dec = interpolatedDec;
+      return Object.assign([interpolatedRow], { columns: table.columns });
+    },
+
+    updateLayersForDate() {
+
+      const interpolatedDailyTable = this.interpolatedTable(daily2023Table);
+      if (this.currentDailyLayer !== null) {
+        this.deleteLayer(this.currentDailyLayer.id);
+        this.currentDailyLayer = null;
+      }
+
+      if (interpolatedDailyTable !== null) {
+        this.createTableLayer({
+          name: "Daily Date Layer",
+          referenceFrame: "Sky",
+          dataCsv: formatCsvTable(interpolatedDailyTable)
+        }).then((layer) => {
+          this.currentDailyLayer = layer;
+          layer.set_lngColumn(1);
+          layer.set_latColumn(2);
+          this.applyTableLayerSettings({
+            id: layer.id.toString(),
+            settings: [
+              ["scaleFactor", 75],
+              ["color", Color.fromHex(this.cometColor)],
+              ["sizeColumn", 3],
+              ["startDateColumn", 0],
+              ["endDateColumn", 0],
+              ["timeSeries", true],
+              ["opacity", 1],
+              ["decay", 1]
+            ]
+          });
+        });
+      }
+    },
+
     closeSplashScreen() {
       this.showSplashScreen = false;
     },
@@ -823,19 +913,23 @@ export default defineComponent({
     },
 
     onItemSelected(place: Place) {
-      this.gotoTarget({
-        place: place,
-        noZoom: false,
-        instant: true,
-        trackObject: false
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.gotoRADecZoom({
+        raRad: D2R * iset.get_centerX(),
+        decRad: D2R * iset.get_centerY(),
+        zoomDeg: place.get_zoomLevel(),
+        instant: true
       });
     },
 
     updateImageOpacity(place: Place, opacity: number) {
+      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
+      console.log(layer);
       applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
     },
 
@@ -1017,7 +1111,7 @@ export default defineComponent({
     },
 
     createHorizon(when: Date | null = null) {
-      this.clearAnnotations();
+      this.removeHorizon();
   
       const color = '#5C4033';
       const date = when || this.selectedDate || new Date();
@@ -1079,6 +1173,10 @@ export default defineComponent({
       return null;
     },
 
+    removeHorizon() {
+      this.clearAnnotations();
+    },
+
     updateLastClosePoint(event: PointerEvent) {
       const pt = { x: event.offsetX, y: event.offsetY };
       const closestPt = this.closestPoint(pt, this.selectionProximity);
@@ -1122,7 +1220,7 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate() {
+    updateViewForDate(instant=true) {
 
       let position = null as TableRow | null;
 
@@ -1143,11 +1241,22 @@ export default defineComponent({
           decRad: D2R * position.dec,
           zoomDeg: this.wwtZoomDeg,
           rollRad: this.wwtRollRad,
-          instant: false
+          instant: instant
         });
       }
 
     },
+
+    updateForDateTime() {
+      const todSeconds = this.dayFrac * 60 * 60 * 24;
+      const dateTime = new Date(this.selectedDate.getTime() + 1000 * todSeconds);
+      this.setTime(dateTime);
+      this.createHorizon(dateTime);
+      if (this.centerViewOnDate) {
+        this.updateViewForDate();
+        this.updateLayersForDate();
+      }
+    }
   },
 
   watch: {
@@ -1165,6 +1274,24 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+    },
+    showConstellations(show: boolean) {
+      this.wwtSettings.set_showConstellationBoundries(show);
+    },
+    showHorizon(show: boolean) {
+      if (show) {
+        this.createHorizon();
+      } else {
+        this.removeHorizon();
+      }
+    },
+    centerViewOnDate(center: boolean) {
+      if (center) {
+        this.updateViewForDate();
+      }
+    },
+    timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+      this.updateForDateTime();
     },
     location(loc: LocationRad) {
       const now = this.selectedDate;
@@ -1186,10 +1313,8 @@ export default defineComponent({
         instant: true
       });
     },
-    selectedDate(date: Date) {
-      this.setTime(date);
-      this.createHorizon(date);
-      this.updateViewForDate();
+    selectedDate(_date: Date) {
+      this.updateForDateTime();
     },
     showLocationSelector(show: boolean) {
       if (show) {
@@ -1203,7 +1328,7 @@ export default defineComponent({
       }
     }
   }
-})
+});
 
 </script>
 
@@ -1214,6 +1339,13 @@ html {
   padding: 0;
   background-color: #000;
   overflow: hidden;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
@@ -1221,6 +1353,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-y: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
@@ -1371,6 +1504,26 @@ body {
   pointer-events: auto;
 }
 
+.folder-view {
+  max-height: calc(100% - 100px);
+}
+
+#controls {
+  background: black;
+  padding: 5px;
+  border-radius: 5px;
+  border: solid 1px var(--comet-color);
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  margin-bottom: 30px;
+  pointer-events: auto;
+
+  .v-label {
+    color: var(--comet-color);
+  }
+}
+
 #credits {
   color: #ddd;
   font-size: calc(0.7em + 0.2vw);
@@ -1419,7 +1572,7 @@ body {
   padding: 5px 5px;
   border: 2px solid black;
   border-radius: 10px;
-  font-size: calc(0.7em + 0.2vw);
+  font-size: calc(0.8em + 0.25vw);
 }
 
 .ui-button {
@@ -1648,6 +1801,22 @@ ul.text-list {
 div.credits {
   font-size: 0.8em;
 }
+
+// For styling the time picker
+// See more info here:
+// https://vue3datepicker.com/customization/theming/
+.dp__theme_dark {
+  --dp-background-color: black !important;
+}
+
+.dp__main {
+  width: 175px;
+}
+
+* {
+  --v-input-control-height: 40px;
+}
+
 // :root {
 //   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 // }
