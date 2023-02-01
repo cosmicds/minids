@@ -170,7 +170,7 @@
             adsorb
             included
             :marks="(d: number) => {
-              return weeklyDates.includes(d) || dailyDates.includes(d)
+              return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
             :order="false"
             v-model="selectedTime"
@@ -416,7 +416,6 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Color, Folder, Grids, Poly, RenderContext, Settings, WWTControl } from "@wwtelescope/engine";
-import { engineStore } from "@wwtelescope/engine-pinia";
 import { ImageSetType, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -455,7 +454,7 @@ type TableRow = typeof fullWeeklyTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-        "Date", "RA", "Dec", "Tmag", "PrevDate", "NextDate"
+        "Date", "RA", "Dec", "Tmag"
       ]].concat(table.map((d, _i) => {
         return [
           d.date.toISOString(),
@@ -475,15 +474,15 @@ const daily2023String = formatCsvTable(daily2023Table);
 
 const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
 const dailyDates = daily2023Table.map(r => r.date.getTime());
-const minDate = Math.min(Math.min(...weeklyDates), Math.min(...dailyDates));
-const maxDate = Math.max(Math.max(...weeklyDates), Math.max(...dailyDates));
+const minDate = Math.min(...weeklyDates, ...dailyDates);
+const maxDate = Math.max(...weeklyDates, ...dailyDates);
 const dates: number[] = [];
 
 const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
-  d.setDate(d.getDate() + 1);
+  d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
 
@@ -713,7 +712,6 @@ export default defineComponent({
       this.setTime(this.selectedDate);
 
       Promise.all(layerPromises).then(() => {
-        console.log(this.imagesetFolder);
         this.layersLoaded = true;
       });
 
@@ -773,7 +771,7 @@ export default defineComponent({
     wwtControl(): WWTControl {
       return WWTControl.singleton;
     },
-    wwtRenderContext() {
+    wwtRenderContext(): RenderContext {
       return this.wwtControl.renderContext;
     },
     wwtSettings(): Settings {
@@ -825,7 +823,6 @@ export default defineComponent({
     },
 
     onItemSelected(place: Place) {
-      console.log(place);
       this.gotoTarget({
         place: place,
         noZoom: false,
@@ -894,13 +891,10 @@ export default defineComponent({
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
           }
         },
-        (error) => {
-          console.log(error);
-          console.log(startup);
+        (_error) => {
           let msg = "Unable to detect location. Please check your browser and/or OS settings.";
           if (startup) {
             msg += "\nUse our location selector to manually input your location";
-            console.log("Here");
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -1148,6 +1142,7 @@ export default defineComponent({
           raRad: D2R * position.ra,
           decRad: D2R * position.dec,
           zoomDeg: this.wwtZoomDeg,
+          rollRad: this.wwtRollRad,
           instant: false
         });
       }
@@ -1193,7 +1188,7 @@ export default defineComponent({
     },
     selectedDate(date: Date) {
       this.setTime(date);
-      this.createHorizon(date);
+      this.updateViewForDate();
     },
     showLocationSelector(show: boolean) {
       if (show) {
