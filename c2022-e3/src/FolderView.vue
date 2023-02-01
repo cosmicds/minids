@@ -9,17 +9,20 @@
       class="bordered"
       @click="expanded = !expanded"
     >
-      <font-awesome-icon
-        id="camera"
-        icon="images"
-        size="lg"
-        class="mr-10"
-        color="#04D6B0"
-      ></font-awesome-icon>
-      <font-awesome-icon
-        id="expand-icon"
-        :icon="expanded ? 'chevron-up' : 'chevron-down'"
-      />
+      <div class="wrapper">
+        <img
+          src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
+        />
+        <div class="overlay">
+          <font-awesome-icon
+            icon="images"
+          />
+        </div>
+      </div>
+        <font-awesome-icon
+          id="expand-icon"
+          :icon="expanded ? 'chevron-up' : 'chevron-down'"
+        />
     </div>
     <transition-expand>
       <div
@@ -216,5 +219,15 @@ export default defineComponent({
   &:hover {
     cursor: pointer;
   }
+}
+
+.wrapper {
+  position:relative
+}
+
+.overlay {
+   position:absolute;
+   top:0;
+   left:75%;
 }
 </style>
