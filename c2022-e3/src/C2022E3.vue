@@ -959,11 +959,11 @@ export default defineComponent({
       this.resetLayerOrder();
       this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1)
 
-      if (!this.imageInView(iset, this.wwtZoomDeg)) {
+      if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
         this.gotoRADecZoom({
         raRad: D2R * iset.get_centerX(),
         decRad: D2R * iset.get_centerY(),
-        zoomDeg: place.get_zoomLevel() * 1.2,
+        zoomDeg: place.get_zoomLevel() * 1.7,
         instant: true
       });
       }
