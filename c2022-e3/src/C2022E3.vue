@@ -975,7 +975,7 @@ export default defineComponent({
       }
     },
 
-    imageInView(iset: Imageset, zoom: number): boolean {
+    imageInView(iset: Imageset): boolean {
       const curRa = this.wwtRARad;
       const curDec = this.wwtDecRad;
       const curZoom = this.wwtZoomDeg * D2R;
@@ -993,7 +993,7 @@ export default defineComponent({
       this.resetLayerOrder();
       this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 100)
 
-      if ((!this.imageInView(iset, this.wwtZoomDeg)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+      if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
         this.gotoRADecZoom({
         raRad: D2R * iset.get_centerX(),
         decRad: D2R * iset.get_centerY(),
@@ -1342,14 +1342,11 @@ export default defineComponent({
       }
 
     },
-
-    imagesetNamefromDate(date: Date): string {
+    
+    namefromDate(date: Date): string {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      // if ((month == 1) && (day == 20)) {
-      //   ymd += ' (2)'
-      // }
       return `${month}/${day}/${year}`;
     },
 
@@ -1365,7 +1362,8 @@ export default defineComponent({
         const [m, d, y] = name.split('/').map(s => parseInt(s))
         const name_date = new Date(y, m - 1, d)
         // if the name is after the date we are looking for, return it
-        if (name_date.getTime() >= date.getTime()) {
+        const wwt_date_string = this.namefromDate(date)
+        if (name == wwt_date_string) {
           // console.log(name)
           return name;
         }
