@@ -9,10 +9,20 @@
       class="bordered"
       @click="expanded = !expanded"
     >
-      <font-awesome-icon
-        id="expand-icon"
-        :icon="expanded ? 'chevron-up' : 'chevron-down'"
-      />
+      <div class="wrapper">
+        <img
+          src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
+        />
+        <div class="overlay">
+          <font-awesome-icon
+            icon="images"
+          />
+        </div>
+      </div>
+        <font-awesome-icon
+          id="expand-icon"
+          :icon="expanded ? 'chevron-up' : 'chevron-down'"
+        />
     </div>
     <transition-expand>
       <div
@@ -155,8 +165,8 @@ export default defineComponent({
     background: black;
   }
   &::-webkit-scrollbar-thumb {
-    background: white;
-    border-radius: 1px;
+    background: rgba(4, 129, 187, 0.5);
+    border-radius: 2px;
   }
   //width: 100%;
   //justify-content: space-around;
@@ -180,7 +190,7 @@ export default defineComponent({
     width: calc(min(12vh, 100px));
   }
   &.selected {
-    border: 1px solid dodgerblue;
+    border: 1px solid #D60493;
   }
 }
 
@@ -208,5 +218,15 @@ export default defineComponent({
   &:hover {
     cursor: pointer;
   }
+}
+
+.wrapper {
+  position:relative
+}
+
+.overlay {
+   position:absolute;
+   top:0;
+   left:75%;
 }
 </style>

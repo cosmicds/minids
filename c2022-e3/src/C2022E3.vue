@@ -669,7 +669,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 0.7]
           ]
         })
@@ -687,7 +687,7 @@ export default defineComponent({
           settings: [
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.ephemerisColor)],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["opacity", 1]
           ]
         })
@@ -706,7 +706,7 @@ export default defineComponent({
             ["scaleFactor", 50],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
-            ["sizeColumn", 3],
+            //["sizecolumn", 3],
             ["startDateColumn", 0],
             ["endDateColumn", 0],
             ["timeSeries", true],
@@ -1036,10 +1036,14 @@ export default defineComponent({
       const minute = utc.getUTCMinutes();
       const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
+      let jan_or_feb = false
       if (month == 1 || month == 2)
       {
           year -= 1;
           month += 12;
+          jan_or_feb = true
+      } else {
+        jan_or_feb = false;
       }
 
       const a = year / 100;
@@ -1047,9 +1051,20 @@ export default defineComponent({
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const bad_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-      // const julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
-      const julianDays = bad_julianDays - 42.27 / (60 * 24) //2 * 0.01166666663812066;
+      const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // const unix_julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
+      // const is_leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+      // CAUTION: this is a very hacky way to get the correct offset
+      // IT will probably only work for 2022 and 2023, and it uses special numbers
+      const _before_feb_28_2022 = (jan_or_feb) || (month == 14 && day < 28) || (year < 2023);
+      let offset = 0
+      if (_before_feb_28_2022) {
+        offset = - 42.27 / (60 * 24)
+      } else {
+        offset = -28 / (60 * 24)
+      }
+      const julianDays = meeus_julianDays + offset ;
+
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1113,7 +1128,7 @@ export default defineComponent({
     createHorizon(when: Date | null = null) {
       this.removeHorizon();
   
-      const color = '#5C4033';
+      const color = '#01362C';
       const date = when || this.selectedDate || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1706,26 +1721,29 @@ body {
 
 .vue-slider-dot-tooltip-inner
 {
-  background-color: var(--comet-color) !important;
+  color: white !important;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
 }
 
-.vue-slider-dot-style
-{
-  color: var(--comet-color) !important;
+.vue-slider-dot-handle {
+  cursor: pointer;
+  background-color: #03866E !important;
+  border: 1px solid white !important;
 }
 
 .mark-line {
   position: absolute;
-  height: 18px;
-  width: 2px;
+  height: 12px;
+  width: 1.25px;
   margin: 0;
-  background-color: #FFFFFF;
+  background-color: #E5E4E2;
   transform: translateX(-50%) translateY(calc(-50% + 1px));
 
   &.tall {
-    height: 25px;
-    background-color: #000000;
-    border: solid 1px white;
+    height: 20px;
+    background-color: #848884;
+    border: solid 0.5px #E5E4E2;
   }
 }
 
@@ -1826,4 +1844,63 @@ div.credits {
 //     filter:var(--map-tiles-filter, none);
 //   }
 // }
+
+/* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
+input[type="range"] {
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
+    margin: 5px;
+    --track-height: 0.3em;
+    --thumb-radius: 0.7em;
+    --thumb-color: rgba(205, 54, 157  , 1);
+    --track-color: rgba(4, 147, 214, 0.7);
+    --thumb-border: 1px solid #899499;
+  }
+  
+  
+  
+  input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: inherit;
+      -moz-appearance: inherit;
+      appearance: inherit;
+    width: var(--thumb-radius);
+    height: var(--thumb-radius);
+    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    border-radius: 50%;
+    background: var(--thumb-color);
+    border: var(--thumb-border);
+    
+    
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
+    width: var(--thumb-radius);
+    height: var(--thumb-radius);
+    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    border-radius: 50%;
+    background: var(--thumb-color);
+    cursor: pointer;
+    border: var(--thumb-border)
+  }
+  
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--track-color);
+    /* outline: 1px solid white; */
+    border-radius: calc(var(--track-height) / 2);
+    height: var(--track-height);
+    margin-top: 0;
+  }
+  
+  
+input[type="range"]::-moz-range-track {
+    background: var(--track-color);
+    /* outline: 1px solid white; */
+    border-radius: calc(var(--track-height) / 2);
+    height:var(--track-height);
+    margin-top: 0;
+  }
 </style>
