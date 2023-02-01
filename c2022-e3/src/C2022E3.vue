@@ -187,7 +187,6 @@
             id="slider"
             adsorb
             included
-            :value="selectedTime"
             :marks="(d: number) => {
               return weeklyDates.includes(d) || dailyDates.includes(d);
             }"
@@ -598,7 +597,7 @@ export default defineComponent({
 
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
-      selectedTime: now.setHours(0, 0, 0, 0),
+      selectedTime: now.setUTCHours(0, 0, 0, 0),
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
