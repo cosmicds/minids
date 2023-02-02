@@ -626,6 +626,7 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
+      todayColor: "#D60493",
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -753,7 +754,7 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 45],
-            ["color", Color.fromHex(this.cometColor)],
+            ["color", Color.fromHex(this.todayColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
             ["startDateColumn", 0],
@@ -936,7 +937,7 @@ export default defineComponent({
             id: layer.id.toString(),
             settings: [
               ["scaleFactor", 50],
-              ["color", Color.fromHex(this.cometColor)],
+              ["color", Color.fromHex(this.todayColor)],
               //["sizeColumn", 3],
               ["opacity", 1],
             ]
