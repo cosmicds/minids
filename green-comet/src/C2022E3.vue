@@ -24,7 +24,7 @@
     >
       <img
         id="splash-screen"
-        :src="require(`./assets/Green_Comet_Mini_Splashscreen.png`)"
+        :src="require(`./assets/Green_Comet_Mini_Splashscreen_wVideo.png`)"
         v-click-outside="closeSplashScreen"
         contain
       />
@@ -63,33 +63,18 @@
     </div>
 
     <div class="top-content">
-      <v-tooltip
-        v-model="showVideoTooltip"
-        :open-on-click="false"
-        :open-on-focus="false"
-        :open-on-hover="true"
-        close-on-content-click
-        :location="smallSize ? 'bottom' : 'end'"
+      <div
+        id="video-icon-dummy"
+        class="control-icon-wrapper"
       >
-        <template v-slot:activator="{ props }">
-          <div
-            @mouseover="showVideoTooltip = true"
-            @mouseleave="showVideoTooltip = false"
-            id="video-icon-wrapper"
-            class="control-icon-wrapper"
-            v-bind="props"
-          >
-            <font-awesome-icon
-              id="video-icon"
-              class="control-icon"
-              icon="video"
-              size="lg"
-              
-            ></font-awesome-icon>
-          </div>
-        </template>
-        <span>Watch video</span>
-      </v-tooltip>
+        <font-awesome-icon
+          id="video-icon"
+          class="control-icon"
+          icon="video"
+          size="lg"
+          
+        ></font-awesome-icon>
+      </div>
       <v-tooltip
         v-model="showMapTooltip"
         location="bottom"
@@ -99,7 +84,7 @@
       >
         <template v-slot:activator="{ props }">
           <div
-            id="text-icon-wrapper"
+            id="map-icon-wrapper"
             class="control-icon-wrapper"
             @mouseover="showMapTooltip = true"
             @mouseleave="showMapTooltip = false"
@@ -116,33 +101,62 @@
         </template>
         <span>Select location</span>
       </v-tooltip>
-      <v-tooltip
-        :location="smallSize ? 'bottom' : 'start'"
-        :open-on-click="false"
-        :open-on-focus="false"
-        :open-on-hover="true"
-        v-model="showTextTooltip"
-        :offset="smallSize ? 0 : '45px'"
-      >
-        <template v-slot:activator="{ props }">
-          <div
-            id="text-icon-wrapper"
-            class="control-icon-wrapper"
-            @mouseover="showTextTooltip = true"
-            @mouseleave="showTextTooltip = false"
-            v-bind="props"
-            @click="showTextSheet = true"
-          >
-            <font-awesome-icon
-              id="text-icon"
-              class="control-icon"
-              icon="book-open"
-              size="lg"
-            ></font-awesome-icon>
-          </div>
-        </template>
-        <span>Learn more</span>
-      </v-tooltip>
+      <div id="right-buttons">
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showTextTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="text-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showTextTooltip = true"
+              @mouseleave="showTextTooltip = false"
+              v-bind="props"
+              @click="showTextSheet = true"
+            >
+              <font-awesome-icon
+                id="text-icon"
+                class="control-icon"
+                icon="book-open"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Learn more</span>
+        </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showVideoTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="video-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showVideoTooltip = true"
+              @mouseleave="showVideoTooltip = false"
+              v-bind="props"
+              @click="showVideoSheet = true"
+            >
+              <font-awesome-icon
+                id="video-icon"
+                class="control-icon"
+                icon="video"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Watch video</span>
+        </v-tooltip>
+      </div>
     </div>
 
     <div class="bottom-content">
@@ -266,6 +280,24 @@
         </div>
       </div>
     </div>
+
+    <v-container
+      id="video-container"
+      v-show="showVideoSheet"
+      transition="slide-y-transition"
+    >
+      <div class="video-wrapper">
+        <font-awesome-icon
+          class="close-icon"
+          icon="times"
+          size="lg"
+          @click="showVideoSheet = false"
+        ></font-awesome-icon>
+        <video controls id="info-video">
+          <source src="./assets/video2.mp4" type="video/mp4">
+        </video>
+      </div>
+    </v-container>
 
     <v-dialog
       id="location-dialog"
@@ -891,6 +923,19 @@ export default defineComponent({
       set(_value: boolean) {
         this.selectSheet('text');
         this.showTextTooltip = false;
+      }
+    },
+    showVideoSheet: {
+      get(): boolean {
+        return this.sheet === "video";
+      },
+      set(value: boolean) {
+        this.selectSheet('video');
+        if (!value) {
+          const video = document.querySelector("#info-video") as HTMLVideoElement;
+          video.pause();
+        }
+        this.showVideoTooltip = false;
       }
     },
     // altAz() {
@@ -1641,7 +1686,7 @@ body {
   }
 }
 
-#video-icon-wrapper {
+#video-icon-dummy {
   pointer-events: none;
   visibility: hidden;
 }
@@ -1654,7 +1699,7 @@ body {
   pointer-events: none;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .bottom-content {
@@ -1832,6 +1877,37 @@ body {
   margin-bottom: 25px;
 }
 
+#right-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.video-wrapper {
+  height: 100%;
+  background: black;
+  text-align: center;
+  z-index: 1000;
+}
+
+video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+#video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+}
+
 .bottom-sheet {
   .v-overlay__content {
     align-self: flex-end;
@@ -1989,6 +2065,10 @@ body {
   #location-selector {
     width: 80vw;
     height: 85vh;
+  }
+
+  #video-container {
+    display: inherit;
   }
 
   #map-container {
