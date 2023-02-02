@@ -729,10 +729,11 @@ export default defineComponent({
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 50],
+            ["scaleFactor", 30],
             ["color", Color.fromHex(this.ephemerisColor)],
             //["sizeColumn", 3],
             ["opacity", 1]
@@ -930,10 +931,11 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
+          layer.set_markerScale(MarkerScales.screen);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 100],
+              ["scaleFactor", 50],
               ["color", Color.fromHex(this.cometColor)],
               //["sizeColumn", 3],
               ["opacity", 1],
