@@ -1906,6 +1906,7 @@ video {
   max-width: 100%;
   overflow: hidden;
   padding: 0px;
+  z-index: 1000;
 }
 
 .bottom-sheet {
@@ -2099,9 +2100,9 @@ video {
   // outline: 1px solid rgba(255, 255, 255, 0.094);
   position: absolute;
   width: 7%;
-  height:8%;
+  height: 8%;
   top: 4%;
-  left: 80.5%;
+  left: 84%;
 
   &:hover {
     cursor: pointer;
