@@ -616,7 +616,7 @@ export default defineComponent({
       decRadLowerBound: 0.2,
 
       showAltAzGrid: true,
-      showConstellations: true,
+      showConstellations: false,
       showHorizon: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
