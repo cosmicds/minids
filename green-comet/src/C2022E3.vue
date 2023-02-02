@@ -1097,14 +1097,14 @@ export default defineComponent({
           }
         },
         (_error) => {
-          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or";
+          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can";
           if (startup) {
-            msg += "\nuse location selector to manually input a location";
+            msg += "\nuse the location selector to manually input a location.";
             this.$notify({
               group: "startup-location",
               type: "error",
               text: msg,
-              duration: 3000
+              duration: 4500
             });
           } else {
             this.locationErrorMessage = msg;
