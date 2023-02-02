@@ -198,6 +198,7 @@
         <span class="tool-container">
           <v-chip
             id="sliderlabel"
+            outlined
             label
             >
               Date:
@@ -424,11 +425,14 @@
                             Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
                           </li>
                           <li>
-                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The green moving marker shows the position of the comet at the displayed local time.
+                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The pink marker shows the position of the comet at the displayed local time.
                           </li>
                           <li>
                             Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
                           </li>
+                          <li>
+                            Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
+                          </li>                          
                           <li>
                             Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
                           </li>
@@ -612,7 +616,7 @@ export default defineComponent({
       decRadLowerBound: 0.2,
 
       showAltAzGrid: true,
-      showConstellations: true,
+      showConstellations: false,
       showHorizon: false,
 
       currentDailyLayer: null as SpreadSheetLayer | null,
@@ -625,6 +629,7 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#FFFFFF",
       cometColor: "#04D6B0",
+      todayColor: "#D60493",
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -712,7 +717,7 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 50],
+            ["scaleFactor", 30],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
@@ -728,10 +733,11 @@ export default defineComponent({
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 50],
+            ["scaleFactor", 30],
             ["color", Color.fromHex(this.ephemerisColor)],
             //["sizeColumn", 3],
             ["opacity", 1]
@@ -750,8 +756,8 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 75],
-            ["color", Color.fromHex(this.cometColor)],
+            ["scaleFactor", 45],
+            ["color", Color.fromHex(this.todayColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
             ["startDateColumn", 0],
@@ -929,11 +935,12 @@ export default defineComponent({
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
+          layer.set_markerScale(MarkerScales.screen);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 100],
-              ["color", Color.fromHex(this.cometColor)],
+              ["scaleFactor", 50],
+              ["color", Color.fromHex(this.todayColor)],
               //["sizeColumn", 3],
               ["opacity", 1],
             ]
@@ -1369,9 +1376,9 @@ export default defineComponent({
     },
     
     namefromDate(date: Date): string {
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth() + 1;
+      const day = date.getUTCDate();
       return `${month}/${day}/${year}`;
     },
 
@@ -1381,26 +1388,22 @@ export default defineComponent({
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
       // that is or comes after the date we are looking for
       
-      for (let i = 0; i < imageset_names.length; i++) {
-        const name = imageset_names[i];
+      for (const name of imageset_names) {
         // convert the name to a date
-        const [m, d, y] = name.split('/').map(s => parseInt(s))
-        const name_date = new Date(y, m - 1, d)
         // if the name is after the date we are looking for, return it
         const wwt_date_string = this.namefromDate(date)
         if (name == wwt_date_string) {
-          // console.log(name)
           return name;
         }
       }
-      return ''
+      return '';
     },
     
     showImageForDateTime(date: Date) {
-      // console.log(this.imagesetNamefromDate(date))
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
-      // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
+      // loop over imageset_names
+      // set opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach((iname: string) => {
         const selector = `#items>div>div.bordered.item[title='${iname}']>input`
         const el = (document.querySelector(selector) as HTMLInputElement)
@@ -1721,10 +1724,15 @@ body {
 
     .v-btn {
       align-self: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      border: solid 1px #899499;
     }
 
     .v-btn__content {
       color: black;
+      font-weight: 900;
+      font-size: 0.75em;
     }
   }
 
@@ -1918,7 +1926,7 @@ body {
   padding:3px 5px;
   margin:0 5px;
   color:#fff !important;
-  background-color: rgba(3,134,110,0.5);
+  background-color: rgba(214, 4, 147,0.7);
 }
 
 #slider {
@@ -1934,13 +1942,15 @@ body {
 .vue-slider-dot-tooltip-inner
 {
   color: white !important;
-  background-color: #03866E !important;
+  background-color: #9A2976
+ !important;
   border: 1px solid white !important;
 }
 
 .vue-slider-dot-handle {
   cursor: pointer;
-  background-color: #03866E !important;
+  background-color: #9A2976
+ !important;
   border: 1px solid white !important;
 }
 
@@ -2059,7 +2069,7 @@ div.credits {
 // }
 
 span.ui-element-ref-comet {
-  background-color: #03866E; /* #04D6B0; */
+  background-color: #9A2976; /* #04D6B0; */
   padding: 0em 0.1em;
   border-radius: 0.2em;
 }

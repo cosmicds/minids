@@ -16,7 +16,7 @@ export function drawSkyOverlays() {
     WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false);
   }
   if (Settings.get_active().get_showAltAzGrid()) {
-    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 126, 42, 99));
+    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 3, 92, 134));
   }
 }
 
@@ -24,7 +24,7 @@ export function initializeConstellationNames() {
   if (Constellations.constellationCentroids == null) {
     return;
   }
-  const textSize = 40;
+  const textSize = 50;
   Constellations._namesBatch = new Text3dBatch(textSize);
   Object.keys(Constellations.constellationCentroids).forEach(key => {
     const centroid = Constellations.constellationCentroids[key];
