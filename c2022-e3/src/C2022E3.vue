@@ -425,11 +425,14 @@
                             Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
                           </li>
                           <li>
-                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The green moving marker shows the position of the comet at the displayed local time.
+                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The pink marker shows the position of the comet at the displayed local time.
                           </li>
                           <li>
                             Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
                           </li>
+                          <li>
+                            Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
+                          </li>                          
                           <li>
                             Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
                           </li>
@@ -1927,7 +1930,7 @@ body {
   padding:3px 5px;
   margin:0 5px;
   color:#fff !important;
-  background-color: rgba(3,134,110,0.5);
+  background-color: rgba(214, 4, 147,0.7);
 }
 
 #slider {
@@ -1943,13 +1946,15 @@ body {
 .vue-slider-dot-tooltip-inner
 {
   color: white !important;
-  background-color: #03866E !important;
+  background-color: #9A2976
+ !important;
   border: 1px solid white !important;
 }
 
 .vue-slider-dot-handle {
   cursor: pointer;
-  background-color: #03866E !important;
+  background-color: #9A2976
+ !important;
   border: 1px solid white !important;
 }
 
@@ -2068,7 +2073,7 @@ div.credits {
 // }
 
 span.ui-element-ref-comet {
-  background-color: #03866E; /* #04D6B0; */
+  background-color: #9A2976; /* #04D6B0; */
   padding: 0em 0.1em;
   border-radius: 0.2em;
 }
