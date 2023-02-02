@@ -50,7 +50,7 @@
               v-if="sliders"
               class="opacity-range"
               type="range"
-              value="100"
+              value="0"
               @input="(e) => onSliderInputChanged(e, item)"
             />
           </div>
