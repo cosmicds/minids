@@ -4,7 +4,7 @@
     "workspaces": [
         "carina",
         "common",
-        "c2022-e3"
+        "green-comet"
     ],
     "scripts": {
         "build": "yarn workspaces foreach -vt run build",
