@@ -198,6 +198,7 @@
         <span class="tool-container">
           <v-chip
             id="sliderlabel"
+            outlined
             label
             >
               Date:
@@ -712,7 +713,7 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 50],
+            ["scaleFactor", 30],
             ["color", Color.fromHex(this.ephemerisColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
@@ -750,7 +751,7 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 75],
+            ["scaleFactor", 45],
             ["color", Color.fromHex(this.cometColor)],
             ["plotType", PlotTypes.circle],
             //["sizeColumn", 3],
@@ -1721,10 +1722,15 @@ body {
 
     .v-btn {
       align-self: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      border: solid 1px #899499;
     }
 
     .v-btn__content {
       color: black;
+      font-weight: 900;
+      font-size: 0.75em;
     }
   }
 
