@@ -1376,9 +1376,9 @@ export default defineComponent({
     },
     
     namefromDate(date: Date): string {
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth() + 1;
+      const day = date.getUTCDate();
       return `${month}/${day}/${year}`;
     },
 
@@ -1388,26 +1388,22 @@ export default defineComponent({
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
       // that is or comes after the date we are looking for
       
-      for (let i = 0; i < imageset_names.length; i++) {
-        const name = imageset_names[i];
+      for (const name of imageset_names) {
         // convert the name to a date
-        const [m, d, y] = name.split('/').map(s => parseInt(s))
-        const name_date = new Date(y, m - 1, d)
         // if the name is after the date we are looking for, return it
         const wwt_date_string = this.namefromDate(date)
         if (name == wwt_date_string) {
-          // console.log(name)
           return name;
         }
       }
-      return ''
+      return '';
     },
     
     showImageForDateTime(date: Date) {
-      // console.log(this.imagesetNamefromDate(date))
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
-      // loop over  imageset_namesset opacity for the one with this name to 1, and all others to 0
+      // loop over imageset_names
+      // set opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach((iname: string) => {
         const selector = `#items>div>div.bordered.item[title='${iname}']>input`
         const el = (document.querySelector(selector) as HTMLInputElement)
