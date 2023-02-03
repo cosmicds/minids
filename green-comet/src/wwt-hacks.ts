@@ -46,12 +46,13 @@ export function makeAltAzGridText() {
   if (Grids._altAzTextBatch == null) {
     const glyphHeight = 70;
     Grids._altAzTextBatch = new Text3dBatch(glyphHeight);
+    const alt = 0.03;
     const directions = [
-      [[0,0,-1], "N"],
-      [[-1,0,0], "E"],
-      [[0,0,1], "S"],
-      [[1,0,-0.0095], "V"],
-      [[1,0,0.0095], "V"]
+      [[0, alt, -1], "N"],
+      [[-1, alt, 0], "E"],
+      [[0, alt, 1], "S"],
+      [[1, alt, -0.0095], "V"],
+      [[1, alt, 0.0095], "V"]
     ]
     directions.forEach(([v, text]) => {
       Grids._altAzTextBatch.add(new Text3d(Vector3d.create(...v), Vector3d.create(0, 1, 0), text, 75, 0.00018));
