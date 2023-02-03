@@ -611,6 +611,13 @@ html {
   padding: 0;
   background-color: #000;
   overflow: hidden;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
