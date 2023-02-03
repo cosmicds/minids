@@ -526,7 +526,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText } from "./wwt-hacks";
 
 
 import {
@@ -832,6 +832,7 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
       this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
@@ -843,6 +844,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Constellations.initializeConstellationNames = initializeConstellationNames;
+      Grids._makeAltAzGridText = makeAltAzGridText;
 
       this.updateWWTLocation();
 
@@ -1515,6 +1517,7 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+      this.wwtSettings.set_showAltAzGridText(show);
     },
     showConstellations(show: boolean) {
       this.wwtSettings.set_showConstellationLabels(show);
