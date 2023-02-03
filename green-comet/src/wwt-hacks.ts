@@ -48,7 +48,7 @@ export function makeAltAzGridText() {
     Grids._altAzTextBatch = new Text3dBatch(glyphHeight);
     const sign = SpaceTimeController.get_location().get_lat() < 0 ? -1 : 1;
     const alt = 0.03 * sign;
-    const up = Vector3d.create(0, 1, 0);
+    const up = Vector3d.create(0, sign, 0);
     const directions = [
       [[0, alt, -1], "N"],
       [[-1, alt, 0], "E"],
