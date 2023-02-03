@@ -638,7 +638,7 @@ export default defineComponent({
     }
   },
   data() {
-    const now = new Date();
+    const now = new Date((new Date()).getTime() - d.getTimezoneOffset()*60*1000);
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -797,7 +797,7 @@ export default defineComponent({
             ["endDateColumn", 0],
             ["timeSeries", true],
             ["opacity", 1],
-            ["decay", 6]
+            ["decay", 1]
           ]
         });
       }));
@@ -1527,8 +1527,8 @@ export default defineComponent({
       this.updateForDateTime();
     },
     location(loc: LocationRad) {
-      const now = this.selectedDate;
-      const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
+      //const now = this.selectedDate;
+      //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
       if (this.map) {
         this.circle?.remove();
