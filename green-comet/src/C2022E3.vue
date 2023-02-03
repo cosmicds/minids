@@ -1303,7 +1303,7 @@ export default defineComponent({
       // Use N annotations to cover below the horizon
       const N = 6;
       const delta = 2 * Math.PI / N;
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < N; i++) {
         let points: [number, number][] = [
           [0, i * delta],
           [-Math.PI / 2, i * delta],
