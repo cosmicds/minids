@@ -638,7 +638,7 @@ export default defineComponent({
     }
   },
   data() {
-    const now = new Date();
+    const now = new Date((new Date()).getTime() - d.getTimezoneOffset()*60*1000);
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -797,7 +797,7 @@ export default defineComponent({
             ["endDateColumn", 0],
             ["timeSeries", true],
             ["opacity", 1],
-            ["decay", 6]
+            ["decay", 1]
           ]
         });
       }));
@@ -883,7 +883,7 @@ export default defineComponent({
     cssVars() {
       return{
         '--comet-color': this.cometColor,
-        '--app-content-height': this.showTextSheet ? '60vh' : '100%',
+        '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
     wwtControl(): WWTControl {
@@ -1527,8 +1527,8 @@ export default defineComponent({
       this.updateForDateTime();
     },
     location(loc: LocationRad) {
-      const now = this.selectedDate;
-      const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
+      //const now = this.selectedDate;
+      //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
       if (this.map) {
         this.circle?.remove();
@@ -1582,28 +1582,33 @@ html {
 }
 
 body {
+  position: fixed;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden;
+  overflow: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 #main-content {
-  position: relative;
+  position: fixed;
   width: 100%;
   height: var(--app-content-height);
+  overflow: hidden;
+
+  transition: height 0.1s ease-in-out;
 }
 
 #app {
   width: 100%;
   height: 100%;
   margin: 0;
+  overflow: hidden;
 
   .wwtelescope-component {
-    position: relative;
+    position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
@@ -1915,7 +1920,7 @@ video {
     padding: 0;
     margin: 0;
     max-width: 100%;
-    height: 40vh;
+    height: 34%;
   }
 }
 
