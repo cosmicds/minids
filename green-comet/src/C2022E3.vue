@@ -736,7 +736,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      // this.getLocation(true);
+      this.getLocation(true);
       this.setClockSync(false);
       // create date with y m d h m s
 
@@ -1407,15 +1407,15 @@ export default defineComponent({
         }
       }
 
-      // if (position !== null) {
-      //   this.gotoRADecZoom({
-      //     raRad: D2R * position.ra,
-      //     decRad: D2R * position.dec,
-      //     zoomDeg: this.wwtZoomDeg,
-      //     rollRad: this.wwtRollRad,
-      //     instant: instant
-      //   });
-      // }
+      if (position !== null) {
+        this.gotoRADecZoom({
+          raRad: D2R * position.ra,
+          decRad: D2R * position.dec,
+          zoomDeg: this.wwtZoomDeg,
+          rollRad: this.wwtRollRad,
+          instant: instant
+        });
+      }
 
     },
     
