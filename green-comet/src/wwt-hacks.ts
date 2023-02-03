@@ -3,7 +3,7 @@
 
  /* eslint-disable */
 
-import { Color, Colors, Constellations, Coordinates, Grids, Settings, Text3d, Text3dBatch, URLHelpers, Vector3d, WWTControl } from "@wwtelescope/engine";
+import { Color, Colors, Constellations, Coordinates, Grids, GlyphItem, GlyphCache, Rectangle, Settings, SpaceTimeController, Text3d, Text3dBatch, URLHelpers, Vector2d, Vector3d, WWTControl } from "@wwtelescope/engine";
 
 export function drawSkyOverlays() {
   if (Settings.get_active().get_showConstellationLabels()) {
@@ -16,9 +16,10 @@ export function drawSkyOverlays() {
     WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false);
   }
   if (Settings.get_active().get_showAltAzGrid()) {
-    Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 3, 92, 134));
+    const altAzColor = Color.fromArgb(1, 3, 92, 134);
+    Grids.drawAltAzGrid(this.renderContext, 1, altAzColor);
     if (Settings.get_active().get_showAltAzGridText()) {
-      Grids.drawAltAzGridText(this.renderContext, 1, Color.fromArgb(1, 3, 92, 134));
+      Grids.drawAltAzGridText(this.renderContext, 1, altAzColor);
     }
   }
 }
@@ -40,3 +41,23 @@ export function initializeConstellationNames() {
     Constellations._namesBatch.add(new Text3d(center, up, name, textSize, 0.000125));
   });
 };
+
+export function makeAltAzGridText() {
+  if (Grids._altAzTextBatch == null) {
+    const glyphHeight = 70;
+    Grids._altAzTextBatch = new Text3dBatch(glyphHeight);
+    const sign = SpaceTimeController.get_location().get_lat() < 0 ? -1 : 1;
+    const alt = 0.03 * sign;
+    const up = Vector3d.create(0, sign, 0);
+    const directions = [
+      [[0, alt, -1], "N"],
+      [[-1, alt, 0], "E"],
+      [[0, alt, 1], "S"],
+      [[1, alt, -0.0095], "V"],
+      [[1, alt, 0.0095], "V"]
+    ]
+    directions.forEach(([v, text]) => {
+      Grids._altAzTextBatch.add(new Text3d(Vector3d.create(...v), up, text, 75, 0.00018));
+    });
+  }
+}

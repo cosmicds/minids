@@ -526,7 +526,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText } from "./wwt-hacks";
 
 
 import {
@@ -833,7 +833,7 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
-      this.wwtSettings.set_showAltAzGridText(true);
+      this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
       this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
@@ -845,6 +845,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Constellations.initializeConstellationNames = initializeConstellationNames;
+      Grids._makeAltAzGridText = makeAltAzGridText;
 
       this.updateWWTLocation();
 
@@ -1525,7 +1526,7 @@ export default defineComponent({
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
     },
-    location(loc: LocationRad) {
+    location(loc: LocationRad, oldLoc: LocationRad) {
       //const now = this.selectedDate;
       //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
@@ -1536,8 +1537,10 @@ export default defineComponent({
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
-      // locatin in degrees
-      console.log("in location watcher:", loc.latitudeRad * R2D, loc.longitudeRad * R2D);
+      if (oldLoc.latitudeRad * loc.latitudeRad < 0) {
+        Grids._altAzTextBatch = null;
+      }
+
       this.updateHorizon();
       this.updateWWTLocation();
       // this.gotoRADecZoom({
