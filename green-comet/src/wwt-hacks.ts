@@ -17,6 +17,9 @@ export function drawSkyOverlays() {
   }
   if (Settings.get_active().get_showAltAzGrid()) {
     Grids.drawAltAzGrid(this.renderContext, 1, Color.fromArgb(1, 3, 92, 134));
+    if (Settings.get_active().get_showAltAzGridText()) {
+      Grids.drawAltAzGridText(this.renderContext, 1, Color.fromArgb(1, 3, 92, 134));
+    }
   }
 }
 
