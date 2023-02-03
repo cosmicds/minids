@@ -1140,7 +1140,7 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
-          console.log("Location: ", this.location)
+          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -1169,7 +1169,7 @@ export default defineComponent({
     // but it doesn't seem to be exposed
     // We should do that, but for now we just copy the web engine code
     // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
-    altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
+    altAzToHADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
       azRad = Math.PI - azRad;
       if (azRad < 0) {
         azRad += 2 * Math.PI;
@@ -1180,16 +1180,6 @@ export default defineComponent({
       }
       const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
       return { ra, dec };
-    },
-
-    altAzToHADec(alt_r: number, az_r: number, lat_r: number): { ha: number; dec: number; } {
-      // for azimuth measured eastward from north
-      let ha = Math.atan2(-Math.sin(az_r) * Math.cos(alt_r), -Math.cos(az_r) * Math.sin(lat_r) * Math.cos(alt_r) + Math.sin(alt_r) * Math.cos(lat_r))
-      if (ha < 0) {
-        ha += 2 * Math.PI;
-      }
-      const dec = Math.asin(Math.sin(lat_r) * Math.sin(alt_r) + Math.cos(lat_r) * Math.cos(alt_r) * Math.cos(az_r))
-      return {ha,  dec}
     },
 
     get_julian(utc: Date): number {
@@ -1225,7 +1215,7 @@ export default defineComponent({
 
       const julianDays = meeus_julianDays ;
 
-      console.log(julianDays)
+      // console.log(julianDays)
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1246,12 +1236,12 @@ export default defineComponent({
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
       const st = this.mstFromUTC2(utc, longRad); // siderial time 
-      console.log(st)
+      // console.log(st)
   
       const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
       // console log alt, az and ra, dec in hours and degrees
       
-      const ha = haDec.ha * R2D;
+      const ha = haDec.ra * R2D;
 
       let ra = st + ha;
       if (ra < 0) {
@@ -1261,10 +1251,7 @@ export default defineComponent({
         ra -= 360;
       }
       // ra -= 180;
-      // at 0,0 ra is neg
-      // at 0, 60, ra is -135 deg
-      // log Alt: 0.00 Az: 0.00 Ra: -180.99 Dec: -90.00
-      console.log(`Alt: ${(altRad*R2D).toFixed(2)} Az: ${(azRad*R2D).toFixed(2)} Ra: ${ra.toFixed(2)} Dec: ${(haDec.dec*R2D).toFixed(2)}`)
+      // console.log(`Alt: ${(altRad*R2D).toFixed(2)} Az: ${(azRad*R2D).toFixed(2)} Ra: ${ra.toFixed(2)} Dec: ${(haDec.dec*R2D).toFixed(2)}`)
 
       return { raRad: D2R * ra, decRad: haDec.dec };
     },
