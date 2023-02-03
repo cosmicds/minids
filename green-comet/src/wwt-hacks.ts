@@ -3,7 +3,7 @@
 
  /* eslint-disable */
 
-import { Color, Colors, Constellations, Coordinates, Grids, GlyphItem, GlyphCache, Rectangle, Settings, Text3d, Text3dBatch, URLHelpers, Vector2d, Vector3d, WWTControl } from "@wwtelescope/engine";
+import { Color, Colors, Constellations, Coordinates, Grids, GlyphItem, GlyphCache, Rectangle, Settings, SpaceTimeController, Text3d, Text3dBatch, URLHelpers, Vector2d, Vector3d, WWTControl } from "@wwtelescope/engine";
 
 export function drawSkyOverlays() {
   if (Settings.get_active().get_showConstellationLabels()) {
@@ -46,7 +46,9 @@ export function makeAltAzGridText() {
   if (Grids._altAzTextBatch == null) {
     const glyphHeight = 70;
     Grids._altAzTextBatch = new Text3dBatch(glyphHeight);
-    const alt = 0.03;
+    const sign = SpaceTimeController.get_location().get_lat() < 0 ? -1 : 1;
+    const alt = 0.03 * sign;
+    const up = Vector3d.create(0, 1, 0);
     const directions = [
       [[0, alt, -1], "N"],
       [[-1, alt, 0], "E"],
@@ -55,7 +57,7 @@ export function makeAltAzGridText() {
       [[1, alt, 0.0095], "V"]
     ]
     directions.forEach(([v, text]) => {
-      Grids._altAzTextBatch.add(new Text3d(Vector3d.create(...v), Vector3d.create(0, 1, 0), text, 75, 0.00018));
+      Grids._altAzTextBatch.add(new Text3d(Vector3d.create(...v), up, text, 75, 0.00018));
     });
   }
 }

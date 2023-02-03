@@ -4,6 +4,7 @@ declare module "@wwtelescope/engine" {
   export class Grids {
     static drawAltAzGrid(renderContext: RenderContext, opacity: number, drawColor: Color): void;
     static _makeAltAzGridText(): void;
+    static _altAzTextBatch: Text3dBatch | null;
   }
 
   export class Text3dBatch {
