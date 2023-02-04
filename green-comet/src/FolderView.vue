@@ -30,10 +30,11 @@
           v-if="items !== null && expanded"
         >
           <div
-            :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
+            :class="['button-38','bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
             v-for="item of items"
             :key="item.get_name()"
             :title="item.get_name()"
+            @click="() => selectItem(item)"
           >
             <img
               v-if="thumbnails"
@@ -42,6 +43,7 @@
             />
             <div
               class="item-name"
+              :class="['thumbnail']"
               @click="() => selectItem(item)"
             >
               {{item.get_name()}}
@@ -96,14 +98,18 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
+    open: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data() {
     return {
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
-      opacities: {} as Record<string,number>,
-      expanded: true
+      opacities: {} as Record<string, number>,
+      expanded: this.open
     }
   },
 
@@ -145,6 +151,14 @@ export default defineComponent({
         "--flex-direction": this.flexDirection
       }
     },
+
+    isMobile() {
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true
+      } else {
+        return false
+      }
+    },
   },
 });
 </script>
@@ -158,6 +172,9 @@ export default defineComponent({
   overflow-y: hidden;
   pointer-events: auto;
   background: black;
+  outline: 1px solid rgb(4, 214, 175);
+  padding: 3px;
+  border-radius: 2px;
   &::-webkit-scrollbar {
     padding: 1px;
     height: 3px;
@@ -176,6 +193,7 @@ export default defineComponent({
 #items {
   height: 100%;
   overflow-y: auto;
+  // add wide radial gradient to the background
 }
 
 .item {
@@ -185,12 +203,14 @@ export default defineComponent({
   width: 100%;
   cursor: pointer;
   pointer-events: auto;
+  margin: .35em 0;
   & img {
     width: 100%;
     height: ~"min(45px, 7.5vw)";
     object-fit: cover;
     border-radius: 2px;
   }
+
 
   & input[type=range] {
     width: calc(min(12vh, 100px));
@@ -210,7 +230,8 @@ export default defineComponent({
 }
 
 .bordered {
-  border: 1px solid #444;
+  border: 1px solid rgb(68, 68, 68);
+  background-color: rgba(68, 68, 68, 0.25);
   border-radius: 2px;
 }
 

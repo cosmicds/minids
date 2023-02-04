@@ -53,7 +53,8 @@
         class="folder-view"
         sliders
         expandable
-        :thumbnails="false"
+        :thumbnails="true"
+        :open="mobile ? false : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
         flex-direction="column"
@@ -2170,8 +2171,8 @@ input[type="range"] {
     -webkit-appearance: inherit;
     -moz-appearance: inherit;
     appearance: inherit;
-    margin: 5px;
-    --track-height: 0.3em;
+    margin: 2px;
+    --track-height: 0.7em;
     --thumb-radius: 0.7em;
     --thumb-color: rgba(205, 54, 157  , 1);
     --track-color: rgba(4, 147, 214, 0.7);
