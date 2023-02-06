@@ -54,7 +54,7 @@
         sliders
         expandable
         :thumbnails="true"
-        :open="mobile ? false : true"
+        :open="mobile ? true : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
         flex-direction="column"
