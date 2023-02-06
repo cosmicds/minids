@@ -37,12 +37,12 @@
             v-for="item of items"
             :key="item.get_name()"
             :title="item.get_name()"
-            @click="() => selectItem(item)"
           >
             <img
               v-if="thumbnails"
               :src="item.get_thumbnailUrl()"
               :alt="item.get_name()"
+              @click="() => selectItem(item)"
             />
             <div
               class="item-name"
@@ -58,6 +58,18 @@
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
             />
+            
+            <span class="toggle-switch">
+              <label class="switch">
+                <input 
+                  type="checkbox"
+                  :title="item.get_name()"
+                  @change="(e) => onToggleImage(e, item)"
+                  
+                  >
+                <span class="slider"></span>
+              </label>
+            </span>
           </div>
         </div>
       </div>
@@ -136,6 +148,7 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
+      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -144,7 +157,13 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
+      console.log("FolderView: slider changed")
       this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+    },
+
+    onToggleImage(e: Event, item: Thumbnail) {
+      console.log("FolderView: toggled")
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
     }
   },
 
@@ -218,8 +237,6 @@ export default defineComponent({
 
   & input[type=range] {
     width: calc(min(12vh, 100px));
-    // width: 90%;
-    // margin: 0 auto;
   }
   &.selected {
     border: 1px solid #D60493;
@@ -261,5 +278,70 @@ export default defineComponent({
   position:absolute;
   top:0;
   left:75%;
+}
+
+// Create a custom toggle switch
+
+span.toggle-switch {
+  position: relative;
+  display: inline-block;
+  
+  --size: 1em;
+  --slider-width: calc(2.5 * var(--size));
+  --slider-height: calc(1.5 * var(--size));
+  width: var(--slider-width);
+  height: var(--slider-height);
+  margin: auto;
+  
+  label.switch {
+    position: absolute;
+      input {
+        visibility: hidden;
+      }
+  }
+
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    height: var(--slider-height);
+    width: var(--slider-width);
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border: 1px solid blue;
+    border-radius: calc(var(--slider-height)/2);
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: var(--size);
+    width: var(--size);
+    left: 1px;
+    margin-top: calc(var(--slider-height)/2 - var(--size)/2);
+    // bottom: 0px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: calc(var(--size));
+  }
+
+  /* display-item box styles */
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked + .slider:before {
+    -webkit-transform: translateX(var(--size));
+    -ms-transform: translateX(var(--size));
+    transform: translateX(var(--size));
+  }
 }
 </style>
