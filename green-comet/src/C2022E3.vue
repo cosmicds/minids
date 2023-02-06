@@ -53,7 +53,7 @@
         class="folder-view"
         sliders
         expandable
-        :thumbnails="true"
+        :thumbnails="false"
         :open="mobile ? false : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"

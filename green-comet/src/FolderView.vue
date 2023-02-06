@@ -174,7 +174,7 @@ export default defineComponent({
   overflow-x: auto;
   overflow-y: hidden;
   pointer-events: auto;
-  background: black;
+  background: rgba(0, 0, 0, 0.5);
   // outline: 1px solid rgb(4, 214, 175);
   padding: 3px;
   border-radius: 2px;
@@ -215,6 +215,8 @@ export default defineComponent({
 
   & input[type=range] {
     width: calc(min(12vh, 100px));
+    // width: 90%;
+    // margin: 0 auto;
   }
   &.selected {
     border: 1px solid #D60493;
@@ -232,7 +234,7 @@ export default defineComponent({
 
 .bordered {
   border: 1px solid rgb(68, 68, 68);
-  background-color: rgba(68, 68, 68, 0.5);
+  // background-color: rgba(68, 68, 68, 0.5);
   border-radius: 5px;
 }
 
