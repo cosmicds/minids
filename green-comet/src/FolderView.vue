@@ -13,6 +13,9 @@
         <img
           src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
         />
+        <div class="item-name">
+          Press <span v-if="thumbnails">image</span><span v-else>date</span> to go to image
+        </div>
         <div class="overlay">
           <font-awesome-icon
             icon="images"
@@ -30,7 +33,7 @@
           v-if="items !== null && expanded"
         >
           <div
-            :class="['button-38','bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
+            :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
             v-for="item of items"
             :key="item.get_name()"
             :title="item.get_name()"
@@ -172,7 +175,7 @@ export default defineComponent({
   overflow-y: hidden;
   pointer-events: auto;
   background: black;
-  outline: 1px solid rgb(4, 214, 175);
+  // outline: 1px solid rgb(4, 214, 175);
   padding: 3px;
   border-radius: 2px;
   &::-webkit-scrollbar {
@@ -193,7 +196,6 @@ export default defineComponent({
 #items {
   height: 100%;
   overflow-y: auto;
-  // add wide radial gradient to the background
 }
 
 .item {
@@ -210,7 +212,6 @@ export default defineComponent({
     object-fit: cover;
     border-radius: 2px;
   }
-
 
   & input[type=range] {
     width: calc(min(12vh, 100px));
@@ -231,8 +232,8 @@ export default defineComponent({
 
 .bordered {
   border: 1px solid rgb(68, 68, 68);
-  background-color: rgba(68, 68, 68, 0.25);
-  border-radius: 2px;
+  background-color: rgba(68, 68, 68, 0.5);
+  border-radius: 5px;
 }
 
 #expand-row {
@@ -252,8 +253,8 @@ export default defineComponent({
 }
 
 .overlay {
-   position:absolute;
-   top:0;
-   left:75%;
+  position:absolute;
+  top:0;
+  left:75%;
 }
 </style>

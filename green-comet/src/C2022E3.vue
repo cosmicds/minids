@@ -2172,11 +2172,23 @@ input[type="range"] {
     -moz-appearance: inherit;
     appearance: inherit;
     margin: 2px;
-    --track-height: 0.7em;
-    --thumb-radius: 0.7em;
-    --thumb-color: rgba(205, 54, 157  , 1);
-    --track-color: rgba(4, 147, 214, 0.7);
-    --thumb-border: 1px solid #899499;
+    --track-height: 1em;
+    --thumb-radius: 0.8em;
+    --thumb-color: rgba(205, 54, 157  , 0.7);
+    // --thumb-color: #444;
+    --track-color: rgba(4, 147, 214, .1);
+    // --thumb-border: 1px solid #899499;
+    --thumb-border-width: 1px;
+    --thumb-border: var(--thumb-border-width) solid rgb(255, 255, 255);
+    --track-border-width: 1px;
+    --track-border: var(--track-border-width) solid rgba(4, 147, 214, 1);
+    --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
+    
+    &:hover {
+      opacity: 1;
+      --track-color: rgba(217, 234, 242,0.2);
+      --thumb-color: rgba(205, 54, 157  , 1);
+    }
   }
   
   
@@ -2187,7 +2199,7 @@ input[type="range"] {
       appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
@@ -2201,7 +2213,7 @@ input[type="range"] {
     appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     cursor: pointer;
@@ -2212,8 +2224,10 @@ input[type="range"] {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height: var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
   
@@ -2221,8 +2235,10 @@ input[type="range"]::-moz-range-track {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height:var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
 #sliderlabel {
