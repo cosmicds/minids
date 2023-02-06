@@ -172,30 +172,33 @@ export default defineComponent({
   flex-direction: var(--flex-direction);
   width: auto;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   pointer-events: auto;
   background: rgba(0, 0, 0, 0.5);
   // outline: 1px solid rgb(4, 214, 175);
   padding: 3px;
   border-radius: 2px;
-  &::-webkit-scrollbar {
-    padding: 1px;
-    height: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: black;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(4, 129, 187, 0.5);
-    border-radius: 2px;
-  }
-  //width: 100%;
-  //justify-content: space-around;
 }
 
 #items {
   height: 100%;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(0, 0, 0,0.5);
+    // border: 5px solid red;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.5);
+    width: 10px;
+    border: 3px solid black;
+    border-radius: 10px;
+  }
+  //width: 100%;
+  //justify-content: space-around;
 }
 
 .item {

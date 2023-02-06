@@ -53,7 +53,7 @@
         class="folder-view"
         sliders
         expandable
-        :thumbnails="false"
+        :thumbnails="true"
         :open="mobile ? false : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
@@ -1579,11 +1579,11 @@ html {
   overflow: hidden;
 
   ::-webkit-scrollbar {
-    display: none;
+    // display: none;
   }
-
+  
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  // scrollbar-width: none;
 }
 
 body {
