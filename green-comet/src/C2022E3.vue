@@ -526,7 +526,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer } from "./wwt-hacks";
 
 
 import {
@@ -695,6 +695,13 @@ export default defineComponent({
 
     this.waitForReady().then(() => {
 
+      // Unlike the other things we're hacking here,
+      // we aren't overwriting a method on a singleton instance (WWTControl)
+      // or a static method (Constellations, Grids)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      SpreadSheetLayer.prototype.draw = drawSpreadSheetLayer;
+
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -771,8 +778,9 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 30],
+            ["scaleFactor", 5],
             ["color", Color.fromHex(this.ephemerisColor)],
+            ["plotType", PlotTypes.point],
             //["sizeColumn", 3],
             ["opacity", 1]
           ]
