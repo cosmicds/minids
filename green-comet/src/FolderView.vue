@@ -51,6 +51,7 @@
             >
               {{item.get_name()}}
             </div>
+            <div class="slider-container">
             <input
               v-if="sliders"
               class="opacity-range"
@@ -68,6 +69,7 @@
                   >
                 <span class="slider"></span>
               </label> 
+            </div>
 
           </div>
         </div>
@@ -279,26 +281,32 @@ export default defineComponent({
   left:75%;
 }
 
-
-
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  
+  
+}
 .switch {
-  --toggle-size: 1em;
+  // moving toggle
+  --toggle-size: 0.77em;
   --slider-height: calc(var(--toggle-size) * 1.3);
   --toggle-bottom-gap: calc((var(--slider-height) - var(--toggle-size))/2);
   --toggle-left-gap: var(--toggle-bottom-gap);
   --slider-width: calc(2*(var(--toggle-left-gap) + var(--toggle-size)));
   --translateX: var(--toggle-size);
-  
+
   position: relative;
-  display: inline-block;
+  display: flex;
   width: var(--slider-width);
   height: var(--slider-height);
 }
 
 .switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
+  visibility: hidden;
 }
 
 .slider {
