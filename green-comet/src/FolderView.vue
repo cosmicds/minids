@@ -59,17 +59,16 @@
               @input="(e) => onSliderInputChanged(e, item)"
             />
             
-            <span class="toggle-switch">
+
               <label class="switch">
                 <input 
                   type="checkbox"
                   :title="item.get_name()"
                   @change="(e) => onToggleImage(e, item)"
-                  
                   >
                 <span class="slider"></span>
-              </label>
-            </span>
+              </label> 
+
           </div>
         </div>
       </div>
@@ -280,68 +279,67 @@ export default defineComponent({
   left:75%;
 }
 
-// Create a custom toggle switch
 
-span.toggle-switch {
+
+.switch {
+  --toggle-size: 1em;
+  --slider-height: calc(var(--toggle-size) * 1.3);
+  --toggle-bottom-gap: calc((var(--slider-height) - var(--toggle-size))/2);
+  --toggle-left-gap: var(--toggle-bottom-gap);
+  --slider-width: calc(2*(var(--toggle-left-gap) + var(--toggle-size)));
+  --translateX: var(--toggle-size);
+  
   position: relative;
   display: inline-block;
-  
-  --size: 1em;
-  --slider-width: calc(2.5 * var(--size));
-  --slider-height: calc(1.5 * var(--size));
   width: var(--slider-width);
   height: var(--slider-height);
-  margin: auto;
-  
-  label.switch {
-    position: absolute;
-      input {
-        visibility: hidden;
-      }
-  }
-
-  /* The slider */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0px;
-    left: 0;
-    bottom: 0;
-    height: var(--slider-height);
-    width: var(--slider-width);
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border: 1px solid blue;
-    border-radius: calc(var(--slider-height)/2);
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: var(--size);
-    width: var(--size);
-    left: 1px;
-    margin-top: calc(var(--slider-height)/2 - var(--size)/2);
-    // bottom: 0px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: calc(var(--size));
-  }
-
-  /* display-item box styles */
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-
-  input:checked + .slider:before {
-    -webkit-transform: translateX(var(--size));
-    -ms-transform: translateX(var(--size));
-    transform: translateX(var(--size));
-  }
 }
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: var(--slider-height);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--toggle-size);
+  width: var(--toggle-size);
+  left: var(--toggle-left-gap);
+  bottom: var(--toggle-bottom-gap);
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(var(--translateX));
+  -ms-transform: translateX(var(--translateX));
+  transform: translateX(var(--translateX));
+}
+
+
 </style>
