@@ -19,4 +19,10 @@ declare module "@wwtelescope/engine" {
     static create(x: number, y: number, z: number): Vector3d;
   }
 
+  export class Texture {}
+
+  export class PushPin {
+    static getPushPinTexture(pinId: number): Texture;
+  }
+
 }
