@@ -234,7 +234,7 @@
             >
               <template v-slot:mark="{ pos, value }">
                 <div
-                  :class="['mark-line', { tall: allDates.includes(value) }]"
+                  :class="[{ 'mark-line': cometImageDates.includes(value) }]"
                   :style="{ left: `${pos}%` }">
                 </div>
               </template>
@@ -545,11 +545,12 @@ function parseCsvTable(csv: string) {
       ra: +d.RA!,
       dec: +d.Dec!,
       tMag: +d.Tmag!,
-      angspeed: +d.Angspeed!,
+      angspeed: +d.SkyMotion!,
     };
   });
 }
 const FullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
+console.log(FullDatesTable);
 const CometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
 
 // NB: The two tables have identical structures.
@@ -664,7 +665,7 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
       cometColor: "#04D6B0",
-      todayColor: "#FFFFFF",
+      todayColor: "#D6B004",
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -770,41 +771,64 @@ export default defineComponent({
         })
       }));
 
+      layerPromises.push(this.createTableLayer({
+        name: "Comet Image Dates",
+        referenceFrame: "Sky",
+        dataCsv: CometImageDatesString
+      }).then((layer) => {
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 4],
+            ["color", #FFFFFF],
+            ["plotType", PlotTypes.point],
+            //["sizeColumn", 3],
+            ["opacity", 0.4]
+          ]
+        })
+      }));
+
+      layerPromises.push(this.createTableLayer({
+        name: "Today",
+        referenceFrame: "Sky",
+        dataCsv: FullDatesString
+      }).then((layer) => {
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        layer.set_markerScale(MarkerScales.screen);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 45],
+            ["color", Color.fromHex(this.todayColor)],
+            ["plotType", PlotTypes.circle],
+            //["sizeColumn", 3],
+            ["startDateColumn", 0],
+            ["endDateColumn", 0],
+            ["timeSeries", true],
+            ["opacity", 1],
+            ["decay", 0.8]
+          ]
+        });
+      }));
+
       // layerPromises.push(this.createTableLayer({
-      //   name: "2023 Daily",
+      //   name: "CometImage Date Layer",
       //   referenceFrame: "Sky",
       //   dataCsv: CometImageDatesString
       // }).then((layer) => {
       //   layer.set_lngColumn(1);
       //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
       //   this.applyTableLayerSettings({
       //     id: layer.id.toString(),
       //     settings: [
-      //       ["scaleFactor", 0.5],
+      //       ["scaleFactor", 3],
       //       ["color", #FFFFFF],
       //       ["plotType", PlotTypes.point],
-      //       //["sizeColumn", 3],
-      //       ["opacity", 1]
-      //     ]
-      //   })
-      // }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "All Date Layer",
-      //   referenceFrame: "Sky",
-      //   dataCsv: FullDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 45],
-      //       ["color", Color.fromHex(this.todayColor)],
-      //       ["plotType", PlotTypes.circle],
-      //       //["sizeColumn", 3],
+      //       ["sizeColumn", 3],
       //       ["startDateColumn", 0],
       //       ["endDateColumn", 0],
       //       ["timeSeries", true],
@@ -813,29 +837,6 @@ export default defineComponent({
       //     ]
       //   });
       // }));
-
-      layerPromises.push(this.createTableLayer({
-        name: "CometImage Date Layer",
-        referenceFrame: "Sky",
-        dataCsv: CometImageDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 3],
-            ["color", #FFFFFF],
-            ["plotType", PlotTypes.point],
-            ["sizeColumn", 3],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 1]
-          ]
-        });
-      }));
 
       this.setTime(this.dateTime);
 
@@ -976,16 +977,19 @@ export default defineComponent({
       const interpolatedRow: TableRow = { ...row };
       interpolatedRow.ra = interpolatedRA;
       interpolatedRow.dec = interpolatedDec;
+      console.log(interpolatedRow);
       return Object.assign([interpolatedRow], { columns: table.columns });
     },
 
     updateLayersForDate() {
 
-      const interpolatedDailyTable = this.interpolatedTable(CometImageDatesTable);
-      if (this.currentDailyLayer !== null) {
-        this.deleteLayer(this.currentDailyLayer.id);
-        this.currentDailyLayer = null;
+      const interpolatedDailyTable = this.interpolatedTable(FullDatesTable);
+      if (this.currentAllLayer !== null) {
+        this.deleteLayer(this.currentAllLayer.id);
+        this.currentAllLayer = null;
       }
+
+      console.log(interpolatedDailyTable);
 
       if (interpolatedDailyTable !== null) {
         this.createTableLayer({
@@ -993,15 +997,16 @@ export default defineComponent({
           referenceFrame: "Sky",
           dataCsv: formatCsvTable(interpolatedDailyTable)
         }).then((layer) => {
-          this.currentDailyLayer = layer;
+          this.currentAllLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
           layer.set_markerScale(MarkerScales.screen);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 50],
-              ["color", Color.fromHex(this.todayColor)],
+              ["scaleFactor", 100],
+              ["plotType", PlotTypes.point],
+              ["color", '#0000FF'],
               //["sizeColumn", 3],
               ["opacity", 1],
             ]
@@ -2035,7 +2040,7 @@ video {
 
 .vue-slider-process
 {
-  background-color: white !important;
+  background-color: var(--comet-color) !important;
 }
 
 .vue-slider-dot-tooltip-inner
@@ -2056,16 +2061,11 @@ video {
 .mark-line {
   position: absolute;
   height: 20px;
-  width: 1.25px;
+  width: 2px;
   margin: 0;
-  background-color: #E5E4E2;
-  transform: translateX(-50%) translateY(calc(-50% + 1px));
+  background-color: var(--comet-color);
+  transform: translateX(-50%) translateY(calc(-50% + 2px));
 
-  &.tall {
-    height: 0px;
-    background-color: #848884;
-    border: solid 0.5px #E5E4E2;
-  }
 }
 
 .left-content {
