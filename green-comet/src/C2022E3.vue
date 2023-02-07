@@ -550,7 +550,6 @@ function parseCsvTable(csv: string) {
   });
 }
 const FullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
-console.log(FullDatesTable);
 const CometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
 
 // NB: The two tables have identical structures.
@@ -783,7 +782,7 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["scaleFactor", 4],
-            ["color", #FFFFFF],
+            ["color", Color.fromHex('#FFFFFF')],
             ["plotType", PlotTypes.point],
             //["sizeColumn", 3],
             ["opacity", 0.4]
@@ -791,29 +790,29 @@ export default defineComponent({
         })
       }));
 
-      layerPromises.push(this.createTableLayer({
-        name: "Today",
-        referenceFrame: "Sky",
-        dataCsv: FullDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 45],
-            ["color", Color.fromHex(this.todayColor)],
-            ["plotType", PlotTypes.circle],
-            //["sizeColumn", 3],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 0.8]
-          ]
-        });
-      }));
+      // layerPromises.push(this.createTableLayer({
+      //   name: "Today",
+      //   referenceFrame: "Sky",
+      //   dataCsv: FullDatesString
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 45],
+      //       ["color", Color.fromHex(this.todayColor)],
+      //       ["plotType", PlotTypes.circle],
+      //       //["sizeColumn", 3],
+      //       ["startDateColumn", 0],
+      //       ["endDateColumn", 0],
+      //       ["timeSeries", true],
+      //       ["opacity", 1],
+      //       ["decay", 0.8]
+      //     ]
+      //   });
+      // }));
 
       // layerPromises.push(this.createTableLayer({
       //   name: "CometImage Date Layer",
@@ -977,7 +976,6 @@ export default defineComponent({
       const interpolatedRow: TableRow = { ...row };
       interpolatedRow.ra = interpolatedRA;
       interpolatedRow.dec = interpolatedDec;
-      console.log(interpolatedRow);
       return Object.assign([interpolatedRow], { columns: table.columns });
     },
 
@@ -988,8 +986,6 @@ export default defineComponent({
         this.deleteLayer(this.currentAllLayer.id);
         this.currentAllLayer = null;
       }
-
-      console.log(interpolatedDailyTable);
 
       if (interpolatedDailyTable !== null) {
         this.createTableLayer({
@@ -1004,9 +1000,9 @@ export default defineComponent({
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 100],
+              ["scaleFactor", 5],
               ["plotType", PlotTypes.point],
-              ["color", '#0000FF'],
+              ["color", Color.fromHex('#E562BC')],
               //["sizeColumn", 3],
               ["opacity", 1],
             ]
