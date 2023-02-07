@@ -1094,7 +1094,9 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
-      applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // tell setLayerOpacityForImageSet that we are updating from the ui
+      this.setLayerOpacityForImageSet(iset.get_name(), opacity / 100, true);
     },
     
     onToggle(place: Place, checked: boolean) {
@@ -1457,17 +1459,22 @@ export default defineComponent({
       return '';
     },
 
-    setLayerOpacityForImageSet(name: string, opacity: number) {
+    setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
+      console.log(`setLayerOpacityForImageSet(${name}, ${opacity})`)
       const layer = this.imagesetLayers[name]
       if (layer != null) {
         // update the image opacity in the WWT control
         applyImageSetLayerSetting(layer, ['opacity', opacity])
 
-        // update the value for the slider {this will trigger the slider's change event}
-        const slider_selector = `#items>div>div.bordered.item[title='${name}']>input`
-        const el = (document.querySelector(slider_selector) as HTMLInputElement)
-        if (el != null) {
-          el.value = `${opacity * 100}`
+        // update the value for the slider only if we are not setting the opacity from the UI
+        if (!setting_opacity_from_ui) {
+          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`
+          const el = (document.querySelector(selector) as HTMLInputElement)
+          console.log(selector, el)
+          if (el != null) {
+            console.log(`setting slider value to ${opacity * 100}`)
+            el.value = `${opacity * 100}`
+          }
         }
 
         const toggle_selector = `#items input[type='checkbox'][title='${name}']`
@@ -1477,6 +1484,7 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
+          console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
@@ -1491,21 +1499,13 @@ export default defineComponent({
       console.log('showImageForDateTime', date)
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
-      // loop over imageset_names
-      // set opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach((iname: string) => {
-        const selector = `#items>div>div.bordered.item[title='${iname}']>input`
-        const el = (document.querySelector(selector) as HTMLInputElement)
         if (iname != name) {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
-          if (el != null) {
-            el.value = '0'
-        }
+          this.setLayerOpacityForImageSet(iname, 0)
         } else {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
-          const iset = this.wwtControl.getImagesetByName(iname)
-          if (iset == null) { return; }
-          if (el != null) { el.value = '100' }
+          this.setLayerOpacityForImageSet(iname, 1)
+          // const iset = this.wwtControl.getImagesetByName(iname)
+          // if (iset == null) { return; }
           // this.gotoRADecZoom({
           //   raRad: D2R * iset.get_centerX(),
           //   decRad: D2R * iset.get_centerY(),
