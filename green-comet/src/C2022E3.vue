@@ -1066,7 +1066,6 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log("onItemSelected", place.get_name());
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1089,7 +1088,6 @@ export default defineComponent({
     },
 
     updateImageOpacity(place: Place, opacity: number) {
-      console.log('updateImageOpacity')
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1104,7 +1102,6 @@ export default defineComponent({
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; } 
       const iname = iset.get_name()
-      console.log('onToggle', iname, checked, '')
       this.setLayerOpacityForImageSet(iname, checked ? 1 : 0);
     },
     
@@ -1460,7 +1457,6 @@ export default defineComponent({
     },
 
     setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
-      console.log(`setLayerOpacityForImageSet(${name}, ${opacity})`)
       const layer = this.imagesetLayers[name]
       if (layer != null) {
         // update the image opacity in the WWT control
@@ -1470,25 +1466,8 @@ export default defineComponent({
         if (!setting_opacity_from_ui) {
           const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`
           const el = (document.querySelector(selector) as HTMLInputElement)
-          console.log(selector, el)
           if (el != null) {
-            console.log(`setting slider value to ${opacity * 100}`)
             el.value = `${opacity * 100}`
-          }
-        }
-
-        const toggle_selector = `#items input[type='checkbox'][title='${name}']`
-        const el2 = (document.querySelector(toggle_selector) as HTMLInputElement)
-        // truth table: opacity == 0 and el.checked == false => do nothing
-        // truth table: opacity == 0 and el.checked == true => set el.checked = false
-        // truth table: opacity > 0 and el.checked == false => set el.checked = true
-        // truth table: opacity > 0 and el.checked == true => do nothing
-        if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
-          if (opacity == 0 && el2.checked) {
-            el2.checked = false
-          } else if (opacity > 0 && !el2.checked) {
-            el2.checked = true
           }
         }
         
@@ -1496,7 +1475,6 @@ export default defineComponent({
     },
     
     showImageForDateTime(date: Date) {
-      console.log('showImageForDateTime', date)
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
       imageset_names.forEach((iname: string) => {
@@ -1527,7 +1505,6 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      console.log('updateForDateTime', this.dateTime)
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
       this.showImageForDateTime(this.dateTime);
@@ -1536,7 +1513,6 @@ export default defineComponent({
     },
 
     updateHorizon(when: Date | null = null) {
-      console.log('updateHorizon', when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1597,7 +1573,6 @@ export default defineComponent({
       // });
     },
     selectedDate(_date: Date) {
-      console.log('selectedDate (watcher)', _date)
       this.updateForDateTime();
     },
     showLocationSelector(show: boolean) {
