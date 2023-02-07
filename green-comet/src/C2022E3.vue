@@ -526,7 +526,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer } from "./wwt-hacks";
 
 
 import {
@@ -695,6 +695,13 @@ export default defineComponent({
 
     this.waitForReady().then(() => {
 
+      // Unlike the other things we're hacking here,
+      // we aren't overwriting a method on a singleton instance (WWTControl)
+      // or a static method (Constellations, Grids)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      SpreadSheetLayer.prototype.draw = drawSpreadSheetLayer;
+
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -738,6 +745,7 @@ export default defineComponent({
 
       this.getLocation(true);
       this.setClockSync(false);
+      // create date with y m d h m s
 
       layerPromises.push(this.createTableLayer({
         name: "Full Weekly",
@@ -770,8 +778,9 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 30],
+            ["scaleFactor", 5],
             ["color", Color.fromHex(this.ephemerisColor)],
+            ["plotType", PlotTypes.point],
             //["sizeColumn", 3],
             ["opacity", 1]
           ]
@@ -832,6 +841,7 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
       this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
@@ -843,6 +853,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Constellations.initializeConstellationNames = initializeConstellationNames;
+      Grids._makeAltAzGridText = makeAltAzGridText;
 
       this.updateWWTLocation();
 
@@ -1001,7 +1012,7 @@ export default defineComponent({
   
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
-      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad + 90);
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
     },
 
     logLocation() {
@@ -1117,6 +1128,7 @@ export default defineComponent({
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: e.latlng.lng * D2R
       };
+      console.log('In onMapSelect: ', this.location);
     },
 
     circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
@@ -1137,6 +1149,7 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
+          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -1165,7 +1178,7 @@ export default defineComponent({
     // but it doesn't seem to be exposed
     // We should do that, but for now we just copy the web engine code
     // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
-    altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
+    altAzToHADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
       azRad = Math.PI - azRad;
       if (azRad < 0) {
         azRad += 2 * Math.PI;
@@ -1178,14 +1191,7 @@ export default defineComponent({
       return { ra, dec };
     },
 
-    get_julian(date: Date): number {
-        return (date.valueOf() / 86400000) - (date.getTimezoneOffset() / 1440) + 2440587.5;
-      },
-  
-    mstFromUTC2(utc: Date, longRad: number): number {
-
-      const lng = longRad * R2D;
-
+    get_julian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
       const day = utc.getUTCDate();
@@ -1193,14 +1199,10 @@ export default defineComponent({
       const minute = utc.getUTCMinutes();
       const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
-      let jan_or_feb = false
       if (month == 1 || month == 2)
       {
           year -= 1;
           month += 12;
-          jan_or_feb = true
-      } else {
-        jan_or_feb = false;
       }
 
       const a = year / 100;
@@ -1209,19 +1211,20 @@ export default defineComponent({
       const d = Math.floor(30.6001 * (month + 1));
 
       const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-      // const unix_julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
-      // const is_leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-      // CAUTION: this is a very hacky way to get the correct offset
-      // IT will probably only work for 2022 and 2023, and it uses special numbers
-      const _before_feb_28_2022 = (jan_or_feb) || (month == 14 && day < 28) || (year < 2023);
-      let offset = 0
-      if (_before_feb_28_2022) {
-        offset = - 42.27 / (60 * 24)
-      } else {
-        offset = -28 / (60 * 24)
-      }
-      const julianDays = meeus_julianDays + offset ;
 
+      const mjday = Math.floor(meeus_julianDays)
+      return mjday + (hour-12) / 24 + minute / 1440 + second / 86400;
+
+    },
+    
+    mstFromUTC2(utc: Date, longRad: number): number {
+      const lng = longRad * R2D;
+
+      const meeus_julianDays = this.get_julian(utc);
+
+      const julianDays = meeus_julianDays ;
+
+      // console.log(julianDays)
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1241,21 +1244,25 @@ export default defineComponent({
     },
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
-      let hourAngle = this.mstFromUTC2(utc, longRad);
+      const st = this.mstFromUTC2(utc, longRad); // siderial time 
+      // console.log(st)
   
-      const raDec = this.altAzToRADec(altRad, azRad, latRad);
-      const ha = raDec.ra * R2D;
+      const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
+      // console log alt, az and ra, dec in hours and degrees
+      
+      const ha = haDec.ra * R2D;
 
-      hourAngle += ha;
-      if (hourAngle < 0) {
-        hourAngle += 360;
+      let ra = st + ha;
+      if (ra < 0) {
+        ra += 360;
       }
-      if (hourAngle > 360) {
-        hourAngle -= 360;
+      if (ra > 360) {
+        ra -= 360;
       }
-      hourAngle -= 180;
+      // ra -= 180;
+      // console.log(`Alt: ${(altRad*R2D).toFixed(2)} Az: ${(azRad*R2D).toFixed(2)} Ra: ${ra.toFixed(2)} Dec: ${(haDec.dec*R2D).toFixed(2)}`)
 
-      return { raRad: D2R * hourAngle, decRad: raDec.dec };
+      return { raRad: D2R * ra, decRad: haDec.dec };
     },
 
     equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
@@ -1515,6 +1522,7 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+      this.wwtSettings.set_showAltAzGridText(show);
     },
     showConstellations(show: boolean) {
       this.wwtSettings.set_showConstellationLabels(show);
@@ -1526,7 +1534,7 @@ export default defineComponent({
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
     },
-    location(loc: LocationRad) {
+    location(loc: LocationRad, oldLoc: LocationRad) {
       //const now = this.selectedDate;
       //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
@@ -1535,6 +1543,10 @@ export default defineComponent({
 
         const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
+      }
+
+      if (oldLoc.latitudeRad * loc.latitudeRad < 0) {
+        Grids._altAzTextBatch = null;
       }
 
       this.updateHorizon();
