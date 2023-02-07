@@ -526,14 +526,13 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
 
 
 import {
   ephemerisFullDatesCsv,
   ephemerisCometImageDatesCsv
 } from "./data";
-import { Script } from 'vm';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -858,6 +857,10 @@ export default defineComponent({
       // @ts-ignore
       Constellations.initializeConstellationNames = initializeConstellationNames;
       Grids._makeAltAzGridText = makeAltAzGridText;
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      LayerManager._draw = layerManagerDraw;
 
       this.updateWWTLocation();
 
