@@ -518,7 +518,7 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
+import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -545,6 +545,7 @@ function parseCsvTable(csv: string) {
       ra: +d.RA!,
       dec: +d.Dec!,
       tMag: +d.Tmag!,
+      angspeed: +d.Angspeed!,
     };
   });
 }
@@ -559,13 +560,14 @@ type TableRow = typeof fullWeeklyTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-        "Date", "RA", "Dec", "Tmag"
+        "Date", "RA", "Dec", "Tmag" , "Angspeed"
       ]].concat(table.map((d, _i) => {
         return [
           d.date.toISOString(),
           d.ra.toString(),
           d.dec.toString(),
           d.tMag.toString(),
+          d.angspeed.toString(),
         ];
     }))).replace(/\n/g, '\r\n');
     // By using a regex, we replace all instances.
@@ -660,9 +662,9 @@ export default defineComponent({
       dates: dates,
       
       lastClosePt: null as TableRow | null,
-      ephemerisColor: "#FFFFFF",
+      ephemerisColor: "#D60493",
       cometColor: "#04D6B0",
-      todayColor: "#D60493",
+      todayColor: "#FFFFFF",
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -758,72 +760,51 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 30],
+            ["scaleFactor", 2],
+            ["plotType", PlotTypes.point],
             ["color", Color.fromHex(this.ephemerisColor)],
-            ["plotType", PlotTypes.circle],
-            //["sizeColumn", 3],
+            //["sizeColumn", 4],
+            //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
         })
       }));
 
-      layerPromises.push(this.createTableLayer({
-        name: "2023 Daily",
-        referenceFrame: "Sky",
-        dataCsv: daily2023String
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 5],
-            ["color", Color.fromHex(this.ephemerisColor)],
-            ["plotType", PlotTypes.point],
-            //["sizeColumn", 3],
-            ["opacity", 1]
-          ]
-        })
-      }));
-
-      layerPromises.push(this.createTableLayer({
-        name: "Weekly Date Layer",
-        referenceFrame: "Sky",
-        dataCsv: fullWeeklyString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 45],
-            ["color", Color.fromHex(this.todayColor)],
-            ["plotType", PlotTypes.circle],
-            //["sizeColumn", 3],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 1]
-          ]
-        });
-      }));
-
       // layerPromises.push(this.createTableLayer({
-      //   name: "Daily Date Layer",
+      //   name: "2023 Daily",
       //   referenceFrame: "Sky",
       //   dataCsv: daily2023String
       // }).then((layer) => {
       //   layer.set_lngColumn(1);
       //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
       //   this.applyTableLayerSettings({
       //     id: layer.id.toString(),
       //     settings: [
-      //       ["scaleFactor", 75],
-      //       ["color", Color.fromHex(this.cometColor)],
-      //       ["sizeColumn", 3],
+      //       ["scaleFactor", 0.5],
+      //       ["color", #FFFFFF],
+      //       ["plotType", PlotTypes.point],
+      //       //["sizeColumn", 3],
+      //       ["opacity", 1]
+      //     ]
+      //   })
+      // }));
+
+      // layerPromises.push(this.createTableLayer({
+      //   name: "Weekly Date Layer",
+      //   referenceFrame: "Sky",
+      //   dataCsv: fullWeeklyString
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 45],
+      //       ["color", Color.fromHex(this.todayColor)],
+      //       ["plotType", PlotTypes.circle],
+      //       //["sizeColumn", 3],
       //       ["startDateColumn", 0],
       //       ["endDateColumn", 0],
       //       ["timeSeries", true],
@@ -832,6 +813,29 @@ export default defineComponent({
       //     ]
       //   });
       // }));
+
+      layerPromises.push(this.createTableLayer({
+        name: "Daily Date Layer",
+        referenceFrame: "Sky",
+        dataCsv: daily2023String
+      }).then((layer) => {
+        layer.set_lngColumn(1);
+        layer.set_latColumn(2);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["scaleFactor", 3],
+            ["color", #FFFFFF],
+            ["plotType", PlotTypes.point],
+            ["sizeColumn", 3],
+            ["startDateColumn", 0],
+            ["endDateColumn", 0],
+            ["timeSeries", true],
+            ["opacity", 1],
+            ["decay", 1]
+          ]
+        });
+      }));
 
       this.setTime(this.dateTime);
 
@@ -2051,14 +2055,14 @@ video {
 
 .mark-line {
   position: absolute;
-  height: 12px;
+  height: 20px;
   width: 1.25px;
   margin: 0;
   background-color: #E5E4E2;
   transform: translateX(-50%) translateY(calc(-50% + 1px));
 
   &.tall {
-    height: 20px;
+    height: 0px;
     background-color: #848884;
     border: solid 0.5px #E5E4E2;
   }
