@@ -2040,7 +2040,7 @@ video {
 
 .vue-slider-process
 {
-  background-color: var(--comet-color) !important;
+  background-color: white !important;
 }
 
 .vue-slider-dot-tooltip-inner
