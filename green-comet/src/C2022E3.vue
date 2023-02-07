@@ -222,7 +222,7 @@
             adsorb
             included
             :marks="(d: number) => {
-              return weeklyDates.includes(d) || dailyDates.includes(d);
+              return allDates.includes(d) || cometImageDates.includes(d);
             }"
             :order="false"
             v-model="selectedTime"
@@ -234,7 +234,7 @@
             >
               <template v-slot:mark="{ pos, value }">
                 <div
-                  :class="['mark-line', { tall: weeklyDates.includes(value) }]"
+                  :class="['mark-line', { tall: allDates.includes(value) }]"
                   :style="{ left: `${pos}%` }">
                 </div>
               </template>
@@ -530,8 +530,8 @@ import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawS
 
 
 import {
-  ephemerisFullWeeklyCsv,
-  ephemeris2023DailyCsv
+  ephemerisFullDatesCsv,
+  ephemerisCometImageDatesCsv
 } from "./data";
 import { Script } from 'vm';
 
@@ -549,14 +549,14 @@ function parseCsvTable(csv: string) {
     };
   });
 }
-const fullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
-const daily2023Table = parseCsvTable(ephemeris2023DailyCsv);
+const FullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
+const CometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
 // generic names are fine
-type Table = typeof fullWeeklyTable;
-type TableRow = typeof fullWeeklyTable[number];
+type Table = typeof FullDatesTable;
+type TableRow = typeof FullDatesTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
@@ -576,13 +576,13 @@ function formatCsvTable(table: Table): string {
     // to be CRLF
 }
 
-const fullWeeklyString = formatCsvTable(fullWeeklyTable);
-const daily2023String = formatCsvTable(daily2023Table);
+const FullDatesString = formatCsvTable(FullDatesTable);
+const CometImageDatesString = formatCsvTable(CometImageDatesTable);
 
-const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
-const dailyDates = daily2023Table.map(r => r.date.getTime());
-const minDate = Math.min(...weeklyDates, ...dailyDates);
-const maxDate = Math.max(...weeklyDates, ...dailyDates);
+const allDates = FullDatesTable.map(r => r.date.getTime());
+const cometImageDates = CometImageDatesTable.map(r => r.date.getTime());
+const minDate = Math.min(...allDates, ...cometImageDates);
+const maxDate = Math.max(...allDates, ...cometImageDates);
 const dates: number[] = [];
 
 const d = new Date(minDate);
@@ -654,11 +654,11 @@ export default defineComponent({
       showConstellations: false,
       showHorizon: false,
 
-      currentDailyLayer: null as SpreadSheetLayer | null,
-      currentWeeklyLayer: null as SpreadSheetLayer | null,
+      currentCometImageLayer: null as SpreadSheetLayer | null,
+      currentAllLayer: null as SpreadSheetLayer | null,
 
-      dailyDates: dailyDates,
-      weeklyDates: weeklyDates,
+      cometImageDates: cometImageDates,
+      allDates: allDates,
       dates: dates,
       
       lastClosePt: null as TableRow | null,
@@ -750,9 +750,9 @@ export default defineComponent({
       // create date with y m d h m s
 
       layerPromises.push(this.createTableLayer({
-        name: "Full Weekly",
+        name: "All Dates",
         referenceFrame: "Sky",
-        dataCsv: fullWeeklyString
+        dataCsv: FullDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -773,7 +773,7 @@ export default defineComponent({
       // layerPromises.push(this.createTableLayer({
       //   name: "2023 Daily",
       //   referenceFrame: "Sky",
-      //   dataCsv: daily2023String
+      //   dataCsv: CometImageDatesString
       // }).then((layer) => {
       //   layer.set_lngColumn(1);
       //   layer.set_latColumn(2);
@@ -791,9 +791,9 @@ export default defineComponent({
       // }));
 
       // layerPromises.push(this.createTableLayer({
-      //   name: "Weekly Date Layer",
+      //   name: "All Date Layer",
       //   referenceFrame: "Sky",
-      //   dataCsv: fullWeeklyString
+      //   dataCsv: FullDatesString
       // }).then((layer) => {
       //   layer.set_lngColumn(1);
       //   layer.set_latColumn(2);
@@ -815,9 +815,9 @@ export default defineComponent({
       // }));
 
       layerPromises.push(this.createTableLayer({
-        name: "Daily Date Layer",
+        name: "CometImage Date Layer",
         referenceFrame: "Sky",
-        dataCsv: daily2023String
+        dataCsv: CometImageDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -981,7 +981,7 @@ export default defineComponent({
 
     updateLayersForDate() {
 
-      const interpolatedDailyTable = this.interpolatedTable(daily2023Table);
+      const interpolatedDailyTable = this.interpolatedTable(CometImageDatesTable);
       if (this.currentDailyLayer !== null) {
         this.deleteLayer(this.currentDailyLayer.id);
         this.currentDailyLayer = null;
@@ -1333,7 +1333,7 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      [daily2023Table, fullWeeklyTable].forEach((table) => {
+      [CometImageDatesTable, FullDatesTable].forEach((table) => {
         table.forEach(row => {
           const raRad = row.ra * D2R;
           const decRad = row.dec * D2R;
@@ -1408,15 +1408,15 @@ export default defineComponent({
 
       let position = null as TableRow | null;
 
-      const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
+      const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
       
-      if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex];
+      if (cometImageIndex > -1) {
+        position = CometImageDatesTable[cometImageIndex];
         // TODO: Use interpolated point here
       } else {
-        const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
-        if (weeklyIndex > -1) {
-          position = fullWeeklyTable[weeklyIndex];
+        const allIndex = allDates.findIndex(d => d === this.selectedTime);
+        if (allIndex > -1) {
+          position = FullDatesTable[allIndex];
         }
       }
 
