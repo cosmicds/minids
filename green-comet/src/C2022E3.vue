@@ -1130,6 +1130,7 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
+      console.log("\nonItemSelected", place.get_name());
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1221,7 +1222,7 @@ export default defineComponent({
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       this.updateImageOpacity(place, opacity);
-      const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 1.7 : this.wwtZoomDeg;
+      const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
       if (this.image_out_of_view(place) && move) {
         this.gotoRADecZoom({
           raRad: D2R * iset.get_centerX(),
@@ -1607,6 +1608,7 @@ export default defineComponent({
       const layer = this.imagesetLayers[name]
       if (layer != null) {
         // update the image opacity in the WWT control
+        console.log(`setting opacity for ${name}`)
         applyImageSetLayerSetting(layer, ['opacity', opacity])
 
         // update the value for the slider only if we are not setting the opacity from the UI
