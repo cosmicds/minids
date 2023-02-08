@@ -104,7 +104,13 @@ export default defineComponent({
     open: {
       type: Boolean,
       default: false
+    },
+
+    incomingItemSelect: {
+      type: Object as PropType<Thumbnail>,
+      default: null
     }
+    
   },
 
   data() {
@@ -170,6 +176,14 @@ export default defineComponent({
       }
     },
   },
+
+  watch: {
+    incomingItemSelect() {
+      if (this.incomingItemSelect != null) {
+        this.lastSelectedItem = this.incomingItemSelect;
+      }
+    }
+  }
 });
 </script>
 

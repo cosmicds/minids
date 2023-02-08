@@ -57,6 +57,7 @@
         :open="mobile ? true : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
         @opacity="updateImageOpacity"
@@ -520,7 +521,7 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
 import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
+import { ImageSetType, MarkerScales, PlotTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -666,6 +667,8 @@ export default defineComponent({
       cometColor: "#04D6B0",
       todayColor: "#D60493",
 
+      incomingItemSelect: null as Thumbnail | null,
+      
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
@@ -1482,6 +1485,14 @@ export default defineComponent({
           this.setLayerOpacityForImageSet(iname, 0)
         } else {
           this.setLayerOpacityForImageSet(iname, 1)
+          // need to get the Place object for the image set and use it to set the view
+          if (this.imagesetFolder != null) {
+            const places = this.imagesetFolder.get_children()
+            if (places != null) {
+              const place = places.filter((place) => place.get_name() == iname)
+              this.incomingItemSelect = place[0]
+            }
+          }
           // const iset = this.wwtControl.getImagesetByName(iname)
           // if (iset == null) { return; }
           // this.gotoRADecZoom({
