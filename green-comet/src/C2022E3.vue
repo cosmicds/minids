@@ -1101,11 +1101,21 @@ export default defineComponent({
       // reset the layer order to the default
       // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
       // get the key item with the value of layer.id
-      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
-        this.setImageSetLayerOrder({
-          id: value,
-          order: Number(key)
-        });
+      // imagesets are in this.imagesetLayers with their name/date as the key
+      this.imagesetLayers
+      function getOrdering(guid: string, imagesetLayers: Record<string, ImageSetLayer>): number {
+        let i = -1;
+        for (const [_key, value] of Object.entries(imagesetLayers)) {
+          i += 1;
+          if (value.id.toString() === guid) {
+            return i;
+          }
+        }
+        return -1;
+      }
+      
+      for (const [_key, value] of Object.entries(this.wwtActiveLayers)) {
+        this.setImageSetLayerOrder({ id: value, order: getOrdering(value, this.imagesetLayers) });
       }
     },
 
@@ -1130,21 +1140,89 @@ export default defineComponent({
         order: this.wwtActiveLayers.length + 1
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day);
+      this.selectedTime = Date.UTC(year, month - 1, day); 
+      // changing selectedTime changes (computer) selectedDate
+      // the selectedDate which run updateForDateTime which
+      // 1) set's the time, the horizon, runs showImageFordateTime and updateLayersForDate
+      // showImageForDateTime will set all other layers to be invisible
+      // updateLayersForDate shows an interpolated point
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        if ((this.image_out_of_view(place)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: place.get_zoomLevel() * 1.7,
+            zoomDeg: place.get_zoomLevel() * 2.5,
             instant: true
           });
         }
       });
     },
 
+    wwtSmallestFov(): number {
+      // ignore the possibility of rotation
+      const w = this.wwtRenderContext.width
+      const h = this.wwtRenderContext.height
+      const fov_h = this.wwtRenderContext.get_fovAngle() * D2R
+      const fov_w = fov_h * w / h
+      return Math.min(fov_w, fov_h)
+    },
+
+      
+    image_out_of_view(place: Place): boolean {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) {
+        console.log("There is not image set for this place: ", place)
+        return false;
+      }
+
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      const isetFov = (place.get_zoomLevel() / 6) * D2R
+      
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curFov = this.wwtSmallestFov();
+
+      let dist = distance(curRa, curDec, isetRa, isetDec);
+      // get distance of far size of image from center of view
+      dist -= isetFov / 3  // ~ allow some of the image to be off screen and still be considered in view
+
+      return dist > curFov / 2
+    },
+
+    need_to_zoom_in(place: Place): boolean {
+      // want to zoom in if 
+      
+      
+      // 1) we are already zoomed all the way out (if FOV > 50)
+      if (this.wwtZoomDeg > 300) { return true; }
+
+      // 2) the image is too small (so it's fov < 1/6 of the current fov)
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset != null) {
+        if (place.get_zoomLevel() < this.wwtZoomDeg) { return true; }
+      }
+      
+      return false
+    },
+
+    onOpacityChanged(place: Place, opacity: number) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.updateImageOpacity(place, opacity);
+      const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 1.7 : this.wwtZoomDeg;
+      if (this.image_out_of_view(place)) {
+        this.gotoRADecZoom({
+          raRad: D2R * iset.get_centerX(),
+          decRad: D2R * iset.get_centerY(),
+          zoomDeg: zoom,
+          instant: false
+        });
+      }
+    },
+    
     updateImageOpacity(place: Place, opacity: number) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
