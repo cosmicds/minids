@@ -1130,7 +1130,6 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log("\nonItemSelected", place.get_name());
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1608,7 +1607,6 @@ export default defineComponent({
       const layer = this.imagesetLayers[name]
       if (layer != null) {
         // update the image opacity in the WWT control
-        console.log(`setting opacity for ${name}`)
         applyImageSetLayerSetting(layer, ['opacity', opacity])
 
         // update the value for the slider only if we are not setting the opacity from the UI
