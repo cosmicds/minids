@@ -867,15 +867,7 @@ export default defineComponent({
         this.layersLoaded = true;
         
         // Set all of the imageset layers to be above the spreadsheet layers
-        Object.keys(this.imagesetLayers).sort((k1, k2) => {
-          return new Date(k2).getTime() - new Date(k1).getTime();
-        }).forEach(key => {
-          const layer = this.imagesetLayers[key];
-          this.setImageSetLayerOrder({
-            id: layer.id.toString(),
-            order: this.wwtActiveLayers.length
-          });
-        });
+        this.resetImagesetLayerOrder();
       });
 
       this.wwtSettings.set_localHorizonMode(true);
