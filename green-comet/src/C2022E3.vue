@@ -1130,7 +1130,6 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
