@@ -1148,7 +1148,6 @@ export default defineComponent({
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: e.latlng.lng * D2R
       };
-      console.log('In onMapSelect: ', this.location);
     },
 
     circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
