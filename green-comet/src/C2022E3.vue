@@ -1148,7 +1148,8 @@ export default defineComponent({
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        if ((this.image_out_of_view(place)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        // if ((this.image_out_of_view(place)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+          if (this.image_out_of_view(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
