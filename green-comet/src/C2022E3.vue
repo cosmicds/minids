@@ -207,17 +207,17 @@
             </v-btn>
             <v-btn
               :color="cometColor"
-              @click="() => centerOnCurrentDate({
+              @click="() => updateViewForDate({
                 zoomDeg: 60
               })"
             >
-              Best View for comet path
+              Best view for comet path
             </v-btn>
             <v-btn
               :color="cometColor"
               @click="setToFirstCometImage"
             >
-              Best View for comet images
+              Best view for comet images
             </v-btn>
           </div>
         </transition-expand>
