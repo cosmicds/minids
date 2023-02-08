@@ -60,7 +60,7 @@
               @input="(e) => onSliderInputChanged(e, item)"
             />
             
-
+<!--
               <label class="switch">
                 <input 
                   type="checkbox"
@@ -68,7 +68,7 @@
                   @change="(e) => onToggleImage(e, item)"
                   >
                 <span class="slider"></span>
-              </label> 
+              </label>  -->
             </div>
 
           </div>
