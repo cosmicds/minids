@@ -967,6 +967,7 @@ export default defineComponent({
       const adjustedDate = new Date(date.valueOf() + timeDiff);
       return adjustedDate.toLocaleDateString();
     },
+
     interpolatedTable(table: Table): Table | null {
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
@@ -980,6 +981,21 @@ export default defineComponent({
       interpolatedRow.ra = interpolatedRA;
       interpolatedRow.dec = interpolatedDec;
       return Object.assign([interpolatedRow], { columns: table.columns });
+    },
+
+    // JC: When the "allow imagesets above spreadsheets" functionality
+    // gets added into the engine,
+    // remember to add something like this along with it
+    setSpreadSheetLayerOrder(id: string, order: number) {
+      const layer = LayerManager.get_layerList()[id];
+      const layers = LayerManager.get_allMaps()[layer.get_referenceFrame()].layers;
+      if (order >= 0) {
+        const currentIndex = layers.indexOf(layer);
+        if (currentIndex > -1) {
+          layers.splice(currentIndex, 1);
+        }
+        LayerManager.get_allMaps()[layer.get_referenceFrame()].layers.splice(order, 0, layer);
+      }
     },
 
     updateLayersForDate() {
@@ -1000,6 +1016,7 @@ export default defineComponent({
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
           layer.set_markerScale(MarkerScales.screen);
+          this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
@@ -1042,12 +1059,6 @@ export default defineComponent({
       }
     },
 
-    setImageSetLayerOrder(layer_id: string, order: number) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.$pinia._s.get("wwt-engine").$wwt.inst.si.setImageSetLayerOrder(layer_id, order)
-    },
-
     getImageSetLayerIndex(layer: ImageSetLayer): number {
       // find layer in this.wwtActiveLayers
       // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
@@ -1065,7 +1076,10 @@ export default defineComponent({
       // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
       // get the key item with the value of layer.id
       for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
-        this.setImageSetLayerOrder(value, Number(key));
+        this.setImageSetLayerOrder({
+          id: value,
+          order: Number(key)
+        });
       }
     },
 
@@ -1084,7 +1098,10 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetLayerOrder();
-      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1);
+      this.setImageSetLayerOrder({
+        id: layer.id.toString(),
+        order: this.wwtActiveLayers.length + 1
+      });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day);
 
@@ -1136,7 +1153,6 @@ export default defineComponent({
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: e.latlng.lng * D2R
       };
-      console.log('In onMapSelect: ', this.location);
     },
 
     circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
