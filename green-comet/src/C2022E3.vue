@@ -60,7 +60,7 @@
         :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="updateImageOpacity"
+        @opacity="onOpacityChanged"
         @toggle="onToggle"
       ></folder-view>
     </div>
@@ -1170,7 +1170,13 @@ export default defineComponent({
     },
 
       
-    image_out_of_view(place: Place): boolean {
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/3): boolean {
+      // checks if the center of place is in the current field of view
+      // The Place RA/Dec is compared to the current RA/Dec and the current FOV
+      // The distance is computed and compared to the current FOV/2
+      // Assume the Zoom level corresponds to the size of the image
+      // fraction_of_place is ~fraction of the place that must be in the current FOV
+      // by default, allow 1/3 of the place to be visible and still be considered in view
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) {
         console.log("There is not image set for this place: ", place)
@@ -1187,10 +1193,14 @@ export default defineComponent({
 
       let dist = distance(curRa, curDec, isetRa, isetDec);
       // get distance of far size of image from center of view
-      dist -= isetFov / 3  // ~ allow some of the image to be off screen and still be considered in view
+      // allow some fraction of the image to be off screen and still be considered in view
+      dist += (fraction_of_place - 1/2) * isetFov 
 
-      return dist > curFov / 2
+      return dist < curFov / 2
     },
+
+    // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
+    image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
 
     need_to_zoom_in(place: Place): boolean {
       // want to zoom in if 
