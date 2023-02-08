@@ -167,8 +167,10 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
     }
     renderContext.set_nominalRadius(thisMap.frame.meanRadius);
   }
+  //console.log("========");
   for (const layer of LayerManager.get_allMaps()[referenceFrame].layers) {
     if (layer.enabled) {
+      //console.log(layer);
       var layerStart = SpaceTimeController.utcToJulian(layer.get_startTime());
       var layerEnd = SpaceTimeController.utcToJulian(layer.get_endTime());
       var fadeIn = SpaceTimeController.utcToJulian(layer.get_startTime()) - ((layer.get_fadeType() === 1 || layer.get_fadeType() === 3) ? (layer.get_fadeSpan() / 864000000) : 0);
