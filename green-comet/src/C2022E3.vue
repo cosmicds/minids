@@ -208,7 +208,7 @@
             <v-btn
               :color="cometColor"
               @click="() => updateViewForDate({
-                zoomDeg: 60
+                zoomDeg: 360
               })"
             >
               Best view for comet path
