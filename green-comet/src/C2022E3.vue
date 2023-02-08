@@ -53,12 +53,15 @@
         class="folder-view"
         sliders
         expandable
-        :thumbnails="false"
+        :thumbnails="true"
+        :open="mobile ? true : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
         @opacity="updateImageOpacity"
+        @toggle="onToggle"
       ></folder-view>
     </div>
 
@@ -205,6 +208,20 @@
             >
               Center on Now
             </v-btn>
+            <v-btn
+              :color="cometColor"
+              @click="() => updateViewForDate({
+                zoomDeg: 360
+              })"
+            >
+              Best view for comet path
+            </v-btn>
+            <v-btn
+              :color="cometColor"
+              @click="setToFirstCometImage"
+            >
+              Best view for comet images
+            </v-btn>
           </div>
         </transition-expand>
       </div>
@@ -222,7 +239,7 @@
             adsorb
             included
             :marks="(d: number) => {
-              return weeklyDates.includes(d) || dailyDates.includes(d);
+              return allDates.includes(d) || cometImageDates.includes(d);
             }"
             :order="false"
             v-model="selectedTime"
@@ -234,7 +251,7 @@
             >
               <template v-slot:mark="{ pos, value }">
                 <div
-                  :class="['mark-line', { tall: weeklyDates.includes(value) }]"
+                  :class="[{ 'mark-line': cometImageDates.includes(value) }]"
                   :style="{ left: `${pos}%` }">
                 </div>
               </template>
@@ -516,9 +533,9 @@
 import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
-import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { distance } from "@wwtelescope/astro";
 import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
+import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -526,14 +543,18 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
-import { drawSkyOverlays, initializeConstellationNames } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
 
+interface MoveOptions {
+  instant?: boolean;
+  zoomDeg?: number;
+  rollRad?: number;
+}
 
 import {
-  ephemerisFullWeeklyCsv,
-  ephemeris2023DailyCsv
+  ephemerisFullDatesCsv,
+  ephemerisCometImageDatesCsv
 } from "./data";
-import { Script } from 'vm';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -545,27 +566,29 @@ function parseCsvTable(csv: string) {
       ra: +d.RA!,
       dec: +d.Dec!,
       tMag: +d.Tmag!,
+      angspeed: +d.SkyMotion!,
     };
   });
 }
-const fullWeeklyTable = parseCsvTable(ephemerisFullWeeklyCsv);
-const daily2023Table = parseCsvTable(ephemeris2023DailyCsv);
+const FullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
+const CometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
 // generic names are fine
-type Table = typeof fullWeeklyTable;
-type TableRow = typeof fullWeeklyTable[number];
+type Table = typeof FullDatesTable;
+type TableRow = typeof FullDatesTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-        "Date", "RA", "Dec", "Tmag"
+        "Date", "RA", "Dec", "Tmag" , "Angspeed"
       ]].concat(table.map((d, _i) => {
         return [
           d.date.toISOString(),
           d.ra.toString(),
           d.dec.toString(),
           d.tMag.toString(),
+          d.angspeed.toString(),
         ];
     }))).replace(/\n/g, '\r\n');
     // By using a regex, we replace all instances.
@@ -574,13 +597,13 @@ function formatCsvTable(table: Table): string {
     // to be CRLF
 }
 
-const fullWeeklyString = formatCsvTable(fullWeeklyTable);
-const daily2023String = formatCsvTable(daily2023Table);
+const FullDatesString = formatCsvTable(FullDatesTable);
+const CometImageDatesString = formatCsvTable(CometImageDatesTable);
 
-const weeklyDates = fullWeeklyTable.map(r => r.date.getTime());
-const dailyDates = daily2023Table.map(r => r.date.getTime());
-const minDate = Math.min(...weeklyDates, ...dailyDates);
-const maxDate = Math.max(...weeklyDates, ...dailyDates);
+const allDates = FullDatesTable.map(r => r.date.getTime());
+const cometImageDates = CometImageDatesTable.map(r => r.date.getTime());
+const minDate = Math.min(...allDates, ...cometImageDates);
+const maxDate = Math.max(...allDates, ...cometImageDates);
 const dates: number[] = [];
 
 const d = new Date(minDate);
@@ -652,18 +675,21 @@ export default defineComponent({
       showConstellations: false,
       showHorizon: false,
 
-      currentDailyLayer: null as SpreadSheetLayer | null,
-      currentWeeklyLayer: null as SpreadSheetLayer | null,
+      currentCometImageLayer: null as SpreadSheetLayer | null,
+      currentAllLayer: null as SpreadSheetLayer | null,
+      interpolatedDailyTable: null as Table | null,
 
-      dailyDates: dailyDates,
-      weeklyDates: weeklyDates,
+      cometImageDates: cometImageDates,
+      allDates: allDates,
       dates: dates,
       
       lastClosePt: null as TableRow | null,
-      ephemerisColor: "#FFFFFF",
+      ephemerisColor: "#D60493",
       cometColor: "#04D6B0",
-      todayColor: "#D60493",
+      todayColor: "#D6B004",
 
+      incomingItemSelect: null as Thumbnail | null,
+      
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
@@ -694,6 +720,13 @@ export default defineComponent({
   created() {
 
     this.waitForReady().then(() => {
+
+      // Unlike the other things we're hacking here,
+      // we aren't overwriting a method on a singleton instance (WWTControl)
+      // or a static method (Constellations, Grids)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      SpreadSheetLayer.prototype.draw = drawSpreadSheetLayer;
 
       // This is just nice for hacking while developing
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -738,11 +771,12 @@ export default defineComponent({
 
       this.getLocation(true);
       this.setClockSync(false);
+      // create date with y m d h m s
 
       layerPromises.push(this.createTableLayer({
-        name: "Full Weekly",
+        name: "All Dates",
         referenceFrame: "Sky",
-        dataCsv: fullWeeklyString
+        dataCsv: FullDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -750,19 +784,20 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 30],
+            ["scaleFactor", 2],
+            ["plotType", PlotTypes.point],
             ["color", Color.fromHex(this.ephemerisColor)],
-            ["plotType", PlotTypes.circle],
-            //["sizeColumn", 3],
+            //["sizeColumn", 4],
+            //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
         })
       }));
 
       layerPromises.push(this.createTableLayer({
-        name: "2023 Daily",
+        name: "Comet Image Dates",
         referenceFrame: "Sky",
-        dataCsv: daily2023String
+        dataCsv: CometImageDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -770,50 +805,52 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 30],
-            ["color", Color.fromHex(this.ephemerisColor)],
+            ["scaleFactor", 4],
+            ["color", Color.fromHex('#FFFFFF')],
+            ["plotType", PlotTypes.point],
             //["sizeColumn", 3],
-            ["opacity", 1]
+            ["opacity", 0.4]
           ]
         })
       }));
 
-      layerPromises.push(this.createTableLayer({
-        name: "Weekly Date Layer",
-        referenceFrame: "Sky",
-        dataCsv: fullWeeklyString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 45],
-            ["color", Color.fromHex(this.todayColor)],
-            ["plotType", PlotTypes.circle],
-            //["sizeColumn", 3],
-            ["startDateColumn", 0],
-            ["endDateColumn", 0],
-            ["timeSeries", true],
-            ["opacity", 1],
-            ["decay", 1]
-          ]
-        });
-      }));
+      // layerPromises.push(this.createTableLayer({
+      //   name: "Today",
+      //   referenceFrame: "Sky",
+      //   dataCsv: FullDatesString
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 45],
+      //       ["color", Color.fromHex(this.todayColor)],
+      //       ["plotType", PlotTypes.circle],
+      //       //["sizeColumn", 3],
+      //       ["startDateColumn", 0],
+      //       ["endDateColumn", 0],
+      //       ["timeSeries", true],
+      //       ["opacity", 1],
+      //       ["decay", 0.8]
+      //     ]
+      //   });
+      // }));
 
       // layerPromises.push(this.createTableLayer({
-      //   name: "Daily Date Layer",
+      //   name: "CometImage Date Layer",
       //   referenceFrame: "Sky",
-      //   dataCsv: daily2023String
+      //   dataCsv: CometImageDatesString
       // }).then((layer) => {
       //   layer.set_lngColumn(1);
       //   layer.set_latColumn(2);
       //   this.applyTableLayerSettings({
       //     id: layer.id.toString(),
       //     settings: [
-      //       ["scaleFactor", 75],
-      //       ["color", Color.fromHex(this.cometColor)],
+      //       ["scaleFactor", 3],
+      //       ["color", #FFFFFF],
+      //       ["plotType", PlotTypes.point],
       //       ["sizeColumn", 3],
       //       ["startDateColumn", 0],
       //       ["endDateColumn", 0],
@@ -832,6 +869,7 @@ export default defineComponent({
 
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
       this.wwtSettings.set_showConstellationFigures(this.showConstellations);
 
@@ -843,6 +881,11 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       Constellations.initializeConstellationNames = initializeConstellationNames;
+      Grids._makeAltAzGridText = makeAltAzGridText;
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      LayerManager._draw = layerManagerDraw;
 
       this.updateWWTLocation();
 
@@ -949,6 +992,7 @@ export default defineComponent({
       const adjustedDate = new Date(date.valueOf() + timeDiff);
       return adjustedDate.toLocaleDateString();
     },
+
     interpolatedTable(table: Table): Table | null {
       const index = table.findIndex(r => r.date.getTime() === this.selectedTime);
       if (index === -1) { return null; }
@@ -964,29 +1008,46 @@ export default defineComponent({
       return Object.assign([interpolatedRow], { columns: table.columns });
     },
 
+    // JC: When the "allow imagesets above spreadsheets" functionality
+    // gets added into the engine,
+    // remember to add something like this along with it
+    setSpreadSheetLayerOrder(id: string, order: number) {
+      const layer = LayerManager.get_layerList()[id];
+      const layers = LayerManager.get_allMaps()[layer.get_referenceFrame()].layers;
+      if (order >= 0) {
+        const currentIndex = layers.indexOf(layer);
+        if (currentIndex > -1) {
+          layers.splice(currentIndex, 1);
+        }
+        LayerManager.get_allMaps()[layer.get_referenceFrame()].layers.splice(order, 0, layer);
+      }
+    },
+
     updateLayersForDate() {
 
-      const interpolatedDailyTable = this.interpolatedTable(daily2023Table);
-      if (this.currentDailyLayer !== null) {
-        this.deleteLayer(this.currentDailyLayer.id);
-        this.currentDailyLayer = null;
+      this.interpolatedDailyTable = this.interpolatedTable(FullDatesTable);
+      if (this.currentAllLayer !== null) {
+        this.deleteLayer(this.currentAllLayer.id);
+        this.currentAllLayer = null;
       }
 
-      if (interpolatedDailyTable !== null) {
+      if (this.interpolatedDailyTable !== null) {
         this.createTableLayer({
           name: "Daily Date Layer",
           referenceFrame: "Sky",
-          dataCsv: formatCsvTable(interpolatedDailyTable)
+          dataCsv: formatCsvTable(this.interpolatedDailyTable)
         }).then((layer) => {
-          this.currentDailyLayer = layer;
+          this.currentAllLayer = layer;
           layer.set_lngColumn(1);
           layer.set_latColumn(2);
           layer.set_markerScale(MarkerScales.screen);
+          this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
           this.applyTableLayerSettings({
             id: layer.id.toString(),
             settings: [
-              ["scaleFactor", 50],
-              ["color", Color.fromHex(this.todayColor)],
+              ["scaleFactor", 5],
+              ["plotType", PlotTypes.point],
+              ["color", Color.fromHex('#E562BC')],
               //["sizeColumn", 3],
               ["opacity", 1],
             ]
@@ -1001,7 +1062,7 @@ export default defineComponent({
   
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
-      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad + 90);
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
     },
 
     logLocation() {
@@ -1023,12 +1084,6 @@ export default defineComponent({
       }
     },
 
-    setImageSetLayerOrder(layer_id: string, order: number) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.$pinia._s.get("wwt-engine").$wwt.inst.si.setImageSetLayerOrder(layer_id, order)
-    },
-
     getImageSetLayerIndex(layer: ImageSetLayer): number {
       // find layer in this.wwtActiveLayers
       // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
@@ -1046,7 +1101,10 @@ export default defineComponent({
       // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
       // get the key item with the value of layer.id
       for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
-        this.setImageSetLayerOrder(value, Number(key));
+        this.setImageSetLayerOrder({
+          id: value,
+          order: Number(key)
+        });
       }
     },
 
@@ -1061,11 +1119,15 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
+      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetLayerOrder();
-      this.setImageSetLayerOrder(layer.id.toString(), this.wwtActiveLayers.length + 1);
+      this.setImageSetLayerOrder({
+        id: layer.id.toString(),
+        order: this.wwtActiveLayers.length + 1
+      });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day);
 
@@ -1087,9 +1149,19 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
-      applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // tell setLayerOpacityForImageSet that we are updating from the ui
+      this.setLayerOpacityForImageSet(iset.get_name(), opacity / 100, true);
     },
-
+    
+    onToggle(place: Place, checked: boolean) {
+      // when we toggle the image we want to set it's opacity to zero
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; } 
+      const iname = iset.get_name()
+      this.setLayerOpacityForImageSet(iname, checked ? 1 : 0);
+    },
+    
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
       const map = L.map("map-container").setView(locationDeg, 4);
@@ -1137,6 +1209,7 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
+          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -1165,7 +1238,7 @@ export default defineComponent({
     // but it doesn't seem to be exposed
     // We should do that, but for now we just copy the web engine code
     // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
-    altAzToRADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
+    altAzToHADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
       azRad = Math.PI - azRad;
       if (azRad < 0) {
         azRad += 2 * Math.PI;
@@ -1178,14 +1251,7 @@ export default defineComponent({
       return { ra, dec };
     },
 
-    get_julian(date: Date): number {
-        return (date.valueOf() / 86400000) - (date.getTimezoneOffset() / 1440) + 2440587.5;
-      },
-  
-    mstFromUTC2(utc: Date, longRad: number): number {
-
-      const lng = longRad * R2D;
-
+    get_julian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
       const day = utc.getUTCDate();
@@ -1193,14 +1259,10 @@ export default defineComponent({
       const minute = utc.getUTCMinutes();
       const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
 
-      let jan_or_feb = false
       if (month == 1 || month == 2)
       {
           year -= 1;
           month += 12;
-          jan_or_feb = true
-      } else {
-        jan_or_feb = false;
       }
 
       const a = year / 100;
@@ -1209,19 +1271,20 @@ export default defineComponent({
       const d = Math.floor(30.6001 * (month + 1));
 
       const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-      // const unix_julianDays = this.get_julian(utc) - 2451545.0; // still offset by a small amount
-      // const is_leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-      // CAUTION: this is a very hacky way to get the correct offset
-      // IT will probably only work for 2022 and 2023, and it uses special numbers
-      const _before_feb_28_2022 = (jan_or_feb) || (month == 14 && day < 28) || (year < 2023);
-      let offset = 0
-      if (_before_feb_28_2022) {
-        offset = - 42.27 / (60 * 24)
-      } else {
-        offset = -28 / (60 * 24)
-      }
-      const julianDays = meeus_julianDays + offset ;
 
+      const mjday = Math.floor(meeus_julianDays)
+      return mjday + (hour-12) / 24 + minute / 1440 + second / 86400;
+
+    },
+    
+    mstFromUTC2(utc: Date, longRad: number): number {
+      const lng = longRad * R2D;
+
+      const meeus_julianDays = this.get_julian(utc);
+
+      const julianDays = meeus_julianDays ;
+
+      // console.log(julianDays)
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1241,21 +1304,25 @@ export default defineComponent({
     },
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
-      let hourAngle = this.mstFromUTC2(utc, longRad);
+      const st = this.mstFromUTC2(utc, longRad); // siderial time 
+      // console.log(st)
   
-      const raDec = this.altAzToRADec(altRad, azRad, latRad);
-      const ha = raDec.ra * R2D;
+      const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
+      // console log alt, az and ra, dec in hours and degrees
+      
+      const ha = haDec.ra * R2D;
 
-      hourAngle += ha;
-      if (hourAngle < 0) {
-        hourAngle += 360;
+      let ra = st + ha;
+      if (ra < 0) {
+        ra += 360;
       }
-      if (hourAngle > 360) {
-        hourAngle -= 360;
+      if (ra > 360) {
+        ra -= 360;
       }
-      hourAngle -= 180;
+      // ra -= 180;
+      // console.log(`Alt: ${(altRad*R2D).toFixed(2)} Az: ${(azRad*R2D).toFixed(2)} Ra: ${ra.toFixed(2)} Dec: ${(haDec.dec*R2D).toFixed(2)}`)
 
-      return { raRad: D2R * hourAngle, decRad: raDec.dec };
+      return { raRad: D2R * ra, decRad: haDec.dec };
     },
 
     equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
@@ -1322,7 +1389,7 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      [daily2023Table, fullWeeklyTable].forEach((table) => {
+      [CometImageDatesTable, FullDatesTable].forEach((table) => {
         table.forEach(row => {
           const raRad = row.ra * D2R;
           const decRad = row.dec * D2R;
@@ -1393,19 +1460,22 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate(instant=true) {
+    updateViewForDate(options?: MoveOptions) {
 
       let position = null as TableRow | null;
 
-      const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
+      const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
       
-      if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex];
-        // TODO: Use interpolated point here
+      if (cometImageIndex > -1) {
+        if (this.interpolatedDailyTable !== null) {
+          position = this.interpolatedDailyTable[0]
+        } else {
+          position = CometImageDatesTable[cometImageIndex];
+        }
       } else {
-        const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
-        if (weeklyIndex > -1) {
-          position = fullWeeklyTable[weeklyIndex];
+        const allIndex = allDates.findIndex(d => d === this.selectedTime);
+        if (allIndex > -1) {
+          position = FullDatesTable[allIndex];
         }
       }
 
@@ -1413,9 +1483,9 @@ export default defineComponent({
         this.gotoRADecZoom({
           raRad: D2R * position.ra,
           decRad: D2R * position.dec,
-          zoomDeg: this.wwtZoomDeg,
-          rollRad: this.wwtRollRad,
-          instant: instant
+          zoomDeg: options?.zoomDeg ?? this.wwtZoomDeg,
+          rollRad: options?.rollRad ?? this.wwtRollRad,
+          instant: options?.instant ?? true
         });
       }
 
@@ -1444,25 +1514,43 @@ export default defineComponent({
       }
       return '';
     },
+
+    setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
+      const layer = this.imagesetLayers[name]
+      if (layer != null) {
+        // update the image opacity in the WWT control
+        applyImageSetLayerSetting(layer, ['opacity', opacity])
+
+        // update the value for the slider only if we are not setting the opacity from the UI
+        if (!setting_opacity_from_ui) {
+          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`
+          const el = (document.querySelector(selector) as HTMLInputElement)
+          if (el != null) {
+            el.value = `${opacity * 100}`
+          }
+        }
+        
+      }
+    },
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
-      // loop over imageset_names
-      // set opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach((iname: string) => {
-        const selector = `#items>div>div.bordered.item[title='${iname}']>input`
-        const el = (document.querySelector(selector) as HTMLInputElement)
         if (iname != name) {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
-          if (el != null) {
-            el.value = '0'
-        }
+          this.setLayerOpacityForImageSet(iname, 0)
         } else {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
-          const iset = this.wwtControl.getImagesetByName(iname)
-          if (iset == null) { return; }
-          if (el != null) { el.value = '100' }
+          this.setLayerOpacityForImageSet(iname, 1)
+          // need to get the Place object for the image set and use it to set the view
+          if (this.imagesetFolder != null) {
+            const places = this.imagesetFolder.get_children()
+            if (places != null) {
+              const place = places.filter((place) => place.get_name() == iname)
+              this.incomingItemSelect = place[0]
+            }
+          }
+          // const iset = this.wwtControl.getImagesetByName(iname)
+          // if (iset == null) { return; }
           // this.gotoRADecZoom({
           //   raRad: D2R * iset.get_centerX(),
           //   decRad: D2R * iset.get_centerY(),
@@ -1474,20 +1562,20 @@ export default defineComponent({
       
     },
 
-    centerOnCurrentDate() {
+    centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
       this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
       this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
-        this.updateViewForDate();
+        this.updateViewForDate(options);
       });
     },
 
-    updateForDateTime() {
+    updateForDateTime(options?: MoveOptions) {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
       this.showImageForDateTime(this.dateTime);
-      this.updateViewForDate();
+      this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
@@ -1497,6 +1585,14 @@ export default defineComponent({
       } else {
         this.removeHorizon();
       }
+    },
+
+    setToFirstCometImage() {
+      this.selectedTime = Date.UTC(2022, 11, 18);
+      const children = this.imagesetFolder?.get_children();
+      if (children == null) { return; }
+      const place = children[0] as Place;
+      this.onItemSelected(place);
     }
   },
 
@@ -1515,6 +1611,7 @@ export default defineComponent({
     // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
+      this.wwtSettings.set_showAltAzGridText(show);
     },
     showConstellations(show: boolean) {
       this.wwtSettings.set_showConstellationLabels(show);
@@ -1526,7 +1623,7 @@ export default defineComponent({
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
     },
-    location(loc: LocationRad) {
+    location(loc: LocationRad, oldLoc: LocationRad) {
       //const now = this.selectedDate;
       //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
@@ -1535,6 +1632,10 @@ export default defineComponent({
 
         const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
+      }
+
+      if (oldLoc.latitudeRad * loc.latitudeRad < 0) {
+        Grids._altAzTextBatch = null;
       }
 
       this.updateHorizon();
@@ -1574,11 +1675,11 @@ html {
   overflow: hidden;
 
   ::-webkit-scrollbar {
-    display: none;
+    // display: none;
   }
-
+  
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  // scrollbar-width: none;
 }
 
 body {
@@ -2039,17 +2140,12 @@ video {
 
 .mark-line {
   position: absolute;
-  height: 12px;
-  width: 1.25px;
+  height: 20px;
+  width: 2px;
   margin: 0;
-  background-color: #E5E4E2;
-  transform: translateX(-50%) translateY(calc(-50% + 1px));
+  background-color: var(--comet-color);
+  transform: translateX(-50%) translateY(calc(-50% + 2px));
 
-  &.tall {
-    height: 20px;
-    background-color: #848884;
-    border: solid 0.5px #E5E4E2;
-  }
 }
 
 .left-content {
@@ -2166,12 +2262,24 @@ input[type="range"] {
     -webkit-appearance: inherit;
     -moz-appearance: inherit;
     appearance: inherit;
-    margin: 5px;
-    --track-height: 0.3em;
-    --thumb-radius: 0.7em;
-    --thumb-color: rgba(205, 54, 157  , 1);
-    --track-color: rgba(4, 147, 214, 0.7);
-    --thumb-border: 1px solid #899499;
+    margin: 2px;
+    --track-height: 1em;
+    --thumb-radius: 0.8em;
+    --thumb-color: rgba(205, 54, 157  , 0.7);
+    // --thumb-color: #444;
+    --track-color: rgba(4, 147, 214, .1);
+    // --thumb-border: 1px solid #899499;
+    --thumb-border-width: 1px;
+    --thumb-border: var(--thumb-border-width) solid rgb(255, 255, 255);
+    --track-border-width: 1px;
+    --track-border: var(--track-border-width) solid rgba(4, 147, 214, 1);
+    --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
+    
+    &:hover {
+      opacity: 1;
+      --track-color: rgba(217, 234, 242,0.2);
+      --thumb-color: rgba(205, 54, 157  , 1);
+    }
   }
   
   
@@ -2182,7 +2290,7 @@ input[type="range"] {
       appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
@@ -2196,7 +2304,7 @@ input[type="range"] {
     appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     cursor: pointer;
@@ -2207,8 +2315,10 @@ input[type="range"] {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height: var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
   
@@ -2216,8 +2326,10 @@ input[type="range"]::-moz-range-track {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height:var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
 #sliderlabel {

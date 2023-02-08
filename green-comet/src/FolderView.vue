@@ -13,6 +13,9 @@
         <img
           src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
         />
+        <div class="item-name">
+          Press <span v-if="thumbnails">image</span><span v-else>date</span> to go to image
+        </div>
         <div class="overlay">
           <font-awesome-icon
             icon="images"
@@ -39,9 +42,11 @@
               v-if="thumbnails"
               :src="item.get_thumbnailUrl()"
               :alt="item.get_name()"
+              @click="() => selectItem(item)"
             />
             <div
               class="item-name"
+              :class="['thumbnail']"
               @click="() => selectItem(item)"
             >
               {{item.get_name()}}
@@ -96,14 +101,24 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
+    open: {
+      type: Boolean,
+      default: false
+    },
+
+    incomingItemSelect: {
+      type: Object as PropType<Thumbnail>,
+      default: null
+    }
+    
   },
 
   data() {
     return {
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
-      opacities: {} as Record<string,number>,
-      expanded: true
+      opacities: {} as Record<string, number>,
+      expanded: this.open
     }
   },
 
@@ -127,6 +142,7 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
+      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -135,7 +151,13 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
+      console.log("FolderView: slider changed")
       this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+    },
+
+    onToggleImage(e: Event, item: Thumbnail) {
+      console.log("FolderView: toggled")
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
     }
   },
 
@@ -145,7 +167,23 @@ export default defineComponent({
         "--flex-direction": this.flexDirection
       }
     },
+
+    isMobile() {
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true
+      } else {
+        return false
+      }
+    },
   },
+
+  watch: {
+    incomingItemSelect() {
+      if (this.incomingItemSelect != null) {
+        this.lastSelectedItem = this.incomingItemSelect;
+      }
+    }
+  }
 });
 </script>
 
@@ -155,27 +193,33 @@ export default defineComponent({
   flex-direction: var(--flex-direction);
   width: auto;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   pointer-events: auto;
-  background: black;
-  &::-webkit-scrollbar {
-    padding: 1px;
-    height: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: black;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(4, 129, 187, 0.5);
-    border-radius: 2px;
-  }
-  //width: 100%;
-  //justify-content: space-around;
+  background: rgba(0, 0, 0, 0.5);
+  // outline: 1px solid rgb(4, 214, 175);
+  padding: 3px;
+  border-radius: 2px;
 }
 
 #items {
   height: 100%;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(0, 0, 0,0.5);
+    // border: 5px solid red;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.5);
+    width: 10px;
+    border: 3px solid black;
+    border-radius: 10px;
+  }
+  //width: 100%;
+  //justify-content: space-around;
 }
 
 .item {
@@ -185,6 +229,7 @@ export default defineComponent({
   width: 100%;
   cursor: pointer;
   pointer-events: auto;
+  margin: .35em 0;
   & img {
     width: 100%;
     height: ~"min(45px, 7.5vw)";
@@ -210,8 +255,9 @@ export default defineComponent({
 }
 
 .bordered {
-  border: 1px solid #444;
-  border-radius: 2px;
+  border: 1px solid rgb(68, 68, 68);
+  // background-color: rgba(68, 68, 68, 0.5);
+  border-radius: 5px;
 }
 
 #expand-row {
@@ -231,8 +277,8 @@ export default defineComponent({
 }
 
 .overlay {
-   position:absolute;
-   top:0;
-   left:75%;
+  position:absolute;
+  top:0;
+  left:75%;
 }
 </style>
