@@ -4,9 +4,9 @@
  /* eslint-disable */
 
 import {
-  Color, Colors, Constellations, Coordinates, Grids, GlyphItem,
-  GlyphCache, PushPin, Rectangle, Settings, SpaceTimeController,
-  SpreadSheetLayer, Text3d, Text3dBatch, URLHelpers, Vector2d,
+  Color, Colors, Constellations, Coordinates, Grids,
+  LayerManager, LayerMap, PushPin, Settings, SpaceTimeController,
+  SpreadSheetLayer, Text3d, Text3dBatch, URLHelpers,
   Vector3d, WWTControl
 } from "@wwtelescope/engine";
 
@@ -145,3 +145,50 @@ export function drawSpreadSheetLayer(renderContext, opacity, flat) {
   }
   return true;
 }
+
+export function layerManagerDraw(renderContext, opacity, astronomical, referenceFrame, nested, cosmos) {
+  if (!(referenceFrame in LayerManager.get_allMaps())) {
+    return;
+  }
+  var thisMap = LayerManager.get_allMaps()[referenceFrame];
+  if (!thisMap.enabled || (!thisMap.layers.length && !(thisMap.frame.showAsPoint || thisMap.frame.showOrbitPath))) {
+    return;
+  }
+  var matOld = renderContext.get_world();
+  var matOldNonRotating = renderContext.get_worldBaseNonRotating();
+  var oldNominalRadius = renderContext.get_nominalRadius();
+  if ((thisMap.frame.reference === 18 | thisMap.frame.reference === 18) === 1) {
+    thisMap.computeFrame(renderContext);
+    if (thisMap.frame.referenceFrameType !== 1 && thisMap.frame.referenceFrameType !== 2) {
+      renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_world()));
+    }
+    else {
+      renderContext.set_world(Matrix3d.multiplyMatrix(thisMap.frame.worldMatrix, renderContext.get_worldBaseNonRotating()));
+    }
+    renderContext.set_nominalRadius(thisMap.frame.meanRadius);
+  }
+  //console.log("========");
+  for (const layer of LayerManager.get_allMaps()[referenceFrame].layers) {
+    if (layer.enabled) {
+      //console.log(layer);
+      var layerStart = SpaceTimeController.utcToJulian(layer.get_startTime());
+      var layerEnd = SpaceTimeController.utcToJulian(layer.get_endTime());
+      var fadeIn = SpaceTimeController.utcToJulian(layer.get_startTime()) - ((layer.get_fadeType() === 1 || layer.get_fadeType() === 3) ? (layer.get_fadeSpan() / 864000000) : 0);
+      var fadeOut = SpaceTimeController.utcToJulian(layer.get_endTime()) + ((layer.get_fadeType() === 2 || layer.get_fadeType() === 3) ? (layer.get_fadeSpan() / 864000000) : 0);
+      if (SpaceTimeController.get_jNow() > fadeIn && SpaceTimeController.get_jNow() < fadeOut) {
+        var fadeOpacity = 1;
+        if (SpaceTimeController.get_jNow() < layerStart) {
+          fadeOpacity = ((SpaceTimeController.get_jNow() - fadeIn) / (layer.get_fadeSpan() / 864000000));
+        }
+        if (SpaceTimeController.get_jNow() > layerEnd) {
+          fadeOpacity = ((fadeOut - SpaceTimeController.get_jNow()) / (layer.get_fadeSpan() / 864000000));
+        }
+        layer.set_astronomical(astronomical);
+        layer.draw(renderContext, opacity * fadeOpacity, cosmos);
+      }
+    }
+  }
+  renderContext.set_nominalRadius(oldNominalRadius);
+  renderContext.set_world(matOld);
+  renderContext.set_worldBaseNonRotating(matOldNonRotating);
+};

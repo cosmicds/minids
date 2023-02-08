@@ -13,6 +13,9 @@
         <img
           src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
         />
+        <div class="item-name">
+          Press <span v-if="thumbnails">image</span><span v-else>date</span> to go to image
+        </div>
         <div class="overlay">
           <font-awesome-icon
             icon="images"
@@ -39,13 +42,16 @@
               v-if="thumbnails"
               :src="item.get_thumbnailUrl()"
               :alt="item.get_name()"
+              @click="() => selectItem(item)"
             />
             <div
               class="item-name"
+              :class="['thumbnail']"
               @click="() => selectItem(item)"
             >
               {{item.get_name()}}
             </div>
+            <div class="slider-container">
             <input
               v-if="sliders"
               class="opacity-range"
@@ -53,6 +59,18 @@
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
             />
+            
+<!--
+              <label class="switch">
+                <input 
+                  type="checkbox"
+                  :title="item.get_name()"
+                  @change="(e) => onToggleImage(e, item)"
+                  >
+                <span class="slider"></span>
+              </label>  -->
+            </div>
+
           </div>
         </div>
       </div>
@@ -96,14 +114,24 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
+    open: {
+      type: Boolean,
+      default: false
+    },
+
+    incomingItemSelect: {
+      type: Object as PropType<Thumbnail>,
+      default: null
+    }
+    
   },
 
   data() {
     return {
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
-      opacities: {} as Record<string,number>,
-      expanded: true
+      opacities: {} as Record<string, number>,
+      expanded: this.open
     }
   },
 
@@ -127,6 +155,7 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
+      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -135,7 +164,13 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
+      console.log("FolderView: slider changed")
       this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+    },
+
+    onToggleImage(e: Event, item: Thumbnail) {
+      console.log("FolderView: toggled")
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
     }
   },
 
@@ -145,7 +180,23 @@ export default defineComponent({
         "--flex-direction": this.flexDirection
       }
     },
+
+    isMobile() {
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true
+      } else {
+        return false
+      }
+    },
   },
+
+  watch: {
+    incomingItemSelect() {
+      if (this.incomingItemSelect != null) {
+        this.lastSelectedItem = this.incomingItemSelect;
+      }
+    }
+  }
 });
 </script>
 
@@ -155,27 +206,33 @@ export default defineComponent({
   flex-direction: var(--flex-direction);
   width: auto;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   pointer-events: auto;
-  background: black;
-  &::-webkit-scrollbar {
-    padding: 1px;
-    height: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: black;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(4, 129, 187, 0.5);
-    border-radius: 2px;
-  }
-  //width: 100%;
-  //justify-content: space-around;
+  background: rgba(0, 0, 0, 0.5);
+  // outline: 1px solid rgb(4, 214, 175);
+  padding: 3px;
+  border-radius: 2px;
 }
 
 #items {
   height: 100%;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(0, 0, 0,0.5);
+    // border: 5px solid red;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.5);
+    width: 10px;
+    border: 3px solid black;
+    border-radius: 10px;
+  }
+  //width: 100%;
+  //justify-content: space-around;
 }
 
 .item {
@@ -185,6 +242,7 @@ export default defineComponent({
   width: 100%;
   cursor: pointer;
   pointer-events: auto;
+  margin: .35em 0;
   & img {
     width: 100%;
     height: ~"min(45px, 7.5vw)";
@@ -210,8 +268,9 @@ export default defineComponent({
 }
 
 .bordered {
-  border: 1px solid #444;
-  border-radius: 2px;
+  border: 1px solid rgb(68, 68, 68);
+  // background-color: rgba(68, 68, 68, 0.5);
+  border-radius: 5px;
 }
 
 #expand-row {
@@ -231,8 +290,78 @@ export default defineComponent({
 }
 
 .overlay {
-   position:absolute;
-   top:0;
-   left:75%;
+  position:absolute;
+  top:0;
+  left:75%;
 }
+
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  
+  
+}
+.switch {
+  // moving toggle
+  --toggle-size: 0.77em;
+  --slider-height: calc(var(--toggle-size) * 1.3);
+  --toggle-bottom-gap: calc((var(--slider-height) - var(--toggle-size))/2);
+  --toggle-left-gap: var(--toggle-bottom-gap);
+  --slider-width: calc(2*(var(--toggle-left-gap) + var(--toggle-size)));
+  --translateX: var(--toggle-size);
+
+  position: relative;
+  display: flex;
+  width: var(--slider-width);
+  height: var(--slider-height);
+}
+
+.switch input { 
+  visibility: hidden;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: var(--slider-height);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--toggle-size);
+  width: var(--toggle-size);
+  left: var(--toggle-left-gap);
+  bottom: var(--toggle-bottom-gap);
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(var(--translateX));
+  -ms-transform: translateX(var(--translateX));
+  transform: translateX(var(--translateX));
+}
+
+
 </style>
