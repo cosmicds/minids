@@ -1218,12 +1218,12 @@ export default defineComponent({
       return false
     },
 
-    onOpacityChanged(place: Place, opacity: number) {
+    onOpacityChanged(place: Place, opacity: number, move: boolean) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       this.updateImageOpacity(place, opacity);
       const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 1.7 : this.wwtZoomDeg;
-      if (this.image_out_of_view(place)) {
+      if (this.image_out_of_view(place) && move) {
         this.gotoRADecZoom({
           raRad: D2R * iset.get_centerX(),
           decRad: D2R * iset.get_centerY(),

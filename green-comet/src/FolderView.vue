@@ -131,7 +131,8 @@ export default defineComponent({
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
-      expanded: this.open
+      expanded: this.open,
+      lastOpacityChanged: null as Thumbnail | null
     }
   },
 
@@ -165,7 +166,13 @@ export default defineComponent({
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
       console.log("FolderView: slider changed")
-      this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+      let move = true
+      if (this.lastOpacityChanged == item) {
+        move = false
+      } else {
+        this.lastOpacityChanged = item;
+      }
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value, move)
     },
 
     onToggleImage(e: Event, item: Thumbnail) {
