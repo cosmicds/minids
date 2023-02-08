@@ -205,6 +205,20 @@
             >
               Center on Now
             </v-btn>
+            <v-btn
+              :color="cometColor"
+              @click="() => centerOnCurrentDate({
+                zoomDeg: 60
+              })"
+            >
+              Best View for comet path
+            </v-btn>
+            <v-btn
+              :color="cometColor"
+              @click="setToFirstCometImage"
+            >
+              Best View for comet images
+            </v-btn>
           </div>
         </transition-expand>
       </div>
@@ -516,9 +530,9 @@
 import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
-import { distance, fmtDegLat, fmtDegLon, fmtHours } from "@wwtelescope/astro";
+import { distance } from "@wwtelescope/astro";
 import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
+import { MarkerScales, PlotTypes } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
@@ -528,12 +542,16 @@ import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer } from "./wwt-hacks";
 
+interface MoveOptions {
+  instant?: boolean;
+  zoomDeg?: number;
+  rollRad?: number;
+}
 
 import {
   ephemerisFullWeeklyCsv,
   ephemeris2023DailyCsv
 } from "./data";
-import { Script } from 'vm';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -654,6 +672,7 @@ export default defineComponent({
 
       currentDailyLayer: null as SpreadSheetLayer | null,
       currentWeeklyLayer: null as SpreadSheetLayer | null,
+      interpolatedDailyTable: null as Table | null,
 
       dailyDates: dailyDates,
       weeklyDates: weeklyDates,
@@ -977,17 +996,17 @@ export default defineComponent({
 
     updateLayersForDate() {
 
-      const interpolatedDailyTable = this.interpolatedTable(daily2023Table);
+      this.interpolatedDailyTable = this.interpolatedTable(daily2023Table);
       if (this.currentDailyLayer !== null) {
         this.deleteLayer(this.currentDailyLayer.id);
         this.currentDailyLayer = null;
       }
 
-      if (interpolatedDailyTable !== null) {
+      if (this.interpolatedDailyTable !== null) {
         this.createTableLayer({
           name: "Daily Date Layer",
           referenceFrame: "Sky",
-          dataCsv: formatCsvTable(interpolatedDailyTable)
+          dataCsv: formatCsvTable(this.interpolatedDailyTable)
         }).then((layer) => {
           this.currentDailyLayer = layer;
           layer.set_lngColumn(1);
@@ -1072,6 +1091,7 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
+      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1400,15 +1420,18 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate(instant=true) {
+    updateViewForDate(options?: MoveOptions) {
 
       let position = null as TableRow | null;
 
       const dailyIndex = dailyDates.findIndex(d => d === this.selectedTime);
       
       if (dailyIndex > -1) {
-        position = daily2023Table[dailyIndex];
-        // TODO: Use interpolated point here
+        if (this.interpolatedDailyTable !== null) {
+          position = this.interpolatedDailyTable[0]
+        } else {
+          position = daily2023Table[dailyIndex];
+        }
       } else {
         const weeklyIndex = weeklyDates.findIndex(d => d === this.selectedTime);
         if (weeklyIndex > -1) {
@@ -1420,9 +1443,9 @@ export default defineComponent({
         this.gotoRADecZoom({
           raRad: D2R * position.ra,
           decRad: D2R * position.dec,
-          zoomDeg: this.wwtZoomDeg,
-          rollRad: this.wwtRollRad,
-          instant: instant
+          zoomDeg: options?.zoomDeg ?? this.wwtZoomDeg,
+          rollRad: options?.rollRad ?? this.wwtRollRad,
+          instant: options?.instant ?? true
         });
       }
 
@@ -1481,20 +1504,20 @@ export default defineComponent({
       
     },
 
-    centerOnCurrentDate() {
+    centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
       this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
       this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
-        this.updateViewForDate();
+        this.updateViewForDate(options);
       });
     },
 
-    updateForDateTime() {
+    updateForDateTime(options?: MoveOptions) {
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime);
       this.showImageForDateTime(this.dateTime);
-      this.updateViewForDate();
+      this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
@@ -1504,6 +1527,14 @@ export default defineComponent({
       } else {
         this.removeHorizon();
       }
+    },
+
+    setToFirstCometImage() {
+      this.selectedTime = Date.UTC(2022, 11, 18);
+      const children = this.imagesetFolder?.get_children();
+      if (children == null) { return; }
+      const place = children[0] as Place;
+      this.onItemSelected(place);
     }
   },
 
