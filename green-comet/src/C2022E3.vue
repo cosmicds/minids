@@ -1529,6 +1529,21 @@ export default defineComponent({
             el.value = `${opacity * 100}`
           }
         }
+
+        const toggle_selector = `#items input[type='checkbox'][title='${name}']`
+        const el2 = (document.querySelector(toggle_selector) as HTMLInputElement)
+        // truth table: opacity == 0 and el.checked == false => do nothing
+        // truth table: opacity == 0 and el.checked == true => set el.checked = false
+        // truth table: opacity > 0 and el.checked == false => set el.checked = true
+        // truth table: opacity > 0 and el.checked == true => do nothing
+        if (el2 != null) {
+          console.log(`setting checkbox value to ${opacity > 0}`)
+          if (opacity == 0 && el2.checked) {
+            el2.checked = false
+          } else if (opacity > 0 && !el2.checked) {
+            el2.checked = true
+          }
+        }
         
       }
     },

@@ -51,6 +51,7 @@
             >
               {{item.get_name()}}
             </div>
+            <div class="slider-container">
             <input
               v-if="sliders"
               class="opacity-range"
@@ -58,6 +59,18 @@
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
             />
+            
+
+              <label class="switch">
+                <input 
+                  type="checkbox"
+                  :title="item.get_name()"
+                  @change="(e) => onToggleImage(e, item)"
+                  >
+                <span class="slider"></span>
+              </label> 
+            </div>
+
           </div>
         </div>
       </div>
@@ -281,4 +294,74 @@ export default defineComponent({
   top:0;
   left:75%;
 }
+
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  
+  
+}
+.switch {
+  // moving toggle
+  --toggle-size: 0.77em;
+  --slider-height: calc(var(--toggle-size) * 1.3);
+  --toggle-bottom-gap: calc((var(--slider-height) - var(--toggle-size))/2);
+  --toggle-left-gap: var(--toggle-bottom-gap);
+  --slider-width: calc(2*(var(--toggle-left-gap) + var(--toggle-size)));
+  --translateX: var(--toggle-size);
+
+  position: relative;
+  display: flex;
+  width: var(--slider-width);
+  height: var(--slider-height);
+}
+
+.switch input { 
+  visibility: hidden;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: var(--slider-height);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--toggle-size);
+  width: var(--toggle-size);
+  left: var(--toggle-left-gap);
+  bottom: var(--toggle-bottom-gap);
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(var(--translateX));
+  -ms-transform: translateX(var(--translateX));
+  transform: translateX(var(--translateX));
+}
+
+
 </style>
