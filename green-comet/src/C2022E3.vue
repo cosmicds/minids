@@ -53,12 +53,15 @@
         class="folder-view"
         sliders
         expandable
-        :thumbnails="false"
+        :thumbnails="true"
+        :open="mobile ? true : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
         @opacity="updateImageOpacity"
+        @toggle="onToggle"
       ></folder-view>
     </div>
 
@@ -665,6 +668,8 @@ export default defineComponent({
       cometColor: "#04D6B0",
       todayColor: "#D6B004",
 
+      incomingItemSelect: null as Thumbnail | null,
+      
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
@@ -1123,9 +1128,19 @@ export default defineComponent({
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
       if (layer == null) { return; }
-      applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // applyImageSetLayerSetting(layer, ["opacity", opacity / 100]);
+      // tell setLayerOpacityForImageSet that we are updating from the ui
+      this.setLayerOpacityForImageSet(iset.get_name(), opacity / 100, true);
     },
-
+    
+    onToggle(place: Place, checked: boolean) {
+      // when we toggle the image we want to set it's opacity to zero
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; } 
+      const iname = iset.get_name()
+      this.setLayerOpacityForImageSet(iname, checked ? 1 : 0);
+    },
+    
     setupLocationSelector() {
       const locationDeg: [number, number] = [R2D * this.location.latitudeRad, R2D * this.location.longitudeRad];
       const map = L.map("map-container").setView(locationDeg, 4);
@@ -1475,25 +1490,43 @@ export default defineComponent({
       }
       return '';
     },
+
+    setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
+      const layer = this.imagesetLayers[name]
+      if (layer != null) {
+        // update the image opacity in the WWT control
+        applyImageSetLayerSetting(layer, ['opacity', opacity])
+
+        // update the value for the slider only if we are not setting the opacity from the UI
+        if (!setting_opacity_from_ui) {
+          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`
+          const el = (document.querySelector(selector) as HTMLInputElement)
+          if (el != null) {
+            el.value = `${opacity * 100}`
+          }
+        }
+        
+      }
+    },
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
       const imageset_names = Object.keys(this.imagesetLayers)
-      // loop over imageset_names
-      // set opacity for the one with this name to 1, and all others to 0
       imageset_names.forEach((iname: string) => {
-        const selector = `#items>div>div.bordered.item[title='${iname}']>input`
-        const el = (document.querySelector(selector) as HTMLInputElement)
         if (iname != name) {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 0])
-          if (el != null) {
-            el.value = '0'
-        }
+          this.setLayerOpacityForImageSet(iname, 0)
         } else {
-          applyImageSetLayerSetting(this.imagesetLayers[iname], ['opacity', 1])
-          const iset = this.wwtControl.getImagesetByName(iname)
-          if (iset == null) { return; }
-          if (el != null) { el.value = '100' }
+          this.setLayerOpacityForImageSet(iname, 1)
+          // need to get the Place object for the image set and use it to set the view
+          if (this.imagesetFolder != null) {
+            const places = this.imagesetFolder.get_children()
+            if (places != null) {
+              const place = places.filter((place) => place.get_name() == iname)
+              this.incomingItemSelect = place[0]
+            }
+          }
+          // const iset = this.wwtControl.getImagesetByName(iname)
+          // if (iset == null) { return; }
           // this.gotoRADecZoom({
           //   raRad: D2R * iset.get_centerX(),
           //   decRad: D2R * iset.get_centerY(),
@@ -1610,11 +1643,11 @@ html {
   overflow: hidden;
 
   ::-webkit-scrollbar {
-    display: none;
+    // display: none;
   }
-
+  
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  // scrollbar-width: none;
 }
 
 body {
@@ -2197,12 +2230,24 @@ input[type="range"] {
     -webkit-appearance: inherit;
     -moz-appearance: inherit;
     appearance: inherit;
-    margin: 5px;
-    --track-height: 0.3em;
-    --thumb-radius: 0.7em;
-    --thumb-color: rgba(205, 54, 157  , 1);
-    --track-color: rgba(4, 147, 214, 0.7);
-    --thumb-border: 1px solid #899499;
+    margin: 2px;
+    --track-height: 1em;
+    --thumb-radius: 0.8em;
+    --thumb-color: rgba(205, 54, 157  , 0.7);
+    // --thumb-color: #444;
+    --track-color: rgba(4, 147, 214, .1);
+    // --thumb-border: 1px solid #899499;
+    --thumb-border-width: 1px;
+    --thumb-border: var(--thumb-border-width) solid rgb(255, 255, 255);
+    --track-border-width: 1px;
+    --track-border: var(--track-border-width) solid rgba(4, 147, 214, 1);
+    --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
+    
+    &:hover {
+      opacity: 1;
+      --track-color: rgba(217, 234, 242,0.2);
+      --thumb-color: rgba(205, 54, 157  , 1);
+    }
   }
   
   
@@ -2213,7 +2258,7 @@ input[type="range"] {
       appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
@@ -2227,7 +2272,7 @@ input[type="range"] {
     appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
-    margin-top: calc(var(--track-height) / 2 - var(--thumb-radius) / 2);
+    margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     cursor: pointer;
@@ -2238,8 +2283,10 @@ input[type="range"] {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height: var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
   
@@ -2247,8 +2294,10 @@ input[type="range"]::-moz-range-track {
     background: var(--track-color);
     /* outline: 1px solid white; */
     border-radius: calc(var(--track-height) / 2);
+    border: var(--track-border);
     height:var(--track-height);
     margin-top: 0;
+    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
   
 #sliderlabel {
