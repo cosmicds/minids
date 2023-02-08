@@ -208,6 +208,7 @@
             >
               Center on Now
             </v-btn>
+            <!--
             <v-btn
               :color="cometColor"
               @click="() => updateViewForDate({
@@ -221,7 +222,7 @@
               @click="setToFirstCometImage"
             >
               Best view for comet images
-            </v-btn>
+            </v-btn> -->
           </div>
         </transition-expand>
       </div>
