@@ -1102,7 +1102,7 @@ export default defineComponent({
     resetImagesetLayerOrder() {
       // Reset the order of the imageset layers
       Object.keys(this.imagesetLayers).sort((k1, k2) => {
-        return new Date(k2).getTime() - new Date(k1).getTime();
+        return new Date(k1).getTime() - new Date(k2).getTime();
       }).forEach((key) => {
         const layer = this.imagesetLayers[key];
         this.setImageSetLayerOrder({
@@ -1123,7 +1123,6 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1472,7 +1471,7 @@ export default defineComponent({
       
       if (cometImageIndex > -1) {
         if (this.interpolatedDailyTable !== null) {
-          position = this.interpolatedDailyTable[0]
+          position = this.interpolatedDailyTable[0];
         } else {
           position = CometImageDatesTable[cometImageIndex];
         }
@@ -1541,7 +1540,7 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
+          //console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
