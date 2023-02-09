@@ -14,31 +14,36 @@ module.exports = {
   ],
   rules: {
     "indent": ["error", 2],
-    "no-unused-vars": [
-      "error", {
-        "args": "all",
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_"
-      }
-    ],
-    "semi": "off",
     "@typescript-eslint/naming-convention": [
       "error", {
-        selector: ["variable"],
-        format: ["camelCase"]
+        selector: ["variable", "memberLike", "function"],
+        format: ["camelCase"],
+        leadingUnderscore: "allow"
       },
       {
         selector: ["variable"],
         modifiers: ["global", "const"],
-        format: ["camelCase", "UPPER_CASE"]
-      },
-      {
-        selector: ["function"],
-        format: ["camelCase"]
+        format: ["camelCase", "UPPER_CASE"],
+        leadingUnderscore: "allow"
       },
       {
         selector: "typeLike",
-        format: ["PascalCase"]
+        format: ["PascalCase"],
+        leadingUnderscore: "allow"
+      },
+      {
+        selector: [
+          "classProperty",
+          "objectLiteralProperty",
+          "typeProperty",
+          "classMethod",
+          "objectLiteralMethod",
+          "typeMethod",
+          "accessor",
+          "enumMember"
+        ],
+        format: null,
+        modifiers: ["requiresQuotes"]
       }
     ],
     "@typescript-eslint/no-unused-vars": [
