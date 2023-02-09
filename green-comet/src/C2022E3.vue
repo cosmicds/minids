@@ -535,7 +535,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -720,7 +720,7 @@ export default defineComponent({
 
   created() {
 
-    this.waitForReady().then(() => {
+    this.waitForReady().then(async () => {
 
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
@@ -737,31 +737,28 @@ export default defineComponent({
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
 
-      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
-        this.loadImageCollection({
-          url: value as string,
-          loadChildFolders: false
-        }).then((folder) => {
-          this.imagesetFolder = folder;
-          const children = folder.get_children();
-          if (children == null) { return; }
-          children.forEach((item) => {
-            if (!(item instanceof Place)) { return; }
-            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-            if (imageset === null) { return; }
-            const name = imageset.get_name();
-            this.addImageSetLayer({
-              url: imageset.get_url(),
-              mode: "autodetect",
-              name: name,
-              goto: false
-            }).then((layer) => {
-              this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 0]);
-            });
-        });
-      }));
-      
+      this.imagesetFolder = await this.loadImageCollection({
+        url: this.wtml.c2022e3,
+        loadChildFolders: false
+      });
+      const children = this.imagesetFolder.get_children() ?? [];
+      const layerPromises: Promise<Layer>[] = [];
+      children.forEach((item) => {
+        if (!(item instanceof Place)) { return; }
+        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+        if (imageset == null) { return; }
+        const name = imageset.get_name();
+        layerPromises.push(this.addImageSetLayer({
+          url: imageset.get_url(),
+          mode: "autodetect",
+          name: name,
+          goto: false
+        }).then((layer) => {
+          this.imagesetLayers[name] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0]);
+          return layer;
+        }));
+      });
 
       this.loadImageCollection({
         url: this.bgWtml,
@@ -792,7 +789,8 @@ export default defineComponent({
             //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
-        })
+        });
+        return layer;
       }));
 
       layerPromises.push(this.createTableLayer({
@@ -812,7 +810,8 @@ export default defineComponent({
             //["sizeColumn", 3],
             ["opacity", 0.4]
           ]
-        })
+        });
+        return layer;
       }));
 
       // layerPromises.push(this.createTableLayer({
@@ -866,6 +865,9 @@ export default defineComponent({
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
+        
+        // Set all of the imageset layers to be above the spreadsheet layers
+        this.resetImagesetLayerOrder();
       });
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -1097,34 +1099,25 @@ export default defineComponent({
       return -1;
     },
 
-    resetLayerOrder() {
-      // reset the layer order to the default
-      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
-      // get the key item with the value of layer.id
-      // imagesets are in this.imagesetLayers with their name/date as the key
-      this.imagesetLayers
-      function getOrdering(guid: string, imagesetLayers: Record<string, ImageSetLayer>): number {
-        let i = -1;
-        for (const [_key, value] of Object.entries(imagesetLayers)) {
-          i += 1;
-          if (value.id.toString() === guid) {
-            return i;
-          }
-        }
-        return -1;
-      }
-      
-      for (const [_key, value] of Object.entries(this.wwtActiveLayers)) {
-        this.setImageSetLayerOrder({ id: value, order: getOrdering(value, this.imagesetLayers) });
-      }
+    resetImagesetLayerOrder() {
+      // Reset the order of the imageset layers
+      Object.keys(this.imagesetLayers).sort((k1, k2) => {
+        return new Date(k1).getTime() - new Date(k2).getTime();
+      }).forEach((key) => {
+        const layer = this.imagesetLayers[key];
+        this.setImageSetLayerOrder({
+          id: layer.id.toString(),
+          order: this.wwtActiveLayers.length
+        });
+      });
     },
 
-
+    
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder();
+      this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
@@ -1548,7 +1541,7 @@ export default defineComponent({
       
       if (cometImageIndex > -1) {
         if (this.interpolatedDailyTable !== null) {
-          position = this.interpolatedDailyTable[0]
+          position = this.interpolatedDailyTable[0];
         } else {
           position = CometImageDatesTable[cometImageIndex];
         }
@@ -1617,7 +1610,7 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
+          //console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
