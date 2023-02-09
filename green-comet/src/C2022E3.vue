@@ -159,6 +159,33 @@
           </template>
           <span>Watch video</span>
         </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showPlayPauseTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="play-pause-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showPlayPauseTooltip = true"
+              @mouseleave="showPlayPauseTooltip = false"
+              v-bind="props"
+              @click="playing = !playing"
+            >
+              <font-awesome-icon
+                id="play-pause-icon"
+                class="control-icon"
+                :icon="playing ? 'pause' : 'play'"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Play/pause</span>
+        </v-tooltip>
       </div>
     </div>
 
@@ -670,7 +697,9 @@ export default defineComponent({
       positionSet: false,
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
-      decRadLowerBound: 0.2,
+
+      playing: false,
+      playingIntervalId: null as ReturnType<typeof setInterval> | null,
 
       showAltAzGrid: true,
       showConstellations: false,
@@ -695,6 +724,7 @@ export default defineComponent({
       showMapTooltip: false,
       showTextTooltip: false,
       showVideoTooltip: false,
+      showPlayPauseTooltip: false,
       showLocationSelector: false,
       showControls: true,
       tab: 0,
@@ -1678,6 +1708,17 @@ export default defineComponent({
         this.map?.remove();
         this.circle = null;
       }
+    },
+    playing(play: boolean) {
+      if (this.playingIntervalId) {
+        clearInterval(this.playingIntervalId);
+        this.playingIntervalId = null;
+      }
+      if (play) {
+        this.playingIntervalId = setInterval(() => {
+          this.selectedTime += 1000 * 60 * 60 * 24;
+        }, 500);
+      }
     }
   }
 });
@@ -1802,6 +1843,7 @@ body {
   border: 1px solid var(--comet-color);
   border-radius: 20px;
   display: flex;
+  justify-content: center;
   align-items: center;
   pointer-events: auto;
 
