@@ -2,7 +2,7 @@ import Vue, { createApp } from "vue";
 
 import Carina from "./Carina.vue";
 
-import vuetify from "../plugins/vuetify"
+import vuetify from "../plugins/vuetify";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -29,7 +29,7 @@ import {
 import {
   faFacebook,
   faTwitter
-} from '@fortawesome/free-brands-svg-icons'
+} from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(faAdjust);
@@ -84,11 +84,11 @@ createApp(Carina, {
 "hide", {
   // Run on initialisation (first render) of the directive on the element
   beforeMount(el, binding, _vnode, _prevVnode) {
-    update(el, binding)
+    update(el, binding);
   },
   // Run on subsequent updates to the value supplied to the directive
   updated(el, binding, _vnode, _prevVnode) {
-    update(el, binding)
+    update(el, binding);
   }
 })
 

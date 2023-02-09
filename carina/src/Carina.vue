@@ -453,7 +453,7 @@ export default defineComponent({
         { name: "facebook", color: "#1877f2", text: "Share" },
         { name: "twitter", color: "#1da1f2", text: "Tweet" },
       ]
-    }
+    };
   },
 
   created() {
@@ -610,11 +610,11 @@ export default defineComponent({
     },
 
     resetView(instant = true) {
-      const D2R = Math.PI / 180.0;
+      const d2R = Math.PI / 180.0;
       const imageset = this.layers.jwst.get_imageSet();
       this.gotoRADecZoom({
-        raRad: D2R * imageset.get_centerX(),
-        decRad: D2R * imageset.get_centerY(),
+        raRad: d2R * imageset.get_centerX(),
+        decRad: d2R * imageset.get_centerY(),
         zoomDeg: 0.8595,
         rollRad: 1.799,
         instant: instant,
