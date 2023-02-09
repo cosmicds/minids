@@ -72,29 +72,29 @@ createApp(Carina, {
   bgName: "unwise"
 })
 
-// Plugins
-.use(wwtPinia)
-.use(vuetify)
+  // Plugins
+  .use(wwtPinia)
+  .use(vuetify)
 
-// Directives
-.directive(
-/**
-* Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
-*/
-"hide", {
-  // Run on initialisation (first render) of the directive on the element
-  beforeMount(el, binding, _vnode, _prevVnode) {
-    update(el, binding);
-  },
-  // Run on subsequent updates to the value supplied to the directive
-  updated(el, binding, _vnode, _prevVnode) {
-    update(el, binding);
-  }
-})
+  // Directives
+  .directive(
+    /**
+    * Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
+    */
+    "hide", {
+      // Run on initialisation (first render) of the directive on the element
+      beforeMount(el, binding, _vnode, _prevVnode) {
+        update(el, binding);
+      },
+      // Run on subsequent updates to the value supplied to the directive
+      updated(el, binding, _vnode, _prevVnode) {
+        update(el, binding);
+      }
+    })
 
-// Components
-.component("WorldWideTelescope", WWTComponent)
-.component('font-awesome-icon', FontAwesomeIcon)
+  // Components
+  .component("WorldWideTelescope", WWTComponent)
+  .component('font-awesome-icon', FontAwesomeIcon)
 
-// Mount
-.mount("#app");
+  // Mount
+  .mount("#app");

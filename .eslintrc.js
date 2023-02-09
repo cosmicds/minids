@@ -13,6 +13,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended'
   ],
   rules: {
+    "indent": ["error", 2],
     "no-unused-vars": [
       "error", {
         "args": "all",

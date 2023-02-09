@@ -476,11 +476,11 @@ export default defineComponent({
             mode: "autodetect",
             name: key,
             goto: false
-        }).then((layer) => {
-          this.layers[key] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
-        });
-      }));
+          }).then((layer) => {
+            this.layers[key] = layer;
+            applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          });
+        }));
 
       Promise.all(layerPromises).then(() => {
         this.resetView();
