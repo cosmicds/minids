@@ -2108,7 +2108,7 @@ video {
 }
 
 .info-text {
-  height: 35vh;
+  height: 33vh;
   padding-bottom: 25px;
 
   & a {
