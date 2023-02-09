@@ -1119,16 +1119,7 @@ export default defineComponent({
       }
     },
 
-    imageInView(iset: Imageset): boolean {
-      const curRa = this.wwtRARad;
-      const curDec = this.wwtDecRad;
-      const curZoom = this.wwtZoomDeg * D2R;
-      const isetRa = iset.get_centerX() * D2R;
-      const isetDec = iset.get_centerY() * D2R;
-      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
-      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
-    },
-    
+
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
