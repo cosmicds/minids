@@ -8,7 +8,8 @@
     ],
     "scripts": {
         "build": "yarn workspaces foreach -vt run build",
-        "clean": "yarn workspaces foreach -vt run clean"
+        "clean": "yarn workspaces foreach -vt run clean",
+        "lint": "yarn workspaces foreach -vt run lint"
     },
     "dependencies": {
         "@mdi/font": "^7.1.96",

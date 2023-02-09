@@ -14,18 +14,39 @@ module.exports = {
   ],
   rules: {
     "no-unused-vars": [
-      "warn", {
+      "error", {
         "args": "all",
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_"
       }
     ],
+    "semi": "off",
+    "@typescript-eslint/naming-convention": [
+      "error", {
+        selector: ["variable"],
+        format: ["camelCase"]
+      },
+      {
+        selector: ["variable"],
+        modifiers: ["global", "const"],
+        format: ["camelCase", "UPPER_CASE"]
+      },
+      {
+        selector: ["function"],
+        format: ["camelCase"]
+      },
+      {
+        selector: "typeLike",
+        format: ["PascalCase"]
+      }
+    ],
     "@typescript-eslint/no-unused-vars": [
-      "warn", {
+      "error", {
         "args": "all",
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/semi": "error"
   }
 };
