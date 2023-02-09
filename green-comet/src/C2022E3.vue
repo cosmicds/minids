@@ -1124,15 +1124,9 @@ export default defineComponent({
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
-      // changing selectedTime changes (computer) selectedDate
-      // the selectedDate which run updateForDateTime which
-      // 1) set's the time, the horizon, runs showImageFordateTime and updateLayersForDate
-      // showImageForDateTime will set all other layers to be invisible
-      // updateLayersForDate shows an interpolated point
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        // if ((this.image_out_of_view(place)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
           if (this.image_out_of_view(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
@@ -1156,8 +1150,6 @@ export default defineComponent({
       
     checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/3): boolean {
       // checks if the center of place is in the current field of view
-      // The Place RA/Dec is compared to the current RA/Dec and the current FOV
-      // The distance is computed and compared to the current FOV/2
       // Assume the Zoom level corresponds to the size of the image
       // fraction_of_place is ~fraction of the place that must be in the current FOV
       // by default, allow 1/3 of the place to be visible and still be considered in view
@@ -1187,9 +1179,6 @@ export default defineComponent({
     image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
 
     need_to_zoom_in(place: Place): boolean {
-      // want to zoom in if 
-      
-      
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
