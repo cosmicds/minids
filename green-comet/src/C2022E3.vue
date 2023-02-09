@@ -244,6 +244,7 @@
             }"
             :order="false"
             v-model="selectedTime"
+            @change="updateForDateTime(true)"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
@@ -1124,6 +1125,7 @@ export default defineComponent({
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
+      this.updateForDateTime()
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
@@ -1191,10 +1193,17 @@ export default defineComponent({
       return false
     },
 
+    
+
     onOpacityChanged(place: Place, opacity: number, move: boolean) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       this.updateImageOpacity(place, opacity);
+
+      const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+      this.selectedTime = Date.UTC(year, month - 1, day); 
+      this.updateForDateTime(false) // don't isolate the image
+      
       const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
       if (this.image_out_of_view(place) && move) {
         this.gotoRADecZoom({
@@ -1648,10 +1657,10 @@ export default defineComponent({
       });
     },
 
-    updateForDateTime(options?: MoveOptions) {
+    updateForDateTime(isolateImage = true, options?: MoveOptions) {
       this.setTime(this.dateTime);
-      this.updateHorizon(this.dateTime);
-      this.showImageForDateTime(this.dateTime);
+      this.updateHorizon(this.dateTime); 
+      if (isolateImage) { this.showImageForDateTime(this.dateTime) }
       this.updateViewForDate(options);
       this.updateLayersForDate();
     },
@@ -1724,9 +1733,7 @@ export default defineComponent({
       //   instant: true
       // });
     },
-    selectedDate(_date: Date) {
-      this.updateForDateTime();
-    },
+    
     showLocationSelector(show: boolean) {
       if (show) {
         this.locationErrorMessage = "";
