@@ -1129,7 +1129,7 @@ export default defineComponent({
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-          if (this.image_out_of_view(place)) {
+          if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
@@ -1149,8 +1149,8 @@ export default defineComponent({
       return Math.min(fov_w, fov_h)
     },
 
-      
-    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/3): boolean {
+    
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 0.9): boolean {
       // checks if the center of place is in the current field of view
       // Assume the Zoom level corresponds to the size of the image
       // fraction_of_place is ~fraction of the place that must be in the current FOV
@@ -1173,27 +1173,27 @@ export default defineComponent({
       // get distance of far size of image from center of view
       // allow some fraction of the image to be off screen and still be considered in view
       dist += (fraction_of_place - 1/2) * isetFov 
-
+      
       return dist < curFov / 2
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
     image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
 
-    need_to_zoom_in(place: Place): boolean {
+    need_to_zoom_in(place: Place, factor = 5): boolean {
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
       // 2) the image is too small (so it's fov < 1/6 of the current fov)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset != null) {
-        if (place.get_zoomLevel() < this.wwtZoomDeg) { return true; }
+        if (place.get_zoomLevel() * factor < this.wwtZoomDeg) { return true; }
       }
       
       return false
     },
 
-    
+
 
     onOpacityChanged(place: Place, opacity: number, move: boolean) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
@@ -1202,17 +1202,29 @@ export default defineComponent({
 
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
-      this.updateForDateTime(false) // don't isolate the image
+      this.setTime(this.dateTime);
+      this.updateHorizon(this.dateTime);
+      // this.updateViewForDate();
+      this.updateLayersForDate();
+      // console.log('opacity changed')
+
       
-      const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
-      if (this.image_out_of_view(place) && move) {
-        this.gotoRADecZoom({
-          raRad: D2R * iset.get_centerX(),
-          decRad: D2R * iset.get_centerY(),
-          zoomDeg: zoom,
-          instant: false
-        });
-      }
+
+      this.$nextTick(() => {
+        console.log('opacity changed. moving? ', move)
+        const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
+          console.log('zooming',this.need_to_zoom_in(place, 1))
+          this.gotoRADecZoom({
+            raRad: D2R * iset.get_centerX(),
+            decRad: D2R * iset.get_centerY(),
+            zoomDeg: zoom,
+            instant: false
+          });
+        }
+
+      });
+
     },
     
     updateImageOpacity(place: Place, opacity: number) {
