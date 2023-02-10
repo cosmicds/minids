@@ -339,9 +339,11 @@
       id="video-container"
       v-show="showVideoSheet"
       transition="slide-y-transition"
+      fluid
     >
       <div class="video-wrapper">
         <font-awesome-icon
+          id="video-close-icon"
           class="close-icon"
           icon="times"
           size="lg"
@@ -349,7 +351,10 @@
           @keyup.enter="showVideoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
-        <video controls id="info-video">
+        <video
+          controls
+          id="info-video"
+        >
           <source src="./assets/video2.mp4" type="video/mp4">
         </video>
       </div>
@@ -908,9 +913,16 @@ export default defineComponent({
 
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
-          window.removeEventListener('keypress', splashScreenListener);
+          window.removeEventListener('keyup', splashScreenListener);
         }
-        window.addEventListener('keypress', splashScreenListener);
+        window.addEventListener('keyup', splashScreenListener);
+
+        window.addEventListener('keyup', (event: KeyboardEvent) => {
+          console.log(event);
+          if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+            this.showVideoSheet = false;
+          }
+        });
       });
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -2151,6 +2163,11 @@ video {
 
   &:hover {
     cursor: pointer;
+  }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
   }
 }
 
