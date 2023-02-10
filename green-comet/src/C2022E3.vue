@@ -1149,6 +1149,27 @@ export default defineComponent({
       return Math.min(fov_w, fov_h)
     },
 
+    radecInFOV(ra: number, dec: number, center_ra: number, center_dec: number, fov: number, fov_view: number, fraction_of_place: number): boolean {
+      let dist = distance(ra, dec, center_ra, center_dec);
+      dist += (fraction_of_place - 1/2) * fov 
+      return dist < fov_view / 2
+    },
+
+    moveIfTableRowOfFOV(position: TableRow) {
+      // get imageset of date
+        const move = this.radecInFOV(
+          D2R * position.ra * D2R,
+          D2R * position.dec * D2R,
+          this.wwtRARad,
+          this.wwtDecRad,
+          10 * D2R,
+          this.wwtRenderContext.get_fovAngle() * D2R,
+          1/2
+        )
+
+      return move
+      
+    },
     
     checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/2): boolean {
       // checks if the center of place is in the current field of view
@@ -1169,12 +1190,8 @@ export default defineComponent({
       const curDec = this.wwtDecRad;
       const curFov = this.wwtSmallestFov();
 
-      let dist = distance(curRa, curDec, isetRa, isetDec);
-      // get distance of far size of image from center of view
-      // allow some fraction of the image to be off screen and still be considered in view
-      dist += (fraction_of_place - 1/2) * isetFov 
       
-      return dist < curFov / 2
+      return this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
@@ -1200,6 +1217,8 @@ export default defineComponent({
       });
     },
 
+    
+    
     onOpacityChanged(place: Place, opacity: number, move: boolean) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
@@ -1542,7 +1561,7 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate(options?: MoveOptions) {
+    updateViewForDate(options?: MoveOptions, move_like_opacity = false) {
 
       let position = null as TableRow | null;
 
@@ -1562,13 +1581,13 @@ export default defineComponent({
       }
 
       if (position !== null) {
-        this.gotoRADecZoom({
-          raRad: D2R * position.ra,
-          decRad: D2R * position.dec,
-          zoomDeg: options?.zoomDeg ?? this.wwtZoomDeg,
-          rollRad: options?.rollRad ?? this.wwtRollRad,
-          instant: options?.instant ?? true
-        });
+          this.gotoRADecZoom({
+            raRad: D2R * position.ra,
+            decRad: D2R * position.dec,
+            zoomDeg: options?.zoomDeg ?? this.wwtZoomDeg,
+            rollRad: options?.rollRad ?? this.wwtRollRad,
+            instant: options?.instant ?? true
+          });
       }
 
     },
