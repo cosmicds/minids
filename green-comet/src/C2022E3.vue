@@ -92,6 +92,7 @@
             @mouseleave="showMapTooltip = false"
             v-bind="props"
             @click="showLocationSelector = true"
+            @keyup.enter="showLocationSelector = true"
             tabindex="0"
           >
             <font-awesome-icon
@@ -121,6 +122,7 @@
               @mouseleave="showTextTooltip = false"
               v-bind="props"
               @click="showTextSheet = true"
+              @keyup.enter="showTextSheet = true"
               tabindex="0"
             >
               <font-awesome-icon
@@ -149,6 +151,7 @@
               @mouseleave="showVideoTooltip = false"
               v-bind="props"
               @click="showVideoSheet = true"
+              @keyup.enter="showVideoSheet = true"
               tabindex="0"
             >
               <font-awesome-icon
@@ -175,6 +178,7 @@
             size="lg"
             :color="cometColor"
             @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
             tabindex="0"
           />
         </div>
@@ -208,6 +212,7 @@
             <v-btn
               :color="cometColor"
               @click="centerOnCurrentDate"
+              @keyup.enter="centerOnCurrentDate"
             >
               Center on Now
             </v-btn>
@@ -253,6 +258,8 @@
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
                 @click="playing = !playing"
+                @keyup.enter="playing = !playing"
+                tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
@@ -339,6 +346,8 @@
           icon="times"
           size="lg"
           @click="showVideoSheet = false"
+          @keyup.enter="showVideoSheet = false"
+          tabindex="0"
         ></font-awesome-icon>
         <video controls id="info-video">
           <source src="./assets/video2.mp4" type="video/mp4">
@@ -358,6 +367,7 @@
         </div>
         <v-btn
           @click="getLocation"
+          @keyup.enter="getLocation"
         >
           Use My Location
         </v-btn>
@@ -380,13 +390,6 @@
       transition="dialog-bottom-transition"
     >
       <v-card height="100%">
-      <!-- <v-container height="11px">
-        <font-awesome-icon
-          class="close-icon"
-          icon="times"
-          @click="showTextSheet = false"
-        ></font-awesome-icon>
-      </v-container> -->
       <v-tabs
         v-model="tab"
         height="32px"
@@ -396,8 +399,8 @@
         dense
         grow
       >
-        <v-tab><h3>Information</h3></v-tab>
-        <v-tab><h3>Using WWT</h3></v-tab>
+        <v-tab tabindex="0"><h3>Information</h3></v-tab>
+        <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
       </v-tabs>
       <font-awesome-icon
         id="close-text-icon"
@@ -405,6 +408,8 @@
         icon="times"
         size="lg"
         @click="showTextSheet = false"
+        @keyup.enter="showTextSheet = false"
+        tabindex="0"
       ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
@@ -1845,7 +1850,7 @@ body {
   }
 
   &:focus {
-    color: #FFFFFF;
+    color: white;
   }
 }
 
@@ -1865,14 +1870,18 @@ body {
   }
 
   &:focus {
-    color: #FFFFFF;
-    border-color: #FFFFFF;
+    color: white;
+    border-color: white;
   }
 }
 
 #play-pause-icon-wrapper {
   color: var(--ephemeris-color);
   border-color: var(--ephemeris-color);
+
+  &:focus {
+    color: white;
+  }
 }
 
 #video-icon-dummy {
@@ -1962,6 +1971,10 @@ body {
       padding-left: 5px;
       padding-right: 5px;
       border: solid 1px #899499;
+
+      &:focus {
+        border: 2px solid white;
+      }
     }
 
     .v-btn__content {
@@ -2027,6 +2040,10 @@ body {
   }
 }
 
+.v-selection-control--focus-visible .v-selection-control__input::before {
+  opacity: 0.25;
+}
+
 .ui-text {
   color: var(--comet-color);
   background: black;
@@ -2034,6 +2051,10 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.8em + 0.25vw);
+
+  &:focus {
+    color: white;
+  }
 }
 
 .ui-button {
