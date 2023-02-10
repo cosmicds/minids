@@ -1197,7 +1197,6 @@ export default defineComponent({
       this.$nextTick(() => {
         this.showImageForDateTime(this.dateTime);
         this.updateViewForDate(options);
-        this.updateForDateTime();
       });
     },
 
@@ -1746,7 +1745,7 @@ export default defineComponent({
     },
 
     selectedDate() {
-      console.log(this.selectedDate)
+      this.updateForDateTime();
     },
     
     showLocationSelector(show: boolean) {
