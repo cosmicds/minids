@@ -1555,6 +1555,10 @@ export default defineComponent({
         this.updateLastClosePoint(event);
         if (this.lastClosePt !== null) {
           this.selectedTime = this.lastClosePt.date.getTime();
+          this.$nextTick(() => {
+            this.onTimeSliderchange();
+            this.updateViewForDate();
+          });
         }
       }
       this.pointerStartPosition = null;
@@ -1691,6 +1695,7 @@ export default defineComponent({
       console.log('updateForDateTime')
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime); 
+      // this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
