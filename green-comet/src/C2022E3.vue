@@ -565,6 +565,8 @@ import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, Render
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
+import { getTimezoneOffset } from "date-fns-tz";
+import tzlookup from "tz-lookup";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
@@ -585,6 +587,9 @@ import {
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
+
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
 function parseCsvTable(csv: string) {
   return csvParse(csv, (d) => {
@@ -688,7 +693,7 @@ export default defineComponent({
     }
   },
   data() {
-    const now = new Date((new Date()).getTime() - d.getTimezoneOffset()*60*1000);
+    const now = new Date();
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -739,6 +744,7 @@ export default defineComponent({
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
       selectedTime: now.setUTCHours(0, 0, 0, 0),
+      selectedTimezone: "America/New_York",
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -936,8 +942,12 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      const todSeconds = this.dayFrac * 60 * 60 * 24;
-      return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
+      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
+      return new Date(this.selectedDate.getTime() + todMs);
+    },
+
+    selectedTimezoneOffset() {
+      return getTimezoneOffset(this.selectedTimezone);
     },
 
     isLoading(): boolean {
@@ -973,24 +983,12 @@ export default defineComponent({
       // @ts-ignore
       return Settings.get_active();
     },
-    dayFrac: {
-      get(): number {
-        const dateForTOD = new Date();
-        dateForTOD.setHours(this.timeOfDay.hours, this.timeOfDay.minutes, this.timeOfDay.seconds);
-        const todSeconds = 3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds();
-        return todSeconds / (24 * 60 * 60);
-      },
-      set(frac: number) {
-        let seconds = Math.floor(24 * 60 * 60 * frac);
-        const hours = Math.floor(seconds / 3600);
-        seconds -= 60 * 60 * hours;
-        const minutes = Math.floor(seconds / 60);
-        seconds -= 60 * minutes;
-        
-        const d = new Date();
-        d.setUTCHours(hours, minutes, seconds);
-        return { hours: d.getHours(), minutes: d.getMinutes(), seconds: Math.floor(d.getSeconds()) };
-      }
+    dayFrac(): number {
+      const dateForTOD = new Date();
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+      const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
@@ -1242,7 +1240,6 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
-          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -1315,9 +1312,7 @@ export default defineComponent({
 
       const meeus_julianDays = this.get_julian(utc);
 
-      const julianDays = meeus_julianDays ;
-
-      // console.log(julianDays)
+      const julianDays = meeus_julianDays;
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1338,10 +1333,8 @@ export default defineComponent({
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
       const st = this.mstFromUTC2(utc, longRad); // siderial time 
-      // console.log(st)
   
       const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
-      // console log alt, az and ra, dec in hours and degrees
       
       const ha = haDec.ra * R2D;
 
@@ -1570,7 +1563,6 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          //console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
@@ -1645,18 +1637,6 @@ export default defineComponent({
   },
 
   watch: {
-    // altAz(coords: { altRad: number; azRad: number }) {
-    //   console.log(coords);
-    //   if (coords.altRad < 0) {
-    //     const pos = this.horizontalToEquatorial(coords.altRad, coords.azRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
-    //     this.gotoRADecZoom({
-    //       raRad: pos.raRad,
-    //       decRad: pos.decRad,
-    //       zoomDeg: this.wwtZoomDeg,
-    //       instant: true
-    //     });
-    //   }
-    // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -1675,10 +1655,9 @@ export default defineComponent({
       //const now = this.selectedDate;
       //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
+      const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
       if (this.map) {
         this.circle?.remove();
-
-        const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
@@ -1686,14 +1665,10 @@ export default defineComponent({
         Grids._altAzTextBatch = null;
       }
 
+      this.selectedTimezone = tzlookup(...locationDeg);
+
       this.updateHorizon();
       this.updateWWTLocation();
-      // this.gotoRADecZoom({
-      //   raRad: raDec.raRad,
-      //   decRad: raDec.decRad,
-      //   zoomDeg: this.wwtZoomDeg,
-      //   instant: true
-      // });
     },
     selectedDate(_date: Date) {
       this.updateForDateTime();
@@ -1708,6 +1683,11 @@ export default defineComponent({
         this.map?.remove();
         this.circle = null;
       }
+    },
+    selectedTimezone(newTz: string, oldTz: string) {
+      const newOffset = getTimezoneOffset(newTz);
+      const oldOffset = getTimezoneOffset(oldTz);
+      this.timeOfDay.hours += ((newOffset - oldOffset) / (1000*60*60));
     },
     playing(play: boolean) {
       if (this.playingIntervalId) {
