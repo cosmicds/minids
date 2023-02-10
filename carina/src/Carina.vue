@@ -6,25 +6,25 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
 
-      <v-overlay
-        :model-value="showSplashScreen"
-        absolute
-        opacity="0.6"
-        id="splash-overlay"
-      >
-        <img
-          id="splash-screen"
-          :src="require(`./assets/Carina_Nebula_Splash_Screen${mobile ? '_Mobile' : ''}_Close.png`)"
-          v-click-outside="closeSplashScreen"
-          max-width="70vw"
-          max-height="70vh"
-          contain
-        />
-        <a
-          id="splash-close"
-          @click="closeSplashScreen">
-        </a>
-      </v-overlay>
+    <v-overlay
+      :model-value="showSplashScreen"
+      absolute
+      opacity="0.6"
+      id="splash-overlay"
+    >
+      <img
+        id="splash-screen"
+        :src="require(`./assets/Carina_Nebula_Splash_Screen${mobile ? '_Mobile' : ''}_Close.png`)"
+        v-click-outside="closeSplashScreen"
+        max-width="70vw"
+        max-height="70vh"
+        contain
+      />
+      <a
+        id="splash-close"
+        @click="closeSplashScreen">
+      </a>
+    </v-overlay>
 
     <transition name="fade">
       <div
@@ -471,6 +471,12 @@ export default defineComponent({
       Promise.all(layerPromises).then(() => {
         this.resetView();
         this.layersLoaded = true;
+        
+        const splashScreenListener = (_event: KeyboardEvent) => {
+          this.showSplashScreen = false;
+          window.removeEventListener('keypress', splashScreenListener);
+        }
+        window.addEventListener('keypress', splashScreenListener);
       });
       
 
@@ -483,6 +489,12 @@ export default defineComponent({
           new BackgroundImageset("unWISE", "unwise")
         );
       });
+
+      const splashScreenListener = (_event: KeyboardEvent) => {
+        this.showSplashScreen = false;
+        window.removeEventListener('keypress', splashScreenListener);
+      }
+      window.addEventListener('keypress', splashScreenListener);
 
     });
   },

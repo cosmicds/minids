@@ -897,6 +897,12 @@ export default defineComponent({
         
         // Set all of the imageset layers to be above the spreadsheet layers
         this.resetImagesetLayerOrder();
+
+        const splashScreenListener = (_event: KeyboardEvent) => {
+          this.showSplashScreen = false;
+          window.removeEventListener('keypress', splashScreenListener);
+        }
+        window.addEventListener('keypress', splashScreenListener);
       });
 
       this.wwtSettings.set_localHorizonMode(true);
