@@ -985,6 +985,7 @@ export default defineComponent({
     },
     dayFrac(): number {
       const dateForTOD = new Date();
+      console.log(this.selectedTimezoneOffset);
       const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
@@ -1216,9 +1217,13 @@ export default defineComponent({
     },
 
     onMapSelect(e: LeafletMouseEvent) {
+      let lngRad = e.latlng.lng * D2R;
+      if (lngRad < - Math.PI) {
+        lngRad += 2 * Math.PI;
+      }
       this.location = {
         latitudeRad: e.latlng.lat * D2R,
-        longitudeRad: e.latlng.lng * D2R
+        longitudeRad: lngRad
       };
     },
 
@@ -1656,6 +1661,7 @@ export default defineComponent({
       //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
 
       const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
+      console.log(locationDeg);
       if (this.map) {
         this.circle?.remove();
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
