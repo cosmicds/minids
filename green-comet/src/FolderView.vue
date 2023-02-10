@@ -165,13 +165,13 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
-      let move = true
+      let dragging = false
       if (this.lastOpacityChanged == item) {
-        move = false
+        dragging = true
       } else {
         this.lastOpacityChanged = item;
       }
-      this.$emit('opacity', item, (e.target as HTMLInputElement).value, move);
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value, !dragging);
     },
 
     onToggleImage(e: Event, item: Thumbnail) {

@@ -244,7 +244,7 @@
             }"
             :order="false"
             v-model="selectedTime"
-            @change="updateForDateTime(true)"
+            @change="onTimeSliderchange"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
@@ -1125,7 +1125,7 @@ export default defineComponent({
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
-      this.updateForDateTime()
+      this.showImageForDateTime(this.dateTime)
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
@@ -1150,7 +1150,7 @@ export default defineComponent({
     },
 
     
-    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 0.9): boolean {
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/2): boolean {
       // checks if the center of place is in the current field of view
       // Assume the Zoom level corresponds to the size of the image
       // fraction_of_place is ~fraction of the place that must be in the current FOV
@@ -1193,28 +1193,27 @@ export default defineComponent({
       return false
     },
 
-
+    onTimeSliderchange(options?: MoveOptions) {
+      this.$nextTick(() => {
+        this.showImageForDateTime(this.dateTime);
+        this.updateViewForDate(options);
+      });
+    },
 
     onOpacityChanged(place: Place, opacity: number, move: boolean) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       this.updateImageOpacity(place, opacity);
-
-      const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day); 
-      this.setTime(this.dateTime);
-      this.updateHorizon(this.dateTime);
-      // this.updateViewForDate();
-      this.updateLayersForDate();
-      // console.log('opacity changed')
-
       
 
       this.$nextTick(() => {
-        console.log('opacity changed. moving? ', move)
         const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
         if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
-          console.log('zooming',this.need_to_zoom_in(place, 1))
+          console.log('opacity changed. moving? ', move)
+          const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+          this.selectedTime = Date.UTC(year, month - 1, day); 
+          this.incomingItemSelect = place;
+
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
@@ -1669,11 +1668,10 @@ export default defineComponent({
       });
     },
 
-    updateForDateTime(isolateImage = true, options?: MoveOptions) {
+    updateForDateTime(options?: MoveOptions) {
+      console.log('updateForDateTime')
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime); 
-      if (isolateImage) { this.showImageForDateTime(this.dateTime) }
-      this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
@@ -1744,6 +1742,10 @@ export default defineComponent({
       //   zoomDeg: this.wwtZoomDeg,
       //   instant: true
       // });
+    },
+
+    selectedDate() {
+      this.updateForDateTime();
     },
     
     showLocationSelector(show: boolean) {
