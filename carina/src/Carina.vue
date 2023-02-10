@@ -56,6 +56,7 @@
             class="control-icon-wrapper"
             v-bind="props"
             @click="showVideoSheet = true"
+            @keyup.enter="showVideoSheet = true"
             tabindex="0"
           >
             <font-awesome-icon
@@ -63,7 +64,6 @@
               class="control-icon"
               icon="video"
               size="lg"
-              
             ></font-awesome-icon>
           </div>
         </template>
@@ -73,7 +73,8 @@
         <button
           id="show-layers-button"
           class="ui-text"
-          @click="showLayers = !showLayers">
+          @click="showLayers = !showLayers"
+        >
           {{ showLayers ? "Hide Images" : "Show Images" }}
         </button>
         <v-tooltip
@@ -91,6 +92,10 @@
               class="control-icon-wrapper"
               v-bind="props"
               tabindex="0"
+              @keyup.enter="() => {
+                resetView(false);
+                showResetTooltip = false;
+              }"
               @click="() => {
                 resetView(false);
                 showResetTooltip = false;
@@ -123,6 +128,7 @@
             @mouseleave="showTextTooltip = false"
             v-bind="props"
             @click="showTextSheet = true"
+            @keyup.enter="showTextSheet = true"
             tabindex="0"
           >
             <font-awesome-icon
@@ -144,6 +150,7 @@
             <span
               class="ui-text slider-label"
               @click="crossfadeOpacity = 0"
+              @keyup.enter="crossfadeOpacity = 0"
               tabindex="0"
             >Hubble<br><span class="light-type">(Visible)</span></span>
             <input
@@ -154,6 +161,7 @@
             <span
               class="ui-text slider-label"
               @click="crossfadeOpacity = 100"
+              @keyup.enter="crossfadeOpacity = 100"
               tabindex="0"
             >JWST<br><span class="light-type">(Infrared)</span></span>
           </template>
@@ -223,8 +231,13 @@
           icon="times"
           size="lg"
           @click="showVideoSheet = false"
+          @keyup.enter="showVideoSheet = false"
+          tabindex="0"
         ></font-awesome-icon>
-        <video controls id="info-video">
+        <video
+          controls
+          id="info-video"
+        >
           <source src="./assets/CarinaFinal.mp4" type="video/mp4">
         </video>
       </div>
@@ -243,13 +256,6 @@
       transition="dialog-bottom-transition"
     >
       <v-card height="100%">
-      <!-- <v-container height="11px">
-        <font-awesome-icon
-          class="close-icon"
-          icon="times"
-          @click="showTextSheet = false"
-        ></font-awesome-icon>
-      </v-container> -->
       <v-tabs
         v-model="tab"
         height="32px"
@@ -260,8 +266,8 @@
       >
         <!-- <v-tabs-slider color="white"></v-tabs-slider> -->
 
-        <v-tab><h3>Information</h3></v-tab>
-        <v-tab><h3>Using WWT</h3></v-tab>
+        <v-tab tabindex="0"><h3>Information</h3></v-tab>
+        <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
       </v-tabs>
       <font-awesome-icon
         id="close-text-icon"
@@ -269,6 +275,7 @@
         icon="times"
         size="lg"
         @click="showTextSheet = false"
+        @keyup.enter="showTextSheet = false"
         tabindex="0"
       ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
@@ -480,9 +487,16 @@ export default defineComponent({
 
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
-          window.removeEventListener('keypress', splashScreenListener);
+          window.removeEventListener('keyup', splashScreenListener);
         }
-        window.addEventListener('keypress', splashScreenListener);
+        window.addEventListener('keyup', splashScreenListener);
+
+        window.addEventListener('keyup', (event: KeyboardEvent) => {
+          console.log(event);
+          if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+            this.showVideoSheet = false;
+          }
+        });
       });
       
 
