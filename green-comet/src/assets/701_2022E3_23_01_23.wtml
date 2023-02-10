@@ -1,0 +1,38 @@
+<Folder MSRCommunityId="0" MSRComponentId="0" Permission="0" Name="701_2022E3_23_01_23" Group="Explorer" Searchable="False">
+  <Place Name="701_2022E3_23_01_23" DataSetType="Sky" RA="15.271533918209276" Dec="58.966012587662874" Rotation="0" ZoomLevel="10">
+    <ForegroundImageSet>
+      <ImageSet       DemUrl=""
+                MSRCommunityId="0"
+                MSRComponentId="0"
+                Permission="0"
+                Generic="False"
+                DataSetType="Sky"
+                BandPass="Visible"
+                Url="https://raw.githubusercontent.com/cosmicds/minids/main/green-comet/src/assets/701_2022E3_23_01_23_inverted_tagged.jpg"
+                TileLevels="0"
+                WidthFactor="2"
+                Sparse="True"
+                Rotation="90.1788099328927"
+                QuadTreeMap=""
+                Projection="SkyImage"
+                Name="701_2022E3_23_01_23"
+                FileType=".jpg"
+                CenterY="58.966012587662874"
+                CenterX="229.07300877313912"
+                BottomsUp="False"
+                StockSet="False"
+                ElevationModel="False"
+                OffsetX="750.5"
+                OffsetY="1060.0"
+                BaseTileLevel="0"
+                BaseDegreesPerTile="0.0015046523789178131"
+                ReferenceFrame=""
+                MeanRadius="0">
+        <Description>description</Description>
+        <Credits>credits</Credits>
+        <CreditsUrl>credits_url</CreditsUrl>
+        <ThumbnailUrl>https://nova.astrometry.net/image/16942765</ThumbnailUrl>
+      </ImageSet>
+    </ForegroundImageSet>
+  </Place>
+</Folder>
