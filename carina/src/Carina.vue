@@ -56,6 +56,7 @@
             class="control-icon-wrapper"
             v-bind="props"
             @click="showVideoSheet = true"
+            tabindex="0"
           >
             <font-awesome-icon
               id="video-icon"
@@ -89,6 +90,7 @@
               id="reset-icon-wrapper"
               class="control-icon-wrapper"
               v-bind="props"
+              tabindex="0"
               @click="() => {
                 resetView(false);
                 showResetTooltip = false;
@@ -121,6 +123,7 @@
             @mouseleave="showTextTooltip = false"
             v-bind="props"
             @click="showTextSheet = true"
+            tabindex="0"
           >
             <font-awesome-icon
               id="text-icon"
@@ -141,6 +144,7 @@
             <span
               class="ui-text slider-label"
               @click="crossfadeOpacity = 0"
+              tabindex="0"
             >Hubble<br><span class="light-type">(Visible)</span></span>
             <input
               class="opacity-range"
@@ -150,6 +154,7 @@
             <span
               class="ui-text slider-label"
               @click="crossfadeOpacity = 100"
+              tabindex="0"
             >JWST<br><span class="light-type">(Infrared)</span></span>
           </template>
           <template v-else-if="currentTool == 'choose-background'">
@@ -264,6 +269,7 @@
         icon="times"
         size="lg"
         @click="showTextSheet = false"
+        tabindex="0"
       ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
@@ -471,7 +477,7 @@ export default defineComponent({
       Promise.all(layerPromises).then(() => {
         this.resetView();
         this.layersLoaded = true;
-        
+
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
           window.removeEventListener('keypress', splashScreenListener);
@@ -747,6 +753,10 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: #FFFFFF;
+  }
 }
 
 .control-icon-wrapper {
@@ -761,6 +771,11 @@ body {
 
   &:hover {
     cursor: pointer;
+  }
+
+  &:focus {
+    color: #FFFFFF;
+    border-color: #FFFFFF;
   }
 }
 
@@ -873,6 +888,10 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
+
+  &:focus {
+    color: white;
+  }
 }
 
 .slider-label {
