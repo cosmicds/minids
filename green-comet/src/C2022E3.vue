@@ -159,33 +159,6 @@
           </template>
           <span>Watch video</span>
         </v-tooltip>
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showPlayPauseTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="play-pause-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showPlayPauseTooltip = true"
-              @mouseleave="showPlayPauseTooltip = false"
-              v-bind="props"
-              @click="playing = !playing"
-            >
-              <font-awesome-icon
-                id="play-pause-icon"
-                class="control-icon"
-                :icon="playing ? 'pause' : 'play'"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Play/pause</span>
-        </v-tooltip>
       </div>
     </div>
 
@@ -260,8 +233,34 @@
             outlined
             label
             >
-              Date:
+            Date
           </v-chip>
+          <v-tooltip
+            location="top"
+            :open-on-click="false"
+            :open-on-focus="false"
+            :open-on-hover="true"
+            v-model="showPlayPauseTooltip"
+          >
+            <template v-slot:activator="{ props }">
+              <div
+                id="play-pause-icon-wrapper"
+                class="control-icon-wrapper"
+                @mouseover="showPlayPauseTooltip = true"
+                @mouseleave="showPlayPauseTooltip = false"
+                v-bind="props"
+                @click="playing = !playing"
+              >
+                <font-awesome-icon
+                  id="play-pause-icon"
+                  class="control-icon"
+                  :icon="playing ? 'pause' : 'play'"
+                  size="lg"
+                ></font-awesome-icon>
+              </div>
+            </template>
+            <span>Play/Pause</span>
+          </v-tooltip>
           <vue-slider
             id="slider"
             adsorb
@@ -959,6 +958,7 @@ export default defineComponent({
     cssVars() {
       return{
         '--comet-color': this.cometColor,
+        '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -1717,7 +1717,7 @@ export default defineComponent({
       if (play) {
         this.playingIntervalId = setInterval(() => {
           this.selectedTime += 1000 * 60 * 60 * 24;
-        }, 500);
+        }, 300);
       }
     }
   }
@@ -1850,6 +1850,11 @@ body {
   &:hover {
     cursor: pointer;
   }
+}
+
+#play-pause-icon-wrapper {
+  color: var(--ephemeris-color);
+  border-color: var(--ephemeris-color);
 }
 
 #video-icon-dummy {
