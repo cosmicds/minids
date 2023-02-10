@@ -75,7 +75,6 @@
           class="control-icon"
           icon="video"
           size="lg"
-          
         ></font-awesome-icon>
       </div>
       <v-tooltip
@@ -93,6 +92,7 @@
             @mouseleave="showMapTooltip = false"
             v-bind="props"
             @click="showLocationSelector = true"
+            tabindex="0"
           >
             <font-awesome-icon
               id="location-icon"
@@ -121,6 +121,7 @@
               @mouseleave="showTextTooltip = false"
               v-bind="props"
               @click="showTextSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="text-icon"
@@ -148,6 +149,7 @@
               @mouseleave="showVideoTooltip = false"
               v-bind="props"
               @click="showVideoSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="video-icon"
@@ -173,6 +175,7 @@
             size="lg"
             :color="cometColor"
             @click="showControls = !showControls"
+            tabindex="0"
           />
         </div>
           <transition-expand>
@@ -1840,6 +1843,10 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: #FFFFFF;
+  }
 }
 
 .control-icon-wrapper {
@@ -1855,6 +1862,11 @@ body {
 
   &:hover {
     cursor: pointer;
+  }
+
+  &:focus {
+    color: #FFFFFF;
+    border-color: #FFFFFF;
   }
 }
 
@@ -2351,22 +2363,24 @@ input[type="range"] {
       --track-color: rgba(217, 234, 242,0.2);
       --thumb-color: rgba(205, 54, 157  , 1);
     }
+
+    &:focus {
+      border-radius: calc(var(--track-height) / 2);
+    }
   }
   
   
   
   input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: inherit;
-      -moz-appearance: inherit;
-      appearance: inherit;
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
     margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
-    
-    
   }
   
   input[type="range"]::-moz-range-thumb {
@@ -2401,6 +2415,7 @@ input[type="range"]::-moz-range-track {
     height:var(--track-height);
     margin-top: 0;
     padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
+
   }
   
 #sliderlabel {
