@@ -237,7 +237,7 @@
       <div id="tools">
         <span class="tool-container">
           <v-chip
-            id="sliderlabel"
+            id="slider-label"
             outlined
             label
             >
@@ -2227,11 +2227,13 @@ video {
 
 // Styling the slider
 
-#sliderlabel {
+#slider-label {
   padding:3px 5px;
   margin:0 5px;
   color:#fff !important;
   background-color: rgba(214, 4, 147,0.7);
+  padding-right: 0.75em;
+  padding-left: 0.5em;
 }
 
 #slider {
@@ -2453,11 +2455,5 @@ input[type="range"]::-moz-range-track {
     height:var(--track-height);
     margin-top: 0;
     padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
-
   }
-  
-#sliderlabel {
-  padding-right: 0.75em;
-  padding-left: 0.5em;
-}
 </style>
