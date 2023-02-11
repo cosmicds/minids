@@ -1351,7 +1351,7 @@ export default defineComponent({
       const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
       return { ra, dec };
     },
-
+    
     get_julian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
@@ -1366,30 +1366,29 @@ export default defineComponent({
           month += 12;
       }
 
-      const a = year / 100;
+      const a = Math.floor(year / 100);
       const b = 2 - a + Math.floor(a / 4.0);
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // gives julian date: number of days since Jan 1, 4713 BC
+      const JD = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
 
-      const mjday = Math.floor(meeus_julianDays)
-      return mjday + (hour-12) / 24 + minute / 1440 + second / 86400;
+      console.log(JD);
+      return JD
 
     },
     
     mstFromUTC2(utc: Date, longRad: number): number {
       const lng = longRad * R2D;
 
-      const meeus_julianDays = this.get_julian(utc);
-
-      const julianDays = meeus_julianDays ;
+      const modified_jd = this.get_julian(utc)  - 2451545;
 
       // console.log(julianDays)
 
-      const julianCenturies = julianDays / 36525.0;
+      const julianCenturies = modified_jd / 36525.0;
       // this form wants julianDays - 2451545
-      let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+      let mst = 280.46061837 + 360.98564736629 * modified_jd + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
 
       if (mst > 0.0) {
         while (mst > 360.0) {
@@ -1565,8 +1564,8 @@ export default defineComponent({
       this.isPointerMoving = false;
     },
 
-    updateViewForDate(options?: MoveOptions, move_like_opacity = false) {
-
+    updateViewForDate(options?: MoveOptions) {
+      this.logTimes("updateViewForDate", new Date(this.selectedTime));
       let position = null as TableRow | null;
 
       const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
@@ -1691,15 +1690,17 @@ export default defineComponent({
       });
     },
 
-    updateForDateTime(options?: MoveOptions) {
+    updateForDateTime() {
       console.log('updateForDateTime')
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime); 
+      // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
+      this.logTimes('updateHorizon',when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1713,7 +1714,18 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
-    }
+    },
+
+    logTimes(pre: string, date = null as Date | null) {
+      console.log('running in',pre)
+      // console.log("::: selectedTime:", new Date(this.selectedTime))
+      // console.log('::: selectedDate:', this.selectedDate)
+      // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
+      date = null // disable block w/o deleting (i.e. stop typescript from complaining)
+      if (date != null) {
+        console.log('::: manual date:', date)
+      }
+    },
   },
 
   watch: {
@@ -1769,7 +1781,12 @@ export default defineComponent({
     },
 
     selectedDate() {
+      this.logTimes('selectedDate')
       this.updateForDateTime();
+    },
+
+    selectedTime() {
+      console.log('changed selectedTime')
     },
     
     showLocationSelector(show: boolean) {
