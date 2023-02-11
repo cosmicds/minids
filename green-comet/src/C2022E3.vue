@@ -415,7 +415,7 @@
                 Adjusting the <span class="ui-element-ref-comet">Date</span> slider along the bottom of the screen shows you the position of the comet since it was discovered in March 2022. 
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
-                  <li>Use the blue image sliders to reveal and hide the comet images for each date. When you are zoomed out they will appear as little rectangles overlayed on the sky. Zoom in to see the details of each image.</li>
+                  <li>Click the thumbnail images on the left to see photographs of the comet in the virtual sky. Use the sliders under the thumbnails to display the comet images for multiple dates.</li>
                   <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
                 </ul>
                 <br>
@@ -465,8 +465,7 @@
                       </v-chip>
                     </v-col>
                     <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong><br>
-                
+                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
                     </v-col>
                   </v-row>
                   <v-row align="center">
@@ -479,8 +478,7 @@
                       </v-chip>
                     </v-col>
                     <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong><br>
-                      
+                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
                     </v-col>
                   </v-row>
                   <v-row>
@@ -502,10 +500,20 @@
                             Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
                           </li>
                           <li>
-                            The white markers in the sky show the path of the comet on a particular date at 00:00 UT. Circle markers are separated by 1 week. Dot markers are separated by 1 day. The pink marker shows the position of the comet at the displayed local time.
+                            Click 
+                              <font-awesome-icon
+                                id="play-pause-icon"
+                                class="control-icon"
+                                icon="play"
+                                size="lg"
+                              ></font-awesome-icon>
+                            to auto-advance time.
                           </li>
                           <li>
-                            Click a date on the panel in the upper left to see an image of the comet photographed by Gerald Rhemann on that day. The slider under the date adjusts the image opacity.
+                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT and 12:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock.
+                          </li>
+                          <li>
+                            Click a thumbnail image in the panel in the upper left to see an image of the comet photographed by Gerald Rhemann overlaid on the virtual sky on that day. The slider under the thumbnail adjusts the image opacity within the sky view.
                           </li>
                           <li>
                             Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
