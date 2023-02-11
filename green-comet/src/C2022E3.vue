@@ -510,7 +510,7 @@
                             to auto-advance time.
                           </li>
                           <li>
-                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT and 12:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock.
+                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT and 12:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Small pink dots overlaid with a larger white'ish dot indicate dates that have comet photographs.
                           </li>
                           <li>
                             Click a thumbnail image in the panel in the upper left to see an image of the comet photographed by Gerald Rhemann overlaid on the virtual sky on that day. The slider under the thumbnail adjusts the image opacity within the sky view.
