@@ -273,7 +273,7 @@
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
-              toLocaleUTCDateString(new Date(v))
+              toDateString(new Date(v))
             "
             >
               <template v-slot:mark="{ pos, value }">
@@ -985,7 +985,6 @@ export default defineComponent({
     },
     dayFrac(): number {
       const dateForTOD = new Date();
-      console.log(this.selectedTimezoneOffset);
       const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
@@ -1019,10 +1018,17 @@ export default defineComponent({
   },
 
   methods: {
-    toLocaleUTCDateString(date: Date) {
-      const timeDiff = date.getTimezoneOffset() * 60000;
-      const adjustedDate = new Date(date.valueOf() + timeDiff);
-      return adjustedDate.toLocaleDateString();
+
+    moveOneDayForward() {
+      this.selectedTime += MILLISECONDS_PER_DAY;
+    },
+
+    moveOneDayBackward() {
+      this.selectedTime -= MILLISECONDS_PER_DAY;
+    },
+
+    toDateString(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -1217,10 +1223,10 @@ export default defineComponent({
     },
 
     onMapSelect(e: LeafletMouseEvent) {
-      let lngRad = e.latlng.lng * D2R;
-      if (lngRad < - Math.PI) {
-        lngRad += 2 * Math.PI;
-      }
+      let lngRad = e.latlng.lng * D2R + Math.PI;
+      const twoPi = 2 * Math.PI;
+      lngRad = ((lngRad % twoPi) + twoPi) % twoPi; // We want modulo, but JS % operator is remainder
+      lngRad -= Math.PI;
       this.location = {
         latitudeRad: e.latlng.lat * D2R,
         longitudeRad: lngRad
@@ -1657,11 +1663,7 @@ export default defineComponent({
       this.updateForDateTime();
     },
     location(loc: LocationRad, oldLoc: LocationRad) {
-      //const now = this.selectedDate;
-      //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
-
       const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
-      console.log(locationDeg);
       if (this.map) {
         this.circle?.remove();
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
@@ -1693,7 +1695,15 @@ export default defineComponent({
     selectedTimezone(newTz: string, oldTz: string) {
       const newOffset = getTimezoneOffset(newTz);
       const oldOffset = getTimezoneOffset(oldTz);
-      this.timeOfDay.hours += ((newOffset - oldOffset) / (1000*60*60));
+      let newHours = this.timeOfDay.hours + ((newOffset - oldOffset) / (1000*60*60));
+      if (newHours >= 24) {
+        newHours -= 24;
+        this.moveOneDayForward();
+      } else if (newHours < 0) {
+        newHours += 24;
+        this.moveOneDayBackward();
+      }
+      this.timeOfDay.hours = newHours;
     },
     playing(play: boolean) {
       if (this.playingIntervalId) {
@@ -1702,7 +1712,7 @@ export default defineComponent({
       }
       if (play) {
         this.playingIntervalId = setInterval(() => {
-          this.selectedTime += 1000 * 60 * 60 * 24;
+          this.moveOneDayForward();
         }, 300);
       }
     }
