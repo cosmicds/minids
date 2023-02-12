@@ -1845,7 +1845,7 @@ body {
 .control-icon-wrapper {
   color: var(--comet-color);
   background: #040404;
-  padding: 6px;
+  padding: 8px 24px;
   border: 1px solid var(--comet-color);
   border-radius: 20px;
   display: flex;
