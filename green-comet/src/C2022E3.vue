@@ -883,7 +883,6 @@ export default defineComponent({
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
-          console.log(event);
           if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
             this.showVideoSheet = false;
           }
@@ -1144,7 +1143,6 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1562,7 +1560,6 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
