@@ -335,11 +335,11 @@
       </div>
     </div>
 
-    <v-container
+    <v-dialog
       id="video-container"
-      v-show="showVideoSheet"
+      v-model="showVideoSheet"
       transition="slide-y-transition"
-      fluid
+      fullscreen
     >
       <div class="video-wrapper">
         <font-awesome-icon
@@ -358,7 +358,7 @@
           <source src="./assets/video2.mp4" type="video/mp4">
         </video>
       </div>
-    </v-container>
+    </v-dialog>
 
     <v-dialog
       id="location-dialog"

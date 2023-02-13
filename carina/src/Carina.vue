@@ -220,10 +220,11 @@
       </div>
     </div>
 
-    <v-container
+    <v-dialog
       id="video-container"
-      v-show="showVideoSheet"
+      v-model="showVideoSheet"
       transition="slide-y-transition"
+      fullscreen
     >
       <div class="video-wrapper">
         <font-awesome-icon
@@ -241,7 +242,7 @@
           <source src="./assets/CarinaFinal.mp4" type="video/mp4">
         </video>
       </div>
-    </v-container>
+    </v-dialog>
 
     <v-dialog
       class="bottom-sheet"
