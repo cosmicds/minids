@@ -23,6 +23,7 @@ import {
   faChevronUp,
   faGear,
   faLocationPin,
+  faClock,
   faPause,
   faPlay,
   faTimes,
@@ -36,6 +37,7 @@ library.add(faCircle);
 library.add(faSquare);
 library.add(faBookOpen);
 library.add(faLocationPin);
+library.add(faClock);
 library.add(faTimes);
 library.add(faVideo);
 library.add(faChevronDown);

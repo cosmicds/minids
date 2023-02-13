@@ -78,32 +78,34 @@
           
         ></font-awesome-icon>
       </div>
-      <v-tooltip
-        v-model="showMapTooltip"
-        location="bottom"
-        :open-on-click="false"
-        :open-on-focus="false"
-        :open-on-hover="true"
-      >
-        <template v-slot:activator="{ props }">
-          <div
-            id="map-icon-wrapper"
-            class="control-icon-wrapper"
-            @mouseover="showMapTooltip = true"
-            @mouseleave="showMapTooltip = false"
-            v-bind="props"
-            @click="showLocationSelector = true"
-          >
-            <font-awesome-icon
-              id="location-icon"
-              class="control-icon"
-              icon="location-pin"
-              size="lg"
-            ></font-awesome-icon>
-          </div>
-        </template>
-        <span>Select location</span>
-      </v-tooltip>
+      <div id="center-buttons">
+        <v-tooltip
+          v-model="showMapTooltip"
+          location="bottom"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="map-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showMapTooltip = true"
+              @mouseleave="showMapTooltip = false"
+              v-bind="props"
+              @click="showLocationSelector = true"
+            >
+              <font-awesome-icon
+                id="location-icon"
+                class="control-icon"
+                icon="location-pin"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Select location</span>
+        </v-tooltip>
+      </div>
       <div id="right-buttons">
         <v-tooltip
           location="start"
@@ -169,42 +171,54 @@
       >
         <div id="controls-top-row">
           <font-awesome-icon
-            :icon="showControls ? `chevron-up` : `gear`"
+            :icon="showControls ? `chevron-down` : `gear`"
             size="lg"
             :color="cometColor"
             @click="showControls = !showControls"
+            class="ma-1"
           />
         </div>
-          <transition-expand>
+        <transition-expand>
           <div v-if="showControls" class="controls-content">
+            <v-checkbox
+              :color="cometColor"
+              v-model="showAltAzGrid"
+              label="Grid"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showConstellations"
+              label="Constellations"
+              hide-details
+            />
+            <v-checkbox
+              :color="cometColor"
+              v-model="showHorizon"
+              label="Horizon"
+              hide-details
+            />
             <date-picker
               dark
               time-picker
               enable-seconds
               :is-24="false"
               v-model="timeOfDay"
-            />
-            <v-checkbox
-              :color="cometColor"
-              v-model="showAltAzGrid"
-              label="Show Grid"
-              hide-details
-            />
-            <v-checkbox
-              :color="cometColor"
-              v-model="showConstellations"
-              label="Show Constellations"
-              hide-details
-            />
-            <v-checkbox
-              :color="cometColor"
-              v-model="showHorizon"
-              label="Show Horizon"
-              hide-details
-            />
+              :clearable="false"
+              close-on-scroll
+              class="my-3 "
+            >
+              <template #input-icon>
+                <font-awesome-icon
+                  icon="clock"
+                  class="mx-2"
+                ></font-awesome-icon>
+              </template>
+            </date-picker>
             <v-btn
               :color="cometColor"
               @click="centerOnCurrentDate"
+              block
             >
               Center on Now
             </v-btn>
@@ -1926,8 +1940,8 @@ body {
 
 #controls {
   background: black;
-  padding: 5px;
-  border-radius: 5px;
+  padding: 10px;
+  border-radius: 10px;
   border: solid 1px var(--comet-color);
   display: flex;
   flex-direction: column;
