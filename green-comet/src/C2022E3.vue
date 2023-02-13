@@ -1195,7 +1195,7 @@ export default defineComponent({
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder();
+      this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
