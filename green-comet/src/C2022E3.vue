@@ -1704,7 +1704,11 @@ export default defineComponent({
       }
       if (play) {
         this.playingIntervalId = setInterval(() => {
-          this.moveOneDayForward();
+          if (this.selectedTime < maxDate) {
+            this.selectedTime += 1000 * 60 * 60 * 24;
+          } else {
+            this.selectedTime = minDate;
+          }
         }, 300);
       }
     }
