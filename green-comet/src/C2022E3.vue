@@ -1164,9 +1164,11 @@ export default defineComponent({
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
       this.showImageForDateTime(this.dateTime)
+      // this.updateViewForDate();
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
+          console.log('onItemSelected move?',place.get_name())
           if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
@@ -1228,8 +1230,9 @@ export default defineComponent({
       const curDec = this.wwtDecRad;
       const curFov = this.wwtSmallestFov();
 
-      
-      return this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
+      const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
+      console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
+      return return_val
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
@@ -1641,6 +1644,7 @@ export default defineComponent({
     },
 
     matchImageSetName(date: Date): string {
+      console.log(`matchImageSetName ${date}`)
       // imageset names are keys in this.imagesetLayers
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
@@ -1657,9 +1661,11 @@ export default defineComponent({
       return '';
     },
 
-    setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
+    setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui = false) {
+      // console.log(`setLayerOpacityForImageSet ${name} ${opacity}`)
       const layer = this.imagesetLayers[name]
       if (layer != null) {
+        // console.log('\tlayer found')
         // update the image opacity in the WWT control
         applyImageSetLayerSetting(layer, ['opacity', opacity])
 
@@ -1692,6 +1698,7 @@ export default defineComponent({
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
+      // console.log(`showImageForDateTime: ${name}`)
       const imageset_names = Object.keys(this.imagesetLayers)
       imageset_names.forEach((iname: string) => {
         if (iname != name) {
@@ -1755,7 +1762,7 @@ export default defineComponent({
     },
 
     logTimes(pre: string, date = null as Date | null) {
-      console.log('running in',pre)
+      console.log('running',pre)
       // console.log("::: selectedTime:", new Date(this.selectedTime))
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
