@@ -585,7 +585,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -773,7 +773,7 @@ export default defineComponent({
 
   created() {
 
-    this.waitForReady().then(() => {
+    this.waitForReady().then(async () => {
 
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
@@ -790,30 +790,28 @@ export default defineComponent({
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
 
-      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
-        this.loadImageCollection({
-          url: value as string,
-          loadChildFolders: false
-        }).then((folder) => {
-          this.imagesetFolder = folder;
-          const children = folder.get_children();
-          if (children == null) { return; }
-          children.forEach((item) => {
-            if (!(item instanceof Place)) { return; }
-            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-            if (imageset === null) { return; }
-            const name = imageset.get_name();
-            this.addImageSetLayer({
-              url: imageset.get_url(),
-              mode: "autodetect",
-              name: name,
-              goto: false
-            }).then((layer) => {
-              this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 0]);
-            });
-        });
-      }));
+      this.imagesetFolder = await this.loadImageCollection({
+        url: this.wtml.c2022e3,
+        loadChildFolders: false
+      });
+      const children = this.imagesetFolder.get_children() ?? [];
+      const layerPromises: Promise<Layer>[] = [];
+      children.forEach((item) => {
+        if (!(item instanceof Place)) { return; }
+        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+        if (imageset == null) { return; }
+        const name = imageset.get_name();
+        layerPromises.push(this.addImageSetLayer({
+          url: imageset.get_url(),
+          mode: "autodetect",
+          name: name,
+          goto: false
+        }).then((layer) => {
+          this.imagesetLayers[name] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0]);
+          return layer;
+        }));
+      });
       
 
       this.loadImageCollection({
@@ -845,7 +843,8 @@ export default defineComponent({
             //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
-        })
+        });
+        return layer;
       }));
 
       layerPromises.push(this.createTableLayer({
@@ -865,55 +864,9 @@ export default defineComponent({
             //["sizeColumn", 3],
             ["opacity", 0.4]
           ]
-        })
+        });
+        return layer;
       }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "Today",
-      //   referenceFrame: "Sky",
-      //   dataCsv: FullDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 45],
-      //       ["color", Color.fromHex(this.todayColor)],
-      //       ["plotType", PlotTypes.circle],
-      //       //["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 0.8]
-      //     ]
-      //   });
-      // }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "CometImage Date Layer",
-      //   referenceFrame: "Sky",
-      //   dataCsv: CometImageDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 3],
-      //       ["color", #FFFFFF],
-      //       ["plotType", PlotTypes.point],
-      //       ["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 1]
-      //     ]
-      //   });
-      // }));
 
       this.setTime(this.dateTime);
 
