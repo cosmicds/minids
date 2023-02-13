@@ -131,7 +131,8 @@ export default defineComponent({
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
-      expanded: this.open
+      expanded: this.open,
+      lastOpacityChanged: null as Thumbnail | null
     }
   },
 
@@ -155,7 +156,6 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
-      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -164,13 +164,17 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
-      console.log("FolderView: slider changed")
-      this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+      let move = true
+      if (this.lastOpacityChanged == item) {
+        move = false
+      } else {
+        this.lastOpacityChanged = item;
+      }
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value, move);
     },
 
     onToggleImage(e: Event, item: Thumbnail) {
-      console.log("FolderView: toggled")
-      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked);
     }
   },
 
@@ -182,11 +186,7 @@ export default defineComponent({
     },
 
     isMobile() {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
+      return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     },
   },
 

@@ -60,7 +60,7 @@
         :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="updateImageOpacity"
+        @opacity="onOpacityChanged"
         @toggle="onToggle"
       ></folder-view>
     </div>
@@ -569,7 +569,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -757,7 +757,7 @@ export default defineComponent({
 
   created() {
 
-    this.waitForReady().then(() => {
+    this.waitForReady().then(async () => {
 
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
@@ -774,31 +774,28 @@ export default defineComponent({
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
 
-      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
-        this.loadImageCollection({
-          url: value as string,
-          loadChildFolders: false
-        }).then((folder) => {
-          this.imagesetFolder = folder;
-          const children = folder.get_children();
-          if (children == null) { return; }
-          children.forEach((item) => {
-            if (!(item instanceof Place)) { return; }
-            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-            if (imageset === null) { return; }
-            const name = imageset.get_name();
-            this.addImageSetLayer({
-              url: imageset.get_url(),
-              mode: "autodetect",
-              name: name,
-              goto: false
-            }).then((layer) => {
-              this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 0]);
-            });
-        });
-      }));
-      
+      this.imagesetFolder = await this.loadImageCollection({
+        url: this.wtml.c2022e3,
+        loadChildFolders: false
+      });
+      const children = this.imagesetFolder.get_children() ?? [];
+      const layerPromises: Promise<Layer>[] = [];
+      children.forEach((item) => {
+        if (!(item instanceof Place)) { return; }
+        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+        if (imageset == null) { return; }
+        const name = imageset.get_name();
+        layerPromises.push(this.addImageSetLayer({
+          url: imageset.get_url(),
+          mode: "autodetect",
+          name: name,
+          goto: false
+        }).then((layer) => {
+          this.imagesetLayers[name] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0]);
+          return layer;
+        }));
+      });
 
       this.loadImageCollection({
         url: this.bgWtml,
@@ -829,7 +826,8 @@ export default defineComponent({
             //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
-        })
+        });
+        return layer;
       }));
 
       layerPromises.push(this.createTableLayer({
@@ -849,7 +847,8 @@ export default defineComponent({
             //["sizeColumn", 3],
             ["opacity", 0.4]
           ]
-        })
+        });
+        return layer;
       }));
 
       // layerPromises.push(this.createTableLayer({
@@ -903,6 +902,9 @@ export default defineComponent({
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
+        
+        // Set all of the imageset layers to be above the spreadsheet layers
+        this.resetImagesetLayerOrder();
       });
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -1135,54 +1137,113 @@ export default defineComponent({
       return -1;
     },
 
-    resetLayerOrder() {
-      // reset the layer order to the default
-      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
-      // get the key item with the value of layer.id
-      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+    resetImagesetLayerOrder() {
+      // Reset the order of the imageset layers
+      Object.keys(this.imagesetLayers).sort((k1, k2) => {
+        return new Date(k1).getTime() - new Date(k2).getTime();
+      }).forEach((key) => {
+        const layer = this.imagesetLayers[key];
         this.setImageSetLayerOrder({
-          id: value,
-          order: Number(key)
+          id: layer.id.toString(),
+          order: this.wwtActiveLayers.length
         });
-      }
+      });
     },
 
-    imageInView(iset: Imageset): boolean {
-      const curRa = this.wwtRARad;
-      const curDec = this.wwtDecRad;
-      const curZoom = this.wwtZoomDeg * D2R;
-      const isetRa = iset.get_centerX() * D2R;
-      const isetDec = iset.get_centerY() * D2R;
-      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
-      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
-    },
     
     onItemSelected(place: Place) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder();
+      this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day);
+      this.selectedTime = Date.UTC(year, month - 1, day); 
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+          if (this.image_out_of_view(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: place.get_zoomLevel() * 1.7,
+            zoomDeg: place.get_zoomLevel() * 2.5,
             instant: true
           });
         }
       });
     },
 
+    wwtSmallestFov(): number {
+      // ignore the possibility of rotation
+      const w = this.wwtRenderContext.width
+      const h = this.wwtRenderContext.height
+      const fov_h = this.wwtRenderContext.get_fovAngle() * D2R
+      const fov_w = fov_h * w / h
+      return Math.min(fov_w, fov_h)
+    },
+
+      
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/3): boolean {
+      // checks if the center of place is in the current field of view
+      // Assume the Zoom level corresponds to the size of the image
+      // fraction_of_place is ~fraction of the place that must be in the current FOV
+      // by default, allow 1/3 of the place to be visible and still be considered in view
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) {
+        console.log("There is not image set for this place: ", place)
+        return false;
+      }
+
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      const isetFov = (place.get_zoomLevel() / 6) * D2R
+      
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curFov = this.wwtSmallestFov();
+
+      let dist = distance(curRa, curDec, isetRa, isetDec);
+      // get distance of far size of image from center of view
+      // allow some fraction of the image to be off screen and still be considered in view
+      dist += (fraction_of_place - 1/2) * isetFov 
+
+      return dist < curFov / 2
+    },
+
+    // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
+    image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
+
+    need_to_zoom_in(place: Place): boolean {
+      // 1) we are already zoomed all the way out (if FOV > 50)
+      if (this.wwtZoomDeg > 300) { return true; }
+
+      // 2) the image is too small (so it's fov < 1/6 of the current fov)
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset != null) {
+        if (place.get_zoomLevel() < this.wwtZoomDeg) { return true; }
+      }
+      
+      return false
+    },
+
+    onOpacityChanged(place: Place, opacity: number, move: boolean) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.updateImageOpacity(place, opacity);
+      const zoom = this.need_to_zoom_in(place) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+      if (this.image_out_of_view(place) && move) {
+        this.gotoRADecZoom({
+          raRad: D2R * iset.get_centerX(),
+          decRad: D2R * iset.get_centerY(),
+          zoomDeg: zoom,
+          instant: false
+        });
+      }
+    },
+    
     updateImageOpacity(place: Place, opacity: number) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
@@ -1507,7 +1568,7 @@ export default defineComponent({
       
       if (cometImageIndex > -1) {
         if (this.interpolatedDailyTable !== null) {
-          position = this.interpolatedDailyTable[0]
+          position = this.interpolatedDailyTable[0];
         } else {
           position = CometImageDatesTable[cometImageIndex];
         }
@@ -1576,7 +1637,7 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
+          //console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
