@@ -1679,9 +1679,12 @@ export default defineComponent({
       }
 
       this.selectedTimezone = tzlookup(...locationDeg);
-
-      this.updateHorizon();
       this.updateWWTLocation();
+
+      // We need to let the location update before we redraw the horizon
+      this.$nextTick(() => {
+        this.updateHorizon();
+      });
     },
     selectedDate(_date: Date) {
       this.updateForDateTime();
