@@ -1168,16 +1168,19 @@ export default defineComponent({
       // this.updateViewForDate();
 
       // Give time for the selectedTime changes to propagate
-      this.$nextTick(() => {
+      setTimeout(() => {
+        this.$nextTick(() => {
           if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
-          this.gotoRADecZoom({
-            raRad: D2R * iset.get_centerX(),
-            decRad: D2R * iset.get_centerY(),
-            zoomDeg: place.get_zoomLevel() * 2.5,
-            instant: true
-          });
-        }
-      });
+            this.gotoRADecZoom({
+              raRad: D2R * iset.get_centerX(),
+              decRad: D2R * iset.get_centerY(),
+              zoomDeg: place.get_zoomLevel() * 2.5,
+              instant: true
+            });
+          }
+        });
+      }, 10);
+      
     },
 
     wwtSmallestFov(): number {
