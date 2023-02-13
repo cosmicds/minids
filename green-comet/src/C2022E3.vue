@@ -1153,6 +1153,7 @@ export default defineComponent({
 
     
     onItemSelected(place: Place) {
+      this.logTimes(`onItemSelected: ${place.get_name()}`)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1168,7 +1169,6 @@ export default defineComponent({
 
       // Give time for the selectedTime changes to propagate
       this.$nextTick(() => {
-          console.log('onItemSelected move?',place.get_name())
           if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
@@ -1231,7 +1231,7 @@ export default defineComponent({
       const curFov = this.wwtSmallestFov();
 
       const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
-      console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
+      // console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
       return return_val
     },
 
@@ -1269,7 +1269,7 @@ export default defineComponent({
       this.$nextTick(() => {
         const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
         if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
-          console.log('opacity changed. moving? ', move)
+          // console.log('opacity changed. moving? ', move)
           const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
           this.selectedTime = Date.UTC(year, month - 1, day); 
           this.incomingItemSelect = place;
@@ -1644,7 +1644,7 @@ export default defineComponent({
     },
 
     matchImageSetName(date: Date): string {
-      console.log(`matchImageSetName ${date}`)
+      // console.log(`matchImageSetName ${date}`)
       // imageset names are keys in this.imagesetLayers
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
@@ -1736,7 +1736,7 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      console.log('updateForDateTime')
+      this.logTimes('updateForDateTime')
       this.setTime(this.dateTime);
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
@@ -1762,14 +1762,15 @@ export default defineComponent({
     },
 
     logTimes(pre: string, date = null as Date | null) {
-      console.log('running',pre)
+      return 
+      // console.log('running',pre)
       // console.log("::: selectedTime:", new Date(this.selectedTime))
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
-      date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      if (date != null) {
-        console.log('::: manual date:', date)
-      }
+      // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
+      // if (date != null) {
+      //   console.log('::: manual date:', date)
+      // }
     },
   },
 
@@ -1831,7 +1832,7 @@ export default defineComponent({
     },
 
     selectedTime() {
-      console.log('changed selectedTime')
+      this.logTimes('selectedTime')
     },
     
     showLocationSelector(show: boolean) {
