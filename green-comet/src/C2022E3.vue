@@ -1289,7 +1289,7 @@ export default defineComponent({
       const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
       return { ra, dec };
     },
-    
+
     get_julian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
@@ -1633,7 +1633,6 @@ export default defineComponent({
     },
 
     updateHorizon(when: Date | null = null) {
-      this.logTimes('updateHorizon',when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1647,18 +1646,7 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
-    },
-
-    logTimes(pre: string, date = null as Date | null) {
-      console.log('running in',pre)
-      // console.log("::: selectedTime:", new Date(this.selectedTime))
-      // console.log('::: selectedDate:', this.selectedDate)
-      // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
-      date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      if (date != null) {
-        console.log('::: manual date:', date)
-      }
-    },
+    }
   },
 
   watch: {
