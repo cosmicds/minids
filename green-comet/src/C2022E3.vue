@@ -47,24 +47,6 @@
       </div>
     </transition>
 
-    <div class="left-content">
-      <folder-view
-        v-if="imagesetFolder !== null"
-        class="folder-view"
-        sliders
-        expandable
-        :thumbnails="true"
-        :open="mobile ? true : true"
-        :root-folder="imagesetFolder"
-        :wwt-namespace="wwtNamespace"
-        :incomingItemSelect="incomingItemSelect"
-        flex-direction="column"
-        @select="onItemSelected"
-        @opacity="updateImageOpacity"
-        @toggle="onToggle"
-      ></folder-view>
-    </div>
-
     <div class="top-content">
       <div
         id="video-icon-dummy"
@@ -166,7 +148,25 @@
         </v-tooltip>
       </div>
     </div>
-
+    
+    <div class="left-content">
+      <folder-view
+        v-if="imagesetFolder !== null"
+        class="folder-view"
+        sliders
+        expandable
+        :thumbnails="true"
+        :open="mobile ? true : true"
+        :root-folder="imagesetFolder"
+        :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
+        flex-direction="column"
+        @select="onItemSelected"
+        @opacity="updateImageOpacity"
+        @toggle="onToggle"
+      ></folder-view>
+    </div>
+    
     <div class="bottom-content">
       <div
         id="controls"
