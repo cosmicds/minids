@@ -59,6 +59,7 @@
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
               @mouseup="() => { lastOpacityChanged = null }"
+              @keyup.enter="() => selectItem(item)"
             />
             
 <!--
