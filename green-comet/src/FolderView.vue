@@ -58,6 +58,7 @@
               type="range"
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
+              @keyup.enter="() => selectItem(item)"
             />
             
 <!--
