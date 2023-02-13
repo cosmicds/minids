@@ -194,18 +194,21 @@
             <v-checkbox
               :color="cometColor"
               v-model="showAltAzGrid"
+              @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Show Grid"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
               label="Show Constellations"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showHorizon"
+              @keyup.enter="showHorizon = !showHorizon"
               label="Show Horizon"
               hide-details
             />
