@@ -21,10 +21,10 @@
         </div>
 
       </div>
-        <font-awesome-icon
-          id="expand-icon"
-          :icon="expanded ? 'chevron-up' : 'chevron-down'"
-        />
+      <font-awesome-icon
+        id="expand-icon"
+        :icon="expanded ? 'chevron-up' : 'chevron-down'"
+      />
     </div>
     <transition-expand>
       <div id="items">
@@ -37,30 +37,34 @@
             :key="item.get_name()"
             :title="item.get_name()"
           >
-            <img
-              class="thumbnail-images"
-              v-if="thumbnails"
-              :src="item.get_thumbnailUrl()"
-              :alt="item.get_name()"
-              @click="() => selectItem(item)"
-            />
             <div
-              class="item-name"
-              :class="['thumbnail']"
-              @click="() => selectItem(item)"
+              class="item-thumbnails"
             >
-              {{item.get_name()}}
+              <img
+                class="thumbnail-images"
+                v-if="thumbnails"
+                :src="item.get_thumbnailUrl()"
+                :alt="item.get_name()"
+                @click="() => selectItem(item)"
+              />
+              <div
+                class="item-name"
+                :class="['thumbnail']"
+                @click="() => selectItem(item)"
+              >
+                {{item.get_name()}}
+              </div>
             </div>
             <div class="slider-container">
-            <input
-              v-if="sliders"
-              class="opacity-range"
-              type="range"
-              value="0"
-              @input="(e) => onSliderInputChanged(e, item)"
-            />
+              <input
+                v-if="sliders"
+                class="opacity-range"
+                type="range"
+                value="0"
+                @input="(e) => onSliderInputChanged(e, item)"
+              />
             
-<!--
+              <!--
               <label class="switch">
                 <input 
                   type="checkbox"
@@ -68,7 +72,8 @@
                   @change="(e) => onToggleImage(e, item)"
                   >
                 <span class="slider"></span>
-              </label>  -->
+              </label>
+              -->
             </div>
 
           </div>
@@ -258,10 +263,18 @@ export default defineComponent({
   }
 }
 
+
+.selected .item-name {
+  color: #fb46c2;
+}
 .item-name {
+  position: absolute;
+  top:5px;
+  right:5px;
+  margin:0px 5px;
+  text-align: right;
   color: white;
-  width: 100%;
-  font-size: 9pt;
+  font-size: 10pt;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -274,8 +287,16 @@ export default defineComponent({
   padding: 3px;
 }
 
+.item-thumbnails {
+  position: relative;
+  display: inline-block;
+  height: 45px;
+}
+
 .thumbnail-images {
   width: 100px;
+  position: absolute;
+  height: 45px;
 }
 
 .bordered {
