@@ -233,16 +233,16 @@
             >
               Center on Now
             </v-btn>
+            <v-btn
+              block
+              :color="cometColor"
+              @click="playingCometPath = !playingCometPath"
+            >
+              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
+            </v-btn>
             <!--
             <v-btn
-              :color="cometColor"
-              @click="() => updateViewForDate({
-                zoomDeg: 360
-              })"
-            >
-              Best view for comet path
-            </v-btn>
-            <v-btn
+              block
               :color="cometColor"
               @click="setToFirstCometImage"
             >
@@ -742,6 +742,7 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
 
       playing: false,
+      playingCometPath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
 
       showAltAzGrid: true,
@@ -1025,6 +1026,13 @@ export default defineComponent({
   },
 
   methods: {
+
+    clearPlayingInterval() {
+      if (this.playingIntervalId !== null) {
+        clearInterval(this.playingIntervalId);
+        this.playingIntervalId = null;
+      }
+    },
 
     moveOneDayForward() {
       this.selectedTime += MILLISECONDS_PER_DAY;
@@ -1771,7 +1779,7 @@ export default defineComponent({
       if (date != null) {
         console.log('::: manual date:', date)
       }
-    },
+    }
   },
 
   watch: {
@@ -1842,11 +1850,9 @@ export default defineComponent({
       }
       this.timeOfDay.hours = newHours;
     },
+    
     playing(play: boolean) {
-      if (this.playingIntervalId) {
-        clearInterval(this.playingIntervalId);
-        this.playingIntervalId = null;
-      }
+      this.clearPlayingInterval();
       if (play) {
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < maxDate) {
@@ -1854,9 +1860,33 @@ export default defineComponent({
           } else {
             this.selectedTime = minDate;
           }
-          this.$nextTick( () => { this.updateViewForDate() })
+          this.$nextTick(() => {
+            this.showImageForDateTime(this.dateTime);
+            this.updateViewForDate();
+          })
         }, 350);
       }
+    },
+
+    playingCometPath(play: boolean) {
+      this.clearPlayingInterval();
+      if (!play) {
+        return;
+      }
+      const minTime = Math.min(...cometImageDates) - MILLISECONDS_PER_DAY;
+      const maxTime = Math.max(...cometImageDates) + MILLISECONDS_PER_DAY;
+      this.selectedTime = minTime;
+      this.playingIntervalId = setInterval(() => {
+        if (this.selectedTime < maxTime) {
+          this.moveOneDayForward();
+          this.$nextTick(() => {
+            this.showImageForDateTime(this.dateTime);
+            this.updateViewForDate({ zoomDeg: 60 });
+          });
+        } else {
+          this.playingCometPath = false;
+        }
+      }, 500);
     }
   }
 });
@@ -2108,10 +2138,10 @@ body {
       color: black;
       font-weight: 900;
       font-size: 0.75em;
+      white-space: break-spaces;
+      width: 150px;
     }
   }
-
-  
 
   #controls-top-row {
     display: flex;
@@ -2119,6 +2149,10 @@ body {
     flex-direction: row;
     justify-content: flex-end;
   }
+}
+
+.dp__select {
+  color: #04D6B0;
 }
 
 #show-controls {
