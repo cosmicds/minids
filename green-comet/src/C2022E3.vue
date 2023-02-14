@@ -97,7 +97,7 @@
             >
               <font-awesome-icon
                 id="location-icon"
-                class="control-icon px-6"
+                class="control-icon px-1"
                 icon="location-pin"
                 size="lg"
               ></font-awesome-icon>
@@ -747,7 +747,7 @@ export default defineComponent({
       showVideoTooltip: false,
       showPlayPauseTooltip: false,
       showLocationSelector: false,
-      showControls: true,
+      showControls: false,
       tab: 0,
 
       circle: null as L.Circle | null,
@@ -914,6 +914,8 @@ export default defineComponent({
       // }));
 
       this.setTime(this.dateTime);
+
+      this.showControls = !this.mobile;
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
@@ -1741,7 +1743,7 @@ export default defineComponent({
           } else {
             this.selectedTime = minDate;
           }
-        }, 400);
+        }, 350);
       }
     }
   }
@@ -1863,7 +1865,7 @@ body {
 .control-icon-wrapper {
   color: var(--comet-color);
   background: #040404;
-  padding: 8px 24px;
+  padding: 8px 16px;
   border: 1px solid var(--comet-color);
   border-radius: 20px;
   display: flex;
@@ -1941,6 +1943,7 @@ body {
 
 .folder-view {
   max-height: calc(100% - 150px);
+  width: ~"min(160px, 35vw)";
 }
 
 #controls {

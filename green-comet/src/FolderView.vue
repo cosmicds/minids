@@ -209,7 +209,6 @@ export default defineComponent({
 .fv-root {
   display: flex;
   flex-direction: var(--flex-direction);
-  width: auto;
   overflow-x: auto;
   overflow-y: auto;
   pointer-events: auto;
@@ -250,7 +249,7 @@ export default defineComponent({
   margin: .5em 0;
   & img {
     width: 100%;
-    height: ~"min(45px, 7.5vw)";
+    height: ~"min(45px, 7.5vh)";
     object-fit: cover;
     border-radius: 2px;
   }
@@ -274,7 +273,7 @@ export default defineComponent({
   margin:0px 5px;
   text-align: right;
   color: white;
-  font-size: 10pt;
+  font-size: 0.7em;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -284,7 +283,7 @@ export default defineComponent({
 .thumbnail-header {
   color: white;
   width: 100%;
-  font-size: 1rem;
+  font-size: 0.7rem;
   padding: 4px 8px;
 }
 
