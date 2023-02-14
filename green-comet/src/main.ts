@@ -16,11 +16,14 @@ import vuetify from "../plugins/vuetify"
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faCircle,
+  faSquare,
   faBookOpen,
   faChevronDown,
   faChevronUp,
   faGear,
   faLocationPin,
+  faClock,
   faPause,
   faPlay,
   faTimes,
@@ -28,10 +31,13 @@ import {
   faCameraRetro,
   faImages
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
+library.add(faCircle);
+library.add(faSquare);
 library.add(faBookOpen);
 library.add(faLocationPin);
+library.add(faClock);
 library.add(faTimes);
 library.add(faVideo);
 library.add(faChevronDown);
@@ -87,6 +93,7 @@ createApp(C2022E3, {
 // Components
 .component("WorldWideTelescope", WWTComponent)
 .component('font-awesome-icon', FontAwesomeIcon)
+.component('font-awesome-layers', FontAwesomeLayers)
 .component('folder-view', FolderView)
 .component('vue-slider', VueSlider)
 .component('transition-expand', TransitionExpand)
