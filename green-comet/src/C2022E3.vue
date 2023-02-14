@@ -1295,28 +1295,29 @@ export default defineComponent({
           month += 12;
       }
 
-      const a = year / 100;
+      const a = Math.floor(year / 100);
       const b = 2 - a + Math.floor(a / 4.0);
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // gives julian date: number of days since Jan 1, 4713 BC
+      const JD = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
 
-      const mjday = Math.floor(meeus_julianDays)
-      return mjday + (hour-12) / 24 + minute / 1440 + second / 86400;
+      console.log(JD);
+      return JD
 
     },
     
     mstFromUTC2(utc: Date, longRad: number): number {
       const lng = longRad * R2D;
 
-      const meeus_julianDays = this.get_julian(utc);
+      const modified_jd = this.get_julian(utc)  - 2451545;
 
-      const julianDays = meeus_julianDays;
+      // console.log(julianDays)
 
-      const julianCenturies = julianDays / 36525.0;
+      const julianCenturies = modified_jd / 36525.0;
       // this form wants julianDays - 2451545
-      let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+      let mst = 280.46061837 + 360.98564736629 * modified_jd + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
 
       if (mst > 0.0) {
         while (mst > 360.0) {
