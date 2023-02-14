@@ -286,7 +286,7 @@
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
-              toLocaleUTCDateString(new Date(v))
+              toDateString(new Date(v))
             "
             >
               <template v-slot:mark="{ pos, value }">
@@ -589,6 +589,8 @@ import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, Render
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
+import { getTimezoneOffset } from "date-fns-tz";
+import tzlookup from "tz-lookup";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
@@ -609,6 +611,9 @@ import {
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
+
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
 function parseCsvTable(csv: string) {
   return csvParse(csv, (d) => {
@@ -712,7 +717,7 @@ export default defineComponent({
     }
   },
   data() {
-    const now = new Date((new Date()).getTime() - d.getTimezoneOffset()*60*1000);
+    const now = new Date();
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -763,6 +768,7 @@ export default defineComponent({
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
       selectedTime: now.setUTCHours(0, 0, 0, 0),
+      selectedTimezone: "America/New_York",
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -926,8 +932,12 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      const todSeconds = this.dayFrac * 60 * 60 * 24;
-      return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
+      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
+      return new Date(this.selectedDate.getTime() + todMs);
+    },
+
+    selectedTimezoneOffset() {
+      return getTimezoneOffset(this.selectedTimezone);
     },
 
     isLoading(): boolean {
@@ -963,24 +973,12 @@ export default defineComponent({
       // @ts-ignore
       return Settings.get_active();
     },
-    dayFrac: {
-      get(): number {
-        const dateForTOD = new Date();
-        dateForTOD.setHours(this.timeOfDay.hours, this.timeOfDay.minutes, this.timeOfDay.seconds);
-        const todSeconds = 3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds();
-        return todSeconds / (24 * 60 * 60);
-      },
-      set(frac: number) {
-        let seconds = Math.floor(24 * 60 * 60 * frac);
-        const hours = Math.floor(seconds / 3600);
-        seconds -= 60 * 60 * hours;
-        const minutes = Math.floor(seconds / 60);
-        seconds -= 60 * minutes;
-        
-        const d = new Date();
-        d.setUTCHours(hours, minutes, seconds);
-        return { hours: d.getHours(), minutes: d.getMinutes(), seconds: Math.floor(d.getSeconds()) };
-      }
+    dayFrac(): number {
+      const dateForTOD = new Date();
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+      const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
@@ -1010,10 +1008,17 @@ export default defineComponent({
   },
 
   methods: {
-    toLocaleUTCDateString(date: Date) {
-      const timeDiff = date.getTimezoneOffset() * 60000;
-      const adjustedDate = new Date(date.valueOf() + timeDiff);
-      return adjustedDate.toLocaleDateString();
+
+    moveOneDayForward() {
+      this.selectedTime += MILLISECONDS_PER_DAY;
+    },
+
+    moveOneDayBackward() {
+      this.selectedTime -= MILLISECONDS_PER_DAY;
+    },
+
+    toDateString(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -1208,9 +1213,13 @@ export default defineComponent({
     },
 
     onMapSelect(e: LeafletMouseEvent) {
+      let lngRad = e.latlng.lng * D2R + Math.PI;
+      const twoPi = 2 * Math.PI;
+      lngRad = ((lngRad % twoPi) + twoPi) % twoPi; // We want modulo, but JS % operator is remainder
+      lngRad -= Math.PI;
       this.location = {
         latitudeRad: e.latlng.lat * D2R,
-        longitudeRad: e.latlng.lng * D2R
+        longitudeRad: lngRad
       };
     },
 
@@ -1232,16 +1241,14 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
-          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
           }
         },
         (_error) => {
-          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can";
+          const msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can\nuse the location selector to manually input a location.";
           if (startup) {
-            msg += "\nuse the location selector to manually input a location.";
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -1305,9 +1312,7 @@ export default defineComponent({
 
       const meeus_julianDays = this.get_julian(utc);
 
-      const julianDays = meeus_julianDays ;
-
-      // console.log(julianDays)
+      const julianDays = meeus_julianDays;
 
       const julianCenturies = julianDays / 36525.0;
       // this form wants julianDays - 2451545
@@ -1328,10 +1333,8 @@ export default defineComponent({
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
       const st = this.mstFromUTC2(utc, longRad); // siderial time 
-      // console.log(st)
   
       const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
-      // console log alt, az and ra, dec in hours and degrees
       
       const ha = haDec.ra * R2D;
 
@@ -1601,7 +1604,9 @@ export default defineComponent({
 
     centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
-      this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
+      const localOffset = now.getTimezoneOffset() * 60 * 1000;
+      const hours = now.getHours() + (this.selectedTimezoneOffset + localOffset) / (1000 * 60 * 60);
+      this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
       this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
         this.updateViewForDate(options);
@@ -1634,18 +1639,6 @@ export default defineComponent({
   },
 
   watch: {
-    // altAz(coords: { altRad: number; azRad: number }) {
-    //   console.log(coords);
-    //   if (coords.altRad < 0) {
-    //     const pos = this.horizontalToEquatorial(coords.altRad, coords.azRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
-    //     this.gotoRADecZoom({
-    //       raRad: pos.raRad,
-    //       decRad: pos.decRad,
-    //       zoomDeg: this.wwtZoomDeg,
-    //       instant: true
-    //     });
-    //   }
-    // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -1661,13 +1654,9 @@ export default defineComponent({
       this.updateForDateTime();
     },
     location(loc: LocationRad, oldLoc: LocationRad) {
-      //const now = this.selectedDate;
-      //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
-
+      const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
       if (this.map) {
         this.circle?.remove();
-
-        const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
@@ -1675,14 +1664,13 @@ export default defineComponent({
         Grids._altAzTextBatch = null;
       }
 
-      this.updateHorizon();
+      this.selectedTimezone = tzlookup(...locationDeg);
       this.updateWWTLocation();
-      // this.gotoRADecZoom({
-      //   raRad: raDec.raRad,
-      //   decRad: raDec.decRad,
-      //   zoomDeg: this.wwtZoomDeg,
-      //   instant: true
-      // });
+
+      // We need to let the location update before we redraw the horizon
+      this.$nextTick(() => {
+        this.updateHorizon();
+      });
     },
     selectedDate(_date: Date) {
       this.updateForDateTime();
@@ -1698,6 +1686,19 @@ export default defineComponent({
         this.circle = null;
       }
     },
+    selectedTimezone(newTz: string, oldTz: string) {
+      const newOffset = getTimezoneOffset(newTz);
+      const oldOffset = getTimezoneOffset(oldTz);
+      let newHours = this.timeOfDay.hours + ((newOffset - oldOffset) / (1000*60*60));
+      if (newHours >= 24) {
+        newHours -= 24;
+        this.moveOneDayForward();
+      } else if (newHours < 0) {
+        newHours += 24;
+        this.moveOneDayBackward();
+      }
+      this.timeOfDay.hours = newHours;
+    },
     playing(play: boolean) {
       if (this.playingIntervalId) {
         clearInterval(this.playingIntervalId);
@@ -1706,7 +1707,7 @@ export default defineComponent({
       if (play) {
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < maxDate) {
-            this.selectedTime += 1000 * 60 * 60 * 24;
+            this.moveOneDayForward();
           } else {
             this.selectedTime = minDate;
           }
