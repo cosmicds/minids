@@ -1842,6 +1842,7 @@ export default defineComponent({
           } else {
             this.selectedTime = minDate;
           }
+          this.$nextTick( () => { this.updateViewForDate() })
         }, 300);
       }
     }
