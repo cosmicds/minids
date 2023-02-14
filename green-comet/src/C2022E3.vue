@@ -1620,7 +1620,9 @@ export default defineComponent({
 
     centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
-      this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
+      const localOffset = now.getTimezoneOffset() * 60 * 1000;
+      const hours = now.getHours() + (this.selectedTimezoneOffset + localOffset) / (1000 * 60 * 60);
+      this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
       this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
         this.updateViewForDate(options);
