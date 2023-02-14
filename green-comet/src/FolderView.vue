@@ -6,7 +6,7 @@
     <div
       v-if="expandable"
       id="expand-row"
-      class="bordered"
+      class="bordered pa-1"
       @click="expanded = !expanded"
     >
       <div class="wrapper">
@@ -17,7 +17,7 @@
           Click <span v-if="thumbnails">thumbnail</span><span v-else>date</span> to see image in sky
         </div>
         <div class="thumbnail-header" v-if="!expanded">
-          Click <font-awesome-icon id="expand-icon" icon="chevron-down"/> to access image controls
+          Image Controls
         </div>
 
       </div>
@@ -247,7 +247,7 @@ export default defineComponent({
   width: 100%;
   cursor: pointer;
   pointer-events: auto;
-  margin: .35em 0;
+  margin: .5em 0;
   & img {
     width: 100%;
     height: ~"min(45px, 7.5vw)";
@@ -278,13 +278,14 @@ export default defineComponent({
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  text-shadow: 0px 0px 5px black;
 }
 
 .thumbnail-header {
   color: white;
   width: 100%;
   font-size: 1rem;
-  padding: 3px;
+  padding: 4px 8px;
 }
 
 .item-thumbnails {
@@ -335,8 +336,7 @@ export default defineComponent({
   align-items: center;
   justify-content: space-between;
   gap: 0.5em;
-  
-  
+  margin-top: 2px;
 }
 .switch {
   // moving toggle
@@ -395,6 +395,11 @@ input:checked + .slider:before {
   -webkit-transform: translateX(var(--translateX));
   -ms-transform: translateX(var(--translateX));
   transform: translateX(var(--translateX));
+}
+
+#expand-icon {
+  color: var(--ephemeris-color);
+  margin:10px;
 }
 
 
