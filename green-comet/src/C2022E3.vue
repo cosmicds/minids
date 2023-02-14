@@ -8,7 +8,7 @@
     id="main-content"
   >
 
-  <WorldWideTelescope
+    <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
       :class="{ pointer: lastClosePt !== null }"
       @pointermove="onPointerMove"
@@ -97,7 +97,7 @@
             >
               <font-awesome-icon
                 id="location-icon"
-                class="control-icon"
+                class="control-icon px-6"
                 icon="location-pin"
                 size="lg"
               ></font-awesome-icon>
@@ -242,13 +242,13 @@
       </div>
       <div id="tools">
         <span class="tool-container">
-          <v-chip
+          <!-- <v-chip
             id="sliderlabel"
             outlined
             label
             >
             Date
-          </v-chip>
+          </v-chip> -->
           <v-tooltip
             location="top"
             :open-on-click="false"
@@ -1737,7 +1737,7 @@ export default defineComponent({
       if (play) {
         this.playingIntervalId = setInterval(() => {
           this.selectedTime += 1000 * 60 * 60 * 24;
-        }, 300);
+        }, 400);
       }
     }
   }
@@ -1875,6 +1875,7 @@ body {
 #play-pause-icon-wrapper {
   color: var(--ephemeris-color);
   border-color: var(--ephemeris-color);
+  margin-left: 2rem;
 }
 
 #video-icon-dummy {
@@ -1884,9 +1885,9 @@ body {
 
 .top-content {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  width: calc(100% - 1rem);
+  top: 1rem;
+  left: 1rem;
+  width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
   justify-content: space-between;
@@ -1897,9 +1898,9 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  width: calc(100% - 1rem);
+  bottom: 1rem;
+  right: 1rem;
+  width: calc(100% - 2rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
@@ -1946,7 +1947,8 @@ body {
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  margin-bottom: 30px;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
   pointer-events: auto;
 
   .v-label {
@@ -2192,10 +2194,11 @@ video {
 // Styling the slider
 
 #sliderlabel {
-  padding:3px 5px;
+  padding: 5px 10px;
   margin:0 5px;
   color:#fff !important;
   background-color: rgba(214, 4, 147,0.7);
+  overflow: visible;
 }
 
 #slider {
@@ -2203,24 +2206,30 @@ video {
   margin: 5px 30px;
 }
 
-.vue-slider-process
-{
+.vue-slider-process {
   background-color: white !important;
 }
 
-.vue-slider-dot-tooltip-inner
-{
+.vue-slider-dot-tooltip-inner {
+  cursor: grab;
+  padding: 4px 10px !important;
   color: white !important;
-  background-color: #9A2976
- !important;
-  border: 1px solid white !important;
+  background-color: #9A2976 !important;
+  border: 1px solid #9A2976 !important;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .vue-slider-dot-handle {
-  cursor: pointer;
-  background-color: #9A2976
- !important;
-  border: 1px solid white !important;
+  cursor: grab;
+  background-color: #9A2976 !important;
+  border: 1px solid black !important;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .mark-line {
@@ -2235,8 +2244,8 @@ video {
 
 .left-content {
   position: absolute;
-  left: 0.5rem;
-  top: 0.5rem;
+  left: 1rem;
+  top: 1rem;
   pointer-events: none;
   height: calc(100% - 2rem);
   display: flex;
@@ -2416,9 +2425,4 @@ input[type="range"]::-moz-range-track {
     margin-top: 0;
     padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
-  
-#sliderlabel {
-  padding-right: 0.75em;
-  padding-left: 0.5em;
-}
 </style>
