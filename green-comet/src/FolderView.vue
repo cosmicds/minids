@@ -58,7 +58,7 @@
               type="range"
               value="0"
               @input="(e) => onSliderInputChanged(e, item)"
-              @keyup.enter="() => selectItem(item)"
+              @mouseup="() => { lastOpacityChanged = null }"
             />
             
 <!--
@@ -132,7 +132,8 @@ export default defineComponent({
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
-      expanded: this.open
+      expanded: this.open,
+      lastOpacityChanged: null as Thumbnail | null
     }
   },
 
@@ -156,7 +157,6 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
-      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -165,13 +165,17 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
-      console.log("FolderView: slider changed")
-      this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+      let dragging = false
+      if (this.lastOpacityChanged == item) {
+        dragging = true
+      } else {
+        this.lastOpacityChanged = item;
+      }
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value, !dragging);
     },
 
     onToggleImage(e: Event, item: Thumbnail) {
-      console.log("FolderView: toggled")
-      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked);
     }
   },
 
