@@ -1722,7 +1722,11 @@ export default defineComponent({
       }
       if (play) {
         this.playingIntervalId = setInterval(() => {
-          this.moveOneDayForward();
+          if (this.selectedTime < maxDate) {
+            this.moveOneDayForward();
+          } else {
+            this.selectedTime = minDate;
+          }
         }, 300);
       }
     }
