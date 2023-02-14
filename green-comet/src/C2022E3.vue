@@ -162,7 +162,7 @@
         :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="updateImageOpacity"
+        @opacity="onOpacityChanged"
         @toggle="onToggle"
       ></folder-view>
     </div>
