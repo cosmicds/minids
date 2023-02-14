@@ -1750,16 +1750,15 @@ export default defineComponent({
       this.onItemSelected(place);
     },
 
-    logTimes(pre: string, date = null as Date | null) {
-      return 
-      // console.log('running',pre)
+    logTimes(pre: string, date = null as Date | null) { 
+      console.log('running',pre)
       // console.log("::: selectedTime:", new Date(this.selectedTime))
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
       // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      // if (date != null) {
-      //   console.log('::: manual date:', date)
-      // }
+      if (date != null) {
+        console.log('::: manual date:', date)
+      }
     },
   },
 
