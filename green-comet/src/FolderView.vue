@@ -11,16 +11,15 @@
     >
       <div class="wrapper">
         <img
-          src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg"
+          src="https://github.com/cosmicds/cds-website/raw/main/public/comet_c2022-e3/thumbnails/694_2022E3_14_01_23.jpg" v-if="!thumbnails"
         />
-        <div class="item-name">
-          Press <span v-if="thumbnails">image</span><span v-else>date</span> to go to image
+        <div class="thumbnail-header" v-if="expanded">
+          Click <span v-if="thumbnails">thumbnail</span><span v-else>date</span> to see image in sky
         </div>
-        <div class="overlay">
-          <font-awesome-icon
-            icon="images"
-          />
+        <div class="thumbnail-header" v-if="!expanded">
+          Click <font-awesome-icon id="expand-icon" icon="chevron-down"/> to access image controls
         </div>
+
       </div>
         <font-awesome-icon
           id="expand-icon"
@@ -39,6 +38,7 @@
             :title="item.get_name()"
           >
             <img
+              class="thumbnail-images"
               v-if="thumbnails"
               :src="item.get_thumbnailUrl()"
               :alt="item.get_name()"
@@ -261,10 +261,21 @@ export default defineComponent({
 .item-name {
   color: white;
   width: 100%;
-  font-size: 7pt;
+  font-size: 9pt;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.thumbnail-header {
+  color: white;
+  width: 100%;
+  font-size: 1rem;
+  padding: 3px;
+}
+
+.thumbnail-images {
+  width: 100px;
 }
 
 .bordered {
@@ -286,7 +297,9 @@ export default defineComponent({
 }
 
 .wrapper {
-  position:relative
+  position:relative;
+  width: 150px;
+  overflow-wrap:break-word;
 }
 
 .overlay {
