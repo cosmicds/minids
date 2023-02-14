@@ -57,6 +57,7 @@
           class="control-icon"
           icon="video"
           size="lg"
+          
         ></font-awesome-icon>
       </div>
       <v-tooltip
@@ -162,7 +163,7 @@
         :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="updateImageOpacity"
+        @opacity="onOpacityChanged"
         @toggle="onToggle"
       ></folder-view>
     </div>
@@ -283,6 +284,7 @@
             }"
             :order="false"
             v-model="selectedTime"
+            @change="onTimeSliderchange"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
@@ -818,7 +820,6 @@ export default defineComponent({
           return layer;
         }));
       });
-      
 
       this.loadImageCollection({
         url: this.bgWtml,
@@ -1137,17 +1138,9 @@ export default defineComponent({
       });
     },
 
-    imageInView(iset: Imageset): boolean {
-      const curRa = this.wwtRARad;
-      const curDec = this.wwtDecRad;
-      const curZoom = this.wwtZoomDeg * D2R;
-      const isetRa = iset.get_centerX() * D2R;
-      const isetDec = iset.get_centerY() * D2R;
-      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
-      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
-    },
     
     onItemSelected(place: Place) {
+      this.logTimes(`onItemSelected: ${place.get_name()}`)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1157,21 +1150,132 @@ export default defineComponent({
         order: this.wwtActiveLayers.length + 1
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day);
+      this.selectedTime = Date.UTC(year, month - 1, day); 
+      this.showImageForDateTime(this.dateTime)
+      // this.updateViewForDate();
 
       // Give time for the selectedTime changes to propagate
+      setTimeout(() => {
+        this.$nextTick(() => {
+          if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
+            this.gotoRADecZoom({
+              raRad: D2R * iset.get_centerX(),
+              decRad: D2R * iset.get_centerY(),
+              zoomDeg: place.get_zoomLevel() * 2.5,
+              instant: true
+            });
+          }
+        });
+      }, 10);
+      
+    },
+
+    wwtSmallestFov(): number {
+      // ignore the possibility of rotation
+      const w = this.wwtRenderContext.width
+      const h = this.wwtRenderContext.height
+      const fov_h = this.wwtRenderContext.get_fovAngle() * D2R
+      const fov_w = fov_h * w / h
+      return Math.min(fov_w, fov_h)
+    },
+
+    radecInFOV(ra: number, dec: number, center_ra: number, center_dec: number, fov: number, fov_view: number, fraction_of_place: number): boolean {
+      let dist = distance(ra, dec, center_ra, center_dec);
+      dist += (fraction_of_place - 1/2) * fov 
+      return dist < fov_view / 2
+    },
+
+    moveIfTableRowOfFOV(position: TableRow) {
+      // get imageset of date
+        const move = this.radecInFOV(
+          D2R * position.ra * D2R,
+          D2R * position.dec * D2R,
+          this.wwtRARad,
+          this.wwtDecRad,
+          10 * D2R,
+          this.wwtRenderContext.get_fovAngle() * D2R,
+          1/2
+        )
+
+      return move
+      
+    },
+    
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/2): boolean {
+      // checks if the center of place is in the current field of view
+      // Assume the Zoom level corresponds to the size of the image
+      // fraction_of_place is ~fraction of the place that must be in the current FOV
+      // by default, allow 1/3 of the place to be visible and still be considered in view
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) {
+        console.log("There is not image set for this place: ", place)
+        return false;
+      }
+
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      const isetFov = (place.get_zoomLevel() / 6) * D2R
+      
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curFov = this.wwtSmallestFov();
+
+      const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
+      // console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
+      return return_val
+    },
+
+    // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
+    image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
+
+    need_to_zoom_in(place: Place, factor = 5): boolean {
+      // 1) we are already zoomed all the way out (if FOV > 50)
+      if (this.wwtZoomDeg > 300) { return true; }
+
+      // 2) the image is too small (so it's fov < 1/6 of the current fov)
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset != null) {
+        if (place.get_zoomLevel() * factor < this.wwtZoomDeg) { return true; }
+      }
+      
+      return false
+    },
+
+    onTimeSliderchange(options?: MoveOptions) {
       this.$nextTick(() => {
-        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
-          this.gotoRADecZoom({
-            raRad: D2R * iset.get_centerX(),
-            decRad: D2R * iset.get_centerY(),
-            zoomDeg: place.get_zoomLevel() * 1.7,
-            instant: true
-          });
-        }
+        this.showImageForDateTime(this.dateTime);
+        this.updateViewForDate(options);
       });
     },
 
+    
+    
+    onOpacityChanged(place: Place, opacity: number, move: boolean) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.updateImageOpacity(place, opacity);
+      
+
+      this.$nextTick(() => {
+        const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
+          // console.log('opacity changed. moving? ', move)
+          const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+          this.selectedTime = Date.UTC(year, month - 1, day); 
+          this.incomingItemSelect = place;
+
+          this.gotoRADecZoom({
+            raRad: D2R * iset.get_centerX(),
+            decRad: D2R * iset.get_centerY(),
+            zoomDeg: zoom,
+            instant: false
+          });
+        }
+
+      });
+
+    },
+    
     updateImageOpacity(place: Place, opacity: number) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
@@ -1280,7 +1384,7 @@ export default defineComponent({
       const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
       return { ra, dec };
     },
-
+    
     get_julian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
@@ -1481,6 +1585,10 @@ export default defineComponent({
         this.updateLastClosePoint(event);
         if (this.lastClosePt !== null) {
           this.selectedTime = this.lastClosePt.date.getTime();
+          this.$nextTick(() => {
+            this.onTimeSliderchange();
+            this.updateViewForDate();
+          });
         }
       }
       this.pointerStartPosition = null;
@@ -1488,7 +1596,7 @@ export default defineComponent({
     },
 
     updateViewForDate(options?: MoveOptions) {
-
+      this.logTimes("updateViewForDate", new Date(this.selectedTime));
       let position = null as TableRow | null;
 
       const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
@@ -1526,6 +1634,7 @@ export default defineComponent({
     },
 
     matchImageSetName(date: Date): string {
+      // console.log(`matchImageSetName ${date}`)
       // imageset names are keys in this.imagesetLayers
       const imageset_names = Object.keys(this.imagesetLayers)
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
@@ -1576,6 +1685,7 @@ export default defineComponent({
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
+      // console.log(`showImageForDateTime: ${name}`)
       const imageset_names = Object.keys(this.imagesetLayers)
       imageset_names.forEach((iname: string) => {
         if (iname != name) {
@@ -1614,15 +1724,17 @@ export default defineComponent({
       });
     },
 
-    updateForDateTime(options?: MoveOptions) {
+    updateForDateTime() {
+      this.logTimes('updateForDateTime')
       this.setTime(this.dateTime);
-      this.updateHorizon(this.dateTime);
-      this.showImageForDateTime(this.dateTime);
-      this.updateViewForDate(options);
+      this.updateHorizon(this.dateTime); 
+      // this.showImageForDateTime(this.dateTime);
+      // this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
+      this.logTimes('updateHorizon',when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1636,7 +1748,19 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
-    }
+    },
+
+    logTimes(pre: string, date = null as Date | null) {
+      return 
+      // console.log('running',pre)
+      // console.log("::: selectedTime:", new Date(this.selectedTime))
+      // console.log('::: selectedDate:', this.selectedDate)
+      // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
+      // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
+      // if (date != null) {
+      //   console.log('::: manual date:', date)
+      // }
+    },
   },
 
   watch: {
@@ -1673,9 +1797,16 @@ export default defineComponent({
         this.updateHorizon();
       });
     },
-    selectedDate(_date: Date) {
+
+    selectedDate() {
+      this.logTimes('selectedDate')
       this.updateForDateTime();
     },
+
+    selectedTime() {
+      this.logTimes('selectedTime')
+    },
+    
     showLocationSelector(show: boolean) {
       if (show) {
         this.locationErrorMessage = "";
