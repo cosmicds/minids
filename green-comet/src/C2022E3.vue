@@ -47,24 +47,6 @@
       </div>
     </transition>
 
-    <div class="left-content">
-      <folder-view
-        v-if="imagesetFolder !== null"
-        class="folder-view"
-        sliders
-        expandable
-        :thumbnails="true"
-        :open="mobile ? true : true"
-        :root-folder="imagesetFolder"
-        :wwt-namespace="wwtNamespace"
-        :incomingItemSelect="incomingItemSelect"
-        flex-direction="column"
-        @select="onItemSelected"
-        @opacity="updateImageOpacity"
-        @toggle="onToggle"
-      ></folder-view>
-    </div>
-
     <div class="top-content">
       <div
         id="video-icon-dummy"
@@ -75,7 +57,6 @@
           class="control-icon"
           icon="video"
           size="lg"
-          
         ></font-awesome-icon>
       </div>
       <v-tooltip
@@ -93,6 +74,8 @@
             @mouseleave="showMapTooltip = false"
             v-bind="props"
             @click="showLocationSelector = true"
+            @keyup.enter="showLocationSelector = true"
+            tabindex="0"
           >
             <font-awesome-icon
               id="location-icon"
@@ -121,6 +104,8 @@
               @mouseleave="showTextTooltip = false"
               v-bind="props"
               @click="showTextSheet = true"
+              @keyup.enter="showTextSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="text-icon"
@@ -148,6 +133,8 @@
               @mouseleave="showVideoTooltip = false"
               v-bind="props"
               @click="showVideoSheet = true"
+              @keyup.enter="showVideoSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="video-icon"
@@ -161,7 +148,25 @@
         </v-tooltip>
       </div>
     </div>
-
+    
+    <div class="left-content">
+      <folder-view
+        v-if="imagesetFolder !== null"
+        class="folder-view"
+        sliders
+        expandable
+        :thumbnails="true"
+        :open="mobile ? true : true"
+        :root-folder="imagesetFolder"
+        :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
+        flex-direction="column"
+        @select="onItemSelected"
+        @opacity="updateImageOpacity"
+        @toggle="onToggle"
+      ></folder-view>
+    </div>
+    
     <div class="bottom-content">
       <div
         id="controls"
@@ -173,6 +178,8 @@
             size="lg"
             :color="cometColor"
             @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
+            tabindex="0"
           />
         </div>
           <transition-expand>
@@ -187,24 +194,28 @@
             <v-checkbox
               :color="cometColor"
               v-model="showAltAzGrid"
+              @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Show Grid"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
               label="Show Constellations"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showHorizon"
+              @keyup.enter="showHorizon = !showHorizon"
               label="Show Horizon"
               hide-details
             />
             <v-btn
               :color="cometColor"
               @click="centerOnCurrentDate"
+              @keyup.enter="centerOnCurrentDate"
             >
               Center on Now
             </v-btn>
@@ -229,7 +240,7 @@
       <div id="tools">
         <span class="tool-container">
           <v-chip
-            id="sliderlabel"
+            id="slider-label"
             outlined
             label
             >
@@ -250,6 +261,8 @@
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
                 @click="playing = !playing"
+                @keyup.enter="playing = !playing"
+                tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
@@ -325,23 +338,30 @@
       </div>
     </div>
 
-    <v-container
+    <v-dialog
       id="video-container"
-      v-show="showVideoSheet"
+      v-model="showVideoSheet"
       transition="slide-y-transition"
+      fullscreen
     >
       <div class="video-wrapper">
         <font-awesome-icon
+          id="video-close-icon"
           class="close-icon"
           icon="times"
           size="lg"
           @click="showVideoSheet = false"
+          @keyup.enter="showVideoSheet = false"
+          tabindex="0"
         ></font-awesome-icon>
-        <video controls id="info-video">
+        <video
+          controls
+          id="info-video"
+        >
           <source src="./assets/video2.mp4" type="video/mp4">
         </video>
       </div>
-    </v-container>
+    </v-dialog>
 
     <v-dialog
       id="location-dialog"
@@ -355,6 +375,7 @@
         </div>
         <v-btn
           @click="getLocation"
+          @keyup.enter="getLocation"
         >
           Use My Location
         </v-btn>
@@ -377,13 +398,6 @@
       transition="dialog-bottom-transition"
     >
       <v-card height="100%">
-      <!-- <v-container height="11px">
-        <font-awesome-icon
-          class="close-icon"
-          icon="times"
-          @click="showTextSheet = false"
-        ></font-awesome-icon>
-      </v-container> -->
       <v-tabs
         v-model="tab"
         height="32px"
@@ -393,8 +407,8 @@
         dense
         grow
       >
-        <v-tab><h3>Information</h3></v-tab>
-        <v-tab><h3>Using WWT</h3></v-tab>
+        <v-tab tabindex="0"><h3>Information</h3></v-tab>
+        <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
       </v-tabs>
       <font-awesome-icon
         id="close-text-icon"
@@ -402,6 +416,8 @@
         icon="times"
         size="lg"
         @click="showTextSheet = false"
+        @keyup.enter="showTextSheet = false"
+        tabindex="0"
       ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
@@ -569,7 +585,7 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -757,7 +773,7 @@ export default defineComponent({
 
   created() {
 
-    this.waitForReady().then(() => {
+    this.waitForReady().then(async () => {
 
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
@@ -774,30 +790,28 @@ export default defineComponent({
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
 
-      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
-        this.loadImageCollection({
-          url: value as string,
-          loadChildFolders: false
-        }).then((folder) => {
-          this.imagesetFolder = folder;
-          const children = folder.get_children();
-          if (children == null) { return; }
-          children.forEach((item) => {
-            if (!(item instanceof Place)) { return; }
-            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-            if (imageset === null) { return; }
-            const name = imageset.get_name();
-            this.addImageSetLayer({
-              url: imageset.get_url(),
-              mode: "autodetect",
-              name: name,
-              goto: false
-            }).then((layer) => {
-              this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 0]);
-            });
-        });
-      }));
+      this.imagesetFolder = await this.loadImageCollection({
+        url: this.wtml.c2022e3,
+        loadChildFolders: false
+      });
+      const children = this.imagesetFolder.get_children() ?? [];
+      const layerPromises: Promise<Layer>[] = [];
+      children.forEach((item) => {
+        if (!(item instanceof Place)) { return; }
+        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+        if (imageset == null) { return; }
+        const name = imageset.get_name();
+        layerPromises.push(this.addImageSetLayer({
+          url: imageset.get_url(),
+          mode: "autodetect",
+          name: name,
+          goto: false
+        }).then((layer) => {
+          this.imagesetLayers[name] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0]);
+          return layer;
+        }));
+      });
       
 
       this.loadImageCollection({
@@ -829,7 +843,8 @@ export default defineComponent({
             //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
-        })
+        });
+        return layer;
       }));
 
       layerPromises.push(this.createTableLayer({
@@ -849,60 +864,29 @@ export default defineComponent({
             //["sizeColumn", 3],
             ["opacity", 0.4]
           ]
-        })
+        });
+        return layer;
       }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "Today",
-      //   referenceFrame: "Sky",
-      //   dataCsv: FullDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 45],
-      //       ["color", Color.fromHex(this.todayColor)],
-      //       ["plotType", PlotTypes.circle],
-      //       //["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 0.8]
-      //     ]
-      //   });
-      // }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "CometImage Date Layer",
-      //   referenceFrame: "Sky",
-      //   dataCsv: CometImageDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 3],
-      //       ["color", #FFFFFF],
-      //       ["plotType", PlotTypes.point],
-      //       ["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 1]
-      //     ]
-      //   });
-      // }));
 
       this.setTime(this.dateTime);
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
+        
+        // Set all of the imageset layers to be above the spreadsheet layers
+        this.resetImagesetLayerOrder();
+
+        const splashScreenListener = (_event: KeyboardEvent) => {
+          this.showSplashScreen = false;
+          window.removeEventListener('keyup', splashScreenListener);
+        }
+        window.addEventListener('keyup', splashScreenListener);
+
+        window.addEventListener('keyup', (event: KeyboardEvent) => {
+          if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+            this.showVideoSheet = false;
+          }
+        });
       });
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -1135,16 +1119,17 @@ export default defineComponent({
       return -1;
     },
 
-    resetLayerOrder() {
-      // reset the layer order to the default
-      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
-      // get the key item with the value of layer.id
-      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+    resetImagesetLayerOrder() {
+      // Reset the order of the imageset layers
+      Object.keys(this.imagesetLayers).sort((k1, k2) => {
+        return new Date(k1).getTime() - new Date(k2).getTime();
+      }).forEach((key) => {
+        const layer = this.imagesetLayers[key];
         this.setImageSetLayerOrder({
-          id: value,
-          order: Number(key)
+          id: layer.id.toString(),
+          order: this.wwtActiveLayers.length
         });
-      }
+      });
     },
 
     imageInView(iset: Imageset): boolean {
@@ -1158,11 +1143,10 @@ export default defineComponent({
     },
     
     onItemSelected(place: Place) {
-      console.log(place);
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder();
+      this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
@@ -1576,7 +1560,6 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
@@ -1844,6 +1827,10 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: white;
+  }
 }
 
 .control-icon-wrapper {
@@ -1860,11 +1847,20 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: white;
+    border-color: white;
+  }
 }
 
 #play-pause-icon-wrapper {
   color: var(--ephemeris-color);
   border-color: var(--ephemeris-color);
+
+  &:focus {
+    color: white;
+  }
 }
 
 #video-icon-dummy {
@@ -1954,6 +1950,10 @@ body {
       padding-left: 5px;
       padding-right: 5px;
       border: solid 1px #899499;
+
+      &:focus {
+        border: 2px solid white;
+      }
     }
 
     .v-btn__content {
@@ -2019,6 +2019,10 @@ body {
   }
 }
 
+.v-selection-control--focus-visible .v-selection-control__input::before {
+  opacity: 0.25;
+}
+
 .ui-text {
   color: var(--comet-color);
   background: black;
@@ -2026,6 +2030,10 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.8em + 0.25vw);
+
+  &:focus {
+    color: white;
+  }
 }
 
 .ui-button {
@@ -2123,6 +2131,11 @@ video {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
+  }
 }
 
 .scrollable {
@@ -2181,11 +2194,13 @@ video {
 
 // Styling the slider
 
-#sliderlabel {
+#slider-label {
   padding:3px 5px;
   margin:0 5px;
   color:#fff !important;
   background-color: rgba(214, 4, 147,0.7);
+  padding-right: 0.75em;
+  padding-left: 0.5em;
 }
 
 #slider {
@@ -2355,22 +2370,24 @@ input[type="range"] {
       --track-color: rgba(217, 234, 242,0.2);
       --thumb-color: rgba(205, 54, 157  , 1);
     }
+
+    &:focus {
+      border-radius: calc(var(--track-height) / 2);
+    }
   }
   
   
   
   input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: inherit;
-      -moz-appearance: inherit;
-      appearance: inherit;
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
     margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
-    
-    
   }
   
   input[type="range"]::-moz-range-thumb {
@@ -2406,9 +2423,4 @@ input[type="range"]::-moz-range-track {
     margin-top: 0;
     padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
   }
-  
-#sliderlabel {
-  padding-right: 0.75em;
-  padding-left: 0.5em;
-}
 </style>
