@@ -47,24 +47,6 @@
       </div>
     </transition>
 
-    <div class="left-content">
-      <folder-view
-        v-if="imagesetFolder !== null"
-        class="folder-view"
-        sliders
-        expandable
-        :thumbnails="true"
-        :open="mobile ? true : true"
-        :root-folder="imagesetFolder"
-        :wwt-namespace="wwtNamespace"
-        :incomingItemSelect="incomingItemSelect"
-        flex-direction="column"
-        @select="onItemSelected"
-        @opacity="updateImageOpacity"
-        @toggle="onToggle"
-      ></folder-view>
-    </div>
-
     <div class="top-content">
       <div
         id="video-icon-dummy"
@@ -75,7 +57,6 @@
           class="control-icon"
           icon="video"
           size="lg"
-          
         ></font-awesome-icon>
       </div>
       <div id="center-buttons">
@@ -94,6 +75,8 @@
               @mouseleave="showMapTooltip = false"
               v-bind="props"
               @click="showLocationSelector = true"
+              @keyup.enter="showLocationSelector = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="location-icon"
@@ -123,6 +106,8 @@
               @mouseleave="showTextTooltip = false"
               v-bind="props"
               @click="showTextSheet = true"
+              @keyup.enter="showTextSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="text-icon"
@@ -150,6 +135,8 @@
               @mouseleave="showVideoTooltip = false"
               v-bind="props"
               @click="showVideoSheet = true"
+              @keyup.enter="showVideoSheet = true"
+              tabindex="0"
             >
               <font-awesome-icon
                 id="video-icon"
@@ -163,7 +150,25 @@
         </v-tooltip>
       </div>
     </div>
-
+    
+    <div class="left-content">
+      <folder-view
+        v-if="imagesetFolder !== null"
+        class="folder-view"
+        sliders
+        expandable
+        :thumbnails="true"
+        :open="mobile ? true : true"
+        :root-folder="imagesetFolder"
+        :wwt-namespace="wwtNamespace"
+        :incomingItemSelect="incomingItemSelect"
+        flex-direction="column"
+        @select="onItemSelected"
+        @opacity="onOpacityChanged"
+        @toggle="onToggle"
+      ></folder-view>
+    </div>
+    
     <div class="bottom-content">
       <div
         id="controls"
@@ -171,11 +176,13 @@
       >
         <div id="controls-top-row">
           <font-awesome-icon
-            :icon="showControls ? `chevron-down` : `gear`"
             size="lg"
-            :color="cometColor"
-            @click="showControls = !showControls"
             class="ma-1"
+            :color="cometColor"
+            :icon="showControls ? `chevron-down` : `gear`"
+            @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
+            tabindex="0"
           />
         </div>
         <transition-expand>
@@ -183,18 +190,21 @@
             <v-checkbox
               :color="cometColor"
               v-model="showAltAzGrid"
+              @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Grid"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
               label="Constellations"
               hide-details
             />
             <v-checkbox
               :color="cometColor"
               v-model="showHorizon"
+              @keyup.enter="showHorizon = !showHorizon"
               label="Horizon"
               hide-details
             />
@@ -216,9 +226,10 @@
               </template>
             </date-picker>
             <v-btn
+              block
               :color="cometColor"
               @click="centerOnCurrentDate"
-              block
+              @keyup.enter="centerOnCurrentDate"
             >
               Center on Now
             </v-btn>
@@ -264,6 +275,8 @@
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
                 @click="playing = !playing"
+                @keyup.enter="playing = !playing"
+                tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
@@ -284,10 +297,11 @@
             }"
             :order="false"
             v-model="selectedTime"
+            @change="onTimeSliderchange"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
-              toLocaleUTCDateString(new Date(v))
+              toDateString(new Date(v))
             "
             >
               <template v-slot:mark="{ pos, value }">
@@ -339,23 +353,30 @@
       </div>
     </div>
 
-    <v-container
+    <v-dialog
       id="video-container"
-      v-show="showVideoSheet"
+      v-model="showVideoSheet"
       transition="slide-y-transition"
+      fullscreen
     >
       <div class="video-wrapper">
         <font-awesome-icon
+          id="video-close-icon"
           class="close-icon"
           icon="times"
           size="lg"
           @click="showVideoSheet = false"
+          @keyup.enter="showVideoSheet = false"
+          tabindex="0"
         ></font-awesome-icon>
-        <video controls id="info-video">
+        <video
+          controls
+          id="info-video"
+        >
           <source src="./assets/video2.mp4" type="video/mp4">
         </video>
       </div>
-    </v-container>
+    </v-dialog>
 
     <v-dialog
       id="location-dialog"
@@ -369,6 +390,7 @@
         </div>
         <v-btn
           @click="getLocation"
+          @keyup.enter="getLocation"
         >
           Use My Location
         </v-btn>
@@ -391,13 +413,6 @@
       transition="dialog-bottom-transition"
     >
       <v-card height="100%">
-      <!-- <v-container height="11px">
-        <font-awesome-icon
-          class="close-icon"
-          icon="times"
-          @click="showTextSheet = false"
-        ></font-awesome-icon>
-      </v-container> -->
       <v-tabs
         v-model="tab"
         height="32px"
@@ -407,8 +422,8 @@
         dense
         grow
       >
-        <v-tab><h3>Information</h3></v-tab>
-        <v-tab><h3>Using WWT</h3></v-tab>
+        <v-tab tabindex="0"><h3>Information</h3></v-tab>
+        <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
       </v-tabs>
       <font-awesome-icon
         id="close-text-icon"
@@ -416,6 +431,8 @@
         icon="times"
         size="lg"
         @click="showTextSheet = false"
+        @keyup.enter="showTextSheet = false"
+        tabindex="0"
       ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
@@ -583,10 +600,12 @@ import { defineComponent } from 'vue';
 import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
-import { Color, Constellations, Folder, Grids, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
+import { getTimezoneOffset } from "date-fns-tz";
+import tzlookup from "tz-lookup";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
 
 import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
@@ -607,6 +626,9 @@ import {
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
+
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
 function parseCsvTable(csv: string) {
   return csvParse(csv, (d) => {
@@ -710,7 +732,7 @@ export default defineComponent({
     }
   },
   data() {
-    const now = new Date((new Date()).getTime() - d.getTimezoneOffset()*60*1000);
+    const now = new Date();
     return {
       showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
@@ -761,6 +783,7 @@ export default defineComponent({
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
       selectedTime: now.setUTCHours(0, 0, 0, 0),
+      selectedTimezone: "America/New_York",
       location: {
         latitudeRad: D2R * 42.3814,
         longitudeRad: D2R * -71.1281
@@ -771,7 +794,7 @@ export default defineComponent({
 
   created() {
 
-    this.waitForReady().then(() => {
+    this.waitForReady().then(async () => {
 
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
@@ -788,30 +811,28 @@ export default defineComponent({
       // @ts-ignore
       window.applyISLSetting = applyImageSetLayerSetting;
 
-      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
-        this.loadImageCollection({
-          url: value as string,
-          loadChildFolders: false
-        }).then((folder) => {
-          this.imagesetFolder = folder;
-          const children = folder.get_children();
-          if (children == null) { return; }
-          children.forEach((item) => {
-            if (!(item instanceof Place)) { return; }
-            const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-            if (imageset === null) { return; }
-            const name = imageset.get_name();
-            this.addImageSetLayer({
-              url: imageset.get_url(),
-              mode: "autodetect",
-              name: name,
-              goto: false
-            }).then((layer) => {
-              this.imagesetLayers[name] = layer;
-              applyImageSetLayerSetting(layer, ["opacity", 0]);
-            });
-        });
-      }));
+      this.imagesetFolder = await this.loadImageCollection({
+        url: this.wtml.c2022e3,
+        loadChildFolders: false
+      });
+      const children = this.imagesetFolder.get_children() ?? [];
+      const layerPromises: Promise<Layer>[] = [];
+      children.forEach((item) => {
+        if (!(item instanceof Place)) { return; }
+        const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+        if (imageset == null) { return; }
+        const name = imageset.get_name();
+        layerPromises.push(this.addImageSetLayer({
+          url: imageset.get_url(),
+          mode: "autodetect",
+          name: name,
+          goto: false
+        }).then((layer) => {
+          this.imagesetLayers[name] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0]);
+          return layer;
+        }));
+      });
       
 
       this.loadImageCollection({
@@ -843,7 +864,8 @@ export default defineComponent({
             //["pointScaleType", PointScaleTypes.log],
             ["opacity", 0.7]
           ]
-        })
+        });
+        return layer;
       }));
 
       layerPromises.push(this.createTableLayer({
@@ -863,55 +885,9 @@ export default defineComponent({
             //["sizeColumn", 3],
             ["opacity", 0.4]
           ]
-        })
+        });
+        return layer;
       }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "Today",
-      //   referenceFrame: "Sky",
-      //   dataCsv: FullDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 45],
-      //       ["color", Color.fromHex(this.todayColor)],
-      //       ["plotType", PlotTypes.circle],
-      //       //["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 0.8]
-      //     ]
-      //   });
-      // }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "CometImage Date Layer",
-      //   referenceFrame: "Sky",
-      //   dataCsv: CometImageDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 3],
-      //       ["color", #FFFFFF],
-      //       ["plotType", PlotTypes.point],
-      //       ["sizeColumn", 3],
-      //       ["startDateColumn", 0],
-      //       ["endDateColumn", 0],
-      //       ["timeSeries", true],
-      //       ["opacity", 1],
-      //       ["decay", 1]
-      //     ]
-      //   });
-      // }));
 
       this.setTime(this.dateTime);
 
@@ -919,6 +895,21 @@ export default defineComponent({
 
       Promise.all(layerPromises).then(() => {
         this.layersLoaded = true;
+        
+        // Set all of the imageset layers to be above the spreadsheet layers
+        this.resetImagesetLayerOrder();
+
+        const splashScreenListener = (_event: KeyboardEvent) => {
+          this.showSplashScreen = false;
+          window.removeEventListener('keyup', splashScreenListener);
+        }
+        window.addEventListener('keyup', splashScreenListener);
+
+        window.addEventListener('keyup', (event: KeyboardEvent) => {
+          if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+            this.showVideoSheet = false;
+          }
+        });
       });
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -958,8 +949,12 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      const todSeconds = this.dayFrac * 60 * 60 * 24;
-      return new Date(this.selectedDate.getTime() + 1000 * todSeconds);
+      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
+      return new Date(this.selectedDate.getTime() + todMs);
+    },
+
+    selectedTimezoneOffset() {
+      return getTimezoneOffset(this.selectedTimezone);
     },
 
     isLoading(): boolean {
@@ -995,24 +990,12 @@ export default defineComponent({
       // @ts-ignore
       return Settings.get_active();
     },
-    dayFrac: {
-      get(): number {
-        const dateForTOD = new Date();
-        dateForTOD.setHours(this.timeOfDay.hours, this.timeOfDay.minutes, this.timeOfDay.seconds);
-        const todSeconds = 3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds();
-        return todSeconds / (24 * 60 * 60);
-      },
-      set(frac: number) {
-        let seconds = Math.floor(24 * 60 * 60 * frac);
-        const hours = Math.floor(seconds / 3600);
-        seconds -= 60 * 60 * hours;
-        const minutes = Math.floor(seconds / 60);
-        seconds -= 60 * minutes;
-        
-        const d = new Date();
-        d.setUTCHours(hours, minutes, seconds);
-        return { hours: d.getHours(), minutes: d.getMinutes(), seconds: Math.floor(d.getSeconds()) };
-      }
+    dayFrac(): number {
+      const dateForTOD = new Date();
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+      const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
@@ -1042,10 +1025,17 @@ export default defineComponent({
   },
 
   methods: {
-    toLocaleUTCDateString(date: Date) {
-      const timeDiff = date.getTimezoneOffset() * 60000;
-      const adjustedDate = new Date(date.valueOf() + timeDiff);
-      return adjustedDate.toLocaleDateString();
+
+    moveOneDayForward() {
+      this.selectedTime += MILLISECONDS_PER_DAY;
+    },
+
+    moveOneDayBackward() {
+      this.selectedTime -= MILLISECONDS_PER_DAY;
+    },
+
+    toDateString(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -1151,49 +1141,150 @@ export default defineComponent({
       return -1;
     },
 
-    resetLayerOrder() {
-      // reset the layer order to the default
-      // this.wwtActiveLayers is a dictionary of {0:id1, 1:id2, 2:id3, ...}
-      // get the key item with the value of layer.id
-      for (const [key, value] of Object.entries(this.wwtActiveLayers)) {
+    resetImagesetLayerOrder() {
+      // Reset the order of the imageset layers
+      Object.keys(this.imagesetLayers).sort((k1, k2) => {
+        return new Date(k1).getTime() - new Date(k2).getTime();
+      }).forEach((key) => {
+        const layer = this.imagesetLayers[key];
         this.setImageSetLayerOrder({
-          id: value,
-          order: Number(key)
+          id: layer.id.toString(),
+          order: this.wwtActiveLayers.length
         });
-      }
+      });
     },
 
-    imageInView(iset: Imageset): boolean {
-      const curRa = this.wwtRARad;
-      const curDec = this.wwtDecRad;
-      const curZoom = this.wwtZoomDeg * D2R;
-      const isetRa = iset.get_centerX() * D2R;
-      const isetDec = iset.get_centerY() * D2R;
-      // check if isetRA, isetDec is within curRa +/- curZoom/2 and curDec +/- curZoom/2
-      return (Math.abs(curRa - isetRa) < curZoom/12) && (Math.abs(curDec - isetDec) < curZoom/12);
-    },
     
     onItemSelected(place: Place) {
-      console.log(place);
+      this.logTimes(`onItemSelected: ${place.get_name()}`)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
-      this.resetLayerOrder();
+      this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day);
+      this.selectedTime = Date.UTC(year, month - 1, day); 
+      this.showImageForDateTime(this.dateTime)
+      // this.updateViewForDate();
 
       // Give time for the selectedTime changes to propagate
+      setTimeout(() => {
+        this.$nextTick(() => {
+          if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
+            this.gotoRADecZoom({
+              raRad: D2R * iset.get_centerX(),
+              decRad: D2R * iset.get_centerY(),
+              zoomDeg: place.get_zoomLevel() * 2.5,
+              instant: true
+            });
+          }
+        });
+      }, 10);
+      
+    },
+
+    wwtSmallestFov(): number {
+      // ignore the possibility of rotation
+      const w = this.wwtRenderContext.width
+      const h = this.wwtRenderContext.height
+      const fov_h = this.wwtRenderContext.get_fovAngle() * D2R
+      const fov_w = fov_h * w / h
+      return Math.min(fov_w, fov_h)
+    },
+
+    radecInFOV(ra: number, dec: number, center_ra: number, center_dec: number, fov: number, fov_view: number, fraction_of_place: number): boolean {
+      let dist = distance(ra, dec, center_ra, center_dec);
+      dist += (fraction_of_place - 1/2) * fov 
+      return dist < fov_view / 2
+    },
+
+    moveIfTableRowOfFOV(position: TableRow) {
+      // get imageset of date
+        const move = this.radecInFOV(
+          D2R * position.ra * D2R,
+          D2R * position.dec * D2R,
+          this.wwtRARad,
+          this.wwtDecRad,
+          10 * D2R,
+          this.wwtRenderContext.get_fovAngle() * D2R,
+          1/2
+        )
+
+      return move
+      
+    },
+    
+    checkIfPlaceIsInTheCurrentFOV(place: Place, fraction_of_place = 1/2): boolean {
+      // checks if the center of place is in the current field of view
+      // Assume the Zoom level corresponds to the size of the image
+      // fraction_of_place is ~fraction of the place that must be in the current FOV
+      // by default, allow 1/3 of the place to be visible and still be considered in view
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) {
+        console.log("There is not image set for this place: ", place)
+        return false;
+      }
+
+      const isetRa = iset.get_centerX() * D2R;
+      const isetDec = iset.get_centerY() * D2R;
+      const isetFov = (place.get_zoomLevel() / 6) * D2R
+      
+      const curRa = this.wwtRARad;
+      const curDec = this.wwtDecRad;
+      const curFov = this.wwtSmallestFov();
+
+      const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
+      // console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
+      return return_val
+    },
+
+    // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
+    image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
+
+    need_to_zoom_in(place: Place, factor = 5): boolean {
+      // 1) we are already zoomed all the way out (if FOV > 50)
+      if (this.wwtZoomDeg > 300) { return true; }
+
+      // 2) the image is too small (so it's fov < 1/6 of the current fov)
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset != null) {
+        if (place.get_zoomLevel() * factor < this.wwtZoomDeg) { return true; }
+      }
+      
+      return false
+    },
+
+    onTimeSliderchange(options?: MoveOptions) {
       this.$nextTick(() => {
-        if ((!this.imageInView(iset)) || (this.wwtZoomDeg > 8 * place.get_zoomLevel())) {
+        this.showImageForDateTime(this.dateTime);
+        this.updateViewForDate(options);
+      });
+    },
+
+    
+    
+    onOpacityChanged(place: Place, opacity: number, move: boolean) {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+      this.updateImageOpacity(place, opacity);
+      
+
+      this.$nextTick(() => {
+        const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
+          // console.log('opacity changed. moving? ', move)
+          const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+          this.selectedTime = Date.UTC(year, month - 1, day); 
+          this.incomingItemSelect = place;
+
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: place.get_zoomLevel() * 1.7,
-            instant: true
+            zoomDeg: zoom,
+            instant: false
           });
         }
       });
@@ -1240,9 +1331,13 @@ export default defineComponent({
     },
 
     onMapSelect(e: LeafletMouseEvent) {
+      let lngRad = e.latlng.lng * D2R + Math.PI;
+      const twoPi = 2 * Math.PI;
+      lngRad = ((lngRad % twoPi) + twoPi) % twoPi; // We want modulo, but JS % operator is remainder
+      lngRad -= Math.PI;
       this.location = {
         latitudeRad: e.latlng.lat * D2R,
-        longitudeRad: e.latlng.lng * D2R
+        longitudeRad: lngRad
       };
     },
 
@@ -1264,16 +1359,14 @@ export default defineComponent({
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
           }
-          // console.log("Location: ", this.location)
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
           }
         },
         (_error) => {
-          let msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can";
+          const msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can\nuse the location selector to manually input a location.";
           if (startup) {
-            msg += "\nuse the location selector to manually input a location.";
             this.$notify({
               group: "startup-location",
               type: "error",
@@ -1320,30 +1413,29 @@ export default defineComponent({
           month += 12;
       }
 
-      const a = year / 100;
+      const a = Math.floor(year / 100);
       const b = 2 - a + Math.floor(a / 4.0);
       const c = Math.floor(365.25 * year);
       const d = Math.floor(30.6001 * (month + 1));
 
-      const meeus_julianDays = b + c + d - 730550.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      // gives julian date: number of days since Jan 1, 4713 BC
+      const JD = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
 
-      const mjday = Math.floor(meeus_julianDays)
-      return mjday + (hour-12) / 24 + minute / 1440 + second / 86400;
+      console.log(JD);
+      return JD
 
     },
     
     mstFromUTC2(utc: Date, longRad: number): number {
       const lng = longRad * R2D;
 
-      const meeus_julianDays = this.get_julian(utc);
-
-      const julianDays = meeus_julianDays ;
+      const modified_jd = this.get_julian(utc)  - 2451545;
 
       // console.log(julianDays)
 
-      const julianCenturies = julianDays / 36525.0;
+      const julianCenturies = modified_jd / 36525.0;
       // this form wants julianDays - 2451545
-      let mst = 280.46061837 + 360.98564736629 * julianDays + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+      let mst = 280.46061837 + 360.98564736629 * modified_jd + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
 
       if (mst > 0.0) {
         while (mst > 360.0) {
@@ -1360,10 +1452,8 @@ export default defineComponent({
 
     horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
       const st = this.mstFromUTC2(utc, longRad); // siderial time 
-      // console.log(st)
   
       const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
-      // console log alt, az and ra, dec in hours and degrees
       
       const ha = haDec.ra * R2D;
 
@@ -1509,6 +1599,10 @@ export default defineComponent({
         this.updateLastClosePoint(event);
         if (this.lastClosePt !== null) {
           this.selectedTime = this.lastClosePt.date.getTime();
+          this.$nextTick(() => {
+            this.onTimeSliderchange();
+            this.updateViewForDate();
+          });
         }
       }
       this.pointerStartPosition = null;
@@ -1516,7 +1610,7 @@ export default defineComponent({
     },
 
     updateViewForDate(options?: MoveOptions) {
-
+      this.logTimes("updateViewForDate", new Date(this.selectedTime));
       let position = null as TableRow | null;
 
       const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
@@ -1592,7 +1686,6 @@ export default defineComponent({
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
-          console.log(`setting checkbox value to ${opacity > 0}`)
           if (opacity == 0 && el2.checked) {
             el2.checked = false
           } else if (opacity > 0 && !el2.checked) {
@@ -1634,22 +1727,26 @@ export default defineComponent({
 
     centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
-      this.timeOfDay = { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() };
+      const localOffset = now.getTimezoneOffset() * 60 * 1000;
+      const hours = now.getHours() + (this.selectedTimezoneOffset + localOffset) / (1000 * 60 * 60);
+      this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
       this.selectedTime = now.setUTCHours(0, 0, 0, 0);
       this.$nextTick(() => {
         this.updateViewForDate(options);
       });
     },
 
-    updateForDateTime(options?: MoveOptions) {
+    updateForDateTime() {
+      this.logTimes('updateForDateTime')
       this.setTime(this.dateTime);
-      this.updateHorizon(this.dateTime);
-      this.showImageForDateTime(this.dateTime);
-      this.updateViewForDate(options);
+      this.updateHorizon(this.dateTime); 
+      // this.showImageForDateTime(this.dateTime);
+      // this.updateViewForDate(options);
       this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
+      this.logTimes('updateHorizon',when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1663,22 +1760,21 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
-    }
+    },
+
+    logTimes(pre: string, date = null as Date | null) { 
+      console.log('running',pre)
+      // console.log("::: selectedTime:", new Date(this.selectedTime))
+      // console.log('::: selectedDate:', this.selectedDate)
+      // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
+      // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
+      if (date != null) {
+        console.log('::: manual date:', date)
+      }
+    },
   },
 
   watch: {
-    // altAz(coords: { altRad: number; azRad: number }) {
-    //   console.log(coords);
-    //   if (coords.altRad < 0) {
-    //     const pos = this.horizontalToEquatorial(coords.altRad, coords.azRad, this.location.latitudeRad, this.location.longitudeRad, new Date());
-    //     this.gotoRADecZoom({
-    //       raRad: pos.raRad,
-    //       decRad: pos.decRad,
-    //       zoomDeg: this.wwtZoomDeg,
-    //       instant: true
-    //     });
-    //   }
-    // },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -1694,13 +1790,9 @@ export default defineComponent({
       this.updateForDateTime();
     },
     location(loc: LocationRad, oldLoc: LocationRad) {
-      //const now = this.selectedDate;
-      //const raDec = this.horizontalToEquatorial(Math.PI/2, 0, loc.latitudeRad, loc.longitudeRad, now);
-
+      const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
       if (this.map) {
         this.circle?.remove();
-
-        const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
         this.circle = this.circleForLocation(...locationDeg).addTo(this.map as Map); // Not sure, why, but TS is cranky w/o casting
       }
 
@@ -1708,18 +1800,24 @@ export default defineComponent({
         Grids._altAzTextBatch = null;
       }
 
-      this.updateHorizon();
+      this.selectedTimezone = tzlookup(...locationDeg);
       this.updateWWTLocation();
-      // this.gotoRADecZoom({
-      //   raRad: raDec.raRad,
-      //   decRad: raDec.decRad,
-      //   zoomDeg: this.wwtZoomDeg,
-      //   instant: true
-      // });
+
+      // We need to let the location update before we redraw the horizon
+      this.$nextTick(() => {
+        this.updateHorizon();
+      });
     },
-    selectedDate(_date: Date) {
+
+    selectedDate() {
+      this.logTimes('selectedDate')
       this.updateForDateTime();
     },
+
+    selectedTime() {
+      this.logTimes('selectedTime')
+    },
+    
     showLocationSelector(show: boolean) {
       if (show) {
         this.locationErrorMessage = "";
@@ -1731,6 +1829,19 @@ export default defineComponent({
         this.circle = null;
       }
     },
+    selectedTimezone(newTz: string, oldTz: string) {
+      const newOffset = getTimezoneOffset(newTz);
+      const oldOffset = getTimezoneOffset(oldTz);
+      let newHours = this.timeOfDay.hours + ((newOffset - oldOffset) / (1000*60*60));
+      if (newHours >= 24) {
+        newHours -= 24;
+        this.moveOneDayForward();
+      } else if (newHours < 0) {
+        newHours += 24;
+        this.moveOneDayBackward();
+      }
+      this.timeOfDay.hours = newHours;
+    },
     playing(play: boolean) {
       if (this.playingIntervalId) {
         clearInterval(this.playingIntervalId);
@@ -1739,10 +1850,11 @@ export default defineComponent({
       if (play) {
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < maxDate) {
-            this.selectedTime += 1000 * 60 * 60 * 24;
+            this.moveOneDayForward();
           } else {
             this.selectedTime = minDate;
           }
+          this.$nextTick( () => { this.updateViewForDate() })
         }, 350);
       }
     }
@@ -1860,6 +1972,10 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: white;
+  }
 }
 
 .control-icon-wrapper {
@@ -1876,12 +1992,21 @@ body {
   &:hover {
     cursor: pointer;
   }
+
+  &:focus {
+    color: white;
+    border-color: white;
+  }
 }
 
 #play-pause-icon-wrapper {
   color: var(--ephemeris-color);
   border-color: var(--ephemeris-color);
   margin-left: 2rem;
+
+  &:focus {
+    color: white;
+  }
 }
 
 #video-icon-dummy {
@@ -1973,6 +2098,10 @@ body {
       padding-left: 5px;
       padding-right: 5px;
       border: solid 1px #899499;
+
+      &:focus {
+        border: 2px solid white;
+      }
     }
 
     .v-btn__content {
@@ -2038,6 +2167,10 @@ body {
   }
 }
 
+.v-selection-control--focus-visible .v-selection-control__input::before {
+  opacity: 0.25;
+}
+
 .ui-text {
   color: var(--comet-color);
   background: black;
@@ -2045,6 +2178,10 @@ body {
   border: 2px solid black;
   border-radius: 10px;
   font-size: calc(0.8em + 0.25vw);
+
+  &:focus {
+    color: white;
+  }
 }
 
 .ui-button {
@@ -2141,6 +2278,11 @@ video {
 
   &:hover {
     cursor: pointer;
+  }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
   }
 }
 
@@ -2381,22 +2523,24 @@ input[type="range"] {
       --track-color: rgba(217, 234, 242,0.2);
       --thumb-color: rgba(205, 54, 157  , 1);
     }
+
+    &:focus {
+      border-radius: calc(var(--track-height) / 2);
+    }
   }
   
   
   
   input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: inherit;
-      -moz-appearance: inherit;
-      appearance: inherit;
+    -webkit-appearance: inherit;
+    -moz-appearance: inherit;
+    appearance: inherit;
     width: var(--thumb-radius);
     height: var(--thumb-radius);
     margin-top: var(--thumb-margin-top);
     border-radius: 50%;
     background: var(--thumb-color);
     border: var(--thumb-border);
-    
-    
   }
   
   input[type="range"]::-moz-range-thumb {
