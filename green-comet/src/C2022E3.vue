@@ -681,6 +681,7 @@ const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
+  dates.push(t + 86400000/2);
   d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
@@ -998,6 +999,11 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
+
+    dontSetTime(): boolean {
+      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+    },
+    
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -1758,7 +1764,7 @@ export default defineComponent({
 
     updateForDateTime() {
       this.logTimes('updateForDateTime')
-      this.setTime(this.dateTime);
+      if (!this.dontSetTime) { this.setTime(this.dateTime) }
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
