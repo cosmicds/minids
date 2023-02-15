@@ -322,12 +322,6 @@
           </span>
       </div>
       <div id="credits" class="ui-text">
-        <div>
-          Powered by
-          <a href="https://worldwidetelescope.org/home/" target="_blank"
-            >WorldWide Telescope</a
-          >
-        </div>
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -335,8 +329,11 @@
           <a href="https://worldwidetelescope.org/home/" target="_blank"
             ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
           /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank"
+          <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
+          /></a>
+          <a href="https://nasa.gov/" target="_blank" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
           /></a>
           <!-- <ShareNetwork
             v-for="network in networks"
@@ -2198,10 +2195,16 @@ body {
   }
 
   img {
-    height: 24px;
+    height: 35px;
     vertical-align: middle;
     margin: 2px;
   }
+
+  @media only screen and (max-width: 600px) {
+  img {
+    height: 24px;
+  }
+}
 
   svg {
     vertical-align: middle;
