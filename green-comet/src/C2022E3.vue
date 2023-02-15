@@ -208,6 +208,12 @@
               label="Horizon"
               hide-details
             />
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
             <date-picker
               dark
               time-picker
@@ -216,12 +222,13 @@
               v-model="timeOfDay"
               :clearable="false"
               close-on-scroll
-              class="my-3 "
+              class="mb-4 mt-1"
             >
               <template #input-icon>
                 <font-awesome-icon
                   icon="clock"
                   class="mx-2"
+                  :color="cometColor"
                 ></font-awesome-icon>
               </template>
             </date-picker>
@@ -230,6 +237,7 @@
               :color="cometColor"
               @click="centerOnCurrentDate"
               @keyup.enter="centerOnCurrentDate"
+              class="mb-2"
             >
               Center on Now
             </v-btn>
