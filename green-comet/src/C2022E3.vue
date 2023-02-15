@@ -1043,6 +1043,7 @@ export default defineComponent({
     },
 
     toDateString(date: Date) {
+      date = new Date(date.getTime() + this.selectedTimezoneOffset)
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
