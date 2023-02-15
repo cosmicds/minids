@@ -1130,6 +1130,10 @@ export default defineComponent({
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
+    printUTCDate(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+    },
+
     selectSheet(name: SheetType) {
       if (this.sheet == name) {
         this.sheet = null;
