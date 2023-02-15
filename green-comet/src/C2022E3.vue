@@ -1714,6 +1714,10 @@ export default defineComponent({
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
+      if (name == null) {
+        this.incomingItemSelect = null
+        return;
+      }
       const imageset_names = Object.keys(this.imagesetLayers)
       imageset_names.forEach((iname: string) => {
         if (iname != name) {
