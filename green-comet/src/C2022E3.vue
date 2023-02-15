@@ -801,7 +801,7 @@ export default defineComponent({
     }
   },
 
-  created() {
+  mounted() {
 
     this.waitForReady().then(async () => {
 
