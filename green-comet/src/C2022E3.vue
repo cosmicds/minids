@@ -1794,9 +1794,9 @@ export default defineComponent({
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
       // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      if (date != null) {
-        console.log('::: manual date:', date)
-      }
+      // if (date != null) {
+      //   console.log('::: manual date:', date)
+      // }
     }
   },
 
