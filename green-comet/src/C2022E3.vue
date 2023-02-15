@@ -1052,7 +1052,10 @@ export default defineComponent({
       if (index === -1) { return null; }
       const row = table[index];
       const nextRow = table[index + 1] ?? row;
-      const f = this.dayFrac;
+      const delta_t = (nextRow.date.getTime() - row.date.getTime()) / MILLISECONDS_PER_DAY;
+      // get how far we are into the day
+      const dayFracPassed = (row.date.getTime() / MILLISECONDS_PER_DAY) % 1;
+      const f = (this.dayFrac - dayFracPassed) / delta_t;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
       
