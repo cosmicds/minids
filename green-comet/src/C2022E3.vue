@@ -863,12 +863,12 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 2],
+            ["scaleFactor", 2.5],
             ["plotType", PlotTypes.point],
             ["color", Color.fromHex(this.ephemerisColor)],
             //["sizeColumn", 4],
             //["pointScaleType", PointScaleTypes.log],
-            ["opacity", 0.7]
+            ["opacity", 0.8]
           ]
         });
         return layer;
@@ -2157,7 +2157,7 @@ body {
 }
 
 .dp__select {
-  color: #04D6B0;
+  color: #04D6B0 !important;
 }
 
 #show-controls {
