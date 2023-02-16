@@ -1881,12 +1881,15 @@ export default defineComponent({
       const minTime = Math.min(...cometImageDates) - MILLISECONDS_PER_DAY;
       const maxTime = Math.max(...cometImageDates) + MILLISECONDS_PER_DAY;
       this.selectedTime = minTime;
+
+      this.updateViewForDate({ zoomDeg: 60 });
+
       this.playingIntervalId = setInterval(() => {
         if (this.selectedTime < maxTime) {
           this.moveOneDayForward();
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate({ zoomDeg: 60 });
+            this.updateViewForDate();
           });
         } else {
           this.playingCometPath = false;
