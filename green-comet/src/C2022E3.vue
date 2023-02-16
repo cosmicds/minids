@@ -208,6 +208,12 @@
               label="Horizon"
               hide-details
             />
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
             <date-picker
               dark
               time-picker
@@ -216,12 +222,13 @@
               v-model="timeOfDay"
               :clearable="false"
               close-on-scroll
-              class="my-3 "
+              class="mb-4 mt-1"
             >
               <template #input-icon>
                 <font-awesome-icon
                   icon="clock"
                   class="mx-2"
+                  :color="cometColor"
                 ></font-awesome-icon>
               </template>
             </date-picker>
@@ -230,13 +237,17 @@
               :color="cometColor"
               @click="centerOnCurrentDate"
               @keyup.enter="centerOnCurrentDate"
+              class="mb-2"
             >
               Center on Now
             </v-btn>
             <v-btn
               block
               :color="cometColor"
-              @click="playingCometPath = !playingCometPath"
+              @click="() => {
+                playing = false;
+                playingCometPath = !playingCometPath;
+              }"
             >
               {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
             </v-btn>
@@ -274,14 +285,20 @@
                 @mouseover="showPlayPauseTooltip = true"
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
-                @click="playing = !playing"
-                @keyup.enter="playing = !playing"
+                @click="() => {
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
+                @keyup.enter="() => {
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
                 tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
-                  :icon="playing ? 'pause' : 'play'"
+                  :icon="!(playing || playingCometPath) ? 'play' : 'pause'"
                   size="lg"
                 ></font-awesome-icon>
               </div>
@@ -314,12 +331,6 @@
           </span>
       </div>
       <div id="credits" class="ui-text">
-        <div>
-          Powered by
-          <a href="https://worldwidetelescope.org/home/" target="_blank"
-            >WorldWide Telescope</a
-          >
-        </div>
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -327,8 +338,11 @@
           <a href="https://worldwidetelescope.org/home/" target="_blank"
             ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
           /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank"
+          <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
+          /></a>
+          <a href="https://nasa.gov/" target="_blank" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
           /></a>
           <!-- <ShareNetwork
             v-for="network in networks"
@@ -793,7 +807,7 @@ export default defineComponent({
     }
   },
 
-  created() {
+  mounted() {
 
     this.waitForReady().then(async () => {
 
@@ -858,12 +872,12 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 2],
+            ["scaleFactor", 2.5],
             ["plotType", PlotTypes.point],
             ["color", Color.fromHex(this.ephemerisColor)],
             //["sizeColumn", 4],
             //["pointScaleType", PointScaleTypes.log],
-            ["opacity", 0.7]
+            ["opacity", 0.8]
           ]
         });
         return layer;
@@ -1875,13 +1889,19 @@ export default defineComponent({
       }
       const minTime = Math.min(...cometImageDates) - MILLISECONDS_PER_DAY;
       const maxTime = Math.max(...cometImageDates) + MILLISECONDS_PER_DAY;
-      this.selectedTime = minTime;
+
+      if(this.selectedTime < minTime || this.selectedTime >= maxTime){
+        this.selectedTime = minTime;
+      }
+
+      this.updateViewForDate({ zoomDeg: 60 });
+
       this.playingIntervalId = setInterval(() => {
         if (this.selectedTime < maxTime) {
           this.moveOneDayForward();
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate({ zoomDeg: 60 });
+            this.updateViewForDate();
           });
         } else {
           this.playingCometPath = false;
@@ -2152,7 +2172,7 @@ body {
 }
 
 .dp__select {
-  color: #04D6B0;
+  color: #04D6B0 !important;
 }
 
 #show-controls {
@@ -2190,10 +2210,16 @@ body {
   }
 
   img {
-    height: 24px;
+    height: 35px;
     vertical-align: middle;
     margin: 2px;
   }
+
+  @media only screen and (max-width: 600px) {
+  img {
+    height: 24px;
+  }
+}
 
   svg {
     vertical-align: middle;
