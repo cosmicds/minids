@@ -286,7 +286,7 @@
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
                 @click="() => {
-                  playing = playing==playingCometPath; // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
                   playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
                 }"
                 @keyup.enter="playing = !playing"
@@ -295,7 +295,7 @@
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
-                  :icon="( playing==playingCometPath )? 'play' : 'pause'"
+                  :icon="!(playing || playingCometPath) ? 'play' : 'pause'"
                   size="lg"
                 ></font-awesome-icon>
               </div>
