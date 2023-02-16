@@ -289,7 +289,10 @@
                   playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
                   playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
                 }"
-                @keyup.enter="playing = !playing"
+                @keyup.enter="() => {
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
                 tabindex="0"
               >
                 <font-awesome-icon
