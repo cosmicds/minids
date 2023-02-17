@@ -6,7 +6,7 @@
     <div
       v-if="expandable"
       id="expand-row"
-      class="bordered"
+      class="bordered pa-1"
       @click="expanded = !expanded"
     >
       <div class="wrapper">
@@ -17,14 +17,14 @@
           Click <span v-if="thumbnails">thumbnail</span><span v-else>date</span> to see image in sky
         </div>
         <div class="thumbnail-header" v-if="!expanded">
-          Click <font-awesome-icon id="expand-icon" icon="chevron-down"/> to access image controls
+          Image Controls
         </div>
 
       </div>
-        <font-awesome-icon
-          id="expand-icon"
-          :icon="expanded ? 'chevron-up' : 'chevron-down'"
-        />
+      <font-awesome-icon
+        id="expand-icon"
+        :icon="expanded ? 'chevron-up' : 'chevron-down'"
+      />
     </div>
     <transition-expand>
       <div id="items">
@@ -36,31 +36,38 @@
             v-for="item of items"
             :key="item.get_name()"
             :title="item.get_name()"
+            :id="`fv-${item.get_name()}`"
           >
-            <img
-              class="thumbnail-images"
-              v-if="thumbnails"
-              :src="item.get_thumbnailUrl()"
-              :alt="item.get_name()"
-              @click="() => selectItem(item)"
-            />
             <div
-              class="item-name"
-              :class="['thumbnail']"
-              @click="() => selectItem(item)"
+              class="item-thumbnails"
             >
-              {{item.get_name()}}
+              <img
+                class="thumbnail-images"
+                v-if="thumbnails"
+                :src="item.get_thumbnailUrl()"
+                :alt="item.get_name()"
+                @click="() => selectItem(item)"
+              />
+              <div
+                class="item-name"
+                :class="['thumbnail']"
+                @click="() => selectItem(item)"
+              >
+                {{item.get_name()}}
+              </div>
             </div>
             <div class="slider-container">
-            <input
-              v-if="sliders"
-              class="opacity-range"
-              type="range"
-              value="0"
-              @input="(e) => onSliderInputChanged(e, item)"
-            />
+              <input
+                v-if="sliders"
+                class="opacity-range"
+                type="range"
+                value="0"
+                @input="(e) => onSliderInputChanged(e, item)"
+                @keyup.enter="() => selectItem(item)"
+                @mouseup="() => { lastOpacityChanged = null }"
+              />
             
-<!--
+              <!--
               <label class="switch">
                 <input 
                   type="checkbox"
@@ -68,7 +75,8 @@
                   @change="(e) => onToggleImage(e, item)"
                   >
                 <span class="slider"></span>
-              </label>  -->
+              </label>
+              -->
             </div>
 
           </div>
@@ -118,7 +126,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-
     incomingItemSelect: {
       type: Object as PropType<Thumbnail>,
       default: null
@@ -131,7 +138,8 @@ export default defineComponent({
       items: [] as Thumbnail[],
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
-      expanded: this.open
+      expanded: this.open,
+      lastOpacityChanged: null as Thumbnail | null
     }
   },
 
@@ -155,7 +163,6 @@ export default defineComponent({
       return item instanceof Imageset;
     },
     selectItem(item: Thumbnail): void {
-      console.log("FolderView: item selected")
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -164,14 +171,30 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
-      console.log("FolderView: slider changed")
-      this.$emit('opacity', item, (e.target as HTMLInputElement).value)
+      let dragging = false
+      if (this.lastOpacityChanged == item) {
+        dragging = true
+      } else {
+        this.lastOpacityChanged = item;
+      }
+      this.$emit('opacity', item, (e.target as HTMLInputElement).value, !dragging);
     },
 
     onToggleImage(e: Event, item: Thumbnail) {
-      console.log("FolderView: toggled")
-      this.$emit('toggle', item, (e.target as HTMLInputElement).checked)
-    }
+      this.$emit('toggle', item, (e.target as HTMLInputElement).checked);
+    },
+
+    scrollToItem(id: string) {
+      const element = document.getElementById(id);
+      if (element !== null) {
+        const container = document.getElementById("items");
+        if (container !== null) {
+          console.log(element.clientHeight);
+          const y = Math.max(Math.min(element.offsetTop - element.clientHeight * 1.5, container.scrollHeight), 0);
+          container.scrollTo(0, y);
+        }
+      }
+    },
   },
 
   computed: {
@@ -182,11 +205,7 @@ export default defineComponent({
     },
 
     isMobile() {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
+      return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     },
   },
 
@@ -194,6 +213,7 @@ export default defineComponent({
     incomingItemSelect() {
       if (this.incomingItemSelect != null) {
         this.lastSelectedItem = this.incomingItemSelect;
+        this.scrollToItem(`fv-${this.incomingItemSelect.get_name()}`);
       }
     }
   }
@@ -204,7 +224,6 @@ export default defineComponent({
 .fv-root {
   display: flex;
   flex-direction: var(--flex-direction);
-  width: auto;
   overflow-x: auto;
   overflow-y: auto;
   pointer-events: auto;
@@ -242,10 +261,10 @@ export default defineComponent({
   width: 100%;
   cursor: pointer;
   pointer-events: auto;
-  margin: .35em 0;
+  margin: .5em 0;
   & img {
     width: 100%;
-    height: ~"min(45px, 7.5vw)";
+    height: ~"min(45px, 7.5vh)";
     object-fit: cover;
     border-radius: 2px;
   }
@@ -258,24 +277,41 @@ export default defineComponent({
   }
 }
 
+
+.selected .item-name {
+  color: #fb46c2;
+}
 .item-name {
+  position: absolute;
+  top:5px;
+  right:5px;
+  margin:0px 5px;
+  text-align: right;
   color: white;
-  width: 100%;
-  font-size: 9pt;
+  font-size: 0.7em;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  text-shadow: 0px 0px 5px black;
 }
 
 .thumbnail-header {
   color: white;
   width: 100%;
-  font-size: 1rem;
-  padding: 3px;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+}
+
+.item-thumbnails {
+  position: relative;
+  display: inline-block;
+  height: 45px;
 }
 
 .thumbnail-images {
   width: 100px;
+  position: absolute;
+  height: 45px;
 }
 
 .bordered {
@@ -314,8 +350,7 @@ export default defineComponent({
   align-items: center;
   justify-content: space-between;
   gap: 0.5em;
-  
-  
+  margin-top: 2px;
 }
 .switch {
   // moving toggle
@@ -374,6 +409,11 @@ input:checked + .slider:before {
   -webkit-transform: translateX(var(--translateX));
   -ms-transform: translateX(var(--translateX));
   transform: translateX(var(--translateX));
+}
+
+#expand-icon {
+  color: var(--ephemeris-color);
+  margin:10px;
 }
 
 
