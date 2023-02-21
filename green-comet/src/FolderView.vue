@@ -214,6 +214,8 @@ export default defineComponent({
       if (this.incomingItemSelect != null) {
         this.lastSelectedItem = this.incomingItemSelect;
         this.scrollToItem(`fv-${this.incomingItemSelect.get_name()}`);
+      } else {
+        this.lastSelectedItem = null
       }
     }
   }

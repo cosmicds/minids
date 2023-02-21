@@ -695,6 +695,7 @@ const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
+  dates.push(t + 86400000/2);
   d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
@@ -1012,6 +1013,11 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
+
+    dontSetTime(): boolean {
+      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+    },
+    
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -1057,6 +1063,7 @@ export default defineComponent({
     },
 
     toDateString(date: Date) {
+      // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
@@ -1065,7 +1072,10 @@ export default defineComponent({
       if (index === -1) { return null; }
       const row = table[index];
       const nextRow = table[index + 1] ?? row;
-      const f = this.dayFrac;
+      const delta_t = (nextRow.date.getTime() - row.date.getTime()) / MILLISECONDS_PER_DAY;
+      // get how far we are into the day
+      const dayFracPassed = (row.date.getTime() / MILLISECONDS_PER_DAY) % 1;
+      const f = (this.dayFrac - dayFracPassed) / delta_t;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
       
@@ -1138,6 +1148,10 @@ export default defineComponent({
     
     logPosition() {
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
+    },
+
+    printUTCDate(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
     },
 
     selectSheet(name: SheetType) {
@@ -1720,6 +1734,10 @@ export default defineComponent({
     
     showImageForDateTime(date: Date) {
       const name = this.matchImageSetName(date)
+      if (name == null) {
+        this.incomingItemSelect = null
+        return;
+      }
       const imageset_names = Object.keys(this.imagesetLayers)
       imageset_names.forEach((iname: string) => {
         if (iname != name) {
@@ -1760,7 +1778,7 @@ export default defineComponent({
 
     updateForDateTime() {
       this.logTimes('updateForDateTime')
-      this.setTime(this.dateTime);
+      if (!this.dontSetTime) { this.setTime(this.dateTime) }
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
@@ -1790,9 +1808,9 @@ export default defineComponent({
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
       // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      if (date != null) {
-        console.log('::: manual date:', date)
-      }
+      // if (date != null) {
+      //   console.log('::: manual date:', date)
+      // }
     }
   },
 
