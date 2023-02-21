@@ -819,14 +819,6 @@ export default defineComponent({
       // @ts-ignore
       SpreadSheetLayer.prototype.draw = drawSpreadSheetLayer;
 
-      // This is just nice for hacking while developing
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.wwt = this; window.settings = this.wwtSettings;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.applyISLSetting = applyImageSetLayerSetting;
-
       this.imagesetFolder = await this.loadImageCollection({
         url: this.wtml.c2022e3,
         loadChildFolders: false
@@ -1260,7 +1252,6 @@ export default defineComponent({
       // by default, allow 1/3 of the place to be visible and still be considered in view
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) {
-        console.log("There is not image set for this place: ", place)
         return false;
       }
 
@@ -1273,7 +1264,6 @@ export default defineComponent({
       const curFov = this.wwtSmallestFov();
 
       const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
-      // console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
       return return_val
     },
 
@@ -1311,7 +1301,6 @@ export default defineComponent({
       this.$nextTick(() => {
         const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
         if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
-          // console.log('opacity changed. moving? ', move)
           const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
           this.selectedTime = Date.UTC(year, month - 1, day); 
           this.incomingItemSelect = place;
@@ -1456,8 +1445,6 @@ export default defineComponent({
 
       // gives julian date: number of days since Jan 1, 4713 BC
       const JD = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-
-      console.log(JD);
       return JD
 
     },
@@ -1466,8 +1453,6 @@ export default defineComponent({
       const lng = longRad * R2D;
 
       const modified_jd = this.get_julian(utc)  - 2451545;
-
-      // console.log(julianDays)
 
       const julianCenturies = modified_jd / 36525.0;
       // this form wants julianDays - 2451545
@@ -1803,7 +1788,7 @@ export default defineComponent({
     },
 
     logTimes(pre: string, date = null as Date | null) { 
-      console.log('running',pre)
+      // console.log('running',pre)
       // console.log("::: selectedTime:", new Date(this.selectedTime))
       // console.log('::: selectedDate:', this.selectedDate)
       // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
