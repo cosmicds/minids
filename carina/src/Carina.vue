@@ -489,7 +489,7 @@ export default defineComponent({
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
           window.removeEventListener('keyup', splashScreenListener);
-        }
+        };
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
@@ -514,7 +514,7 @@ export default defineComponent({
       const splashScreenListener = (_event: KeyboardEvent) => {
         this.showSplashScreen = false;
         window.removeEventListener('keypress', splashScreenListener);
-      }
+      };
       window.addEventListener('keypress', splashScreenListener);
 
     });
