@@ -7,12 +7,12 @@ import TransitionExpand from "./TransitionExpand.vue";
 import "./polyfills";
 
 import VueSlider from "vue-slider-component";
-import 'vue-slider-component/theme/default.css'
+import 'vue-slider-component/theme/default.css';
 
 import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
+import '@vuepic/vue-datepicker/dist/main.css';
 
-import vuetify from "../plugins/vuetify"
+import vuetify from "../plugins/vuetify";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -69,35 +69,35 @@ createApp(C2022E3, {
   bgName: "unwise"
 })
 
-// Plugins
-.use(wwtPinia)
-.use(vuetify)
-.use(Notifications)
+  // Plugins
+  .use(wwtPinia)
+  .use(vuetify)
+  .use(Notifications)
 
-// Directives
-.directive(
-/**
-* Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
-*/
-"hide", {
-  // Run on initialisation (first render) of the directive on the element
-  beforeMount(el, binding, _vnode, _prevVnode) {
-    update(el, binding)
-  },
-  // Run on subsequent updates to the value supplied to the directive
-  updated(el, binding, _vnode, _prevVnode) {
-    update(el, binding)
-  }
-})
+  // Directives
+  .directive(
+    /**
+    * Hides an HTML element, keeping the space it would have used if it were visible (css: Visibility)
+    */
+    "hide", {
+      // Run on initialisation (first render) of the directive on the element
+      beforeMount(el, binding, _vnode, _prevVnode) {
+        update(el, binding);
+      },
+      // Run on subsequent updates to the value supplied to the directive
+      updated(el, binding, _vnode, _prevVnode) {
+        update(el, binding);
+      }
+    })
 
-// Components
-.component("WorldWideTelescope", WWTComponent)
-.component('font-awesome-icon', FontAwesomeIcon)
-.component('font-awesome-layers', FontAwesomeLayers)
-.component('folder-view', FolderView)
-.component('vue-slider', VueSlider)
-.component('transition-expand', TransitionExpand)
-.component('date-picker', Datepicker)
+  // Components
+  .component("WorldWideTelescope", WWTComponent)
+  .component('font-awesome-icon', FontAwesomeIcon)
+  .component('font-awesome-layers', FontAwesomeLayers)
+  .component('folder-view', FolderView)
+  .component('vue-slider', VueSlider)
+  .component('transition-expand', TransitionExpand)
+  .component('date-picker', Datepicker)
 
-// Mount
-.mount("#app");
+  // Mount
+  .mount("#app");
