@@ -461,7 +461,7 @@
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
                   <li>Click the thumbnail images on the left to see photographs of the comet in the virtual sky. Use the sliders under the thumbnails to display the comet images for multiple dates.</li>
-                  <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
+                  <li>Click "Play comet images" to view them in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
                 </ul>
                 <br>
 
@@ -470,7 +470,7 @@
                 <br><br>
 
                 <h3>A Comet’s Tail</h3>
-                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet as it moves in space!
+                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet for much of its path through space!
 
                 <br><br><br>
                 <div class="credits">
@@ -555,7 +555,7 @@
                             to auto-advance time.
                           </li>
                           <li>
-                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT and 12:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Small pink dots overlaid with a larger white'ish dot indicate dates that have comet photographs.
+                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Larger white'ish dots overlaid on the small pink dots indicate dates that have comet photographs.
                           </li>
                           <li>
                             Click a thumbnail image in the panel in the upper left to see an image of the comet photographed by Gerald Rhemann overlaid on the virtual sky on that day. The slider under the thumbnail adjusts the image opacity within the sky view.
@@ -564,7 +564,13 @@
                             Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
                           </li>                          
                           <li>
-                            Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
+                            Choose whether to display the sky grid, constellations, or the horizon.
+                          </li>
+                          <li>
+                            Adjust the displayed time for your chosen location using the time controller.
+                          </li>
+                          <li>
+                            Re-center the view on the comet's location "now" or Play the comet images, in order, along their path.
                           </li>
                         </ul>
                       <br>
