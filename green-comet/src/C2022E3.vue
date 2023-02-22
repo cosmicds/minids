@@ -158,7 +158,7 @@
         sliders
         expandable
         :thumbnails="true"
-        :open="mobile ? true : true"
+        :open="mobile ? false : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
         :incomingItemSelect="incomingItemSelect"
