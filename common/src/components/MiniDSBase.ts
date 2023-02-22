@@ -25,7 +25,7 @@ export default defineComponent({
   },
 
   created() {
-    this.touchscreen = matchMedia('(hover: none)').matches;
+    this.touchscreen = "ontouchstart" in document.documentElement;
   },
 
   mounted() {
