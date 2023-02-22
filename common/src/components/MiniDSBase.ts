@@ -25,7 +25,9 @@ export default defineComponent({
   },
 
   created() {
-    this.touchscreen = "ontouchstart" in document.documentElement;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || window.navigator.msPointerEnabled;
   },
 
   mounted() {
