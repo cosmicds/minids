@@ -70,7 +70,7 @@ export default defineComponent({
       requestAnimationFrame(() => {
         element.style.height = "0";
       });
-      this.$emit('leave')
+      this.$emit('leave');
     }
   }
 });

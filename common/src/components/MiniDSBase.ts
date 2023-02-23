@@ -21,7 +21,7 @@ export default defineComponent({
       resizeObserver: null as ResizeObserver | null,
       touchscreen: false,
       windowShape: defaultWindowShape,
-    }
+    };
   },
 
   created() {

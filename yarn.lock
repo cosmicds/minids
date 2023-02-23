@@ -479,6 +479,8 @@ __metadata:
   resolution: "@minids/common@workspace:common"
   dependencies:
     "@wwtelescope/engine-pinia": ^0.2.0
+    eslint: ^8.31.0
+    eslint-plugin-vue: ^9.8.0
     screenfull: ^6.0.2
     typescript: ^4.9.4
     vue: ^3
@@ -505,6 +507,7 @@ __metadata:
     "@vuepic/vue-datepicker": ^3.6.5
     "@wwtelescope/astro": ^0.2.2
     d3-dsv: ^3.0.1
+    date-fns: ^2.29.3
     date-fns-tz: ^2.0.0
     eslint: ^8.31.0
     eslint-plugin-vue: ^9.8.0

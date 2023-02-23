@@ -453,7 +453,7 @@ export default defineComponent({
         { name: "facebook", color: "#1877f2", text: "Share" },
         { name: "twitter", color: "#1da1f2", text: "Tweet" },
       ]
-    }
+    };
   },
 
   created() {
@@ -476,11 +476,11 @@ export default defineComponent({
             mode: "autodetect",
             name: key,
             goto: false
-        }).then((layer) => {
-          this.layers[key] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
-        });
-      }));
+          }).then((layer) => {
+            this.layers[key] = layer;
+            applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          });
+        }));
 
       Promise.all(layerPromises).then(() => {
         this.resetView();
@@ -489,7 +489,7 @@ export default defineComponent({
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
           window.removeEventListener('keyup', splashScreenListener);
-        }
+        };
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
@@ -514,7 +514,7 @@ export default defineComponent({
       const splashScreenListener = (_event: KeyboardEvent) => {
         this.showSplashScreen = false;
         window.removeEventListener('keypress', splashScreenListener);
-      }
+      };
       window.addEventListener('keypress', splashScreenListener);
 
     });
@@ -610,11 +610,11 @@ export default defineComponent({
     },
 
     resetView(instant = true) {
-      const D2R = Math.PI / 180.0;
+      const d2R = Math.PI / 180.0;
       const imageset = this.layers.jwst.get_imageSet();
       this.gotoRADecZoom({
-        raRad: D2R * imageset.get_centerX(),
-        decRad: D2R * imageset.get_centerY(),
+        raRad: d2R * imageset.get_centerX(),
+        decRad: d2R * imageset.get_centerY(),
         zoomDeg: 0.8595,
         rollRad: 1.799,
         instant: instant,
