@@ -35,7 +35,6 @@
             :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
             v-for="item of items"
             :key="item.get_name()"
-            :title="item.get_name()"
             :id="`fv-${item.get_name()}`"
           >
             <div
