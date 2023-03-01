@@ -100,10 +100,10 @@ const infoSheet = {
       selector: ".v-window"
     },
     infoText: {
-      selector: ".v-window-item:nth-of-type(1)"
+      selector: ".v-window-item:nth-of-type(1) .v-card-text"
     },
     wwtText: {
-      selector: ".v-window-item:nth-of-type(2)"
+      selector: ".v-card-text:nth-of-type(2) .v-card-text"
     }
   }
 };
