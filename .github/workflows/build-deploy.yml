@@ -38,7 +38,7 @@ jobs:
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            if [ $ws != 'common' ]
+            if [ $ws != 'common' -a $ws != 'tests' ]
             then
               mv ${ws}/dist dist/${ws}
             fi
