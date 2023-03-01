@@ -1204,6 +1204,9 @@ export default defineComponent({
       this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate();
 
+      this.playing = false;
+      this.playingCometPath = false;
+
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
