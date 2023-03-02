@@ -20,6 +20,18 @@ const carinaElements = {
   },
   splashClose: {
     selector: "#splash-close"
+  },
+  topContent: {
+    selector: "#top-content"
+  },
+  bottomContent: {
+    selector: "#bottom-content"
+  },
+  videoDialog: {
+    selector: "#video-container",
+  },
+  infoSheet: {
+    selector: "#text-bottom-sheet"
   }
 };
 
@@ -127,7 +139,9 @@ const carinaSections = {
   }
 };
 
-const carinaProps = {};
+const carinaProps = {
+  title: "Compare JWST and Hubble images of Carina!"
+};
 
 const carinaPage: PageObjectModel = {
   url: "http://localhost:8080",
