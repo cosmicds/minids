@@ -396,7 +396,7 @@
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
-import { defineComponent } from "vue";
+import { defineComponent, nextTick } from "vue";
 
 type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
@@ -483,8 +483,9 @@ export default defineComponent({
         }));
 
       Promise.all(layerPromises).then(() => {
-        this.resetView();
         this.layersLoaded = true;
+
+        nextTick(() => this.resetView());
 
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
