@@ -493,7 +493,6 @@ export default defineComponent({
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
-          console.log(event);
           if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
             this.showVideoSheet = false;
           }

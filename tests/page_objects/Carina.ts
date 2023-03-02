@@ -15,6 +15,9 @@ const carinaElements = {
   wwtComponent: {
     selector: ".wwtelescope-component"
   },
+  mainContent: {
+    selector: "#main-content"
+  },
   splashScreen: {
     selector: "#splash-screen"
   },
@@ -89,6 +92,9 @@ const bottomContent = {
     creditIcon: {
       selector: "#credits a"
     }
+  },
+  props: {
+    creditIconCount: 4
   }
 };
 
@@ -105,19 +111,27 @@ const infoSheet = {
     wwtTabHeader: {
       selector: ".v-tab:nth-of-type(2)"
     },
-    closeTextIcon: {
+    closeIcon: {
       selector: "#close-text-icon"
     },
     textWindow: {
       selector: ".v-window"
     },
+    textItem: {
+      selector: ".v-window-item .v-card-text"
+    },
     infoText: {
       selector: ".v-window-item:nth-of-type(1) .v-card-text"
     },
     wwtText: {
-      selector: ".v-card-text:nth-of-type(2) .v-card-text"
+      selector: ".v-window-item:nth-of-type(2) .v-card-text"
     }
+  },
+
+  props: {
+    tabCount: 2
   }
+
 };
 
 const carinaSections = {
