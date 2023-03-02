@@ -1901,7 +1901,7 @@ export default defineComponent({
             const image = this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
             if (image) {
-              this.playingWaitCount = 3;
+              this.playingWaitCount = 1;
             }
           });
         } else {
