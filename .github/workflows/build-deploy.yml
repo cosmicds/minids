@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
     
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -47,6 +48,11 @@ jobs:
           sleep 10 # give the local service time to start up
           yarn bs-local -e default,firefox,edge,safari -o reports
           pkill -f vue-cli-service # stop the servers
+
+      - name: 'BrowserStackLocal Stop'  # Terminating the BrowserStackLocal tunnel connection
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: stop
 
       - name: Get workspaces
         uses: sergeysova/jq-action@v2
