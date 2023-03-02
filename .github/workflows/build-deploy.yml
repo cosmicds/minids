@@ -6,7 +6,7 @@ on:
       main
 
 jobs:
-  build-test:
+  build:
     if: ${{ github.repository_owner == 'cosmicds' }}
     runs-on: ubuntu-latest
     steps:
