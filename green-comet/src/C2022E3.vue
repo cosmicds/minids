@@ -314,7 +314,7 @@
             }"
             :order="false"
             v-model="selectedTime"
-            @change="onTimeSliderchange"
+            @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
@@ -765,6 +765,7 @@ export default defineComponent({
       playing: false,
       playingCometPath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
+      playingWaitCount: 0,
 
       showAltAzGrid: true,
       showConstellations: false,
@@ -1203,6 +1204,9 @@ export default defineComponent({
       this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate();
 
+      this.playing = false;
+      this.playingCometPath = false;
+
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
@@ -1287,7 +1291,7 @@ export default defineComponent({
       return false;
     },
 
-    onTimeSliderchange(options?: MoveOptions) {
+    onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
         this.showImageForDateTime(this.dateTime);
         this.updateViewForDate(options);
@@ -1625,7 +1629,7 @@ export default defineComponent({
         if (this.lastClosePt !== null) {
           this.selectedTime = this.lastClosePt.date.getTime();
           this.$nextTick(() => {
-            this.onTimeSliderchange();
+            this.onTimeSliderChange();
             this.updateViewForDate();
           });
         }
@@ -1720,18 +1724,20 @@ export default defineComponent({
       }
     },
     
-    showImageForDateTime(date: Date) {
+    showImageForDateTime(date: Date): boolean {
       const name = this.matchImageSetName(date);
       if (name == null) {
         this.incomingItemSelect = null;
-        return;
+        return false;
       }
       const imagesetNames = Object.keys(this.imagesetLayers);
+      let shown = false;
       imagesetNames.forEach((iname: string) => {
         if (iname != name) {
           this.setLayerOpacityForImageSet(iname, 0);
         } else {
           this.setLayerOpacityForImageSet(iname, 1);
+          shown = true;
           // need to get the Place object for the image set and use it to set the view
           if (this.imagesetFolder != null) {
             const places = this.imagesetFolder.get_children();
@@ -1750,7 +1756,7 @@ export default defineComponent({
           // });
         }
       });
-      
+      return shown;
     },
 
     centerOnCurrentDate(options?: MoveOptions) {
@@ -1885,11 +1891,18 @@ export default defineComponent({
       this.updateViewForDate({ zoomDeg: 60 });
 
       this.playingIntervalId = setInterval(() => {
+        if (this.playingWaitCount > 0) {
+          this.playingWaitCount -= 1;
+          return;
+        }
         if (this.selectedTime < maxTime) {
           this.moveOneDayForward();
           this.$nextTick(() => {
-            this.showImageForDateTime(this.dateTime);
+            const image = this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
+            if (image) {
+              this.playingWaitCount = 1;
+            }
           });
         } else {
           this.playingCometPath = false;
