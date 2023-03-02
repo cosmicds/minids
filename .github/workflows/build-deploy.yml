@@ -39,14 +39,14 @@ jobs:
           local-testing: start
           local-identifier: random
 
-      - bash: |
+      - name: Run BrowserStack tests
+        run: |
           set -xeuo pipefail
           cd tests
           yarn serve &
           sleep 10 # give the local service time to start up
           yarn bs-local -e default,firefox,edge,safari -o reports
           pkill -f vue-cli-service # stop the servers
-        displayName: Run BrowserStack tests
 
       - name: Get workspaces
         uses: sergeysova/jq-action@v2
