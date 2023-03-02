@@ -471,20 +471,22 @@ export default defineComponent({
           const item = children[0] as Place;
           const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
           if (imageset === null) { return; }
-          this.addImageSetLayer({
+          return this.addImageSetLayer({
             url: imageset.get_url(),
             mode: "autodetect",
             name: key,
             goto: false
-          }).then((layer) => {
-            this.layers[key] = layer;
-            applyImageSetLayerSetting(layer, ["opacity", 0.5]);
           });
         }));
 
-      Promise.all(layerPromises).then(() => {
-        this.resetView();
+      Promise.all(layerPromises).then((layers) => {
+        layers.forEach(layer => {
+          if (layer === undefined) { return; }
+          this.layers[layer.get_name()] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+        });
         this.layersLoaded = true;
+        this.resetView();
 
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
@@ -493,7 +495,6 @@ export default defineComponent({
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
-          console.log(event);
           if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
             this.showVideoSheet = false;
           }
