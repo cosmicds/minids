@@ -46,10 +46,3 @@ jobs:
           yarn bs-local -e default,firefox,edge,safari -o reports
           pkill -f vue-cli-service # stop the servers
         displayName: Run BrowserStack tests
-
-      - task: PublishTestResults@2
-        displayName: Publish test results
-        condition: succeededOrFailed()
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'tests/reports/*.xml'

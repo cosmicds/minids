@@ -48,13 +48,6 @@ jobs:
           pkill -f vue-cli-service # stop the servers
         displayName: Run BrowserStack tests
 
-      - task: PublishTestResults@2
-        displayName: Publish test results
-        condition: succeededOrFailed()
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'tests/reports/*.xml'
-
       - name: Get workspaces
         uses: sergeysova/jq-action@v2
         id: workspaces
