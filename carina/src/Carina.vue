@@ -396,7 +396,7 @@
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
-import { defineComponent, nextTick } from "vue";
+import { defineComponent } from "vue";
 
 type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
@@ -471,21 +471,22 @@ export default defineComponent({
           const item = children[0] as Place;
           const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
           if (imageset === null) { return; }
-          this.addImageSetLayer({
+          return this.addImageSetLayer({
             url: imageset.get_url(),
             mode: "autodetect",
             name: key,
             goto: false
-          }).then((layer) => {
-            this.layers[key] = layer;
-            applyImageSetLayerSetting(layer, ["opacity", 0.5]);
           });
         }));
 
-      Promise.all(layerPromises).then(() => {
+      Promise.all(layerPromises).then((layers) => {
+        layers.forEach(layer => {
+          if (layer === undefined) { return; }
+          this.layers[layer.get_name()] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+        });
         this.layersLoaded = true;
-
-        nextTick(() => this.resetView());
+        this.resetView();
 
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
