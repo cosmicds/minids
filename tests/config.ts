@@ -31,7 +31,7 @@ export interface BrowserCapabilities extends Capabilities {
 
 export interface MobileCapabilities extends Capabilities {
   device: string,
-  real_mobile: boolean,
+  realMobile: boolean,
   osVersion: string;
 }
 
@@ -66,7 +66,7 @@ export function mobileCapabilities(deviceOS: string, deviceName: string, osVersi
   return {
     'device': deviceName,
     'osVersion': osVersion,
-    'real_mobile': realMobile,
+    'realMobile': realMobile,
     'browserName': deviceOS, // Seems strange, but this is what BrowserStack shows in their examples
   };
 }
