@@ -27,7 +27,7 @@ const services = loadServices();
 const directory = __dirname;
 
 const nightwatchConfig: Configuration = {
-  src_folders: [directory + "/carina"],
+  src_folders: [directory],
   page_objects_path: [directory + "/page_objects"],
   custom_assertions_path: [],
   disable_typescript: true,

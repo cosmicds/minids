@@ -20,7 +20,7 @@ const BSLOCAL_CAPABILITIES = {
 const localDirectory = __dirname;
 
 const nightwatchConfig: Configuration = {
-  src_folders: [localDirectory + "/carina"],
+  src_folders: [localDirectory],
   page_objects_path: [localDirectory + "/page_objects"],
   custom_assertions_path: [],
   disable_typescript: true,
