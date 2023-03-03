@@ -76,7 +76,7 @@ const simpleKeyMaker = function(_version: string, browser: string): string {
   return browser.toLowerCase();
 };
 addBrowsers(environments, BSLOCAL_CAPABILITIES, 'Windows', ['10'], ['Chrome', 'Firefox', 'MicrosoftEdge'], simpleKeyMaker);
-addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', ['Big Sur'], ['Safari'], simpleKeyMaker);
+addBrowsers(environments, BSLOCAL_CAPABILITIES, 'OS X', ['Ventura'], ['Safari'], simpleKeyMaker);
 
 // Code to copy seleniumhost/port into test settings
 for (const i in nightwatchConfig.test_settings) {
@@ -87,5 +87,4 @@ for (const i in nightwatchConfig.test_settings) {
   config['selenium_host'] = nightwatchConfig.selenium.host;
   config['selenium_port'] = nightwatchConfig.selenium.port;
 }
-
 module.exports = nightwatchConfig;

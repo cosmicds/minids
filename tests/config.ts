@@ -24,15 +24,15 @@ export interface Capabilities {
 }
 
 export interface BrowserCapabilities extends Capabilities {
-  browser_version: string,
+  browserVersion: string,
   os: string,
-  os_version: string;
+  osVersion: string;
 }
 
 export interface MobileCapabilities extends Capabilities {
   device: string,
   real_mobile: boolean,
-  os_version: string;
+  osVersion: string;
 }
 
 export interface TestEnvironment {
@@ -56,16 +56,16 @@ export interface Configuration {
 export function browserCapabilities(browserName: string, browserVersion: string, osName: string, osVersion: string): BrowserCapabilities {
   return {
     'browserName': browserName,
-    'browser_version': browserVersion,
+    'browserVersion': browserVersion,
     'os': osName,
-    'os_version': osVersion,
+    'osVersion': osVersion,
   };
 }
 
 export function mobileCapabilities(deviceOS: string, deviceName: string, osVersion: string, realMobile=true): MobileCapabilities {
   return {
     'device': deviceName,
-    'os_version': osVersion,
+    'osVersion': osVersion,
     'real_mobile': realMobile,
     'browserName': deviceOS, // Seems strange, but this is what BrowserStack shows in their examples
   };

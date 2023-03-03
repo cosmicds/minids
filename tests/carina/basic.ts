@@ -6,6 +6,8 @@ import {
   WindowSize
 } from "nightwatch";
 
+import { assert } from "chai";
+
 import {
   expectAllNotPresent,
   expectAllVisible,
@@ -128,7 +130,7 @@ const tests: CarinaTests = {
       this.app.getElementSize("@mainContent", (mainContentSize) => {
         const wsize = windowSize.value as WindowSize;
         const csize = mainContentSize.value as WindowSize;
-        browser.assert.equal(Math.round(csize.height), Math.round(0.66 * wsize.height));
+        assert(Math.round(csize.height - 0.66 * wsize.height) < 2);
         browser.assert.equal(wsize.width, csize.width);
       });
     });

@@ -47,7 +47,7 @@ jobs:
           yarn serve &
           sleep 10 # give the local service time to start up
           cd ../tests
-          yarn bs-local -e default,firefox,edge --group carina -o reports
+          yarn bs-local -e default,firefox,edge,safari --group carina -o reports
           pkill -f vue-cli-service # stop the servers
 
       - name: 'BrowserStackLocal Stop'  # Terminating the BrowserStackLocal tunnel connection
