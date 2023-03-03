@@ -743,7 +743,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*":
+"@types/chai@npm:*, @types/chai@npm:^4.3.4":
   version: 4.3.4
   resolution: "@types/chai@npm:4.3.4"
   checksum: 571184967beb03bf64c4392a13a7d44e72da9af5a1e83077ff81c39cf59c0fda2a5c78d2005084601cf8f3d11726608574d8b5b4a0e3e9736792807afd926cd0
@@ -6509,6 +6509,7 @@ __metadata:
     "@minids/carina": "workspace:*"
     "@minids/common": "workspace:*"
     "@minids/tests": "workspace:*"
+    "@types/chai": ^4.3.4
     rimraf: ^4.1.0
   languageName: unknown
   linkType: soft
