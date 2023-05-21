@@ -244,7 +244,7 @@
                 playingCometPath = !playingCometPath;
               }"
             >
-              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
+              {{ `${playingCometPath ? 'Stop' : 'Play'} supernova images` }}
             </v-btn>
             <!--
             <v-btn
@@ -303,9 +303,8 @@
           <vue-slider
             id="slider"
             adsorb
-            included
             :marks="(d: number) => {
-              return allDates.includes(d) || cometImageDates.includes(d);
+              return allDates.includes(d) || imageDates.includes(d);
             }"
             :order="false"
             v-model="selectedTime"
@@ -318,29 +317,14 @@
             >
               <template v-slot:mark="{ pos, value }">
                 <div
-                  :class="[{ 'mark-line': cometImageDates.includes(value) }]"
+                  :class="[{ 'mark-line': imageDates.includes(value) }]"
                   :style="{ left: `${pos}%` }">
                 </div>
               </template>
             </vue-slider>
           </span>
       </div>
-      <div id="credits" class="ui-text">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
-            ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-        </div>
-      </div>
+      <mini-credits></mini-credits>
     </div>
 
     <v-dialog
@@ -428,26 +412,26 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
+                <p>
+                  In the Pinwheel Galaxy (Messier object 101, M101) a massive star has exploded in what is known as a supernova.
+                </p>
+                In particular, it has died in what is called a core-collapse supernova. These occur when a star several times the mass of our Sun dies. 
+                A star dies when it can no longer produce energy through the fusion of elements in it's core. 
+                Stars generate energy through the fusion of elements. 
+                Initially stars fuse hydrogen into helium. 
+                Star like the Sun are not massive enough to fuse helium into heavier elements.
+                Eventually, as the core runs out of hydrogen, the star will fuse hydrogen in an ever expanding shell until it gets too hot too close to the surface. T
+                he outer layers to expand forming a plantary nebular like the Ring Nebua.
                 
-                Comets are dusty snowballs, large clumps of rock and ice, that originate in the outer solar system. The “Green Comet” (or <a href="https://science.nasa.gov/comet-2022-e3-ztf" target="_blank">C/2022 E3</a>) makes its closest approach to the Sun (and to Earth) in early 2023. The comet images in this interactive view were taken on different dates from December 2022 through January 2023 by astrophotographer <a href="http://www.astrostudio.at/" target="_blank">Gerald Rhemann</a>.
-                <br><br>
-
-                <h3>Explore!</h3>
-                Adjusting the <span class="ui-element-ref-comet">Date</span> slider along the bottom of the screen shows you the position of the comet since it was discovered in March 2022. 
-                <ul class="text-list">
-                  <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
-                  <li>Click the thumbnail images on the left to see photographs of the comet in the virtual sky. Use the sliders under the thumbnails to display the comet images for multiple dates.</li>
-                  <li>Click "Play comet images" to view them in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
-                </ul>
-                <br>
-
-                <h3>Why is the Comet Green?</h3>
-                Visually, comets have three parts: the bright coma and two tails. The coma is material being vaporized off the comet’s surface by radiation from the Sun. The green color of the comet is due to dicarbon (a molecule made of two carbon atoms, C<sub>2</sub>) in the comet’s coma. When excited by ultraviolet light from the sun, dicarbon fluoresces with a blue-green light. 
-                <br><br>
-
-                <h3>A Comet’s Tail</h3>
-                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet for much of its path through space!
-
+                Stars several times the mass of the Sun however can fuse helium into heaver elements - fusing helium into carbon, carbon to oxygen, all the way up to iron - the "star killer".
+                Unlike the lighter elements, the fusion of iron does not release any energy. 
+                The sudden cessation of fusion in the core is a literal shock to the star, initiating a series of shockwaves which crush the core into a nuetron star or black and hole and cause the star to explode!!
+                
+                During this process, the star is also shedding it's outer layers into the surrounding space. 
+                After the initial explosion, the layers of the exploding star ram into the layers it have previously expelled. 
+                This causes a gradual rise in brightness over time during the early stages of a supernova. 
+                After a certain amount of time the the lightcurve (the change of brightness over time) peaks and then begins to fall-off as material continues to cool and expand. 
+                
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
@@ -531,13 +515,10 @@
                             to auto-advance time.
                           </li>
                           <li>
-                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Larger white'ish dots overlaid on the small pink dots indicate dates that have comet photographs.
+                            Click a thumbnail image in the panel in the upper left to make the image show up in the sky
                           </li>
                           <li>
-                            Click a thumbnail image in the panel in the upper left to see an image of the comet photographed by Gerald Rhemann overlaid on the virtual sky on that day. The slider under the thumbnail adjusts the image opacity within the sky view.
-                          </li>
-                          <li>
-                            Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
+                            Use the slider to change the transparency so see multiple images overlayed. 
                           </li>                          
                           <li>
                             Choose whether to display the sky grid, constellations, or the horizon.
@@ -546,7 +527,7 @@
                             Adjust the displayed time for your chosen location using the time controller.
                           </li>
                           <li>
-                            Re-center the view on the comet's location "now" or Play the comet images, in order, along their path.
+                            Re-center the view on the Pinwheel Galaxy's location "now" or Play the supernova images, in order, over time
                           </li>
                         </ul>
                       <br>
@@ -617,7 +598,7 @@ interface MoveOptions {
 
 import {
   ephemerisFullDatesCsv,
-  ephemerisCometImageDatesCsv
+  ephemerisImageDatesCsv
 } from "./data";
 
 const D2R = Math.PI / 180;
@@ -638,7 +619,7 @@ function parseCsvTable(csv: string) {
   });
 }
 const fullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
-const cometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
+const imageDatesTable = parseCsvTable(ephemerisImageDatesCsv);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
@@ -665,19 +646,19 @@ function formatCsvTable(table: Table): string {
 }
 
 const fullDatesString = formatCsvTable(fullDatesTable);
-const cometImageDatesString = formatCsvTable(cometImageDatesTable);
+const imageDatesString = formatCsvTable(imageDatesTable);
 
 const allDates = fullDatesTable.map(r => r.date.getTime());
-const cometImageDates = cometImageDatesTable.map(r => r.date.getTime());
-const minDate = Math.min(...allDates, ...cometImageDates);
-const maxDate = Math.max(...allDates, ...cometImageDates);
+const imageDates = imageDatesTable.map(r => r.date.getTime());
+const minDate = Math.min(...allDates, ...imageDates);
+const maxDate = Math.max(...allDates, ...imageDates);
 const dates: number[] = [];
 
 const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
-  dates.push(t + 86400000/2);
+  // dates.push(t + 86400000/2);
   d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
@@ -744,14 +725,14 @@ export default defineComponent({
       playingWaitCount: 0,
 
       showAltAzGrid: true,
-      showConstellations: false,
-      showHorizon: false,
+      showConstellations: true,
+      showHorizon: true,
 
       currentCometImageLayer: null as SpreadSheetLayer | null,
       currentAllLayer: null as SpreadSheetLayer | null,
       interpolatedDailyTable: null as Table | null,
 
-      cometImageDates: cometImageDates,
+      imageDates: imageDates,
       allDates: allDates,
       dates: dates,
       
@@ -862,7 +843,7 @@ export default defineComponent({
       layerPromises.push(this.createTableLayer({
         name: "Comet Image Dates",
         referenceFrame: "Sky",
-        dataCsv: cometImageDatesString
+        dataCsv: imageDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -939,6 +920,10 @@ export default defineComponent({
 
   computed: {
 
+    selectedDate(): Date {
+      return new Date(this.selectedTime);
+    },
+    
     dateTime() {
       const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
       return new Date(this.selectedDate.getTime() + todMs);
@@ -953,9 +938,6 @@ export default defineComponent({
     },
     ready(): boolean {
       return this.layersLoaded && this.positionSet;
-    },
-    selectedDate(): Date {
-      return new Date(this.selectedTime);
     },
     smallSize(): boolean {
       return this.$vuetify.display.smAndDown;
@@ -990,7 +972,8 @@ export default defineComponent({
     },
 
     dontSetTime(): boolean {
-      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+      // return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+      return false;
     },
     
     showTextSheet: {
@@ -1175,9 +1158,12 @@ export default defineComponent({
         id: layer.id.toString(),
         order: this.wwtActiveLayers.length + 1
       });
-      const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = Date.UTC(year, month - 1, day); 
-      this.showImageForDateTime(this.dateTime);
+      this.setLayerOpacityForImageSet(iset.get_name(), 1);
+      
+      // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+      // this.selectedTime = Date.UTC(year, month - 1, day);
+      // this.showImageForDateTime(this.dateTime);
+      
       // this.updateViewForDate();
 
       this.playing = false;
@@ -1280,13 +1266,16 @@ export default defineComponent({
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       this.updateImageOpacity(place, opacity);
-      
 
       this.$nextTick(() => {
         const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
-        if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move) ) {
+        if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
           const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-          this.selectedTime = Date.UTC(year, month - 1, day); 
+          if (month && day && year) {
+            this.selectedTime = Date.UTC(year, month - 1, day); 
+          }
+          
+          
           this.incomingItemSelect = place;
 
           this.gotoRADecZoom({
@@ -1539,7 +1528,7 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      [cometImageDatesTable, fullDatesTable].forEach((table) => {
+      [imageDatesTable, fullDatesTable].forEach((table) => {
         table.forEach(row => {
           const raRad = row.ra * D2R;
           const decRad = row.dec * D2R;
@@ -1617,13 +1606,13 @@ export default defineComponent({
     updateViewForDate(options?: MoveOptions) {
       let position = null as TableRow | null;
 
-      const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
+      const cometImageIndex = imageDates.findIndex(d => d === this.selectedTime);
       
       if (cometImageIndex > -1) {
         if (this.interpolatedDailyTable !== null) {
           position = this.interpolatedDailyTable[0];
         } else {
-          position = cometImageDatesTable[cometImageIndex];
+          position = imageDatesTable[cometImageIndex];
         }
       } else {
         const allIndex = allDates.findIndex(d => d === this.selectedTime);
@@ -1702,7 +1691,7 @@ export default defineComponent({
     
     showImageForDateTime(date: Date): boolean {
       const name = this.matchImageSetName(date);
-      if (name == null) {
+      if (name == null || name == '') {
         this.incomingItemSelect = null;
         return false;
       }
@@ -1857,8 +1846,8 @@ export default defineComponent({
       if (!play) {
         return;
       }
-      const minTime = Math.min(...cometImageDates) - MILLISECONDS_PER_DAY;
-      const maxTime = Math.max(...cometImageDates) + MILLISECONDS_PER_DAY;
+      const minTime = Math.min(...imageDates) - MILLISECONDS_PER_DAY;
+      const maxTime = Math.max(...imageDates) + MILLISECONDS_PER_DAY;
 
       if(this.selectedTime < minTime || this.selectedTime >= maxTime){
         this.selectedTime = minTime;
@@ -1898,9 +1887,6 @@ html {
   background-color: #000;
   overflow: hidden;
 
-  ::-webkit-scrollbar {
-    // display: none;
-  }
   
   -ms-overflow-style: none;
   // scrollbar-width: none;
@@ -2162,54 +2148,6 @@ body {
 
 #show-controls {
   color: var(--comet-color);
-}
-
-#credits {
-  color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
-
-  img {
-    height: 35px;
-    vertical-align: middle;
-    margin: 2px;
-  }
-
-  @media only screen and (max-width: 600px) {
-  img {
-    height: 24px;
-  }
-}
-
-  svg {
-    vertical-align: middle;
-    height: 24px;
-  }
 }
 
 .v-selection-control--focus-visible .v-selection-control__input::before {

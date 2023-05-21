@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
+import Credits from "./Credits.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 
 import "./polyfills";
@@ -59,7 +60,7 @@ import "leaflet/dist/leaflet.css";
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 createApp(C2022E3, {
-  wwtNamespace: "wwt-minids-c2022e3",
+  wwtNamespace: "wwt-minids-m101-supernova",
   wtml: { // images are listed in chronological order earliest to latest
     imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101_images.wtml",
   },
@@ -95,6 +96,7 @@ createApp(C2022E3, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('font-awesome-layers', FontAwesomeLayers)
   .component('folder-view', FolderView)
+  .component('mini-credits', Credits)
   .component('vue-slider', VueSlider)
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
