@@ -159,7 +159,7 @@
         :incomingItemSelect="incomingItemSelect"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="onOpacityChanged"
+        @opacity="(place, opacity, m) => onOpacityChanged(place, opacity, false)" 
         @toggle="onToggle"
       ></folder-view>
     </div>
@@ -1152,6 +1152,7 @@ export default defineComponent({
     onItemSelected(place: Place) {
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
+      console.log(iset);
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
@@ -1668,6 +1669,7 @@ export default defineComponent({
           const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`;
           const el = (document.querySelector(selector) as HTMLInputElement);
           if (el != null) {
+            console.log(`setting opacity slider for ${name} to ${opacity * 100}`);
             el.value = `${opacity * 100}`;
           }
         }
