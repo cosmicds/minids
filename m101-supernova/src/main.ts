@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
 
-import C2022E3 from "./C2022E3.vue";
+import M101SN from "./M101SN.vue";
 import FolderView from "./FolderView.vue";
 import Credits from "./Credits.vue";
 import TransitionExpand from "./TransitionExpand.vue";
@@ -59,7 +59,7 @@ import "leaflet/dist/leaflet.css";
 // Extract the function out, up here, so I'm not writing it twice
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
-createApp(C2022E3, {
+createApp(M101SN, {
   wwtNamespace: "wwt-minids-m101-supernova",
   wtml: { // images are listed in chronological order earliest to latest
     imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101_all.wtml",
