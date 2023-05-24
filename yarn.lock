@@ -485,12 +485,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@minids/common@workspace:common"
   dependencies:
+    "@vue/cli-plugin-eslint": ^5.0.8
+    "@vue/cli-plugin-typescript": ^5.0.8
+    "@vue/cli-service": ^5.0.8
     "@wwtelescope/engine-pinia": ^0.2.0
     eslint: ^8.31.0
     eslint-plugin-vue: ^9.8.0
     screenfull: ^6.0.2
     typescript: ^4.9.4
     vue: ^3
+    vue-template-compiler: ^2.7.14
     webpack: ^5.75.0
   languageName: unknown
   linkType: soft
@@ -3404,6 +3408,13 @@ __metadata:
   version: 2.29.3
   resolution: "date-fns@npm:2.29.3"
   checksum: e01cf5b62af04e05dfff921bb9c9933310ed0e1ae9a81eb8653452e64dc841acf7f6e01e1a5ae5644d0337e9a7f936175fd2cb6819dc122fdd9c5e86c56be484
+  languageName: node
+  linkType: hard
+
+"de-indent@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "de-indent@npm:1.0.2"
+  checksum: 8deacc0f4a397a4414a0fc4d0034d2b7782e7cb4eaf34943ea47754e08eccf309a0e71fa6f56cc48de429ede999a42d6b4bca761bf91683be0095422dbf24611
   languageName: node
   linkType: hard
 
@@ -9877,6 +9888,16 @@ __metadata:
     hash-sum: ^1.0.2
     loader-utils: ^1.0.2
   checksum: ef79d0c6329303d69c87f128f67e486bd37e9a8d416aa662edafae62fab727117b7452f50be8b11fe0c4cb43992344d5ef6a46b206f375fca4d37ae5a5b99185
+  languageName: node
+  linkType: hard
+
+"vue-template-compiler@npm:^2.7.14":
+  version: 2.7.14
+  resolution: "vue-template-compiler@npm:2.7.14"
+  dependencies:
+    de-indent: ^1.0.2
+    he: ^1.2.0
+  checksum: eba9d2eed6b7110c963bc356b47bdd11d4023d25148abb7e5f7826db2fefe7ad8a575787ee0d8fa47701d44a6f54bde475279b1319f44e1049271eb2419f93a7
   languageName: node
   linkType: hard
 
