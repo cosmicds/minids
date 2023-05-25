@@ -48,11 +48,12 @@
                 @click="() => selectItem(item)"
               />
               <div
+                v-if = "showName"
                 class="item-name"
                 :class="['thumbnail']"
                 @click="() => selectItem(item)"
               >
-                {{item.get_name()}}
+                {{ displayName(item) }}
               </div>
             </div>
             <div class="slider-container">
@@ -128,6 +129,17 @@ export default defineComponent({
     incomingItemSelect: {
       type: Object as PropType<Thumbnail>,
       default: null
+    },
+    showName: {
+      type: Boolean,
+      default: true
+    },
+
+    itemNames: {
+      type: Object as PropType<Record<string, string>>,
+      default: () => ({})
+    },
+
     }
     
   },
@@ -169,6 +181,15 @@ export default defineComponent({
         this.$emit('select', item);
       }
     },
+
+    displayName(item: Thumbnail): string {
+      // check if items names is empty or a function
+      if (this.validItemNames && Object.keys(this.itemNames).includes(item.get_name())) {
+        return this.itemNames[item.get_name()];
+      }
+      return item.get_name();
+    },
+    
     onSliderInputChanged(e: Event, item: Thumbnail) {
       let dragging = false;
       if (this.lastOpacityChanged == item) {
@@ -204,6 +225,25 @@ export default defineComponent({
 
     isMobile() {
       return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    },
+
+    validItemNames() {
+      const length = Object.keys(this.itemNames).length;
+      
+      if (length == 0) { return false; }
+      
+      if ((length - this.items.length) != 0) {
+        console.warn(`itemNames length (${length}) does not match items length (${this.items.length})`);
+      }
+
+      // loop over item names and esure alla re in this.itemNames
+      this.items.forEach((item) => {
+        if (!Object.keys(this.itemNames).includes(item.get_name())) {
+          console.warn(`itemNames does not contain ${item.get_name()}`);
+        }
+      });
+      
+      return length > 0;
     },
   },
 
