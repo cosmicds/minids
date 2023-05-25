@@ -140,6 +140,14 @@ export default defineComponent({
       default: () => ({})
     },
 
+    sortBy: {
+      type: Object as PropType<Record<string, number>>,
+      default: () => ({})
+    },
+
+    reversed: {
+      type: Boolean,
+      default: false
     }
     
   },
@@ -147,6 +155,7 @@ export default defineComponent({
   data() {
     return {
       items: [] as Thumbnail[],
+      originalOrder: [] as string[],
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
       expanded: this.open,
@@ -156,6 +165,8 @@ export default defineComponent({
 
   created() {
     this.populate();
+    this.originalOrder = this.items.map((item) => item.get_name());
+    if (this.validSortBy) { this.sortItems(); }
   },
 
   methods: {
@@ -173,6 +184,24 @@ export default defineComponent({
     showSlider(item: Thumbnail | null): boolean {
       return item instanceof Imageset;
     },
+
+    sortItems(): void {
+      if (!this.validSortBy) {
+        // restore original order
+        this.items.sort((a, b) => {
+          const aIndex = this.originalOrder.indexOf(a.get_name());
+          const bIndex = this.originalOrder.indexOf(b.get_name());
+          return aIndex - bIndex;
+        });
+        return;
+      }
+      this.items.sort((a, b) => {
+        const aIndex = this.sortBy[a.get_name()] ?? this.items.length;
+        const bIndex = this.sortBy[b.get_name()] ?? this.items.length;
+        return this.reversed ? bIndex - aIndex : aIndex - bIndex;
+      });
+    },
+    
     selectItem(item: Thumbnail): void {
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
@@ -227,7 +256,7 @@ export default defineComponent({
       return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     },
 
-    validItemNames() {
+    validItemNames(): boolean {
       const length = Object.keys(this.itemNames).length;
       
       if (length == 0) { return false; }
@@ -236,7 +265,6 @@ export default defineComponent({
         console.warn(`itemNames length (${length}) does not match items length (${this.items.length})`);
       }
 
-      // loop over item names and esure alla re in this.itemNames
       this.items.forEach((item) => {
         if (!Object.keys(this.itemNames).includes(item.get_name())) {
           console.warn(`itemNames does not contain ${item.get_name()}`);
@@ -245,6 +273,19 @@ export default defineComponent({
       
       return length > 0;
     },
+
+    validSortBy(): boolean {
+      let valid = true;
+      const sortKeys = Object.keys(this.sortBy);
+      for (const item of this.items) {
+        if (!sortKeys.includes(item.get_name())) {
+          console.warn(`sortBy does not contain ${item}`);
+          valid = false;
+        }
+      }
+      return valid;
+    },
+  
   },
 
   watch: {
@@ -255,7 +296,11 @@ export default defineComponent({
       } else {
         this.lastSelectedItem = null;
       }
-    }
+    },
+
+    sortBy() {
+      this.sortItems();
+    },
   }
 });
 </script>
