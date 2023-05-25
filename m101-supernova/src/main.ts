@@ -62,7 +62,7 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 createApp(M101SN, {
   wwtNamespace: "wwt-minids-m101-supernova",
   wtml: { // images are listed in chronological order earliest to latest
-    imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101_all.wtml",
+    imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/m101_all.wtml",
   },
   url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
   thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
