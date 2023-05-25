@@ -157,6 +157,9 @@
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
         :incomingItemSelect="incomingItemSelect"
+        :showName="true"
+        :itemNames="imageNames"
+        :sortBy="imageSortBy"
         flex-direction="column"
         @select="onItemSelected"
         @opacity="(place, opacity, m) => onOpacityChanged(place, opacity, false)" 
@@ -601,6 +604,11 @@ import {
   ephemerisImageDatesCsv
 } from "./data";
 
+import {
+  m101DataList,
+  m101DataCount,
+} from "./m101";
+
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
 
@@ -621,6 +629,23 @@ function parseCsvTable(csv: string) {
 const fullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
 const imageDatesTable = parseCsvTable(ephemerisImageDatesCsv);
 
+// convert m101DataList to a DSVParsedArray
+// columns are pngFilename,objectName,wtmlName,Date,Bandpass,Ra,Dec
+const m101DataTable = csvParse(m101DataList, (d, index) => {
+  const thisDate = new Date(d.Date ?? "");
+  return {
+    _index: index,
+    _filename: d.pngFilename,
+    objectName: d.objectName,
+    wtmlName: d.wtmlName,
+    date: thisDate,
+    bandpass: d.Bandpass,
+    ra: +(d.Ra ?? ""),
+    dec: +(d.Dec ?? ""),
+    // get a date that looks like Month DD HH:MM
+    dateString: thisDate.toDateString().slice(4, 10) + " " + thisDate.toTimeString().slice(0, 5),
+  };
+});
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
 // generic names are fine
@@ -735,6 +760,12 @@ export default defineComponent({
       imageDates: imageDates,
       allDates: allDates,
       dates: dates,
+
+      // imageNames: {} as Record<string, string>,
+      // imageSortBy: {} as Record<string, number>,
+      imageNames: Object.fromEntries(m101DataTable.map( d => [d.wtmlName, d.dateString] )),
+      imageSortBy: Object.fromEntries(m101DataTable.map(d => [d.wtmlName, d.date.getTime()])),
+      
       
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
