@@ -3,6 +3,7 @@ import Vue, { createApp } from "vue";
 import M101SN from "./M101SN.vue";
 import FolderView from "./FolderView.vue";
 import Credits from "./Credits.vue";
+import Toggle from "./Toggle.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 
 import "./polyfills";
@@ -100,6 +101,7 @@ createApp(M101SN, {
   .component('vue-slider', VueSlider)
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
+  .component('toggle', Toggle)
 
   // Mount
   .mount("#app");

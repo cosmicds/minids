@@ -176,7 +176,7 @@
           <font-awesome-icon
             size="lg"
             class="ma-1"
-            :color="cometColor"
+            :color="accentColor"
             :icon="showControls ? `chevron-down` : `gear`"
             @click="showControls = !showControls"
             @keyup.enter="showControls = !showControls"
@@ -185,26 +185,23 @@
         </div>
         <transition-expand>
           <div v-if="showControls" class="controls-content">
-            <v-checkbox
-              :color="cometColor"
-              v-model="showAltAzGrid"
-              @keyup.enter="showAltAzGrid = !showAltAzGrid"
+            <toggle
+              :color="accentColor"
+              :item="showAltAzGrid"
               label="Grid"
-              hide-details
+              @toggle="showAltAzGrid = $event"
             />
-            <v-checkbox
-              :color="cometColor"
-              v-model="showConstellations"
-              @keyup.enter="showConstellations = !showConstellations"
+            <toggle
+              :color="accentColor"
+              :item="showConstellations"
               label="Constellations"
-              hide-details
+              @toggle="showConstellations = $event"
             />
-            <v-checkbox
-              :color="cometColor"
-              v-model="showHorizon"
-              @keyup.enter="showHorizon = !showHorizon"
+            <toggle
+              :color="accentColor"
+              :item="showHorizon"
               label="Horizon"
-              hide-details
+              @toggle="showHorizon = $event"
             />
             <div
               style="color:white;"
@@ -226,13 +223,13 @@
                 <font-awesome-icon
                   icon="clock"
                   class="mx-2"
-                  :color="cometColor"
+                  :color="accentColor"
                 ></font-awesome-icon>
               </template>
             </date-picker>
             <v-btn
               block
-              :color="cometColor"
+              :color="accentColor"
               @click="centerOnCurrentDate"
               @keyup.enter="centerOnCurrentDate"
               class="mb-2"
@@ -241,7 +238,7 @@
             </v-btn>
             <v-btn
               block
-              :color="cometColor"
+              :color="accentColor"
               @click="() => {
                 playing = false;
                 playingCometPath = !playingCometPath;
@@ -252,7 +249,7 @@
             <!--
             <v-btn
               block
-              :color="cometColor"
+              :color="accentColor"
               @click="setToFirstCometImage"
             >
               Best view for comet images
@@ -393,8 +390,8 @@
       <v-tabs
         v-model="tab"
         height="32px"
-        :color="cometColor"
-        :slider-color="cometColor"
+        :color="accentColor"
+        :slider-color="accentColor"
         id="tabs"
         dense
         grow
@@ -769,7 +766,7 @@ export default defineComponent({
       
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
-      cometColor: "#a0009b",
+      accentColor: "#a0009b",
       todayColor: "#D6B004",
 
       incomingItemSelect: null as Thumbnail | null,
@@ -978,7 +975,7 @@ export default defineComponent({
     },
     cssVars() {
       return{
-        '--comet-color': this.cometColor,
+        '--comet-color': this.accentColor,
         '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
