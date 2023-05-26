@@ -20,12 +20,11 @@
 
 <script lang="ts">
 import { defineComponent, } from "vue";
-import { Thumbnail } from "@wwtelescope/engine-types";
-import { WWTAwareComponent } from "@wwtelescope/engine-pinia";
+
 
 
 export default defineComponent({
-  extends: WWTAwareComponent,
+
 
   props: {
     visible: {
@@ -35,13 +34,7 @@ export default defineComponent({
   },
 
   data() {
-    return {
-      items: [] as Thumbnail[],
-      lastSelectedItem: null as Thumbnail | null,
-      opacities: {} as Record<string, number>,
-      expanded: this.open,
-      lastOpacityChanged: null as Thumbnail | null
-    };
+    return {    };
   },
 
   created() {
@@ -52,12 +45,7 @@ export default defineComponent({
     
   },
 
-  computed: {
-    cssVars() {
-      return {
-        "display": this.visible ? "flex" : "none",
-      };
-    },
+  computed: { 
 
     isMobile() {
       return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
