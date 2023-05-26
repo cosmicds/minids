@@ -32,7 +32,7 @@ export default defineComponent({
     },
     
     label: {
-      type: Array,
+      type: String,
       required: true,
     },
     item: {
