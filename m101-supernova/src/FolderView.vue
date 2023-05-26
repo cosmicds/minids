@@ -62,7 +62,7 @@
                 class="opacity-range"
                 type="range"
                 value="0"
-                @input="(e) => onSliderInputChanged(e, item)"
+                @input="(e: Event) => onSliderInputChanged(e , item)"
                 @keyup.enter="() => selectItem(item)"
                 @mouseup="() => { lastOpacityChanged = null }"
               />

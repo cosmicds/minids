@@ -162,7 +162,7 @@
         :sortBy="imageSortBy"
         flex-direction="column"
         @select="onItemSelected"
-        @opacity="(place, opacity, m) => onOpacityChanged(place, opacity, false)" 
+        @opacity="(place: Place, opacity: number, m: boolean) => onOpacityChanged(place, opacity, false)" 
         @toggle="onToggle"
       ></folder-view>
     </div>
