@@ -64,7 +64,7 @@
                 value="0"
                 @input="(e: Event) => onSliderInputChanged(e , item)"
                 @keyup.enter="() => selectItem(item)"
-                @mouseup="() => { lastOpacityChanged = null }"
+                @mouseup="() => { lastOpacityChanged = null}"
               />
             
               <!--
@@ -114,6 +114,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    scrolling: {
+      type: Boolean,
+      default: false
+    },
     startFirstSelected: {
       type: Boolean,
       default: false
@@ -159,14 +163,15 @@ export default defineComponent({
       lastSelectedItem: null as Thumbnail | null,
       opacities: {} as Record<string, number>,
       expanded: this.open,
-      lastOpacityChanged: null as Thumbnail | null
+      lastOpacityChanged: null as Thumbnail | null,
+      sorted: false
     };
   },
 
   created() {
     this.populate();
     this.originalOrder = this.items.map((item) => item.get_name());
-    if (this.validSortBy) { this.sortItems(); }
+    if (this.validSortBy) { this.sortItems(); this.sorted=true; }
   },
 
   methods: {
@@ -203,6 +208,11 @@ export default defineComponent({
     },
     
     selectItem(item: Thumbnail): void {
+      if (!this.sliders && (item === this.lastSelectedItem)) {
+        this.lastSelectedItem = null;
+        this.$emit('select', null);
+        return;
+      }
       this.lastSelectedItem = item;
       if (item instanceof Folder || item instanceof FolderUp) {
         this.items = item.get_children() ?? [];
@@ -216,6 +226,7 @@ export default defineComponent({
       if (this.validItemNames && Object.keys(this.itemNames).includes(item.get_name())) {
         return this.itemNames[item.get_name()];
       }
+      console.log("item name", item.get_name());
       return item.get_name();
     },
     
@@ -265,11 +276,11 @@ export default defineComponent({
         console.warn(`itemNames length (${length}) does not match items length (${this.items.length})`);
       }
 
-      this.items.forEach((item) => {
-        if (!Object.keys(this.itemNames).includes(item.get_name())) {
-          console.warn(`itemNames does not contain ${item.get_name()}`);
-        }
-      });
+      // this.items.forEach((item) => {
+      //   if (!Object.keys(this.itemNames).includes(item.get_name())) {
+      //     console.warn(`itemNames does not contain ${item.get_name()}`);
+      //   }
+      // });
       
       return length > 0;
     },
@@ -292,7 +303,9 @@ export default defineComponent({
     incomingItemSelect() {
       if (this.incomingItemSelect != null) {
         this.lastSelectedItem = this.incomingItemSelect;
-        this.scrollToItem(`fv-${this.incomingItemSelect.get_name()}`);
+        if (this.scrolling) {
+          this.scrollToItem(`fv-${this.incomingItemSelect.get_name()}`);
+        }
       } else {
         this.lastSelectedItem = null;
       }

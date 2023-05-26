@@ -150,7 +150,7 @@
       <folder-view
         v-if="imagesetFolder !== null"
         class="folder-view"
-        sliders
+        :sliders="false"
         expandable
         :thumbnails="true"
         :open="mobile ? false : true"
@@ -186,6 +186,7 @@
         <transition-expand>
           <div v-if="showControls" class="controls-content">
             <toggle
+              :show="false"
               :color="accentColor"
               :item="showAltAzGrid"
               label="Grid"
@@ -198,6 +199,7 @@
               @toggle="showConstellations = $event"
             />
             <toggle
+              :show="false"
               :color="accentColor"
               :item="showHorizon"
               label="Horizon"
@@ -241,10 +243,10 @@
               :color="accentColor"
               @click="() => {
                 playing = false;
-                playingCometPath = !playingCometPath;
+                playingImagePath = !playingImagePath;
               }"
             >
-              {{ `${playingCometPath ? 'Stop' : 'Play'} supernova images` }}
+              {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
             </v-btn>
             <!--
             <v-btn
@@ -281,19 +283,19 @@
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
                 @click="() => {
-                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                  playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingImagePath = false; // don't reverse the order of this line and previous or logic will break.
                 }"
                 @keyup.enter="() => {
-                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                  playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingImagePath = false; // don't reverse the order of this line and previous or logic will break.
                 }"
                 tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
-                  :icon="!(playing || playingCometPath) ? 'play' : 'pause'"
+                  :icon="!(playing || playingImagePath) ? 'play' : 'pause'"
                   size="lg"
                 ></font-awesome-icon>
               </div>
@@ -302,7 +304,6 @@
           </v-tooltip>
           <vue-slider
             id="slider"
-            adsorb
             :marks="(d: number) => {
               return allDates.includes(d) || imageDates.includes(d);
             }"
@@ -596,15 +597,15 @@ interface MoveOptions {
   rollRad?: number;
 }
 
-import {
-  ephemerisFullDatesCsv,
-  ephemerisImageDatesCsv
-} from "./data";
+// import {
+//   ephemerisFullDatesCsv,
+//   ephemerisImageDatesCsv
+// } from "./data";
 
 import {
   m101DataList,
-  m101DataCount,
 } from "./m101";
+
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -613,36 +614,32 @@ const SECONDS_PER_DAY = 60 * 60 * 24;
 const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
 function parseCsvTable(csv: string) {
-  return csvParse(csv, (d) => {
+  return csvParse(csv, (d, index) => {
+    const thisDate = new Date(d.Date ?? "");
     return {
-      date: new Date(d.Date ?? ""),
-      ra: +(d.RA ?? ""),
+      date: thisDate,
+      ra: +(d.Ra ?? ""),
       dec: +(d.Dec ?? ""),
-      tMag: +(d.Tmag ?? ""),
-      angspeed: +(d.SkyMotion ?? ""),
+      objectName: d.objectName as string,
+      bandpass: d.Bandpass as string,
+      wtmlName: d.wtmlName as string,
+      // get a date that looks like Month DD HH:MM
+      dateString: thisDate.toUTCString().slice(4, 11) + " " + `${thisDate.getUTCHours()}` + ":" + thisDate.getUTCMinutes().toString().padStart(2, "0") + ` (${index})`,
+      // dateString: thisDate.toUTCString().slice(4, 10) + " " + thisDate.toTimeString().slice(0, 5),
+      _filename: d.pngFilename as string,
+      _index: index as number,
     };
   });
 }
-const fullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
-const imageDatesTable = parseCsvTable(ephemerisImageDatesCsv);
+const fullDatesTable = parseCsvTable(m101DataList);
+const imageDatesTable = parseCsvTable(m101DataList);
 
 // convert m101DataList to a DSVParsedArray
 // columns are pngFilename,objectName,wtmlName,Date,Bandpass,Ra,Dec
-const m101DataTable = csvParse(m101DataList, (d, index) => {
-  const thisDate = new Date(d.Date ?? "");
-  return {
-    _index: index,
-    _filename: d.pngFilename,
-    objectName: d.objectName,
-    wtmlName: d.wtmlName,
-    date: thisDate,
-    bandpass: d.Bandpass,
-    ra: +(d.Ra ?? ""),
-    dec: +(d.Dec ?? ""),
-    // get a date that looks like Month DD HH:MM
-    dateString: thisDate.toDateString().slice(4, 10) + " " + thisDate.toTimeString().slice(0, 5),
-  };
-});
+
+
+
+
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
 // generic names are fine
@@ -651,39 +648,46 @@ type TableRow = typeof fullDatesTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-    "Date", "RA", "Dec", "Tmag" , "Angspeed"
+    "Date", "RA", "Dec"
   ]].concat(table.map((d, _i) => {
     return [
       d.date.toISOString(),
       d.ra.toString(),
       d.dec.toString(),
-      d.tMag.toString(),
-      d.angspeed.toString(),
+      // d.tMag.toString(),
+      // d.angspeed.toString(),
     ];
   }))).replace(/\n/g, '\r\n');
   // By using a regex, we replace all instances.
   // For WWT implementation reasons (left over from 
   // the Windows client?), we need the line endings 
-  // to be CRLF
+  // to be CRLF // lol
 }
 
 const fullDatesString = formatCsvTable(fullDatesTable);
 const imageDatesString = formatCsvTable(imageDatesTable);
 
 const allDates = fullDatesTable.map(r => r.date.getTime());
-const imageDates = imageDatesTable.map(r => r.date.getTime());
-const minDate = Math.min(...allDates, ...imageDates);
-const maxDate = Math.max(...allDates, ...imageDates);
+const imageDates = [... new Set(imageDatesTable.map(r => r.date.getTime()))];
+const minDate = Math.min(...allDates, ...imageDates)-2*MILLISECONDS_PER_DAY;
+const maxDate = Math.max(...allDates, ...imageDates, (new Date()).getTime())+2*MILLISECONDS_PER_DAY;
 const dates: number[] = [];
 
-const d = new Date(minDate);
-let t = d.getTime();
+let t = minDate - (minDate % MILLISECONDS_PER_DAY);
 while (t <= maxDate) {
   dates.push(t);
-  // dates.push(t + 86400000/2);
-  d.setUTCDate(d.getUTCDate() + 1);
-  t = d.getTime();
+  t += MILLISECONDS_PER_DAY/12;
 }
+
+for (const d of imageDates) {
+  if (!dates.includes(d)) {
+    dates.push(d);
+  }
+}
+
+// dates = [...new Set(dates)];
+dates.sort((a, b) => a - b);
+
 
 type LocationRad = {
   longitudeRad: number;
@@ -742,13 +746,13 @@ export default defineComponent({
       backgroundImagesets: [] as BackgroundImageset[],
 
       playing: false,
-      playingCometPath: false,
+      playingImagePath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
 
-      showAltAzGrid: true,
+      showAltAzGrid: false,
       showConstellations: true,
-      showHorizon: true,
+      showHorizon: false,
 
       currentCometImageLayer: null as SpreadSheetLayer | null,
       currentAllLayer: null as SpreadSheetLayer | null,
@@ -757,20 +761,23 @@ export default defineComponent({
       imageDates: imageDates,
       allDates: allDates,
       dates: dates,
+      minDate: minDate,
+      maxDate: maxDate,
 
       // imageNames: {} as Record<string, string>,
       // imageSortBy: {} as Record<string, number>,
-      imageNames: Object.fromEntries(m101DataTable.map( d => [d.wtmlName, d.dateString] )),
-      imageSortBy: Object.fromEntries(m101DataTable.map(d => [d.wtmlName, d.date.getTime()])),
-      
-      
+      imageNames: Object.fromEntries(imageDatesTable.map( d => [d.wtmlName, d.dateString] )),
+      imageSortBy: Object.fromEntries(imageDatesTable.map(d => [d.wtmlName, d.date.getTime()])),
+      imageDateRef: { 'names': imageDatesTable.map(d => d.wtmlName), 'dates': imageDatesTable.map(d => d.date.getTime()) },
+      imageDateRefInv: Object.fromEntries(imageDatesTable.map(d => [d.date.getTime(), d.wtmlName])),
+      imageDateSorted: imageDatesTable.map(d => d.date.getTime()).sort((a, b) => a - b),
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
       accentColor: "#a0009b",
       todayColor: "#D6B004",
 
       incomingItemSelect: null as Thumbnail | null,
-      
+
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
@@ -912,7 +919,7 @@ export default defineComponent({
         });
       });
 
-      this.wwtSettings.set_localHorizonMode(true);
+      this.wwtSettings.set_localHorizonMode(false);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
@@ -974,7 +981,7 @@ export default defineComponent({
       return this.smallSize && this.touchscreen;
     },
     cssVars() {
-      return{
+      return {
         '--comet-color': this.accentColor,
         '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
@@ -993,7 +1000,7 @@ export default defineComponent({
     },
     dayFrac(): number {
       const dateForTOD = new Date();
-      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60 * 60 * 1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
@@ -1040,6 +1047,42 @@ export default defineComponent({
       }
     },
 
+
+    getClosest(arr: number[], val: number, index = false): number {
+      if (arr.includes(val)) {
+        return arr.indexOf(val);
+      }
+
+      const closest = arr.reduce((prev, curr) => {
+        return (Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev);
+      });
+
+      return index ? arr.indexOf(closest) : closest;
+    },
+
+
+    nextDate(wrap = false) {
+      const index = this.getClosest(this.dates, this.selectedTime, true);
+      if (this.dates[index] > this.selectedTime) {
+        this.selectedTime = this.dates[index];
+      } else {
+        const next = index + 1;
+        this.selectedTime = this.dates[(wrap || next === this.dates.length) ? 0 : next];
+
+      }
+    },
+
+    previousDate(wrap = false) {
+      const index = this.getClosest(this.dates, this.selectedTime, true);
+      if (this.dates[index] < this.selectedTime) {
+        this.selectedTime = this.dates[index];
+      } else {
+        const prev = index - 1;
+        this.selectedTime = this.dates[(wrap || prev < 0) ? this.dates.length + -1 : prev];
+
+      }
+    },
+
     moveOneDayForward() {
       this.selectedTime += MILLISECONDS_PER_DAY;
     },
@@ -1050,7 +1093,7 @@ export default defineComponent({
 
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
-      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -1064,7 +1107,7 @@ export default defineComponent({
       const f = (this.dayFrac - dayFracPassed) / deltaT;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
-      
+
       const interpolatedRow: TableRow = { ...row };
       interpolatedRow.ra = interpolatedRA;
       interpolatedRow.dec = interpolatedDec;
@@ -1122,16 +1165,16 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false;
     },
-  
+
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
-      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad);
     },
 
     logLocation() {
       console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
     },
-    
+
     logPosition() {
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
@@ -1176,11 +1219,26 @@ export default defineComponent({
       });
     },
 
+    getImageSetDate(place: Place): Date | null  {
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return null; }
+      const names = this.imageDateRef['names'];
+      const dates = this.imageDateRef['dates'];
+      console.log(names.indexOf(iset.get_name()));
+      return new Date(dates[names.indexOf(iset.get_name())]);
+    },
+    
     
     onItemSelected(place: Place) {
+
+      if (place == null) {
+        console.log("place is null");
+        this.hideAllImagesets();
+      }
+      
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
-      console.log(iset);
+
       const layer = this.imagesetLayers[iset.get_name()];
       this.resetImagesetLayerOrder();
       this.setImageSetLayerOrder({
@@ -1188,16 +1246,16 @@ export default defineComponent({
         order: this.wwtActiveLayers.length + 1
       });
       this.setLayerOpacityForImageSet(iset.get_name(), 1);
-      
+      this.showImagesetByName(iset.get_name());
       // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      // this.selectedTime = Date.UTC(year, month - 1, day);
+      this.selectedTime = this.imageSortBy[iset.get_name()];
       // this.showImageForDateTime(this.dateTime);
       
       // this.updateViewForDate();
 
       this.playing = false;
-      this.playingCometPath = false;
-
+      this.playingImagePath = false;
+      
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
@@ -1669,21 +1727,62 @@ export default defineComponent({
       return `${month}/${day}/${year}`;
     },
 
-    matchImageSetName(date: Date): string {
-      // imageset names are keys in this.imagesetLayers
-      const imagesetNames = Object.keys(this.imagesetLayers);
-      // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
-      // that is or comes after the date we are looking for
+    // matchImageSetName(date: Date): string {
+    //   // imageset names are keys in this.imagesetLayers
+    //   const imagesetNames = Object.keys(this.imagesetLayers);
+    //   // loop over image set names. find the name (which is a MM/DD/YYYY date string)
+    //   // that is or comes after the date we are looking for
+
+    //   for (const name of imagesetNames) {
+    //     // convert the name to a date
+    //     // if the name is after the date we are looking for, return it
+    //     const wwtDateString = this.namefromDate(date);
+    //     if (name == wwtDateString) {
+    //       return name;
+    //     }
+    //   }
+    //   return '';
+    // },
+    
+        
+    binarySearch(arr: number[], target: number, lo = 0, hi = arr.length - 1): number {
+      if (target < arr[lo]) { return arr[0];}
+      if (target > arr[hi]) { return arr[hi]; }
       
-      for (const name of imagesetNames) {
-        // convert the name to a date
-        // if the name is after the date we are looking for, return it
-        const wwtDateString = this.namefromDate(date);
-        if (name == wwtDateString) {
-          return name;
-        }
+      const mid = Math.floor((hi + lo) / 2);
+
+      return hi - lo < 2
+        ? (target - arr[lo]) < (arr[hi] - target) ? arr[lo] : arr[hi]
+        : target < arr[mid]
+          ? this.binarySearch(arr, target, lo, mid)
+          : target > arr[mid]
+            ? this.binarySearch(arr, target, mid, hi)
+            : arr[mid];
+    },
+
+    matchImageSetName(date: Date): string {
+      const thisDate = date.getTime();
+      if (this.imageDateSorted.includes(thisDate)) {
+        console.log('matchImageSetName: found exact match');
+        return this.imageDateRefInv[thisDate];
       }
-      return '';
+      
+      const closestDate = this.binarySearch(this.imageDateSorted, thisDate);
+
+      // within 1 hour, in milliseconds
+      if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
+      
+      const name = this.imageDateRefInv[closestDate];
+      if (this.incomingItemSelect?.get_name() == name) {
+        return'';
+      }
+      return name;
+    },
+
+    hideAllImagesets() {
+      for (const name of Object.keys(this.imagesetLayers)) {
+        this.setLayerOpacityForImageSet(name, 0);
+      }
     },
 
     setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
@@ -1694,10 +1793,9 @@ export default defineComponent({
 
         // update the value for the slider only if we are not setting the opacity from the UI
         if (!setting_opacity_from_ui) {
-          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`;
+          const selector = `#items div.item[id='fv-${name}'] input.opacity-range[type='range']`;
           const el = (document.querySelector(selector) as HTMLInputElement);
           if (el != null) {
-            console.log(`setting opacity slider for ${name} to ${opacity * 100}`);
             el.value = `${opacity * 100}`;
           }
         }
@@ -1718,13 +1816,8 @@ export default defineComponent({
         
       }
     },
-    
-    showImageForDateTime(date: Date): boolean {
-      const name = this.matchImageSetName(date);
-      if (name == null || name == '') {
-        this.incomingItemSelect = null;
-        return false;
-      }
+
+    showImagesetByName(name: string): boolean {
       const imagesetNames = Object.keys(this.imagesetLayers);
       let shown = false;
       imagesetNames.forEach((iname: string) => {
@@ -1753,13 +1846,24 @@ export default defineComponent({
       });
       return shown;
     },
+    
+    showImageForDateTime(date: Date): boolean {
+      const name = this.matchImageSetName(date);
+      if (name == null || name == '') {
+        // this.incomingItemSelect = null;
+        return false;
+      }
+      console.log(`showImageForDateTime: ${name}`);
+      return this.showImagesetByName(name);
 
+    },
+
+    
     centerOnCurrentDate(options?: MoveOptions) {
       const now = new Date();
-      const localOffset = now.getTimezoneOffset() * 60 * 1000;
-      const hours = now.getHours() + (this.selectedTimezoneOffset + localOffset) / (1000 * 60 * 60);
+      const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
       this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      this.selectedTime = now.setUTCHours(0, 0, 0, 0);
+      this.selectedTime = this.binarySearch(this.dates, now.getTime());
       this.$nextTick(() => {
         this.updateViewForDate(options);
       });
@@ -1782,7 +1886,7 @@ export default defineComponent({
     },
 
     setToFirstCometImage() {
-      this.selectedTime = Date.UTC(2022, 11, 18);
+      this.selectedTime = Math.min(...this.imageDates);
       const children = this.imagesetFolder?.get_children();
       if (children == null) { return; }
       const place = children[0] as Place;
@@ -1859,7 +1963,7 @@ export default defineComponent({
       if (play) {
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < maxDate) {
-            this.moveOneDayForward();
+            this.nextDate();
           } else {
             this.selectedTime = minDate;
           }
@@ -1867,7 +1971,7 @@ export default defineComponent({
             this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
           });
-        }, 350);
+        }, 100);
       }
     },
 
@@ -1891,7 +1995,7 @@ export default defineComponent({
           return;
         }
         if (this.selectedTime < maxTime) {
-          this.moveOneDayForward();
+          this.nextDate();
           this.$nextTick(() => {
             const image = this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
@@ -1900,7 +2004,7 @@ export default defineComponent({
             }
           });
         } else {
-          this.playingCometPath = false;
+          this.playingImagePath = false;
         }
       }, 500);
     }
