@@ -131,13 +131,7 @@ const tests: GreenCometTests = {
     infoSheet.expect.element("@wwtText").to.not.be.visible;
 
     infoSheet.click("@closeIcon");
-    expectAllNotPresent(infoSheet, [
-      "@closeIcon",
-      "@infoTabHeader",
-      "@wwtTabHeader",
-      "@infoText",
-      "@wwtText"
-    ]);
+    this.app.expect.element("@infoSheet").to.not.be.present;
   },
 
   'Location selector': function() {
