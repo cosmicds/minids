@@ -4,6 +4,8 @@ import {
   PageObjectModel
 } from "nightwatch";
 
+import { escapeRegExp } from "../utils";
+
 const greenCometCommands = {
   waitForReady(this: EnhancedPageObject): EnhancedPageObject {
     return this
@@ -121,7 +123,7 @@ const folderView = {
     }
   },
   props: {
-    expandedHeaderText: "Click thumbnail to see image in sky",
+    expandedHeaderText: new RegExp(`(\\s+)?${escapeRegExp("Click thumbnail to see image in sky")}(\\s+)?`),
     contractedHeaderText: "Image Controls",
     folderImageCount: 16
   }

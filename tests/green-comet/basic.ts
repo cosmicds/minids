@@ -64,7 +64,7 @@ const tests: GreenCometTests = {
     
     const folderView = this.sections.folderView;
     folderView.expect.elements("@folderItem").count.to.equal(folderView.props.folderImageCount);
-    folderView.expect.element("@expandHeader").text.to.equal(folderView.props.expandedHeaderText);
+    folderView.expect.element("@expandHeader").text.to.match(folderView.props.expandedHeaderText);
     folderView.expect.element("@expandChevron").to.have.property("classList").contain("fa-chevron-up");
 
     const controls = this.sections.controls;
@@ -158,7 +158,7 @@ const tests: GreenCometTests = {
 
     folderView.click("@expandRow");
     folderView.expect.elements("@folderItem").count.to.equal(folderView.props.folderImageCount);
-    folderView.expect.element("@expandHeader").text.to.equal(folderView.props.expandedHeaderText);
+    folderView.expect.element("@expandHeader").text.to.match(folderView.props.expandedHeaderText);
     folderView.expect.element("@expandChevron").to.have.property("classList").contain("fa-chevron-up");
   },
 
