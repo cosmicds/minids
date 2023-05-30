@@ -29,19 +29,22 @@ const greenCometElements = {
     selector: "#splash-close"
   },
   topContent: {
-    selector: "#top-content",
+    selector: ".top-content"
   },
   folderView: {
-    selector: "#left-content .folder-view",
+    selector: "#left-content .folder-view"
   },
   bottomContent: {
-    selector: "#bottom-content",
+    selector: ".bottom-content"
   },
   videoDialog: {
-    selector: "#video-container",
+    selector: "#video-container"
+  },
+  locationDialog: {
+    selector: "#location-dialog"
   },
   infoSheet: {
-    selector: "#text-bottom-sheet",
+    selector: "#text-bottom-sheet"
   }
 };
 
@@ -90,6 +93,10 @@ const locationDialog = {
     mapContainer: {
       selector: "#map-container"
     }
+  },
+  props: {
+    actionText: "Move around the map and double-click to change location",
+    useMyLocationText: "Use My Location".toUpperCase()
   }
 };
 
@@ -100,6 +107,12 @@ const folderView = {
     expandRow: {
       selector: "#expand-row"
     },
+    expandHeader: {
+      selector: ".thumbnail-header"
+    },
+    expandChevron: {
+      selector: ".svg-inline--fa"
+    },
     folderItems: {
       selector: "#items"
     },
@@ -108,6 +121,8 @@ const folderView = {
     }
   },
   props: {
+    expandedHeaderText: "Click thumbnail to see image in sky",
+    contractedHeaderText: "Image Controls",
     folderImageCount: 16
   }
 };
@@ -119,14 +134,35 @@ const controls = {
     topRow: {
       selector: "#controls-top-row"
     },
+    openCloseButton: {
+      selector: ".svg-inline--fa"
+    },
     optionCheckbox: {
       selector: ".v-checkbox"
+    },
+    gridCheckbox: {
+      selector: ".v-checkbox:nth-of-type(1)"
+    },
+    constellationsCheckbox: {
+      selector: ".v-checkbox:nth-of-type(2)"
+    },
+    horizonCheckbox: {
+      selector: ".v-checkbox:nth-of-type(3)"
     },
     optionLabel: {
       selector: ".v-checkbox .v-label"
     },
     optionInput: {
       selector: ".v-checkbox input"
+    },
+    gridInput: {
+      selector: ".v-checkbox:nth-of-type(1) input"
+    },
+    constellationsInput: {
+      selector: ".v-checkbox:nth-of-type(2) input"
+    },
+    horizonInput: {
+      selector: ".v-checkbox:nth-of-type(3) input"
     },
     selectedLocationTimeLabel: {
       selector: "div.mt-3"
@@ -149,17 +185,17 @@ const controls = {
     playCometImagesContent: {
       selector: ".v-btn:nth-of-type(2) .v-btn__content"
     }
+  },
+  props: {
+    selectedLocationTimeText: "Selected location's time:",
+    centerOnNowText: "Center on Now".toUpperCase(),
+    playCometImagesText: "Play comet images".toUpperCase()
   }
 };
 
 const bottomContent = {
   commands: {},
-  sections: {
-    controls: {
-      selector: "#controls",
-      ...controls
-    }
-  },
+  sections: {},
   elements: {
     playPauseIconWrapper: {
       selector: "#play-pause-icon-wrapper"
@@ -181,7 +217,16 @@ const bottomContent = {
     },
     sliderTooltipText: {
       selector: ".vue-slider-dot-tooltip-text"
+    },
+    credits: {
+      selector: "#credits"
+    },
+    creditIcon: {
+      selector: "#credits a"
     }
+  },
+  props: {
+    creditIconCount: 4
   }
 };
 
@@ -222,12 +267,20 @@ const infoSheet = {
 
 const greenCometSections = {
   topContent: {
-    selector: "#top-content",
+    selector: ".top-content",
     ...topContent
   },
   bottomContent: {
-    selector: "#bottom-content",
+    selector: ".bottom-content",
     ...bottomContent
+  },
+  // Technically this should be a subsection of bottomContent
+  // But getting the typing to work there seems like it'd be
+  // more effort than it's worth - we already have to add in
+  // the top level section types manually
+  controls: {
+    selector: "#controls",
+    ...controls
   },
   videoDialog: {
     selector: "#video-container",
