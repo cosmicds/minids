@@ -25,7 +25,18 @@
       <div id="splash-screen"
         @click="closeSplashScreen"
       >
-      <p> M101 Supernova</p>
+      <p> Want to see the </p>
+      <p> Supernova </p>
+      <p> Go off in the Pinwheel Galaxy? </p>
+      
+      <div class="guide">
+        Watch the demo <font-awesome-icon
+          id="video-icon"
+          class="control-icon"
+          icon="video"
+          size="lg"
+        ></font-awesome-icon>
+      </div>
     </div>
     </v-overlay>
 
@@ -606,6 +617,10 @@ import {
   m101DataList,
 } from "./m101";
 
+// import lightcuve data from assets/lightcuve.csv
+import {
+  lightCurve,
+} from "./lightcurve";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -634,11 +649,19 @@ function parseCsvTable(csv: string) {
 const fullDatesTable = parseCsvTable(m101DataList);
 const imageDatesTable = parseCsvTable(m101DataList);
 
-// convert m101DataList to a DSVParsedArray
-// columns are pngFilename,objectName,wtmlName,Date,Bandpass,Ra,Dec
 
+// parse the lightCurve data into a D3 table
+const lightCurveTable = csvParse(lightCurve, (d) => {
+  // d.timestamp
+  // d.magnitude
+  return {
+    date: new Date(+(d.timestamp ?? "")),
+    magnitude: +(d.magnitude ?? ""),
 
+  };
+});
 
+console.log(lightCurveTable);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
