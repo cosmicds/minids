@@ -60,6 +60,7 @@ jobs:
               cd ../tests
               yarn bs-local -e default,firefox,edge,safari --group $ws -o reports
               pkill -f vue-cli-service # stop the servers
+              cd ..
             fi
           done
 
