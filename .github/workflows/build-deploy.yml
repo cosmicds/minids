@@ -52,7 +52,7 @@ jobs:
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            if [ $ws != 'common' -a $ws != 'tests' ]
+            if [[ $ws != 'common' && $ws != 'tests' && -d tests/${ws} ]]
             then
               cd $ws
               yarn serve &
@@ -74,7 +74,7 @@ jobs:
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            if [[ $ws != 'common' && $ws != 'tests' && -d tests/${ws} ]]
+            if [[ $ws != 'common' && $ws != 'tests' ]]
             then
               mv ${ws}/dist dist/${ws}
             fi
