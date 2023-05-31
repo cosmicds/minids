@@ -753,6 +753,9 @@ export default defineComponent({
       showAltAzGrid: false,
       showConstellations: true,
       showHorizon: false,
+      arrow: null as Poly | null,
+      m101RADeg: 3.681181581357794 * R2D,
+      m101DecDeg: 0.9480289529731357 * R2D,
 
       currentCometImageLayer: null as SpreadSheetLayer | null,
       currentAllLayer: null as SpreadSheetLayer | null,
@@ -811,40 +814,6 @@ export default defineComponent({
 
     this.waitForReady().then(async () => {
 
-      // eslint-disable-next-line 
-      // @ts-ignore
-      window.app = this;
-
-      const arrow = new Poly();
-      const m1RADeg = 3.681181581357794 * R2D;
-      const m1DecDeg = 0.9480289529731357 * R2D;
-
-      const pointRADeg = m1RADeg + 0.05;
-      const arrowHalfHeight = 0.02;
-      arrow.addPoint(pointRADeg, m1DecDeg);
-      arrow.addPoint(pointRADeg + 0.05, m1DecDeg + arrowHalfHeight);
-      arrow.addPoint(pointRADeg + 0.05, m1DecDeg + 0.5 * arrowHalfHeight);
-      arrow.addPoint(pointRADeg + 0.1, m1DecDeg + 0.5 * arrowHalfHeight);
-      arrow.addPoint(pointRADeg + 0.1, m1DecDeg - 0.5 * arrowHalfHeight);
-      arrow.addPoint(pointRADeg + 0.05, m1DecDeg - 0.5 * arrowHalfHeight);
-      arrow.addPoint(pointRADeg + 0.05, m1DecDeg - arrowHalfHeight);
-      const color = '#a0009b';
-      arrow.set_lineColor(color);
-      arrow.set_fillColor(color);
-      arrow.set_fill(true);
-      this.addAnnotation(arrow);
-
-      // eslint-disable-next-line
-      // @ts-ignore
-      window.arrow = arrow;
-
-      this.gotoRADecZoom({
-        raRad: D2R * m1RADeg,
-        decRad: D2R * m1DecDeg,
-        zoomDeg: 0.3,
-        instant: true
-      });
-
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
       // or a static method (Constellations, Grids)
@@ -886,49 +855,6 @@ export default defineComponent({
       this.getLocation(true);
       this.setClockSync(false);
       // create date with y m d h m s
-
-      //layerPromises.push(this.createTableLayer({
-      //  name: "All Dates",
-      //  referenceFrame: "Sky",
-      //  dataCsv: fullDatesString
-      //}).then((layer) => {
-      //  layer.set_lngColumn(1);
-      //  layer.set_latColumn(2);
-      //  layer.set_markerScale(MarkerScales.screen);
-      //  this.applyTableLayerSettings({
-      //    id: layer.id.toString(),
-      //    settings: [
-      //      ["scaleFactor", 2.5],
-      //      ["plotType", PlotTypes.point],
-      //      ["color", Color.fromHex(this.ephemerisColor)],
-      //      //["sizeColumn", 4],
-      //      //["pointScaleType", PointScaleTypes.log],
-      //      ["opacity", 0.8]
-      //    ]
-      //  });
-      //  return layer;
-      //}));
-
-      //layerPromises.push(this.createTableLayer({
-      //  name: "Comet Image Dates",
-      //  referenceFrame: "Sky",
-      //  dataCsv: imageDatesString
-      //}).then((layer) => {
-      //  layer.set_lngColumn(1);
-      //  layer.set_latColumn(2);
-      //  layer.set_markerScale(MarkerScales.screen);
-      //  this.applyTableLayerSettings({
-      //    id: layer.id.toString(),
-      //    settings: [
-      //      ["scaleFactor", 4],
-      //      ["color", Color.fromHex('#FFFFFF')],
-      //      ["plotType", PlotTypes.point],
-      //      //["sizeColumn", 3],
-      //      ["opacity", 0.4]
-      //    ]
-      //  });
-      //  return layer;
-      //}));
 
       this.setTime(this.dateTime);
 
@@ -983,8 +909,16 @@ export default defineComponent({
         this.positionSet = true;
       }, 100);
 
-    });
+      this.createArrow();
 
+      this.gotoRADecZoom({
+        raRad: D2R * this.m101RADeg,
+        decRad: D2R * this.m101DecDeg,
+        zoomDeg: 0.3,
+        instant: true
+      });
+
+    });
   },
 
   computed: {
@@ -1073,6 +1007,30 @@ export default defineComponent({
   },
 
   methods: {
+
+    createArrow() {
+      this.arrow = new Poly();
+
+      const pointRADeg = this.m101RADeg + 0.05;
+      const centerDecDeg = this.m101DecDeg;
+      const arrowHalfHeight = 0.02;
+      const stemFraction = 0.4;
+      const headWidth = 0.05;
+      const stemWidth = 0.05;
+      this.arrow.addPoint(pointRADeg, centerDecDeg);
+      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg + arrowHalfHeight);
+      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg + stemFraction * arrowHalfHeight);
+      this.arrow.addPoint(pointRADeg + headWidth + stemWidth, centerDecDeg + stemFraction * arrowHalfHeight);
+      this.arrow.addPoint(pointRADeg + headWidth + stemWidth, centerDecDeg - stemFraction * arrowHalfHeight);
+      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg - stemFraction * arrowHalfHeight);
+      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg - arrowHalfHeight);
+
+      this.arrow.set_lineColor(this.accentColor);
+      this.arrow.set_fillColor(this.accentColor);
+      this.arrow.set_fill(true);
+      
+      this.addAnnotation(this.arrow);
+    },
 
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
