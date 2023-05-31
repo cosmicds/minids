@@ -38,3 +38,9 @@ export function nthOfTypeSelector(selector: string, n: number): string {
 export function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+// Safari likes to add whitespace at the beginning/end of strings,
+// presumably for layout/sizing purposes?
+export function whitespacePaddedRegex(str: string): RegExp {
+  return new RegExp(`(\\s+)?${escapeRegExp(str)}(\\s+)?`);
+}
