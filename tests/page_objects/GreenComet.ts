@@ -4,6 +4,8 @@ import {
   PageObjectModel
 } from "nightwatch";
 
+import { whitespacePaddedRegex } from "../utils";
+
 const greenCometCommands = {
   waitForReady(this: EnhancedPageObject): EnhancedPageObject {
     return this
@@ -95,8 +97,8 @@ const locationDialog = {
     }
   },
   props: {
-    actionText: "Move around the map and double-click to change location",
-    useMyLocationText: "Use My Location".toUpperCase()
+    actionText: whitespacePaddedRegex("Move around the map and double-click to change location"),
+    useMyLocationText: whitespacePaddedRegex("Use My Location", "i")
   }
 };
 
@@ -121,8 +123,8 @@ const folderView = {
     }
   },
   props: {
-    expandedHeaderText: "Click thumbnail to see image in sky",
-    contractedHeaderText: "Image Controls",
+    expandedHeaderText: whitespacePaddedRegex("Click thumbnail to see image in sky"),
+    contractedHeaderText: whitespacePaddedRegex("Image Controls"),
     folderImageCount: 16
   }
 };
@@ -187,9 +189,9 @@ const controls = {
     }
   },
   props: {
-    selectedLocationTimeText: "Selected location's time:",
-    centerOnNowText: "Center on Now".toUpperCase(),
-    playCometImagesText: "Play comet images".toUpperCase()
+    selectedLocationTimeText: whitespacePaddedRegex("Selected location's time:"),
+    centerOnNowText: whitespacePaddedRegex("Center on Now", "i"),
+    playCometImagesText: whitespacePaddedRegex("Play comet images", "i")
   }
 };
 
