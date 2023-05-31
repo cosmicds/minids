@@ -39,8 +39,13 @@ export function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
+function regexSource(item: string | RegExp): string {
+  return typeof item === "string" ? escapeRegExp(item) : item.source;
+}
+
 // Safari likes to add whitespace at the beginning/end of strings,
 // presumably for layout/sizing purposes?
-export function whitespacePaddedRegex(str: string): RegExp {
-  return new RegExp(`(\\s+)?${escapeRegExp(str)}(\\s+)?`);
+export function whitespacePaddedRegex(base: string | RegExp, flags?: string): RegExp {
+  const source = regexSource(base);
+  return new RegExp(`(\\s+)?${source}(\\s+)?`, flags);
 }

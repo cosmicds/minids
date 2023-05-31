@@ -98,7 +98,7 @@ const locationDialog = {
   },
   props: {
     actionText: whitespacePaddedRegex("Move around the map and double-click to change location"),
-    useMyLocationText: whitespacePaddedRegex("Use My Location")
+    useMyLocationText: whitespacePaddedRegex("Use My Location", "i")
   }
 };
 
@@ -190,8 +190,8 @@ const controls = {
   },
   props: {
     selectedLocationTimeText: whitespacePaddedRegex("Selected location's time:"),
-    centerOnNowText: /Center on Now/i,
-    playCometImagesText: /Play comet images/i 
+    centerOnNowText: whitespacePaddedRegex("Center on Now", "i"),
+    playCometImagesText: whitespacePaddedRegex("Play comet images", "i")
   }
 };
 
