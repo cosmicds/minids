@@ -183,7 +183,7 @@
       <chartjs-scatter
         reversedY
         hideXAxis
-        hideYAxis
+        
         line
         :animation=false
         :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
@@ -191,7 +191,7 @@
         :width="100"
         :height="100"
         :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
-        :yrange="[13.9,10.5]"
+        :yrange="[10.5, 14]"
         :lineOptions="{borderColor: 'white', borderWidth: 2, tension: 0, radius: 5,backgroundColor: accentColor,}"
         
       />

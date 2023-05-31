@@ -177,7 +177,7 @@ export default defineComponent({
     computedYRange() {
       if (this.yrange == null) {
         const y = this.computedData.map(d => d.y as number);
-        return [Math.min(...y), Math.max(...y)].sort();
+        return [Math.min(...y), Math.max(...y)];
       } else {
         return this.yrange;
       }
@@ -232,6 +232,10 @@ export default defineComponent({
             reverse: this.reversedY,
             min: this.computedYRange[0],
             max: this.computedYRange[1],
+            ticks: { // https://www.chartjs.org/docs/latest/axes/styling.html#tick-configuration
+              stepSize:1,
+              autoSkip: true,
+            }
           }
         },
 
@@ -265,16 +269,12 @@ export default defineComponent({
 
 
 #plot {
-  // display: flex;
-  // border: 2px solid orange;
+  border: 2px solid greenyellow;
   width: 100%;
   height: 100%;
 }
 
 .chartjs {
-  border: 20px solid greenyellow;
-  width: 100%;
-  height: 100%;
 }
 
 </style>
