@@ -811,6 +811,40 @@ export default defineComponent({
 
     this.waitForReady().then(async () => {
 
+      // eslint-disable-next-line 
+      // @ts-ignore
+      window.app = this;
+
+      const arrow = new Poly();
+      const m1RADeg = 3.681181581357794 * R2D;
+      const m1DecDeg = 0.9480289529731357 * R2D;
+
+      const pointRADeg = m1RADeg + 0.05;
+      const arrowHalfHeight = 0.02;
+      arrow.addPoint(pointRADeg, m1DecDeg);
+      arrow.addPoint(pointRADeg + 0.05, m1DecDeg + arrowHalfHeight);
+      arrow.addPoint(pointRADeg + 0.05, m1DecDeg + 0.5 * arrowHalfHeight);
+      arrow.addPoint(pointRADeg + 0.1, m1DecDeg + 0.5 * arrowHalfHeight);
+      arrow.addPoint(pointRADeg + 0.1, m1DecDeg - 0.5 * arrowHalfHeight);
+      arrow.addPoint(pointRADeg + 0.05, m1DecDeg - 0.5 * arrowHalfHeight);
+      arrow.addPoint(pointRADeg + 0.05, m1DecDeg - arrowHalfHeight);
+      const color = '#a0009b';
+      arrow.set_lineColor(color);
+      arrow.set_fillColor(color);
+      arrow.set_fill(true);
+      this.addAnnotation(arrow);
+
+      // eslint-disable-next-line
+      // @ts-ignore
+      window.arrow = arrow;
+
+      this.gotoRADecZoom({
+        raRad: D2R * m1RADeg,
+        decRad: D2R * m1DecDeg,
+        zoomDeg: 0.3,
+        instant: true
+      });
+
       // Unlike the other things we're hacking here,
       // we aren't overwriting a method on a singleton instance (WWTControl)
       // or a static method (Constellations, Grids)
@@ -853,48 +887,48 @@ export default defineComponent({
       this.setClockSync(false);
       // create date with y m d h m s
 
-      layerPromises.push(this.createTableLayer({
-        name: "All Dates",
-        referenceFrame: "Sky",
-        dataCsv: fullDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 2.5],
-            ["plotType", PlotTypes.point],
-            ["color", Color.fromHex(this.ephemerisColor)],
-            //["sizeColumn", 4],
-            //["pointScaleType", PointScaleTypes.log],
-            ["opacity", 0.8]
-          ]
-        });
-        return layer;
-      }));
+      //layerPromises.push(this.createTableLayer({
+      //  name: "All Dates",
+      //  referenceFrame: "Sky",
+      //  dataCsv: fullDatesString
+      //}).then((layer) => {
+      //  layer.set_lngColumn(1);
+      //  layer.set_latColumn(2);
+      //  layer.set_markerScale(MarkerScales.screen);
+      //  this.applyTableLayerSettings({
+      //    id: layer.id.toString(),
+      //    settings: [
+      //      ["scaleFactor", 2.5],
+      //      ["plotType", PlotTypes.point],
+      //      ["color", Color.fromHex(this.ephemerisColor)],
+      //      //["sizeColumn", 4],
+      //      //["pointScaleType", PointScaleTypes.log],
+      //      ["opacity", 0.8]
+      //    ]
+      //  });
+      //  return layer;
+      //}));
 
-      layerPromises.push(this.createTableLayer({
-        name: "Comet Image Dates",
-        referenceFrame: "Sky",
-        dataCsv: imageDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 4],
-            ["color", Color.fromHex('#FFFFFF')],
-            ["plotType", PlotTypes.point],
-            //["sizeColumn", 3],
-            ["opacity", 0.4]
-          ]
-        });
-        return layer;
-      }));
+      //layerPromises.push(this.createTableLayer({
+      //  name: "Comet Image Dates",
+      //  referenceFrame: "Sky",
+      //  dataCsv: imageDatesString
+      //}).then((layer) => {
+      //  layer.set_lngColumn(1);
+      //  layer.set_latColumn(2);
+      //  layer.set_markerScale(MarkerScales.screen);
+      //  this.applyTableLayerSettings({
+      //    id: layer.id.toString(),
+      //    settings: [
+      //      ["scaleFactor", 4],
+      //      ["color", Color.fromHex('#FFFFFF')],
+      //      ["plotType", PlotTypes.point],
+      //      //["sizeColumn", 3],
+      //      ["opacity", 0.4]
+      //    ]
+      //  });
+      //  return layer;
+      //}));
 
       this.setTime(this.dateTime);
 
@@ -1137,29 +1171,29 @@ export default defineComponent({
         this.currentAllLayer = null;
       }
 
-      if (this.interpolatedDailyTable !== null) {
-        this.createTableLayer({
-          name: "Daily Date Layer",
-          referenceFrame: "Sky",
-          dataCsv: formatCsvTable(this.interpolatedDailyTable)
-        }).then((layer) => {
-          this.currentAllLayer = layer;
-          layer.set_lngColumn(1);
-          layer.set_latColumn(2);
-          layer.set_markerScale(MarkerScales.screen);
-          this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
-          this.applyTableLayerSettings({
-            id: layer.id.toString(),
-            settings: [
-              ["scaleFactor", 5],
-              ["plotType", PlotTypes.point],
-              ["color", Color.fromHex('#E562BC')],
-              //["sizeColumn", 3],
-              ["opacity", 1],
-            ]
-          });
-        });
-      }
+      //if (this.interpolatedDailyTable !== null) {
+      //  this.createTableLayer({
+      //    name: "Daily Date Layer",
+      //    referenceFrame: "Sky",
+      //    dataCsv: formatCsvTable(this.interpolatedDailyTable)
+      //  }).then((layer) => {
+      //    this.currentAllLayer = layer;
+      //    layer.set_lngColumn(1);
+      //    layer.set_latColumn(2);
+      //    layer.set_markerScale(MarkerScales.screen);
+      //    this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
+      //    this.applyTableLayerSettings({
+      //      id: layer.id.toString(),
+      //      settings: [
+      //        ["scaleFactor", 5],
+      //        ["plotType", PlotTypes.point],
+      //        ["color", Color.fromHex('#E562BC')],
+      //        //["sizeColumn", 3],
+      //        ["opacity", 1],
+      //      ]
+      //    });
+      //  });
+      //}
     },
 
     closeSplashScreen() {
@@ -1461,7 +1495,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          this.updateHorizon();
+          //this.updateHorizon();
         },
         options
       );
@@ -1640,7 +1674,7 @@ export default defineComponent({
     },
 
     removeHorizon() {
-      this.clearAnnotations();
+      //this.clearAnnotations();
     },
 
     updateLastClosePoint(event: PointerEvent) {
