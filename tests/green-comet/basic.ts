@@ -11,6 +11,7 @@ import { assert } from "chai";
 import {
   expectAllNotPresent,
   expectAllVisible,
+  hasClass
 } from "../utils";
 
 type GreenCometTests = NightwatchTests & { app: GreenCometPage; sections: GreenCometSections };
@@ -65,17 +66,17 @@ const tests: GreenCometTests = {
     const folderView = this.sections.folderView;
     folderView.expect.elements("@folderItem").count.to.equal(folderView.props.folderImageCount);
     folderView.expect.element("@expandHeader").text.to.match(folderView.props.expandedHeaderText);
-    folderView.expect.element("@expandChevron").to.have.property("classList").contain("fa-chevron-up");
+    folderView.expect.element("@expandChevron").to.have.attribute("data-icon", "chevron-up");
 
     const controls = this.sections.controls;
-    controls.expect.element("@openCloseButton").to.have.property("classList").contain("fa-chevron-down");
+    controls.expect.element("@openCloseButton").to.have.attribute("data-icon", "chevron-down");
     controls.expect.element("@gridInput").to.be.selected;
     controls.expect.element("@constellationsInput").to.not.be.selected;
     controls.expect.element("@horizonInput").to.not.be.selected; 
 
-    controls.expect.element("@selectedLocationTimeLabel").text.to.equal(controls.props.selectedLocationTimeText);
-    controls.expect.element("@centerOnNowButtonContent").text.to.equal(controls.props.centerOnNowText);
-    controls.expect.element("@playCometImagesContent").text.to.equal(controls.props.playCometImagesText);
+    controls.expect.element("@selectedLocationTimeLabel").text.to.match(controls.props.selectedLocationTimeText);
+    controls.expect.element("@centerOnNowButtonContent").text.to.match(controls.props.centerOnNowText);
+    controls.expect.element("@playCometImagesContent").text.to.match(controls.props.playCometImagesText);
 
     expectAllVisible(controls, [
       "@topRow", "@openCloseButton",
@@ -142,8 +143,8 @@ const tests: GreenCometTests = {
       "@useMyLocationButton",
       "@mapContainer"
     ]);
-    locationDialog.expect.element("@useMyLocationButtonContent").text.to.equal(locationDialog.props.useMyLocationText);
-    locationDialog.expect.element("@actionText").text.to.equal(locationDialog.props.actionText);
+    locationDialog.expect.element("@useMyLocationButtonContent").text.to.match(locationDialog.props.useMyLocationText);
+    locationDialog.expect.element("@actionText").text.to.match(locationDialog.props.actionText);
 
     browser.sendKeys("html", browser.Keys.ESCAPE); 
     this.app.expect.element("@locationDialog").to.not.be.present;
@@ -153,20 +154,20 @@ const tests: GreenCometTests = {
     const folderView = this.sections.folderView;
     folderView.click("@expandRow");
     folderView.expect.elements("@folderItem").count.to.equal(0);
-    folderView.expect.element("@expandHeader").text.to.equal(folderView.props.contractedHeaderText);
-    folderView.expect.element("@expandChevron").to.have.property("classList").contain("fa-chevron-down");
+    folderView.expect.element("@expandHeader").text.to.match(folderView.props.contractedHeaderText);
+    folderView.expect.element("@expandChevron").to.have.attribute("data-icon", "chevron-down");
 
     folderView.click("@expandRow");
     folderView.expect.elements("@folderItem").count.to.equal(folderView.props.folderImageCount);
     folderView.expect.element("@expandHeader").text.to.match(folderView.props.expandedHeaderText);
-    folderView.expect.element("@expandChevron").to.have.property("classList").contain("fa-chevron-up");
+    folderView.expect.element("@expandChevron").to.have.attribute("data-icon", "chevron-up");
   },
 
   'Control Panel': function() {
     const controls = this.sections.controls;
 
     controls.click("@openCloseButton");
-    controls.expect.element("@openCloseButton").to.have.property("classList").contain("fa-gear");
+    controls.expect.element("@openCloseButton").to.have.attribute("data-icon", "gear");
     expectAllNotPresent(controls, [
       "@gridInput", "@constellationsInput", "@horizonInput",
       "@selectedLocationTimeLabel", "@selectedLocationTimeInput",
@@ -174,7 +175,7 @@ const tests: GreenCometTests = {
     ]);
 
     controls.click("@openCloseButton");
-    controls.expect.element("@openCloseButton").to.have.property("classList").contain("fa-chevron-down");
+    controls.expect.element("@openCloseButton").to.have.attribute("data-icon", "chevron-down");
     expectAllVisible(controls, [
       "@topRow", "@openCloseButton",
       "@gridCheckbox", "@constellationsCheckbox", "@horizonCheckbox",
