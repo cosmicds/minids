@@ -179,6 +179,22 @@
     </div>
     
     <div class="bottom-content">
+      
+      <chartjs-scatter
+        reversedY
+        hideXAxis
+        hideYAxis
+        line
+        :animation=false
+        :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+        :keys="{ x: 'time', y: 'magnitude' }"
+        :width="100"
+        :height="100"
+        :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
+        :yrange="[13.9,10.5]"
+        :lineOptions="{borderColor: 'white', borderWidth: 2, tension: 0, radius: 5,backgroundColor: accentColor,}"
+        
+      />
       <div
         id="controls"
         class="control-icon-wrapper"
@@ -655,7 +671,7 @@ const lightCurveTable = csvParse(lightCurve, (d) => {
   // d.timestamp
   // d.magnitude
   return {
-    date: new Date(+(d.timestamp ?? "")),
+    time: new Date(+(d.timestamp ?? "")),
     magnitude: +(d.magnitude ?? ""),
 
   };
@@ -761,7 +777,7 @@ export default defineComponent({
   data() {
     const now = new Date();
     return {
-      showSplashScreen: true,
+      showSplashScreen: false,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
       positionSet: false,
@@ -799,6 +815,7 @@ export default defineComponent({
       accentColor: "#a0009b",
       todayColor: "#D6B004",
 
+      lightCurveData: lightCurveTable,
       incomingItemSelect: null as Thumbnail | null,
 
       sheet: null as SheetType,
