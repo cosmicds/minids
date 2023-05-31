@@ -11,7 +11,6 @@ import { assert } from "chai";
 import {
   expectAllNotPresent,
   expectAllVisible,
-  hasClass
 } from "../utils";
 
 type GreenCometTests = NightwatchTests & { app: GreenCometPage; sections: GreenCometSections };
