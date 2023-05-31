@@ -753,7 +753,8 @@ export default defineComponent({
       showAltAzGrid: false,
       showConstellations: true,
       showHorizon: false,
-      arrow: null as Poly | null,
+      outerArrow: null as Poly | null,
+      innerArrow: null as Poly | null,
       m101RADeg: 3.681181581357794 * R2D,
       m101DecDeg: 0.9480289529731357 * R2D,
 
@@ -1009,27 +1010,64 @@ export default defineComponent({
   methods: {
 
     createArrow() {
-      this.arrow = new Poly();
+    
+      // Create the outer (purple) arrow
+      this.outerArrow = new Poly();
 
+      console.log("Here");
       const pointRADeg = this.m101RADeg + 0.05;
       const centerDecDeg = this.m101DecDeg;
       const arrowHalfHeight = 0.02;
       const stemFraction = 0.4;
       const headWidth = 0.05;
       const stemWidth = 0.05;
-      this.arrow.addPoint(pointRADeg, centerDecDeg);
-      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg + arrowHalfHeight);
-      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg + stemFraction * arrowHalfHeight);
-      this.arrow.addPoint(pointRADeg + headWidth + stemWidth, centerDecDeg + stemFraction * arrowHalfHeight);
-      this.arrow.addPoint(pointRADeg + headWidth + stemWidth, centerDecDeg - stemFraction * arrowHalfHeight);
-      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg - stemFraction * arrowHalfHeight);
-      this.arrow.addPoint(pointRADeg + headWidth, centerDecDeg - arrowHalfHeight);
+      const headBackRA = pointRADeg + headWidth;
+      const stemBackRA = headBackRA + stemWidth;
+      const topDec = centerDecDeg + arrowHalfHeight;
+      const bottomDec = centerDecDeg - arrowHalfHeight;
+      const stemHalfHeight = stemFraction * arrowHalfHeight;
+      const stemTopDec = centerDecDeg + stemHalfHeight;
+      const stemBottomDec = centerDecDeg - stemHalfHeight;
+      const headSlope = (topDec - centerDecDeg) / (headBackRA - pointRADeg);
+      const cOuter = topDec - headSlope * headBackRA;
+      this.outerArrow.addPoint(pointRADeg, centerDecDeg);
+      this.outerArrow.addPoint(headBackRA, topDec);
+      this.outerArrow.addPoint(headBackRA, stemTopDec);
+      this.outerArrow.addPoint(stemBackRA, stemTopDec);
+      this.outerArrow.addPoint(stemBackRA, stemBottomDec);
+      this.outerArrow.addPoint(headBackRA, stemBottomDec);
+      this.outerArrow.addPoint(headBackRA, bottomDec);
 
-      this.arrow.set_lineColor(this.accentColor);
-      this.arrow.set_fillColor(this.accentColor);
-      this.arrow.set_fill(true);
+      this.outerArrow.set_lineColor(this.accentColor);
+      this.outerArrow.set_fillColor(this.accentColor);
+      this.outerArrow.set_fill(true);
       
-      this.addAnnotation(this.arrow);
+      this.addAnnotation(this.outerArrow);
+
+      // Create the inner (white) arrow
+      this.innerArrow = new Poly();
+     
+      const delta = 0.005; // The thickness of the outer "border"
+      const innerPointRADeg = pointRADeg + 0.01;
+      const innerHeadBackRA = headBackRA - delta; 
+      const innerStemBackRA = stemBackRA - delta;
+      const cInner = cOuter - delta * Math.sqrt(1 + headSlope ** 2);
+      const innerTopDec = headSlope * (innerHeadBackRA) + cInner;
+      const innerBottomDec = 2 * centerDecDeg - innerTopDec;
+      this.innerArrow.addPoint(innerPointRADeg, centerDecDeg);
+      this.innerArrow.addPoint(innerHeadBackRA, innerTopDec); 
+      this.innerArrow.addPoint(innerHeadBackRA, stemTopDec - delta / 2); 
+      this.innerArrow.addPoint(innerStemBackRA, stemTopDec - delta / 2); 
+      this.innerArrow.addPoint(innerStemBackRA, stemBottomDec + delta / 2);
+      this.innerArrow.addPoint(innerHeadBackRA, stemBottomDec + delta / 2);
+      this.innerArrow.addPoint(innerHeadBackRA, innerBottomDec);
+
+      const innerColor = "#ffffff";
+      this.innerArrow.set_lineColor(innerColor);
+      this.innerArrow.set_fillColor(innerColor);
+      this.innerArrow.set_fill(true);
+
+      this.addAnnotation(this.innerArrow);
     },
 
     clearPlayingInterval() {
