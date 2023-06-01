@@ -50,11 +50,11 @@ export default defineComponent({
 
     width: {
       type: Number,
-      required: true,
+      required: false,
     },
     height: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     xrange: {
@@ -74,10 +74,22 @@ export default defineComponent({
       default: false,
     },
 
+    scatter: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+
     animation: {
       type: Boolean,
       required: false,
       default: true,
+    },
+
+    maintainAspectRatio: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
 
     reversedY: {
@@ -110,6 +122,18 @@ export default defineComponent({
       default: () => ({}),
     },
 
+    color: {
+      type: String,
+      required: false,
+      default: null,
+    },
+
+    borderColor: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    
     lineOptions: {
       type: Object,
       required: false,
@@ -157,7 +181,7 @@ export default defineComponent({
     computedData() {
 
       if (this.data.length == 0) {
-        return [{ x: 0, y: 0 }];
+        return [{ x: null, y: null }];
       }
       
       const data = this.data.map(d => (
@@ -193,21 +217,36 @@ export default defineComponent({
         data: this.computedData,
         radius: 3, // Chart.js default
         pointStyle: 'circle', // Chart.js default
+        backgroundColor: this.color,
+        borderColor: this.borderColor,
         ...this.scatterOptions
       };
       const lineData = {
         type: 'line',
         label: 'Supernove Lightcurve',
         data: this.computedData,
-        ...this.scatterOptions,
+        backgroundColor: 'transparent',
+        radius: 0,
+        borderColor: this.color,
         ...this.lineOptions
       };
 
-      if (this.line) {
-        return { datasets: [ lineData] };
-      } else {
-        return { datasets: [scatterData] };
+      let outData = [];
+
+
+      if (this.scatter) {
+        outData.push(scatterData);
       }
+      
+      if (this.line) {
+        outData.push(lineData);
+      }
+      
+      if (outData.length == 0) {
+        outData = [scatterData, lineData];
+      }
+      
+      return { datasets: outData };
 
     },
 
@@ -216,7 +255,7 @@ export default defineComponent({
       const options =  {
         animation: this.animation,
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: this.maintainAspectRatio,
         scales: {
           x: {
             display: !this.hideXAxis,
@@ -247,9 +286,29 @@ export default defineComponent({
       };
 
       
-      
       return options;
-    }
+    },
+
+    // get the x-pixel postion of the first data point
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    x0(): any {
+      if (this.chart == null) {
+        return;
+      }
+      const chart = this.chart as Chart;
+      if (this.computedData[0].x == null) {
+        return;
+      }
+      
+      const val = chart.scales.x.getPixelForValue(this.computedData[0].x as number);
+      console.log(chart.data.datasets[0] );
+      if (isNaN(val)) {
+        return ;
+      }
+      this.$emit("x0_pix", val);
+      return val;
+
+    },
     
   },
 
@@ -269,12 +328,16 @@ export default defineComponent({
 
 
 #plot {
+  position: relative;
   border: 2px solid greenyellow;
   width: 100%;
+  max-height: 20vh;
   height: 100%;
 }
 
 .chartjs {
+  border: 1px solid #eee;
+  width: 100%;
 }
 
 </style>
