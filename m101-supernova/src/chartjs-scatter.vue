@@ -329,14 +329,14 @@ export default defineComponent({
 
 #plot {
   position: relative;
-  border: 2px solid greenyellow;
+  // border: 2px solid greenyellow;
   width: 100%;
   max-height: 20vh;
   height: 100%;
 }
 
 .chartjs {
-  border: 1px solid #eee;
+  // border: 1px solid #eee;
   width: 100%;
 }
 

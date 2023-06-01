@@ -2303,11 +2303,11 @@ body {
 }
 
 div#main-content > div {
-  outline: 1px solid orange;
+  // outline: 1px solid orange;
 }
 
 div.bottom-content > div {
-  outline: 1px solid rgb(154, 154, 251);
+  // outline: 1px solid rgb(154, 154, 251);
 }
 
 #tools {
