@@ -5,6 +5,8 @@ import FolderView from "./FolderView.vue";
 import Credits from "./Credits.vue";
 import Toggle from "./Toggle.vue";
 import TransitionExpand from "./TransitionExpand.vue";
+import chartjsScatter from "./chartjs-scatter.vue";
+// import PlotDataPlotly from "./PlotDataPlotly.vue";
 
 import "./polyfills";
 
@@ -102,6 +104,8 @@ createApp(M101SN, {
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
   .component('toggle', Toggle)
+  .component('chartjs-scatter', chartjsScatter)
+  // .component('plot-plotly', PlotDataPlotly)
 
   // Mount
   .mount("#app");
