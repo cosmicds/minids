@@ -180,21 +180,8 @@
     
     <div class="bottom-content">
       
-      <chartjs-scatter
-        reversedY
-        hideXAxis
-        
-        line
-        :animation=false
-        :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
-        :keys="{ x: 'time', y: 'magnitude' }"
-        :width="100"
-        :height="100"
-        :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
-        :yrange="[10.5, 14]"
-        :lineOptions="{borderColor: 'white', borderWidth: 2, tension: 0, radius: 5,backgroundColor: accentColor,}"
-        
-      />
+      
+      
       <div
         id="controls"
         class="control-icon-wrapper"
@@ -286,7 +273,29 @@
           </div>
         </transition-expand>
       </div>
+      
+      
+        
+      
+      
       <div id="tools">
+          <div id="chart-container">
+          <chartjs-scatter
+            reversedY
+            hideXAxis
+            
+            line
+            :animation=false
+            :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            :keys="{ x: 'time', y: 'magnitude' }"
+            :width="100"
+            :height="100"
+            :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
+            :yrange="[10.5, 14]"
+            :lineOptions="{borderColor: 'white', borderWidth: 2, tension: 0, radius: 5,backgroundColor: accentColor,}"
+            
+          />
+        </div>
         <span class="tool-container">
           <!-- <v-chip
             id="sliderlabel"
