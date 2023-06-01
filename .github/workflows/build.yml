@@ -29,6 +29,12 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Get workspaces
+        uses: sergeysova/jq-action@v2
+        id: workspaces
+        with:
+          cmd: (cat package.json | jq -r '.workspaces | @sh') | tr -d \'
+
       - name: BrowserStack env setup
         uses: browserstack/github-actions/setup-env@master
         with:
@@ -44,12 +50,20 @@ jobs:
       - name: Run BrowserStack tests
         run: |
           set -xeuo pipefail
-          cd carina
-          yarn serve &
-          sleep 10 # give the local service time to start up
-          cd ../tests
-          yarn bs-local -e default,firefox,edge,safari --group carina -o reports
-          pkill -f vue-cli-service # stop the servers
+          workspaces=(${{ steps.workspaces.outputs.value }})
+          for ws in "${workspaces[@]}"
+          do
+            if [[ $ws != 'common' && $ws != 'tests' && -d tests/${ws} ]]
+            then
+              cd $ws
+              yarn serve &
+              sleep 10 # give the local service time to start up
+              cd ../tests
+              yarn bs-local -e default,firefox,edge,safari --group $ws -o reports
+              pkill -f vue-cli-service # stop the servers
+              cd ..
+            fi
+          done
 
       - name: 'BrowserStackLocal Stop'  # Terminating the BrowserStackLocal tunnel connection
         uses: browserstack/github-actions/setup-local@master

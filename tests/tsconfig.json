@@ -22,6 +22,7 @@
   },
   "include": [
     "carina/*.ts",
+    "green-comet/*.ts",
     "page_objects/*.ts",
     "*.ts"
   ]
