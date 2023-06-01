@@ -181,116 +181,18 @@
     </div>
     
     <div class="bottom-content">
-      
-      
-      
-      <div
-        id="controls"
-        class="control-icon-wrapper"
-      >
-        <div id="controls-top-row">
-          <font-awesome-icon
-            size="lg"
-            class="ma-1"
-            :color="accentColor"
-            :icon="showControls ? `chevron-down` : `gear`"
-            @click="showControls = !showControls"
-            @keyup.enter="showControls = !showControls"
-            tabindex="0"
-          />
-        </div>
-        <transition-expand>
-          <div v-if="showControls" class="controls-content">
-            <toggle
-              :show="false"
-              :color="accentColor"
-              :item="showAltAzGrid"
-              label="Grid"
-              @toggle="showAltAzGrid = $event"
-            />
-            <toggle
-              :color="accentColor"
-              :item="showConstellations"
-              label="Constellations"
-              @toggle="showConstellations = $event"
-            />
-            <toggle
-              :show="false"
-              :color="accentColor"
-              :item="showHorizon"
-              label="Horizon"
-              @toggle="showHorizon = $event"
-            />
-            <div
-              style="color:white;"
-              class="mt-3"
-            >
-              Selected location's time:
-            </div>
-            <date-picker
-              dark
-              time-picker
-              enable-seconds
-              :is-24="false"
-              v-model="timeOfDay"
-              :clearable="false"
-              close-on-scroll
-              class="mb-4 mt-1"
-            >
-              <template #input-icon>
-                <font-awesome-icon
-                  icon="clock"
-                  class="mx-2"
-                  :color="accentColor"
-                ></font-awesome-icon>
-              </template>
-            </date-picker>
-            <v-btn
-              block
-              :color="accentColor"
-              @click="centerOnCurrentDate"
-              @keyup.enter="centerOnCurrentDate"
-              class="mb-2"
-            >
-              Center on Now
-            </v-btn>
-            <v-btn
-              block
-              :color="accentColor"
-              @click="() => {
-                playing = false;
-                playingImagePath = !playingImagePath;
-              }"
-            >
-              {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
-            </v-btn>
-            <!--
-            <v-btn
-              block
-              :color="accentColor"
-              @click="setToFirstCometImage"
-            >
-              Best view for comet images
-            </v-btn> -->
-          </div>
-        </transition-expand>
-      </div>
-      
-      
-        
-      
-      <!-- :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))" -->
+
       <div id="tools">
           <div id="chart-container">
+            <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
           <chartjs-scatter
             reversedY
             hideXAxis
-            hideYAxis
             line
             scatter
             :animation=false
             :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
-            
+            :lineData="dates.map(d => {return {x: d, y: 12.5}}).filter(d => (d.x < selectedTime ))"
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
             :yrange="[10.5, 14]"
@@ -367,6 +269,106 @@
             </vue-slider>
           </span>
       </div>
+      
+      <div
+        id="controls"
+        class="control-icon-wrapper"
+      >
+        <div id="controls-top-row">
+          <font-awesome-icon
+            size="lg"
+            class="ma-1"
+            :color="accentColor"
+            :icon="showControls ? `chevron-down` : `gear`"
+            @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
+            tabindex="0"
+          />
+        </div>
+        <transition-expand>
+          <div v-if="showControls" class="controls-content">
+            <v-btn
+                block
+                :color="accentColor"
+                @click="() => {
+                  playing =  !(playing || playingImagePath);;
+                  playingImagePath = !playingImagePath;
+                }"
+              >
+                {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
+              </v-btn>
+            
+            <v-btn
+                block
+                :color="accentColor"
+                @click="centerView"
+                @keyup.enter="centerView"
+                class="mb-2"
+              >
+                Center the Pinwheel
+            </v-btn>
+          
+            <toggle
+              :show="false"
+              :color="accentColor"
+              :item="showAltAzGrid"
+              label="Grid"
+              @toggle="showAltAzGrid = $event"
+            />
+            <toggle
+              :color="accentColor"
+              :item="showConstellations"
+              label="Constellations"
+              @toggle="showConstellations = $event"
+            />
+            <toggle
+              :show="false"
+              :color="accentColor"
+              :item="showHorizon"
+              label="Horizon"
+              @toggle="showHorizon = $event"
+            />
+            <div 
+              v-if="false"
+              id="time-picker-wrapper">
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
+            <date-picker
+              v-if="false"
+              dark
+              time-picker
+              enable-seconds
+              :is-24="false"
+              v-model="timeOfDay"
+              :clearable="false"
+              close-on-scroll
+              class="mb-4 mt-1"
+            >
+              <template #input-icon>
+                <font-awesome-icon
+                  icon="clock"
+                  class="mx-2"
+                  :color="accentColor"
+                ></font-awesome-icon>
+              </template>
+            </date-picker>
+          </div>
+            <!--
+            <v-btn
+              block
+              :color="accentColor"
+              @click="setToFirstCometImage"
+            >
+              Best view for comet images
+            </v-btn> -->
+          </div>
+        </transition-expand>
+      </div>
+      
       <mini-credits></mini-credits>
     </div>
 
@@ -692,7 +694,6 @@ const lightCurveTable = csvParse(lightCurve, (d) => {
   };
 });
 
-console.log(lightCurveTable);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
@@ -832,6 +833,7 @@ export default defineComponent({
 
       lightCurveData: lightCurveTable,
       incomingItemSelect: null as Thumbnail | null,
+      m101Position: {ra: 210.802, dec: 54.348},
 
       chartXOffset: 0,
 
@@ -1007,7 +1009,7 @@ export default defineComponent({
       // and it was the same in nextTick
       // so give just a bit of a delay
       setTimeout(() => {
-        this.centerOnCurrentDate();
+        this.centerView();
         this.positionSet = true;
       }, 100);
 
@@ -1109,7 +1111,7 @@ export default defineComponent({
       if (toolsDiv == null) {
         return;
       }
-      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLInputElement;
+      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
       let inputRailWidth = inputRail.clientWidth;
 
       const chartContainer = document.getElementById("chart-container");
@@ -1117,11 +1119,14 @@ export default defineComponent({
         return;
       }
 
+      console.log("inputRailWidth", inputRailWidth, this.chartXOffset);
 
-      inputRailWidth += (this.chartXOffset);
+      inputRailWidth += (this.chartXOffset + 8);
       
       chartContainer.style.width = `${inputRailWidth}px`;
       // chartContainer.style.left = `${inputRail.offsetLeft}px`;
+      console.log("chartContainer.style.width", chartContainer.style.width);
+      console.log("chartContainer.clientWidth", chartContainer.clientWidth);
       
       return;
     },
@@ -1310,7 +1315,6 @@ export default defineComponent({
       if (iset == null) { return null; }
       const names = this.imageDateRef['names'];
       const dates = this.imageDateRef['dates'];
-      console.log(names.indexOf(iset.get_name()));
       return new Date(dates[names.indexOf(iset.get_name())]);
     },
     
@@ -1318,7 +1322,6 @@ export default defineComponent({
     onItemSelected(place: Place) {
 
       if (place == null) {
-        console.log("place is null");
         this.hideAllImagesets();
       }
       
@@ -1849,7 +1852,6 @@ export default defineComponent({
     matchImageSetName(date: Date): string {
       const thisDate = date.getTime();
       if (this.imageDateSorted.includes(thisDate)) {
-        console.log('matchImageSetName: found exact match');
         return this.imageDateRefInv[thisDate];
       }
       
@@ -1945,14 +1947,20 @@ export default defineComponent({
     },
 
     
-    centerOnCurrentDate(options?: MoveOptions) {
-      const now = new Date();
-      const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
-      this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      this.selectedTime = this.binarySearch(this.dates, now.getTime());
-      this.$nextTick(() => {
-        this.updateViewForDate(options);
+    centerView(_options?: MoveOptions) {
+      this.gotoRADecZoom({
+        raRad: this.m101Position.ra * D2R,
+        decRad: this.m101Position.dec * D2R,
+        zoomDeg: 10,
+        instant: true,
       });
+      // const now = new Date();
+      // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
+      // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
+      // this.selectedTime = this.binarySearch(this.dates, now.getTime());
+      // this.$nextTick(() => {
+      //   this.updateViewForDate(options);
+      // });
     },
 
     updateForDateTime() {
@@ -2245,19 +2253,36 @@ body {
   margin-right: 30px;
 }
 
+
 // make a vertical line with text "brightness" in psuedoelement before #chart-container div
-#chart-container:before {
-  content: "Brightness";
+// #chart-container:before {
+//   content: "Brightness";
+//   position: absolute;
+//   top: 15%;
+//   border: 1px solid red;
+//   transform: translateX(-100%) rotate(-90deg);
+//   transform-origin: 100% 100%;
+//   color: white;
+//   font-size: 1em;
+//   font-weight: normal;
+//   pointer-events: none;
+// }
+
+#chartjs {
+  // outline:1px solid red;
+}
+
+// makes the y-axis border look like an arrow
+#chart-container:after {
+  content: "^";
   position: absolute;
-  top: 50%;
-  // right: 0px;
-  transform: rotate(-90deg)  translateY(-100%);
+  top: 0;
+  font-size: 1.5em;
+  transform: translateX(.86em) translateY(-.2em);
   transform-origin: 0 0;
-  color: white;
-  font-size: 1em;
-  font-weight: normal;
   pointer-events: none;
 }
+
 
 #play-pause-icon-wrapper {
   color: var(--ephemeris-color);
@@ -2360,7 +2385,8 @@ div.bottom-content > div {
   pointer-events: auto;
 
   .v-label {
-    color: var(--comet-color);
+    // color: var(--comet-color);
+    color: white;
     opacity: 1;
   }
 
@@ -2368,12 +2394,13 @@ div.bottom-content > div {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 0.5rem;
 
     .v-btn {
       align-self: center;
       padding-left: 5px;
       padding-right: 5px;
-      border: solid 1px #899499;
+      border: solid 1.5px #ffc5fd;
 
       &:focus {
         border: 2px solid white;
@@ -2390,10 +2417,8 @@ div.bottom-content > div {
   }
 
   #controls-top-row {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-end;
+    margin-right: 0px;
+    margin-left: auto;
   }
 }
 

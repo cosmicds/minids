@@ -42,6 +42,12 @@ export default defineComponent({
 
     },
 
+    lineData: {
+      type: Array as PropType<{ x: Date | number; y: number }[]>,
+      required: false,
+      default: () => [],
+    },
+
     keys: {
       type: Object as PropType<{ x: string; y: string }>,
       required: false,
@@ -147,6 +153,15 @@ export default defineComponent({
 
   },
   methods: {
+
+    getKey(obj: { [key: string]: unknown}  , key: string, defaultKey: string | null = null) {
+      // check if obj has key
+      if (key in obj) {
+        return obj[key as keyof typeof obj];
+      } else if (defaultKey != null && defaultKey in obj) {
+        return obj[defaultKey as keyof typeof obj];
+      }
+    },
     
     draw() {
       
@@ -166,6 +181,8 @@ export default defineComponent({
         
       });
 
+      this.x0;
+
       return ;
     },
     
@@ -177,6 +194,7 @@ export default defineComponent({
     isDate() {
       return this.data[0].x instanceof Date;
     },
+
     
     computedData() {
 
@@ -196,6 +214,21 @@ export default defineComponent({
       } 
 
       return data;
+    },
+
+    computedLineData() {
+      if (this.line) {
+        if (this.lineData.length == 0) {
+          return this.computedData;
+        } else {
+          return this.lineData.map(d => (
+            {
+              x: this.getKey(d, this.keys['x'], 'x'),
+              y: this.getKey(d, this.keys['y'], 'y'),
+            }));
+        }
+      }
+      return [{ x: null, y: null}];
     },
 
     computedYRange() {
@@ -224,7 +257,7 @@ export default defineComponent({
       const lineData = {
         type: 'line',
         label: 'Supernove Lightcurve',
-        data: this.computedData,
+        data: this.computedLineData,
         backgroundColor: 'transparent',
         radius: 0,
         borderColor: this.color,
@@ -268,11 +301,29 @@ export default defineComponent({
 
           y: {
             display: !this.hideYAxis,
+            type: 'linear',
             reverse: this.reversedY,
             min: this.computedYRange[0],
             max: this.computedYRange[1],
+            title: {
+              display: true,
+              text: "Brightness",
+              color: 'white',
+            },
+            border: {
+              display: true,
+              color: 'white',
+              width: 2,
+              // top: false,
+              // bottom: false,
+              // left: false,
+              // right: false
+            },
+            grid: {
+            },
             ticks: { // https://www.chartjs.org/docs/latest/axes/styling.html#tick-configuration
-              stepSize:1,
+              display: false,
+              stepSize: 1,
               autoSkip: true,
             }
           }
@@ -300,8 +351,8 @@ export default defineComponent({
         return;
       }
       
-      const val = chart.scales.x.getPixelForValue(this.computedData[0].x as number);
-      console.log(chart.data.datasets[0] );
+      const val = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.min as number);
+      console.log(val);
       if (isNaN(val)) {
         return ;
       }
@@ -331,7 +382,7 @@ export default defineComponent({
   position: relative;
   // border: 2px solid greenyellow;
   width: 100%;
-  max-height: 20vh;
+  max-height: 20dvh;
   height: 100%;
 }
 
