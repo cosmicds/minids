@@ -55,6 +55,7 @@
 
     <div class="top-content">
       <div
+        v-if="false"
         id="video-icon-dummy"
         class="control-icon-wrapper"
       >
@@ -67,6 +68,7 @@
       </div>
       <div id="center-buttons">
         <v-tooltip
+          v-if="false"
           v-model="showMapTooltip"
           location="bottom"
           :open-on-click="false"
@@ -277,22 +279,26 @@
       
         
       
-      
+      <!-- :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))" -->
       <div id="tools">
           <div id="chart-container">
           <chartjs-scatter
             reversedY
             hideXAxis
-            
+            hideYAxis
             line
+            scatter
             :animation=false
             :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            
             :keys="{ x: 'time', y: 'magnitude' }"
-            :width="100"
-            :height="100"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
             :yrange="[10.5, 14]"
-            :lineOptions="{borderColor: 'white', borderWidth: 2, tension: 0, radius: 5,backgroundColor: accentColor,}"
+            :color="accentColor"
+            borderColor="#DD6BD9"
+            :scatterOptions="{radius: 5, borderWidth: 2}"
+            :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
+            @x0_pix="(val: number) => { chartXOffset = val, onResize() }"
             
           />
         </div>
@@ -827,6 +833,8 @@ export default defineComponent({
       lightCurveData: lightCurveTable,
       incomingItemSelect: null as Thumbnail | null,
 
+      chartXOffset: 0,
+
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
@@ -857,6 +865,11 @@ export default defineComponent({
   },
 
   mounted() {
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
+    });
 
     this.waitForReady().then(async () => {
 
@@ -1000,6 +1013,8 @@ export default defineComponent({
 
     });
 
+    
+
   },
 
   computed: {
@@ -1088,6 +1103,28 @@ export default defineComponent({
   },
 
   methods: {
+    
+    onResize() {
+      const toolsDiv = document.getElementById("tools");
+      if (toolsDiv == null) {
+        return;
+      }
+      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLInputElement;
+      let inputRailWidth = inputRail.clientWidth;
+
+      const chartContainer = document.getElementById("chart-container");
+      if (chartContainer == null) {
+        return;
+      }
+
+
+      inputRailWidth += (this.chartXOffset);
+      
+      chartContainer.style.width = `${inputRailWidth}px`;
+      // chartContainer.style.left = `${inputRail.offsetLeft}px`;
+      
+      return;
+    },
 
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
@@ -2058,6 +2095,8 @@ export default defineComponent({
       }, 500);
     }
   }
+
+  
 });
 
 </script>
@@ -2181,9 +2220,9 @@ body {
 .control-icon-wrapper {
   color: var(--comet-color);
   background: #040404;
-  padding: 8px 16px;
+  padding: .5em 1em;
   border: 1px solid var(--comet-color);
-  border-radius: 20px;
+  border-radius: 1.25em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2197,6 +2236,27 @@ body {
     color: white;
     border-color: white;
   }
+}
+
+#chart-container {
+  pointer-events: auto;
+  position: initial;
+  margin-left: auto;
+  margin-right: 30px;
+}
+
+// make a vertical line with text "brightness" in psuedoelement before #chart-container div
+#chart-container:before {
+  content: "Brightness";
+  position: absolute;
+  top: 50%;
+  // right: 0px;
+  transform: rotate(-90deg)  translateY(-100%);
+  transform-origin: 0 0;
+  color: white;
+  font-size: 1em;
+  font-weight: normal;
+  pointer-events: none;
 }
 
 #play-pause-icon-wrapper {
@@ -2215,7 +2275,7 @@ body {
 }
 
 #video-icon-wrapper {
-  display: none;
+  display: initial;
 }
 
 .top-content {
@@ -2225,6 +2285,7 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
 }
@@ -2239,6 +2300,14 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+div#main-content > div {
+  outline: 1px solid orange;
+}
+
+div.bottom-content > div {
+  outline: 1px solid rgb(154, 154, 251);
 }
 
 #tools {
@@ -2276,6 +2345,9 @@ body {
 }
 
 #controls {
+  position: absolute;
+  bottom: 8rem;
+  z-index: 10;
   background: black;
   padding: 10px;
   border-radius: 10px;
@@ -2558,6 +2630,7 @@ video {
 }
 
 .left-content {
+  display: none !important;
   position: absolute;
   left: 1rem;
   top: 1rem;
