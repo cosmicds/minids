@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "composite": true,
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "declaration": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ]
+  },
+  "include": [
+    "carina/*.ts",
+    "green-comet/*.ts",
+    "page_objects/*.ts",
+    "*.ts"
+  ]
+}

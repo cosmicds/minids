@@ -29,7 +29,7 @@
   "scripts": {
     "build": "vue-cli-service build",
     "clean": "rimraf dist",
-    "lint": "vue-cli-service lint src",
+    "lint": "vue-cli-service lint src --no-fix",
     "serve": "vue-cli-service serve"
   }
 }

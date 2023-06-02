@@ -35,7 +35,7 @@
             :class="['bordered', 'item', lastSelectedItem === item ? 'selected' : '']"
             v-for="item of items"
             :key="item.get_name()"
-            :title="item.get_name()"
+            :id="`fv-${item.get_name()}`"
           >
             <div
               class="item-thumbnails"
@@ -125,7 +125,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-
     incomingItemSelect: {
       type: Object as PropType<Thumbnail>,
       default: null
@@ -140,7 +139,7 @@ export default defineComponent({
       opacities: {} as Record<string, number>,
       expanded: this.open,
       lastOpacityChanged: null as Thumbnail | null
-    }
+    };
   },
 
   created() {
@@ -171,9 +170,9 @@ export default defineComponent({
       }
     },
     onSliderInputChanged(e: Event, item: Thumbnail) {
-      let dragging = false
+      let dragging = false;
       if (this.lastOpacityChanged == item) {
-        dragging = true
+        dragging = true;
       } else {
         this.lastOpacityChanged = item;
       }
@@ -182,14 +181,25 @@ export default defineComponent({
 
     onToggleImage(e: Event, item: Thumbnail) {
       this.$emit('toggle', item, (e.target as HTMLInputElement).checked);
-    }
+    },
+
+    scrollToItem(id: string) {
+      const element = document.getElementById(id);
+      if (element !== null) {
+        const container = document.getElementById("items");
+        if (container !== null) {
+          const y = Math.max(Math.min(element.offsetTop - element.clientHeight * 1.5, container.scrollHeight), 0);
+          container.scrollTo(0, y);
+        }
+      }
+    },
   },
 
   computed: {
     cssVars() {
       return {
         "--flex-direction": this.flexDirection
-      }
+      };
     },
 
     isMobile() {
@@ -201,6 +211,9 @@ export default defineComponent({
     incomingItemSelect() {
       if (this.incomingItemSelect != null) {
         this.lastSelectedItem = this.incomingItemSelect;
+        this.scrollToItem(`fv-${this.incomingItemSelect.get_name()}`);
+      } else {
+        this.lastSelectedItem = null;
       }
     }
   }

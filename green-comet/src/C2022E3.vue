@@ -158,7 +158,7 @@
         sliders
         expandable
         :thumbnails="true"
-        :open="mobile ? true : true"
+        :open="mobile ? false : true"
         :root-folder="imagesetFolder"
         :wwt-namespace="wwtNamespace"
         :incomingItemSelect="incomingItemSelect"
@@ -208,6 +208,12 @@
               label="Horizon"
               hide-details
             />
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
             <date-picker
               dark
               time-picker
@@ -216,12 +222,13 @@
               v-model="timeOfDay"
               :clearable="false"
               close-on-scroll
-              class="my-3 "
+              class="mb-4 mt-1"
             >
               <template #input-icon>
                 <font-awesome-icon
                   icon="clock"
                   class="mx-2"
+                  :color="cometColor"
                 ></font-awesome-icon>
               </template>
             </date-picker>
@@ -230,13 +237,17 @@
               :color="cometColor"
               @click="centerOnCurrentDate"
               @keyup.enter="centerOnCurrentDate"
+              class="mb-2"
             >
               Center on Now
             </v-btn>
             <v-btn
               block
               :color="cometColor"
-              @click="playingCometPath = !playingCometPath"
+              @click="() => {
+                playing = false;
+                playingCometPath = !playingCometPath;
+              }"
             >
               {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
             </v-btn>
@@ -274,14 +285,20 @@
                 @mouseover="showPlayPauseTooltip = true"
                 @mouseleave="showPlayPauseTooltip = false"
                 v-bind="props"
-                @click="playing = !playing"
-                @keyup.enter="playing = !playing"
+                @click="() => {
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
+                @keyup.enter="() => {
+                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
                 tabindex="0"
               >
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
-                  :icon="playing ? 'pause' : 'play'"
+                  :icon="!(playing || playingCometPath) ? 'play' : 'pause'"
                   size="lg"
                 ></font-awesome-icon>
               </div>
@@ -297,7 +314,7 @@
             }"
             :order="false"
             v-model="selectedTime"
-            @change="onTimeSliderchange"
+            @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
             :tooltip-formatter="(v: number) => 
@@ -314,12 +331,6 @@
           </span>
       </div>
       <div id="credits" class="ui-text">
-        <div>
-          Powered by
-          <a href="https://worldwidetelescope.org/home/" target="_blank"
-            >WorldWide Telescope</a
-          >
-        </div>
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -327,8 +338,11 @@
           <a href="https://worldwidetelescope.org/home/" target="_blank"
             ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
           /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank"
+          <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
+          /></a>
+          <a href="https://nasa.gov/" target="_blank" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
           /></a>
           <!-- <ShareNetwork
             v-for="network in networks"
@@ -447,7 +461,7 @@
                 <ul class="text-list">
                   <li>Move the date slider forward and backward. Observe how the comet moves in the sky with time. Can you find when the comet is moving fastest in the sky and when it is moving slowest in the sky? Can you find when the comet path “twirls” in the sky? (This is known as “retrograde motion.”)</li>
                   <li>Click the thumbnail images on the left to see photographs of the comet in the virtual sky. Use the sliders under the thumbnails to display the comet images for multiple dates.</li>
-                  <li>Look at the comet images in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
+                  <li>Click "Play comet images" to view them in order by date. What do you notice about the direction of the comet’s tails relative to the motion of the comet?</li>
                 </ul>
                 <br>
 
@@ -456,7 +470,7 @@
                 <br><br>
 
                 <h3>A Comet’s Tail</h3>
-                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet as it moves in space!
+                The comet has an ionized gas tail and a dust tail. The gas tail is composed of the gas being blown off the comet’s surface and ionized (given an electric charge) by ultraviolet radiation from the Sun. This charged gas is blown in a direction <strong>away</strong> from the Sun by the solar wind. The dust tail is made of dust blown off the surface by jets of vaporizing gas. The dust is electrically neutral and does not get pushed as hard by the solar wind, which is why it is generally distinct from the gas tail. Many people think that the tails trail behind the comet as it moves forward. You can see from the images that the solar wind is blowing the tails ahead of the comet for much of its path through space!
 
                 <br><br><br>
                 <div class="credits">
@@ -541,7 +555,7 @@
                             to auto-advance time.
                           </li>
                           <li>
-                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT and 12:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Small pink dots overlaid with a larger white'ish dot indicate dates that have comet photographs.
+                            The small pink markers in the sky show the path of the comet on a particular date at 00:00 UT. The larger pink marker shows the position of the comet at the time displayed on the clock. Larger white'ish dots overlaid on the small pink dots indicate dates that have comet photographs.
                           </li>
                           <li>
                             Click a thumbnail image in the panel in the upper left to see an image of the comet photographed by Gerald Rhemann overlaid on the virtual sky on that day. The slider under the thumbnail adjusts the image opacity within the sky view.
@@ -550,7 +564,13 @@
                             Depending on what you are trying to see, you may want to try different zoom levels. Zooming out will help you see the comet's overall path better. Zooming in will help you see more details in the comet images.
                           </li>                          
                           <li>
-                            Adjust your local time using the time controller and choose whether to display the sky grid, constellations, or the horizon. You can also recenter the view on the comet's location today.
+                            Choose whether to display the sky grid, constellations, or the horizon.
+                          </li>
+                          <li>
+                            Adjust the displayed time for your chosen location using the time controller.
+                          </li>
+                          <li>
+                            Re-center the view on the comet's location "now" or Play the comet images, in order, along their path.
                           </li>
                         </ul>
                       <br>
@@ -601,14 +621,14 @@ import { csvFormatRows, csvParse } from "d3-dsv";
 
 import { distance } from "@wwtelescope/astro";
 import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
-import { ImageSetType, MarkerScales, PlotTypes, PointScaleTypes, Thumbnail } from "@wwtelescope/engine-types";
+import { MarkerScales, PlotTypes, Thumbnail } from "@wwtelescope/engine-types";
 
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import { getTimezoneOffset } from "date-fns-tz";
 import tzlookup from "tz-lookup";
-import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common"
+import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 
-import { ImageSetLayer, Place, Imageset } from "@wwtelescope/engine";
+import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
@@ -633,46 +653,46 @@ const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 function parseCsvTable(csv: string) {
   return csvParse(csv, (d) => {
     return {
-      date: new Date(d.Date!),
-      ra: +d.RA!,
-      dec: +d.Dec!,
-      tMag: +d.Tmag!,
-      angspeed: +d.SkyMotion!,
+      date: new Date(d.Date ?? ""),
+      ra: +(d.RA ?? ""),
+      dec: +(d.Dec ?? ""),
+      tMag: +(d.Tmag ?? ""),
+      angspeed: +(d.SkyMotion ?? ""),
     };
   });
 }
-const FullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
-const CometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
+const fullDatesTable = parseCsvTable(ephemerisFullDatesCsv);
+const cometImageDatesTable = parseCsvTable(ephemerisCometImageDatesCsv);
 
 // NB: The two tables have identical structures.
 // We aren't exporting these types anywhere, so
 // generic names are fine
-type Table = typeof FullDatesTable;
-type TableRow = typeof FullDatesTable[number];
+type Table = typeof fullDatesTable;
+type TableRow = typeof fullDatesTable[number];
 
 function formatCsvTable(table: Table): string {
   return csvFormatRows([[
-        "Date", "RA", "Dec", "Tmag" , "Angspeed"
-      ]].concat(table.map((d, _i) => {
-        return [
-          d.date.toISOString(),
-          d.ra.toString(),
-          d.dec.toString(),
-          d.tMag.toString(),
-          d.angspeed.toString(),
-        ];
-    }))).replace(/\n/g, '\r\n');
-    // By using a regex, we replace all instances.
-    // For WWT implementation reasons (left over from 
-    // the Windows client?), we need the line endings 
-    // to be CRLF
+    "Date", "RA", "Dec", "Tmag" , "Angspeed"
+  ]].concat(table.map((d, _i) => {
+    return [
+      d.date.toISOString(),
+      d.ra.toString(),
+      d.dec.toString(),
+      d.tMag.toString(),
+      d.angspeed.toString(),
+    ];
+  }))).replace(/\n/g, '\r\n');
+  // By using a regex, we replace all instances.
+  // For WWT implementation reasons (left over from 
+  // the Windows client?), we need the line endings 
+  // to be CRLF
 }
 
-const FullDatesString = formatCsvTable(FullDatesTable);
-const CometImageDatesString = formatCsvTable(CometImageDatesTable);
+const fullDatesString = formatCsvTable(fullDatesTable);
+const cometImageDatesString = formatCsvTable(cometImageDatesTable);
 
-const allDates = FullDatesTable.map(r => r.date.getTime());
-const cometImageDates = CometImageDatesTable.map(r => r.date.getTime());
+const allDates = fullDatesTable.map(r => r.date.getTime());
+const cometImageDates = cometImageDatesTable.map(r => r.date.getTime());
 const minDate = Math.min(...allDates, ...cometImageDates);
 const maxDate = Math.max(...allDates, ...cometImageDates);
 const dates: number[] = [];
@@ -681,6 +701,7 @@ const d = new Date(minDate);
 let t = d.getTime();
 while (t <= maxDate) {
   dates.push(t);
+  dates.push(t + 86400000/2);
   d.setUTCDate(d.getUTCDate() + 1);
   t = d.getTime();
 }
@@ -688,17 +709,17 @@ while (t <= maxDate) {
 type LocationRad = {
   longitudeRad: number;
   latitudeRad: number;
-}
+};
 
 type EquatorialRad = {
   raRad: number;
   decRad: number;
-}
+};
 
 type HorizontalRad = {
   altRad: number;
   azRad: number;
-}
+};
 
 type SheetType = "text" | "video" | null;
 
@@ -744,6 +765,7 @@ export default defineComponent({
       playing: false,
       playingCometPath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
+      playingWaitCount: 0,
 
       showAltAzGrid: true,
       showConstellations: false,
@@ -790,10 +812,10 @@ export default defineComponent({
         longitudeRad: D2R * -71.1281
       } as LocationRad,
       locationErrorMessage: ""
-    }
+    };
   },
 
-  created() {
+  mounted() {
 
     this.waitForReady().then(async () => {
 
@@ -803,14 +825,6 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       SpreadSheetLayer.prototype.draw = drawSpreadSheetLayer;
-
-      // This is just nice for hacking while developing
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.wwt = this; window.settings = this.wwtSettings;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.applyISLSetting = applyImageSetLayerSetting;
 
       this.imagesetFolder = await this.loadImageCollection({
         url: this.wtml.c2022e3,
@@ -850,7 +864,7 @@ export default defineComponent({
       layerPromises.push(this.createTableLayer({
         name: "All Dates",
         referenceFrame: "Sky",
-        dataCsv: FullDatesString
+        dataCsv: fullDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -858,12 +872,12 @@ export default defineComponent({
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
-            ["scaleFactor", 2],
+            ["scaleFactor", 2.5],
             ["plotType", PlotTypes.point],
             ["color", Color.fromHex(this.ephemerisColor)],
             //["sizeColumn", 4],
             //["pointScaleType", PointScaleTypes.log],
-            ["opacity", 0.7]
+            ["opacity", 0.8]
           ]
         });
         return layer;
@@ -872,7 +886,7 @@ export default defineComponent({
       layerPromises.push(this.createTableLayer({
         name: "Comet Image Dates",
         referenceFrame: "Sky",
-        dataCsv: CometImageDatesString
+        dataCsv: cometImageDatesString
       }).then((layer) => {
         layer.set_lngColumn(1);
         layer.set_latColumn(2);
@@ -903,7 +917,7 @@ export default defineComponent({
         const splashScreenListener = (_event: KeyboardEvent) => {
           this.showSplashScreen = false;
           window.removeEventListener('keyup', splashScreenListener);
-        }
+        };
         window.addEventListener('keyup', splashScreenListener);
 
         window.addEventListener('keyup', (event: KeyboardEvent) => {
@@ -998,6 +1012,11 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
+
+    dontSetTime(): boolean {
+      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+    },
+    
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -1043,6 +1062,7 @@ export default defineComponent({
     },
 
     toDateString(date: Date) {
+      // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
@@ -1051,7 +1071,10 @@ export default defineComponent({
       if (index === -1) { return null; }
       const row = table[index];
       const nextRow = table[index + 1] ?? row;
-      const f = this.dayFrac;
+      const deltaT = (nextRow.date.getTime() - row.date.getTime()) / MILLISECONDS_PER_DAY;
+      // get how far we are into the day
+      const dayFracPassed = (row.date.getTime() / MILLISECONDS_PER_DAY) % 1;
+      const f = (this.dayFrac - dayFracPassed) / deltaT;
       const interpolatedRA = (1 - f) * row.ra + f * nextRow.ra;
       const interpolatedDec = (1 - f) * row.dec + f * nextRow.dec;
       
@@ -1078,7 +1101,7 @@ export default defineComponent({
 
     updateLayersForDate() {
 
-      this.interpolatedDailyTable = this.interpolatedTable(FullDatesTable);
+      this.interpolatedDailyTable = this.interpolatedTable(fullDatesTable);
       if (this.currentAllLayer !== null) {
         this.deleteLayer(this.currentAllLayer.id);
         this.currentAllLayer = null;
@@ -1126,6 +1149,10 @@ export default defineComponent({
       console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
+    printUTCDate(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+    },
+
     selectSheet(name: SheetType) {
       if (this.sheet == name) {
         this.sheet = null;
@@ -1164,7 +1191,6 @@ export default defineComponent({
 
     
     onItemSelected(place: Place) {
-      this.logTimes(`onItemSelected: ${place.get_name()}`)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
       const layer = this.imagesetLayers[iset.get_name()];
@@ -1175,13 +1201,16 @@ export default defineComponent({
       });
       const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
       this.selectedTime = Date.UTC(year, month - 1, day); 
-      this.showImageForDateTime(this.dateTime)
+      this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate();
+
+      this.playing = false;
+      this.playingCometPath = false;
 
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
-          if (this.image_out_of_view(place) || this.need_to_zoom_in(place)) {
+          if (this.imageOutOfView(place) || this.needToZoomIn(place)) {
             this.gotoRADecZoom({
               raRad: D2R * iset.get_centerX(),
               decRad: D2R * iset.get_centerY(),
@@ -1196,32 +1225,32 @@ export default defineComponent({
 
     wwtSmallestFov(): number {
       // ignore the possibility of rotation
-      const w = this.wwtRenderContext.width
-      const h = this.wwtRenderContext.height
-      const fov_h = this.wwtRenderContext.get_fovAngle() * D2R
-      const fov_w = fov_h * w / h
-      return Math.min(fov_w, fov_h)
+      const w = this.wwtRenderContext.width;
+      const h = this.wwtRenderContext.height;
+      const fovH = this.wwtRenderContext.get_fovAngle() * D2R;
+      const fovW = fovH * w / h;
+      return Math.min(fovW, fovH);
     },
 
     radecInFOV(ra: number, dec: number, center_ra: number, center_dec: number, fov: number, fov_view: number, fraction_of_place: number): boolean {
       let dist = distance(ra, dec, center_ra, center_dec);
-      dist += (fraction_of_place - 1/2) * fov 
-      return dist < fov_view / 2
+      dist += (fraction_of_place - 1/2) * fov;
+      return dist < fov_view / 2;
     },
 
     moveIfTableRowOfFOV(position: TableRow) {
       // get imageset of date
-        const move = this.radecInFOV(
-          D2R * position.ra * D2R,
-          D2R * position.dec * D2R,
-          this.wwtRARad,
-          this.wwtDecRad,
-          10 * D2R,
-          this.wwtRenderContext.get_fovAngle() * D2R,
-          1/2
-        )
+      const move = this.radecInFOV(
+        D2R * position.ra * D2R,
+        D2R * position.dec * D2R,
+        this.wwtRARad,
+        this.wwtDecRad,
+        10 * D2R,
+        this.wwtRenderContext.get_fovAngle() * D2R,
+        1/2
+      );
 
-      return move
+      return move;
       
     },
     
@@ -1232,27 +1261,24 @@ export default defineComponent({
       // by default, allow 1/3 of the place to be visible and still be considered in view
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) {
-        console.log("There is not image set for this place: ", place)
         return false;
       }
 
       const isetRa = iset.get_centerX() * D2R;
       const isetDec = iset.get_centerY() * D2R;
-      const isetFov = (place.get_zoomLevel() / 6) * D2R
+      const isetFov = (place.get_zoomLevel() / 6) * D2R;
       
       const curRa = this.wwtRARad;
       const curDec = this.wwtDecRad;
       const curFov = this.wwtSmallestFov();
 
-      const return_val = this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place) 
-      // console.log('checkIfPlaceIsInTheCurrentFOV', place.get_name(), return_val)
-      return return_val
+      return this.radecInFOV(isetRa, isetDec, curRa, curDec, isetFov, curFov, fraction_of_place);
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
-    image_out_of_view(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place) },
+    imageOutOfView(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place); },
 
-    need_to_zoom_in(place: Place, factor = 5): boolean {
+    needToZoomIn(place: Place, factor = 5): boolean {
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
@@ -1262,10 +1288,10 @@ export default defineComponent({
         if (place.get_zoomLevel() * factor < this.wwtZoomDeg) { return true; }
       }
       
-      return false
+      return false;
     },
 
-    onTimeSliderchange(options?: MoveOptions) {
+    onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
         this.showImageForDateTime(this.dateTime);
         this.updateViewForDate(options);
@@ -1281,9 +1307,8 @@ export default defineComponent({
       
 
       this.$nextTick(() => {
-        const zoom = this.need_to_zoom_in(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
-        if ((this.image_out_of_view(place) && move) || (this.need_to_zoom_in(place, 8) && move) ) {
-          // console.log('opacity changed. moving? ', move)
+        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move) ) {
           const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
           this.selectedTime = Date.UTC(year, month - 1, day); 
           this.incomingItemSelect = place;
@@ -1312,7 +1337,7 @@ export default defineComponent({
       // when we toggle the image we want to set it's opacity to zero
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; } 
-      const iname = iset.get_name()
+      const iname = iset.get_name();
       this.setLayerOpacityForImageSet(iname, checked ? 1 : 0);
     },
     
@@ -1349,7 +1374,7 @@ export default defineComponent({
       };
     },
 
-    circleForLocation(latDeg: number, lonDeg: number): L.Circle<any> {
+    circleForLocation(latDeg: number, lonDeg: number): L.Circle {
       return L.circle([latDeg, lonDeg], {
         color: "#FF0000",
         fillColor: "#FF0033",
@@ -1366,7 +1391,7 @@ export default defineComponent({
           this.location = {
             longitudeRad: D2R * position.coords.longitude,
             latitudeRad: D2R * position.coords.latitude
-          }
+          };
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -1407,7 +1432,7 @@ export default defineComponent({
       return { ra, dec };
     },
 
-    get_julian(utc: Date): number {
+    getJulian(utc: Date): number {
       let year = utc.getUTCFullYear();
       let month = utc.getUTCMonth()+1;
       const day = utc.getUTCDate();
@@ -1417,8 +1442,8 @@ export default defineComponent({
 
       if (month == 1 || month == 2)
       {
-          year -= 1;
-          month += 12;
+        year -= 1;
+        month += 12;
       }
 
       const a = Math.floor(year / 100);
@@ -1427,23 +1452,19 @@ export default defineComponent({
       const d = Math.floor(30.6001 * (month + 1));
 
       // gives julian date: number of days since Jan 1, 4713 BC
-      const JD = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
-
-      console.log(JD);
-      return JD
+      const jd = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      return jd;
 
     },
     
     mstFromUTC2(utc: Date, longRad: number): number {
       const lng = longRad * R2D;
 
-      const modified_jd = this.get_julian(utc)  - 2451545;
+      const modifiedJD = this.getJulian(utc)  - 2451545;
 
-      // console.log(julianDays)
-
-      const julianCenturies = modified_jd / 36525.0;
+      const julianCenturies = modifiedJD / 36525.0;
       // this form wants julianDays - 2451545
-      let mst = 280.46061837 + 360.98564736629 * modified_jd + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+      let mst = 280.46061837 + 360.98564736629 * modifiedJD + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
 
       if (mst > 0.0) {
         while (mst > 360.0) {
@@ -1510,9 +1531,9 @@ export default defineComponent({
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
       // Use N annotations to cover below the horizon
-      const N = 6;
-      const delta = 2 * Math.PI / N;
-      for (let i = 0; i < N; i++) {
+      const n = 6;
+      const delta = 2 * Math.PI / n;
+      for (let i = 0; i < n; i++) {
         let points: [number, number][] = [
           [0, i * delta],
           [-Math.PI / 2, i * delta],
@@ -1542,7 +1563,7 @@ export default defineComponent({
       let minDist = Infinity;
       let closestPt = null as TableRow | null;
 
-      [CometImageDatesTable, FullDatesTable].forEach((table) => {
+      [cometImageDatesTable, fullDatesTable].forEach((table) => {
         table.forEach(row => {
           const raRad = row.ra * D2R;
           const decRad = row.dec * D2R;
@@ -1608,7 +1629,7 @@ export default defineComponent({
         if (this.lastClosePt !== null) {
           this.selectedTime = this.lastClosePt.date.getTime();
           this.$nextTick(() => {
-            this.onTimeSliderchange();
+            this.onTimeSliderChange();
             this.updateViewForDate();
           });
         }
@@ -1618,21 +1639,20 @@ export default defineComponent({
     },
 
     updateViewForDate(options?: MoveOptions) {
-      this.logTimes("updateViewForDate", new Date(this.selectedTime));
       let position = null as TableRow | null;
 
       const cometImageIndex = cometImageDates.findIndex(d => d === this.selectedTime);
       
       if (cometImageIndex > -1) {
         if (this.interpolatedDailyTable !== null) {
-          position = this.interpolatedDailyTable[0]
+          position = this.interpolatedDailyTable[0];
         } else {
-          position = CometImageDatesTable[cometImageIndex];
+          position = cometImageDatesTable[cometImageIndex];
         }
       } else {
         const allIndex = allDates.findIndex(d => d === this.selectedTime);
         if (allIndex > -1) {
-          position = FullDatesTable[allIndex];
+          position = fullDatesTable[allIndex];
         }
       }
 
@@ -1657,15 +1677,15 @@ export default defineComponent({
 
     matchImageSetName(date: Date): string {
       // imageset names are keys in this.imagesetLayers
-      const imageset_names = Object.keys(this.imagesetLayers)
+      const imagesetNames = Object.keys(this.imagesetLayers);
       // loop over image set names. find the name (which is a MM/DD/YYYY date string) 
       // that is or comes after the date we are looking for
       
-      for (const name of imageset_names) {
+      for (const name of imagesetNames) {
         // convert the name to a date
         // if the name is after the date we are looking for, return it
-        const wwt_date_string = this.namefromDate(date)
-        if (name == wwt_date_string) {
+        const wwtDateString = this.namefromDate(date);
+        if (name == wwtDateString) {
           return name;
         }
       }
@@ -1673,51 +1693,57 @@ export default defineComponent({
     },
 
     setLayerOpacityForImageSet(name: string, opacity: number, setting_opacity_from_ui=false) {
-      const layer = this.imagesetLayers[name]
+      const layer = this.imagesetLayers[name];
       if (layer != null) {
         // update the image opacity in the WWT control
-        applyImageSetLayerSetting(layer, ['opacity', opacity])
+        applyImageSetLayerSetting(layer, ['opacity', opacity]);
 
         // update the value for the slider only if we are not setting the opacity from the UI
         if (!setting_opacity_from_ui) {
-          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`
-          const el = (document.querySelector(selector) as HTMLInputElement)
+          const selector = `#items div.item[title='${name}'] input.opacity-range[type='range']`;
+          const el = (document.querySelector(selector) as HTMLInputElement);
           if (el != null) {
-            el.value = `${opacity * 100}`
+            el.value = `${opacity * 100}`;
           }
         }
 
-        const toggle_selector = `#items input[type='checkbox'][title='${name}']`
-        const el2 = (document.querySelector(toggle_selector) as HTMLInputElement)
+        const toggleSelector = `#items input[type='checkbox'][title='${name}']`;
+        const el2 = (document.querySelector(toggleSelector) as HTMLInputElement);
         // truth table: opacity == 0 and el.checked == false => do nothing
         // truth table: opacity == 0 and el.checked == true => set el.checked = false
         // truth table: opacity > 0 and el.checked == false => set el.checked = true
         // truth table: opacity > 0 and el.checked == true => do nothing
         if (el2 != null) {
           if (opacity == 0 && el2.checked) {
-            el2.checked = false
+            el2.checked = false;
           } else if (opacity > 0 && !el2.checked) {
-            el2.checked = true
+            el2.checked = true;
           }
         }
         
       }
     },
     
-    showImageForDateTime(date: Date) {
-      const name = this.matchImageSetName(date)
-      const imageset_names = Object.keys(this.imagesetLayers)
-      imageset_names.forEach((iname: string) => {
+    showImageForDateTime(date: Date): boolean {
+      const name = this.matchImageSetName(date);
+      if (name == null) {
+        this.incomingItemSelect = null;
+        return false;
+      }
+      const imagesetNames = Object.keys(this.imagesetLayers);
+      let shown = false;
+      imagesetNames.forEach((iname: string) => {
         if (iname != name) {
-          this.setLayerOpacityForImageSet(iname, 0)
+          this.setLayerOpacityForImageSet(iname, 0);
         } else {
-          this.setLayerOpacityForImageSet(iname, 1)
+          this.setLayerOpacityForImageSet(iname, 1);
+          shown = true;
           // need to get the Place object for the image set and use it to set the view
           if (this.imagesetFolder != null) {
-            const places = this.imagesetFolder.get_children()
+            const places = this.imagesetFolder.get_children();
             if (places != null) {
-              const place = places.filter((place) => place.get_name() == iname)
-              this.incomingItemSelect = place[0]
+              const place = places.filter((place) => place.get_name() == iname);
+              this.incomingItemSelect = place[0];
             }
           }
           // const iset = this.wwtControl.getImagesetByName(iname)
@@ -1729,8 +1755,8 @@ export default defineComponent({
           //   instant: true
           // });
         }
-      })
-      
+      });
+      return shown;
     },
 
     centerOnCurrentDate(options?: MoveOptions) {
@@ -1745,8 +1771,7 @@ export default defineComponent({
     },
 
     updateForDateTime() {
-      this.logTimes('updateForDateTime')
-      this.setTime(this.dateTime);
+      if (!this.dontSetTime) { this.setTime(this.dateTime); }
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
@@ -1754,7 +1779,6 @@ export default defineComponent({
     },
 
     updateHorizon(when: Date | null = null) {
-      this.logTimes('updateHorizon',when)
       if (this.showHorizon) {
         this.createHorizon(when);
       } else {
@@ -1768,17 +1792,6 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
-    },
-
-    logTimes(pre: string, date = null as Date | null) { 
-      console.log('running',pre)
-      // console.log("::: selectedTime:", new Date(this.selectedTime))
-      // console.log('::: selectedDate:', this.selectedDate)
-      // console.log('::: wwtCurrentTime:', this.wwtCurrentTime)
-      // date = null // disable block w/o deleting (i.e. stop typescript from complaining)
-      if (date != null) {
-        console.log('::: manual date:', date)
-      }
     }
   },
 
@@ -1818,12 +1831,7 @@ export default defineComponent({
     },
 
     selectedDate() {
-      this.logTimes('selectedDate')
       this.updateForDateTime();
-    },
-
-    selectedTime() {
-      this.logTimes('selectedTime')
     },
     
     showLocationSelector(show: boolean) {
@@ -1863,7 +1871,7 @@ export default defineComponent({
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
-          })
+          });
         }, 350);
       }
     },
@@ -1875,13 +1883,26 @@ export default defineComponent({
       }
       const minTime = Math.min(...cometImageDates) - MILLISECONDS_PER_DAY;
       const maxTime = Math.max(...cometImageDates) + MILLISECONDS_PER_DAY;
-      this.selectedTime = minTime;
+
+      if(this.selectedTime < minTime || this.selectedTime >= maxTime){
+        this.selectedTime = minTime;
+      }
+
+      this.updateViewForDate({ zoomDeg: 60 });
+
       this.playingIntervalId = setInterval(() => {
+        if (this.playingWaitCount > 0) {
+          this.playingWaitCount -= 1;
+          return;
+        }
         if (this.selectedTime < maxTime) {
           this.moveOneDayForward();
           this.$nextTick(() => {
-            this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate({ zoomDeg: 60 });
+            const image = this.showImageForDateTime(this.dateTime);
+            this.updateViewForDate();
+            if (image) {
+              this.playingWaitCount = 1;
+            }
           });
         } else {
           this.playingCometPath = false;
@@ -2152,7 +2173,7 @@ body {
 }
 
 .dp__select {
-  color: #04D6B0;
+  color: #04D6B0 !important;
 }
 
 #show-controls {
@@ -2190,10 +2211,16 @@ body {
   }
 
   img {
-    height: 24px;
+    height: 35px;
     vertical-align: middle;
     margin: 2px;
   }
+
+  @media only screen and (max-width: 600px) {
+  img {
+    height: 24px;
+  }
+}
 
   svg {
     vertical-align: middle;

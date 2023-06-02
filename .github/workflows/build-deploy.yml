@@ -14,12 +14,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
     
       - name: Set up Node.js
         uses: actions/setup-node@v3
 
       - name: Yarn install
         run: yarn install
+
+      - name: Lint
+        run: yarn lint
 
       - name: Build
         run: yarn build
@@ -29,13 +33,48 @@ jobs:
         id: workspaces
         with:
           cmd: (cat package.json | jq -r '.workspaces | @sh') | tr -d \'
+
+      - name: BrowserStack env setup
+        uses: browserstack/github-actions/setup-env@master
+        with:
+          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+
+      - name: 'BrowserStack local tunnel setup'
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: start
+          local-identifier: random
+
+      - name: Run BrowserStack tests
+        run: |
+          set -xeuo pipefail
+          workspaces=(${{ steps.workspaces.outputs.value }})
+          for ws in "${workspaces[@]}"
+          do
+            if [[ $ws != 'common' && $ws != 'tests' && -d tests/${ws} ]]
+            then
+              cd $ws
+              yarn serve &
+              sleep 10 # give the local service time to start up
+              cd ../tests
+              yarn bs-local -e default,firefox,edge,safari --group $ws -o reports
+              pkill -f vue-cli-service # stop the servers
+              cd ..
+            fi
+          done
+
+      - name: 'BrowserStackLocal Stop'  # Terminating the BrowserStackLocal tunnel connection
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: stop
         
       - name: Rearrange for Pages
         run: |
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            if [ $ws != 'common' ]
+            if [[ $ws != 'common' && $ws != 'tests' ]]
             then
               mv ${ws}/dist dist/${ws}
             fi
