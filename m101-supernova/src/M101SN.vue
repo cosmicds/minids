@@ -156,6 +156,67 @@
           </template>
           <span>Watch video</span>
         </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showResetTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="video-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showResetTooltip = true"
+              @mouseleave="showResetTooltip = false"
+              v-bind="props"
+              @click="centerView"
+              @keyup.enter="centerView"
+              tabindex="0"
+            >
+              <font-awesome-icon
+                id="reset-icon"
+                class="control-icon"
+                icon="refresh"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Center the Pinwheel</span>
+        </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showConstellationTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="const-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showConstellationTooltip = true"
+              @mouseleave="showConstellationTooltip = false"
+              v-bind="props"
+              @click="showConstellations = !showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
+              tabindex="0"
+            >
+              <!-- add svg from url -->
+              <!-- https://github.com/johnarban/minids/blob/2fbeed8791a553f6360928b4fa38bc7c80726fe4/m101-supernova/src/assets/dipper.svg -->
+              <img src="https://raw.githubusercontent.com/johnarban/minids/m101-supernova-minids/m101-supernova/src/assets/dipper.svg" style="filter:invert(0)">
+              <!-- <font-awesome-icon
+                id="reset-icon"
+                class="control-icon"
+                icon="star"
+                size="lg"
+              ></font-awesome-icon> -->
+            </div>
+          </template>
+          <span>Show Constellations</span>
+        </v-tooltip>
       </div>
     </div>
     
@@ -292,6 +353,7 @@
       </div>
       
       <div
+        v-if="false"
         id="controls"
         class="control-icon-wrapper"
       >
@@ -319,7 +381,7 @@
                 {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
               </v-btn>
             
-            <v-btn
+            <!-- <v-btn
                 block
                 :color="accentColor"
                 @click="centerView"
@@ -327,7 +389,7 @@
                 class="mb-2"
               >
                 Center the Pinwheel
-            </v-btn>
+            </v-btn> -->
           
             <toggle
               :show="false"
@@ -863,6 +925,8 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showPlayPauseTooltip: false,
+      showResetTooltip: false,
+      showConstellationTooltip: false,
       showLocationSelector: false,
       showControls: false,
       tab: 0,
@@ -2318,6 +2382,12 @@ body {
 
 #video-icon-wrapper {
   display: initial;
+}
+
+#const-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .top-content {

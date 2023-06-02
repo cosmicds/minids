@@ -34,7 +34,9 @@ import {
   faTimes,
   faVideo,
   faCameraRetro,
-  faImages
+  faImages,
+  faRefresh,
+  faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
@@ -52,6 +54,8 @@ library.add(faImages);
 library.add(faGear);
 library.add(faPause);
 library.add(faPlay);
+library.add(faRefresh);
+library.add(faStar);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
