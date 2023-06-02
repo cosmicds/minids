@@ -6,6 +6,7 @@ import Credits from "./Credits.vue";
 import Toggle from "./Toggle.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import chartjsScatter from "./chartjs-scatter.vue";
+import d3Scatter from "./d3-scatter.vue";
 // import PlotDataPlotly from "./PlotDataPlotly.vue";
 
 import "./polyfills";
@@ -105,6 +106,7 @@ createApp(M101SN, {
   .component('date-picker', Datepicker)
   .component('toggle', Toggle)
   .component('chartjs-scatter', chartjsScatter)
+  .component('d3-scatter', d3Scatter)
   // .component('plot-plotly', PlotDataPlotly)
 
   // Mount
