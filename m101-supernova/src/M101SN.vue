@@ -200,10 +200,27 @@
             borderColor="#DD6BD9"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
-            @x0_pix="(val: number) => { chartXOffset = val, onResize() }"
+            @offset="(val: number) => { chartXOffset = val, onResize() }"
             
           />
-        </div>
+          </div>
+          <!-- <d3-scatter
+            scatter
+            line
+            reversedY
+            hideYAxis
+            :height="200"
+            :animation=false
+            :keys="{ x: 'time', y: 'magnitude' }"
+            :xrange="[new Date(Math.min(...dates.map(d => d))), new Date(Math.max(...dates.map(d => d)))]"
+            :yrange="[10.5,14]"
+            :color="accentColor"
+            :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            :lineData="dates.map(d => {return {x: d, y: 12.5}}).filter(d => (d.x < selectedTime ))"
+            @offset="(val: number) => { chartXOffset = val, onResize() }"
+          />
+          </div> -->
+        
         <span class="tool-container">
           <!-- <v-chip
             id="sliderlabel"
@@ -249,6 +266,7 @@
             <span>Watch the supernova change over time!</span>
           </v-tooltip>
           <vue-slider
+            adsorb
             id="slider"
             :marks="(d: number) => {
               return allDates.includes(d) || imageDates.includes(d);
@@ -722,8 +740,8 @@ function formatCsvTable(table: Table): string {
   // to be CRLF // lol
 }
 
-const fullDatesString = formatCsvTable(fullDatesTable);
-const imageDatesString = formatCsvTable(imageDatesTable);
+// const fullDatesString = formatCsvTable(fullDatesTable);
+// const imageDatesString = formatCsvTable(imageDatesTable);
 
 const allDates = fullDatesTable.map(r => r.date.getTime());
 const imageDates = [... new Set(imageDatesTable.map(r => r.date.getTime()))];
@@ -734,7 +752,7 @@ const dates: number[] = [];
 let t = minDate - (minDate % MILLISECONDS_PER_DAY);
 while (t <= maxDate) {
   dates.push(t);
-  t += MILLISECONDS_PER_DAY/12;
+  t += MILLISECONDS_PER_DAY/24;
 }
 
 for (const d of imageDates) {
@@ -1122,14 +1140,10 @@ export default defineComponent({
         return;
       }
 
-      console.log("inputRailWidth", inputRailWidth, this.chartXOffset);
-
       inputRailWidth += (this.chartXOffset + 8);
       
       chartContainer.style.width = `${inputRailWidth}px`;
       // chartContainer.style.left = `${inputRail.offsetLeft}px`;
-      console.log("chartContainer.style.width", chartContainer.style.width);
-      console.log("chartContainer.clientWidth", chartContainer.clientWidth);
       
       return;
     },
@@ -2272,9 +2286,7 @@ body {
 //   pointer-events: none;
 // }
 
-#chartjs {
-  // outline:1px solid red;
-}
+
 
 // makes the y-axis border look like an arrow
 #chart-container:after {
@@ -2333,10 +2345,12 @@ body {
 }
 
 div#main-content > div {
+  content: "";
   // outline: 1px solid orange;
 }
 
 div.bottom-content > div {
+  content: "";
   // outline: 1px solid rgb(154, 154, 251);
 }
 
@@ -2648,6 +2662,17 @@ video {
     cursor: grabbing;
   }
 }
+
+// adds a vertical line to track it better
+// .vue-slider-dot-handle::before {
+//   content:"";
+//   // position: absolute;
+//   // border-left: 3px solid white;
+//   // height: 500px;
+//   // transform: translateY(-500px) translateX(150%);
+//   // transform-origin: 0 100%;
+// }
+
 
 .mark-line {
   position: absolute;

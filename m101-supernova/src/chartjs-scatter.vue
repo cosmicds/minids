@@ -151,6 +151,10 @@ export default defineComponent({
   mounted() {
     this.draw();
 
+    new ResizeObserver(() => {
+      this.draw();
+    }).observe(this.$el);
+
   },
   methods: {
 
@@ -356,7 +360,7 @@ export default defineComponent({
       if (isNaN(val)) {
         return ;
       }
-      this.$emit("x0_pix", val);
+      this.$emit("offset", val);
       return val;
 
     },
