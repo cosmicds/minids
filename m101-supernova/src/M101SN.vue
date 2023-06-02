@@ -1014,23 +1014,20 @@ export default defineComponent({
       // Create the outer (purple) arrow
       this.outerArrow = new Poly();
 
-      console.log("Here");
-      const pointRADeg = this.m101RADeg + 0.05;
-      const centerDecDeg = this.m101DecDeg;
+      const pointRA = this.m101RADeg + 0.05;
+      const centerDec = this.m101DecDeg;
       const arrowHalfHeight = 0.02;
       const stemFraction = 0.4;
       const headWidth = 0.05;
       const stemWidth = 0.05;
-      const headBackRA = pointRADeg + headWidth;
+      const headBackRA = pointRA + headWidth;
       const stemBackRA = headBackRA + stemWidth;
-      const topDec = centerDecDeg + arrowHalfHeight;
-      const bottomDec = centerDecDeg - arrowHalfHeight;
+      const topDec = centerDec + arrowHalfHeight;
+      const bottomDec = centerDec - arrowHalfHeight;
       const stemHalfHeight = stemFraction * arrowHalfHeight;
-      const stemTopDec = centerDecDeg + stemHalfHeight;
-      const stemBottomDec = centerDecDeg - stemHalfHeight;
-      const headSlope = (topDec - centerDecDeg) / (headBackRA - pointRADeg);
-      const cOuter = topDec - headSlope * headBackRA;
-      this.outerArrow.addPoint(pointRADeg, centerDecDeg);
+      const stemTopDec = centerDec + stemHalfHeight;
+      const stemBottomDec = centerDec - stemHalfHeight;
+      this.outerArrow.addPoint(pointRA, centerDec);
       this.outerArrow.addPoint(headBackRA, topDec);
       this.outerArrow.addPoint(headBackRA, stemTopDec);
       this.outerArrow.addPoint(stemBackRA, stemTopDec);
@@ -1047,19 +1044,21 @@ export default defineComponent({
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
      
-      const delta = 0.005; // The thickness of the outer "border"
-      const innerPointRADeg = pointRADeg + 0.01;
+      const delta = 0.002; // The thickness of the outer "border"
+      const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
+      const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
       const innerHeadBackRA = headBackRA - delta; 
       const innerStemBackRA = stemBackRA - delta;
-      const cInner = cOuter - delta * Math.sqrt(1 + headSlope ** 2);
-      const innerTopDec = headSlope * (innerHeadBackRA) + cInner;
-      const innerBottomDec = 2 * centerDecDeg - innerTopDec;
-      this.innerArrow.addPoint(innerPointRADeg, centerDecDeg);
+      const innerTopDec = headSlope * (innerHeadBackRA - innerPointRA) + centerDec;
+      const innerBottomDec = 2 * centerDec - innerTopDec;
+      const innerStemTopDec = stemTopDec - 0.75 * delta;
+      const innerStemBottomDec = stemBottomDec + 0.75 * delta;
+      this.innerArrow.addPoint(innerPointRA, centerDec);
       this.innerArrow.addPoint(innerHeadBackRA, innerTopDec); 
-      this.innerArrow.addPoint(innerHeadBackRA, stemTopDec - delta / 2); 
-      this.innerArrow.addPoint(innerStemBackRA, stemTopDec - delta / 2); 
-      this.innerArrow.addPoint(innerStemBackRA, stemBottomDec + delta / 2);
-      this.innerArrow.addPoint(innerHeadBackRA, stemBottomDec + delta / 2);
+      this.innerArrow.addPoint(innerHeadBackRA, innerStemTopDec);
+      this.innerArrow.addPoint(innerStemBackRA, innerStemTopDec); 
+      this.innerArrow.addPoint(innerStemBackRA, innerStemBottomDec);
+      this.innerArrow.addPoint(innerHeadBackRA, innerStemBottomDec);
       this.innerArrow.addPoint(innerHeadBackRA, innerBottomDec);
 
       const innerColor = "#ffffff";
