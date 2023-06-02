@@ -915,7 +915,7 @@ export default defineComponent({
       this.gotoRADecZoom({
         raRad: D2R * this.m101RADeg,
         decRad: D2R * this.m101DecDeg,
-        zoomDeg: 0.3,
+        zoomDeg: 1,
         instant: true
       });
 
@@ -1165,30 +1165,6 @@ export default defineComponent({
         this.deleteLayer(this.currentAllLayer.id);
         this.currentAllLayer = null;
       }
-
-      //if (this.interpolatedDailyTable !== null) {
-      //  this.createTableLayer({
-      //    name: "Daily Date Layer",
-      //    referenceFrame: "Sky",
-      //    dataCsv: formatCsvTable(this.interpolatedDailyTable)
-      //  }).then((layer) => {
-      //    this.currentAllLayer = layer;
-      //    layer.set_lngColumn(1);
-      //    layer.set_latColumn(2);
-      //    layer.set_markerScale(MarkerScales.screen);
-      //    this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
-      //    this.applyTableLayerSettings({
-      //      id: layer.id.toString(),
-      //      settings: [
-      //        ["scaleFactor", 5],
-      //        ["plotType", PlotTypes.point],
-      //        ["color", Color.fromHex('#E562BC')],
-      //        //["sizeColumn", 3],
-      //        ["opacity", 1],
-      //      ]
-      //    });
-      //  });
-      //}
     },
 
     closeSplashScreen() {
