@@ -752,6 +752,7 @@ export default defineComponent({
 
       showAltAzGrid: false,
       showConstellations: true,
+      showArrow: true,
       showHorizon: false,
       outerArrow: null as Poly | null,
       innerArrow: null as Poly | null,
@@ -911,6 +912,9 @@ export default defineComponent({
       }, 100);
 
       this.createArrow();
+      if (this.showArrow) {
+        this.displayArrow();
+      }
 
       this.gotoRADecZoom({
         raRad: D2R * this.m101RADeg,
@@ -1039,8 +1043,6 @@ export default defineComponent({
       this.outerArrow.set_fillColor(this.accentColor);
       this.outerArrow.set_fill(true);
       
-      this.addAnnotation(this.outerArrow);
-
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
      
@@ -1065,8 +1067,35 @@ export default defineComponent({
       this.innerArrow.set_lineColor(innerColor);
       this.innerArrow.set_fillColor(innerColor);
       this.innerArrow.set_fill(true);
+    },
 
-      this.addAnnotation(this.innerArrow);
+    displayArrow() {
+      if (this.outerArrow == null || this.innerArrow == null) {
+        this.createArrow();
+      }
+      if (this.outerArrow) {
+        this.addAnnotation(this.outerArrow);
+      }
+      if (this.innerArrow) {
+        this.addAnnotation(this.innerArrow);
+      }
+    },
+
+    hideArrow() {
+      if (this.outerArrow) {
+        this.removeAnnotation(this.outerArrow);
+      }
+      if (this.innerArrow) {
+        this.removeAnnotation(this.innerArrow);
+      }
+    },
+
+    updateArrow(show: boolean) {
+      if (show) {
+        this.displayArrow();
+      } else {
+        this.hideArrow();
+      }
     },
 
     clearPlayingInterval() {
@@ -1900,6 +1929,9 @@ export default defineComponent({
   },
 
   watch: {
+    showArrow(show: boolean) {
+      this.updateArrow(show);
+    },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
