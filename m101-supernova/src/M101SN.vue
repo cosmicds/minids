@@ -236,15 +236,17 @@
                 }"
                 tabindex="0"
               >
+              Watch over time
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
                   :icon="!(playing || playingImagePath) ? 'play' : 'pause'"
-                  size="lg"
+                  size="sm"
                 ></font-awesome-icon>
+                
               </div>
             </template>
-            <span>Play/Pause</span>
+            <span>Watch the supernova change over time!</span>
           </v-tooltip>
           <vue-slider
             id="slider"
@@ -256,6 +258,7 @@
             @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
+            tooltip-placement="bottom"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
@@ -917,48 +920,48 @@ export default defineComponent({
       this.setClockSync(false);
       // create date with y m d h m s
 
-      layerPromises.push(this.createTableLayer({
-        name: "All Dates",
-        referenceFrame: "Sky",
-        dataCsv: fullDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 2.5],
-            ["plotType", PlotTypes.point],
-            ["color", Color.fromHex(this.ephemerisColor)],
-            //["sizeColumn", 4],
-            //["pointScaleType", PointScaleTypes.log],
-            ["opacity", 0.8]
-          ]
-        });
-        return layer;
-      }));
+      // layerPromises.push(this.createTableLayer({
+      //   name: "All Dates",
+      //   referenceFrame: "Sky",
+      //   dataCsv: fullDatesString
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 2.5],
+      //       ["plotType", PlotTypes.point],
+      //       ["color", Color.fromHex(this.ephemerisColor)],
+      //       //["sizeColumn", 4],
+      //       //["pointScaleType", PointScaleTypes.log],
+      //       ["opacity", 0.8]
+      //     ]
+      //   });
+      //   return layer;
+      // }));
 
-      layerPromises.push(this.createTableLayer({
-        name: "Comet Image Dates",
-        referenceFrame: "Sky",
-        dataCsv: imageDatesString
-      }).then((layer) => {
-        layer.set_lngColumn(1);
-        layer.set_latColumn(2);
-        layer.set_markerScale(MarkerScales.screen);
-        this.applyTableLayerSettings({
-          id: layer.id.toString(),
-          settings: [
-            ["scaleFactor", 4],
-            ["color", Color.fromHex('#FFFFFF')],
-            ["plotType", PlotTypes.point],
-            //["sizeColumn", 3],
-            ["opacity", 0.4]
-          ]
-        });
-        return layer;
-      }));
+      // layerPromises.push(this.createTableLayer({
+      //   name: "Comet Image Dates",
+      //   referenceFrame: "Sky",
+      //   dataCsv: imageDatesString
+      // }).then((layer) => {
+      //   layer.set_lngColumn(1);
+      //   layer.set_latColumn(2);
+      //   layer.set_markerScale(MarkerScales.screen);
+      //   this.applyTableLayerSettings({
+      //     id: layer.id.toString(),
+      //     settings: [
+      //       ["scaleFactor", 4],
+      //       ["color", Color.fromHex('#FFFFFF')],
+      //       ["plotType", PlotTypes.point],
+      //       //["sizeColumn", 3],
+      //       ["opacity", 0.4]
+      //     ]
+      //   });
+      //   return layer;
+      // }));
 
       this.setTime(this.dateTime);
 
@@ -1048,7 +1051,7 @@ export default defineComponent({
     },
     cssVars() {
       return {
-        '--comet-color': this.accentColor,
+        '--accent-color': this.accentColor,
         '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
@@ -2121,7 +2124,8 @@ html {
   -ms-overflow-style: none;
   // scrollbar-width: none;
   
-  --accent-color: #a0009b;
+  // --accent-color: #a0009b;
+  --accent-color: #d517cf;
   --accent-color2: #55a5e9;
 }
 
@@ -2226,10 +2230,10 @@ body {
 }
 
 .control-icon-wrapper {
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: #040404;
   padding: .5em 1em;
-  border: 1px solid var(--comet-color);
+  border: 1px solid var(--accent-color);
   border-radius: 1.25em;
   display: flex;
   justify-content: center;
@@ -2285,9 +2289,10 @@ body {
 
 
 #play-pause-icon-wrapper {
-  color: var(--ephemeris-color);
-  border-color: var(--ephemeris-color);
-  margin-left: 2rem;
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  margin-left: 0;
+  font-size: 0.75em;
 
   &:focus {
     color: white;
@@ -2376,7 +2381,7 @@ div.bottom-content > div {
   background: black;
   padding: 10px;
   border-radius: 10px;
-  border: solid 1px var(--comet-color);
+  border: solid 1px var(--accent-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
@@ -2385,7 +2390,7 @@ div.bottom-content > div {
   pointer-events: auto;
 
   .v-label {
-    // color: var(--comet-color);
+    // color: var(--accent-color);
     color: white;
     opacity: 1;
   }
@@ -2427,7 +2432,7 @@ div.bottom-content > div {
 }
 
 #show-controls {
-  color: var(--comet-color);
+  color: var(--accent-color);
 }
 
 .v-selection-control--focus-visible .v-selection-control__input::before {
@@ -2435,7 +2440,7 @@ div.bottom-content > div {
 }
 
 .ui-text {
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: black;
   padding: 5px 5px;
   border: 2px solid black;
@@ -2449,10 +2454,10 @@ div.bottom-content > div {
 
 .ui-button {
   text-align: center;
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: black;
   padding: 5px 5px;
-  border: 2px solid var(--comet-color);
+  border: 2px solid var(--accent-color);
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
   user-select: none;
@@ -2649,7 +2654,7 @@ video {
   height: 20px;
   width: 2px;
   margin: 0;
-  background-color: var(--comet-color);
+  background-color: var(--accent-color);
   transform: translateX(-50%) translateY(calc(-50% + 2px));
 
 }
