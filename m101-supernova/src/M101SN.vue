@@ -2202,8 +2202,7 @@ html {
   -ms-overflow-style: none;
   // scrollbar-width: none;
   
-  // --accent-color: #a0009b;
-  --accent-color: #d517cf;
+  --accent-color: #a0009b;
   --accent-color2: #55a5e9;
 }
 
@@ -2388,7 +2387,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  svg {
+    fill: var(--accent-color);
+    stroke: white;
+  }
 }
+
 
 .top-content {
   position: absolute;
