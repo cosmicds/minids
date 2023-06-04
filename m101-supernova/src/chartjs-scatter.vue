@@ -143,7 +143,7 @@ export default defineComponent({
     lineOptions: {
       type: Object,
       required: false,
-      default: () => ({}),
+      default: null,
     },
     
     
@@ -222,15 +222,17 @@ export default defineComponent({
 
     computedLineData() {
       if (this.line) {
-        if (this.lineData.length == 0) {
+        if (this.lineData == null) {
           return this.computedData;
-        } else {
+        }
+        
+        if (this.lineData.length > 0) {
           return this.lineData.map(d => (
             {
               x: this.getKey(d, this.keys['x'], 'x'),
               y: this.getKey(d, this.keys['y'], 'y'),
             }));
-        }
+        } 
       }
       return [{ x: null, y: null}];
     },
