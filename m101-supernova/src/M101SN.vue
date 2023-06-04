@@ -249,14 +249,14 @@
           <chartjs-scatter
             reversedY
             hideXAxis
-            line
             scatter
+            line
             :animation=false
             :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
-            :lineData="dates.map(d => {return {x: d, y: 12.5}}).filter(d => (d.x < selectedTime ))"
+            :lineData="aavsoLightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
-            :yrange="[10.5, 14]"
+            :yrange="[10.5, 16]"
             :color="accentColor"
             borderColor="#DD6BD9"
             :scatterOptions="{radius: 5, borderWidth: 2}"
@@ -733,10 +733,10 @@ import {
   m101DataList,
 } from "./m101";
 
-// import lightcuve data from assets/lightcuve.csv
+
 import {
-  lightCurve,
-} from "./lightcurve";
+  aavsoLightCurve,
+} from "./aavsolightcurve";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -754,9 +754,9 @@ function parseCsvTable(csv: string) {
       objectName: d.objectName as string,
       bandpass: d.Bandpass as string,
       wtmlName: d.wtmlName as string,
-      // get a date that looks like Month DD HH:MM
+      magnitude: +(d.magnitude ?? ""),
       dateString: thisDate.toUTCString().slice(4, 11) + " " + `${thisDate.getUTCHours()}` + ":" + thisDate.getUTCMinutes().toString().padStart(2, "0") + ` (${index})`,
-      // dateString: thisDate.toUTCString().slice(4, 10) + " " + thisDate.toTimeString().slice(0, 5),
+
       _filename: d.pngFilename as string,
       _index: index as number,
     };
@@ -767,7 +767,7 @@ const imageDatesTable = parseCsvTable(m101DataList);
 
 
 // parse the lightCurve data into a D3 table
-const lightCurveTable = csvParse(lightCurve, (d) => {
+const aavsoLightCurveTable = csvParse(aavsoLightCurve, (d) => {
   // d.timestamp
   // d.magnitude
   return {
@@ -776,6 +776,7 @@ const lightCurveTable = csvParse(lightCurve, (d) => {
 
   };
 });
+
 
 
 // NB: The two tables have identical structures.
@@ -904,7 +905,7 @@ export default defineComponent({
 
       // imageNames: {} as Record<string, string>,
       // imageSortBy: {} as Record<string, number>,
-      imageNames: Object.fromEntries(imageDatesTable.map( d => [d.wtmlName, d.dateString] )),
+      imageNames: Object.fromEntries(imageDatesTable.map(d => [d.wtmlName, d.dateString])),
       imageSortBy: Object.fromEntries(imageDatesTable.map(d => [d.wtmlName, d.date.getTime()])),
       imageDateRef: { 'names': imageDatesTable.map(d => d.wtmlName), 'dates': imageDatesTable.map(d => d.date.getTime()) },
       imageDateRefInv: Object.fromEntries(imageDatesTable.map(d => [d.date.getTime(), d.wtmlName])),
@@ -914,9 +915,17 @@ export default defineComponent({
       accentColor: "#a0009b",
       todayColor: "#D6B004",
 
-      lightCurveData: lightCurveTable,
+      aavsoLightCurveData: aavsoLightCurveTable,
+      // lightCurveData: imageDatesTable.map(d => { 'time': d.date, 'magnitude': d.magnitude };),
+      lightCurveData: imageDatesTable.map(d => {
+        return {
+          time: d.date,
+          magnitude: d.magnitude
+        };
+      }),
+      
       incomingItemSelect: null as Thumbnail | null,
-      m101Position: {ra: 210.802, dec: 54.348},
+      m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
       chartXOffset: 0,
 
@@ -1433,7 +1442,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * iset.get_centerX(),
               decRad: D2R * iset.get_centerY(),
-              zoomDeg: place.get_zoomLevel() * 2.5,
+              zoomDeg: place.get_zoomLevel(),
               instant: true
             });
           }
@@ -1525,7 +1534,7 @@ export default defineComponent({
       this.updateImageOpacity(place, opacity);
 
       this.$nextTick(() => {
-        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
           const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
           if (month && day && year) {
@@ -1939,7 +1948,7 @@ export default defineComponent({
       const closestDate = this.binarySearch(this.imageDateSorted, thisDate);
 
       // within 1 hour, in milliseconds
-      if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
+      // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
       if (this.incomingItemSelect?.get_name() == name) {
@@ -2032,7 +2041,7 @@ export default defineComponent({
       this.gotoRADecZoom({
         raRad: this.m101Position.ra * D2R,
         decRad: this.m101Position.dec * D2R,
-        zoomDeg: 10,
+        zoomDeg: this.m101Position.zoom,
         instant: true,
       });
       // const now = new Date();
@@ -2760,7 +2769,7 @@ video {
 }
 
 .left-content {
-  display: none !important;
+  // display: none !important;
   position: absolute;
   left: 1rem;
   top: 1rem;

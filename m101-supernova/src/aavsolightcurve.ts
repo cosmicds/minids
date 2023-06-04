@@ -1,4 +1,4 @@
-export const lightCurve = `timestamp,magnitude
+export const aavsoLightCurve = `timestamp,magnitude
 1684582049000,13.385333333333335
 1684625249000,11.972410256410257
 1684668449000,11.845833333333333
