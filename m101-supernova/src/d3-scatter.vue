@@ -136,7 +136,7 @@ export default defineComponent({
     this.$emit("offset", this.x0Pixel());
     // create resize watcher
     new ResizeObserver(() => {
-      console.log("resize");
+
       if (this.$el.querySelector("svg") != null) {
         d3.select("#plot").selectAll("svg").remove();
         this.draw();

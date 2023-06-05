@@ -358,7 +358,7 @@ export default defineComponent({
       }
       
       const val = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.min as number);
-      console.log(val);
+
       if (isNaN(val)) {
         return ;
       }
