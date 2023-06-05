@@ -337,7 +337,8 @@
             @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
-            tooltip-placement="bottom"
+            tooltip-placement="top"
+            tooltip-style="opacity: 0.75"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
@@ -2376,6 +2377,7 @@ body {
   position: initial;
   margin-left: auto;
   margin-right: 30px;
+  opacity: 0.5;
 }
 
 
