@@ -451,7 +451,23 @@
           </div>
         </transition-expand>
       </div>
-      
+      <div class="opacity-slider-wrapper">
+        <vue-slider
+              v-if="!smallSize"
+              class="opacity-slider"
+              adsorb
+              :min="0"
+              :max="1"
+              :interval="0.01"
+              id="slider"
+              :order="false"
+              tooltipPlacement="bottom"
+              v-model="currentOpacity"
+              @change="(opacity: number) => setLayerOpacityForImageSet(currentLayer ? currentLayer.get_name() : '', opacity, false)"
+              >
+              <span>Change image opacity</span>
+      </vue-slider>
+    </div>
       <mini-credits></mini-credits>
     </div>
 
@@ -815,7 +831,7 @@ const dates: number[] = [];
 let t = minDate - (minDate % MILLISECONDS_PER_DAY);
 while (t <= maxDate) {
   dates.push(t);
-  t += MILLISECONDS_PER_DAY/24;
+  t += MILLISECONDS_PER_DAY/6;
 }
 
 for (const d of imageDates) {
@@ -883,6 +899,7 @@ export default defineComponent({
       positionSet: false,
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
+      places: {} as Record<string, Place>,
 
       playing: false,
       playingImagePath: false,
@@ -893,9 +910,12 @@ export default defineComponent({
       showConstellations: true,
       showHorizon: false,
 
+      showSpeadSheetLater: false,
+
       currentCometImageLayer: null as SpreadSheetLayer | null,
       currentAllLayer: null as SpreadSheetLayer | null,
       interpolatedDailyTable: null as Table | null,
+      currentLayer: null as Layer | null,
 
       imageDates: imageDates,
       allDates: allDates,
@@ -923,6 +943,8 @@ export default defineComponent({
           magnitude: d.magnitude
         };
       }),
+
+      currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,
       m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
@@ -994,6 +1016,7 @@ export default defineComponent({
           goto: false
         }).then((layer) => {
           this.imagesetLayers[name] = layer;
+          this.places[name] = item;
           applyImageSetLayerSetting(layer, ["opacity", 0]);
           return layer;
         }));
@@ -1311,7 +1334,8 @@ export default defineComponent({
     },
 
     updateLayersForDate() {
-
+      if (!this.showSpeadSheetLater) { return; }
+      
       this.interpolatedDailyTable = this.interpolatedTable(fullDatesTable);
       if (this.currentAllLayer !== null) {
         this.deleteLayer(this.currentAllLayer.id);
@@ -1536,10 +1560,11 @@ export default defineComponent({
       this.$nextTick(() => {
         const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
-          const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-          if (month && day && year) {
-            this.selectedTime = Date.UTC(year, month - 1, day); 
-          }
+          this.selectedTime = this.imageSortBy[iset.get_name()];
+          // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+          // if (month && day && year) {
+          //   this.selectedTime = Date.UTC(year, month - 1, day); 
+          // }
           
           
           this.incomingItemSelect = place;
@@ -2012,14 +2037,19 @@ export default defineComponent({
               this.incomingItemSelect = place[0];
             }
           }
-          // const iset = this.wwtControl.getImagesetByName(iname)
-          // if (iset == null) { return; }
-          // this.gotoRADecZoom({
-          //   raRad: D2R * iset.get_centerX(),
-          //   decRad: D2R * iset.get_centerY(),
-          //   zoomDeg: this.wwtZoomDeg,
-          //   instant: true
-          // });
+          const iset = this.wwtControl.getImagesetByName(iname);
+          const place = this.places[iname];
+          if (iset == null) { return; }
+          if (place == null) { return; }
+          this.$nextTick(() => {
+            this.gotoRADecZoom({
+              raRad: D2R * place.get_RA() * 15,
+              decRad: D2R * place.get_dec(),
+              zoomDeg: place.get_zoomLevel(),
+              instant: true
+            });
+          });
+          
         }
       });
       return shown;
@@ -2032,6 +2062,8 @@ export default defineComponent({
         return false;
       }
       console.log(`showImageForDateTime: ${name}`);
+      this.currentLayer = this.imagesetLayers[name];
+      this.currentOpacity = 1;
       return this.showImagesetByName(name);
 
     },
@@ -2044,6 +2076,9 @@ export default defineComponent({
         zoomDeg: this.m101Position.zoom,
         instant: true,
       });
+      // show the first image
+      this.selectedTime = this.imageDates[0];
+      this.onTimeSliderChange();
       // const now = new Date();
       // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
       // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
@@ -2416,6 +2451,27 @@ body {
   align-items: flex-start;
 }
 
+
+div.opacity-slider-wrapper {
+  display:flex;
+  position:absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 200px;
+  border-radius: 20px;
+  
+  .opacity-slider {
+    pointer-events: auto;
+
+  }
+  span {
+    color: white;
+    margin-top: 0.75em;
+    font-size: 0.75em;
+  }
+}
+
+
 .bottom-content {
   display: flex;
   flex-direction: column;
@@ -2769,7 +2825,7 @@ video {
 }
 
 .left-content {
-  // display: none !important;
+  display: none !important;
   position: absolute;
   left: 1rem;
   top: 1rem;
