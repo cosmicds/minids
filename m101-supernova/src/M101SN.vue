@@ -196,7 +196,7 @@
           <template v-slot:activator="{ props }">
             <div
               id="const-icon-wrapper"
-              class="control-icon-wrapper"
+              :class='["control-icon-wrapper", showConstellations ? "active" : ""]'
               @mouseover="showConstellationTooltip = true"
               @mouseleave="showConstellationTooltip = false"
               v-bind="props"
@@ -2061,7 +2061,6 @@ export default defineComponent({
         // this.incomingItemSelect = null;
         return false;
       }
-      console.log(`showImageForDateTime: ${name}`);
       this.currentLayer = this.imagesetLayers[name];
       this.currentOpacity = 1;
       return this.showImagesetByName(name);
@@ -2070,15 +2069,16 @@ export default defineComponent({
 
     
     centerView(_options?: MoveOptions) {
+      const firstPlace = this.places[Object.keys(this.places)[0]];
       this.gotoRADecZoom({
         raRad: this.m101Position.ra * D2R,
         decRad: this.m101Position.dec * D2R,
-        zoomDeg: this.m101Position.zoom,
+        zoomDeg: firstPlace.get_zoomLevel()*6,
         instant: true,
       });
       // show the first image
       this.selectedTime = this.imageDates[0];
-      this.onTimeSliderChange();
+      this.onTimeSliderChange({zoomDeg: firstPlace.get_zoomLevel()});
       // const now = new Date();
       // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
       // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
@@ -2438,6 +2438,9 @@ body {
   }
 }
 
+.active {
+  background-color: #340032a7;
+}
 
 .top-content {
   position: absolute;
