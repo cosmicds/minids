@@ -72,7 +72,7 @@ createApp(M101SN, {
   wtml: { // images are listed in chronological order earliest to latest
     imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/m101_all.wtml",
   },
-  url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
+  url: "https://web.wwtassets.org/specials/2023/cosmicds-pinwheel/",
   thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
   bgWtml: "https://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/jwst_smacs0723.wtml",
   bgName: "unwise"
