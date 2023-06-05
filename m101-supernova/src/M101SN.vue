@@ -2045,7 +2045,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * place.get_RA() * 15,
               decRad: D2R * place.get_dec(),
-              zoomDeg: place.get_zoomLevel(),
+              zoomDeg: this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg,
               instant: true
             });
           });
@@ -2372,7 +2372,7 @@ body {
 }
 
 #chart-container {
-  pointer-events: auto;
+  pointer-events: none;
   position: initial;
   margin-left: auto;
   margin-right: 30px;
