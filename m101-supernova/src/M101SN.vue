@@ -253,7 +253,7 @@
             line
             :animation=false
             :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
-            :lineData="aavsoLightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            :lineData="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
             :yrange="[10.5, 16]"
