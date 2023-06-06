@@ -145,7 +145,24 @@ export default defineComponent({
       required: false,
       default: null,
     },
-    
+
+    axisOptions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+
+    xAxisOptions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+
+    yAxisOptions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
     
   },
   mounted() {
@@ -301,37 +318,20 @@ export default defineComponent({
             type: 'linear' ,
             min: this.xrange[0],
             max: this.xrange[1],
-            reverse: this.reversedX
-            // position: "bottom", // axis is along the bottom
+            reverse: this.reversedX,
+            ...this.axisOptions,
+            ...this.xAxisOptions,
           },
-
+          // https://www.chartjs.org/docs/latest/axes/styling.html#tick-configuration
           y: {
             display: !this.hideYAxis,
             type: 'linear',
             reverse: this.reversedY,
             min: this.computedYRange[0],
             max: this.computedYRange[1],
-            title: {
-              display: true,
-              text: "Brightness",
-              color: 'white',
-            },
-            border: {
-              display: true,
-              color: 'white',
-              width: 2,
-              // top: false,
-              // bottom: false,
-              // left: false,
-              // right: false
-            },
-            grid: {
-            },
-            ticks: { // https://www.chartjs.org/docs/latest/axes/styling.html#tick-configuration
-              display: false,
-              stepSize: 1,
-              autoSkip: true,
-            }
+            ...this.axisOptions,
+            ...this.yAxisOptions,
+            
           }
         },
 
