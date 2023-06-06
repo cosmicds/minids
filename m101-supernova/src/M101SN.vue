@@ -2380,41 +2380,60 @@ body {
 }
 
 #chart-container {
-  pointer-events: none;
-  position: initial;
+  pointer-events: auto;
   margin-left: auto;
   margin-right: 30px;
-  opacity: 0.5;
+  box-shadow: -4px 0 0 0 #ccc;
+  color: #ccc;
+  
+  // makes the y-axis border look like an arrow
+  &:before {
+    content: "^";
+    position: absolute;
+    font-size: 1.5em;
+    font-weight: bold;
+    transform: translateX(-.51em) translateY(-.55em);
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+
+  #yaxis-text {
+    font-size: 1.15em;
+    max-width: fit-content;
+    position: absolute;
+    top: 50%;
+    transform: translate(calc(-100% - 20px), -150%);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  #xaxis-text {
+    width: 30%;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    bottom: 1em;
+    box-shadow: 0px -4px 0px 0px #ccc;
+    transform: translate(-50%, 0);
+    
+    &:after {
+      content: "^";
+      position: absolute;
+      right: 0;
+      top: calc(-1.5em/3);
+      font-size: 1.5em;
+      line-height: 0;
+      font-weight: bold;
+      transform: translateX(75%) rotate(90deg);
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    font-size: 0.75em;
+  }
+  
 }
-
-
-// make a vertical line with text "brightness" in psuedoelement before #chart-container div
-// #chart-container:before {
-//   content: "Brightness";
-//   position: absolute;
-//   top: 15%;
-//   border: 1px solid red;
-//   transform: translateX(-100%) rotate(-90deg);
-//   transform-origin: 100% 100%;
-//   color: white;
-//   font-size: 1em;
-//   font-weight: normal;
-//   pointer-events: none;
-// }
-
-
-
-// makes the y-axis border look like an arrow
-#chart-container:after {
-  content: "^";
-  position: absolute;
-  top: 0;
-  font-size: 1.5em;
-  transform: translateX(.86em) translateY(-.2em);
-  transform-origin: 0 0;
-  pointer-events: none;
-}
-
 
 #play-pause-icon-wrapper {
   color: var(--accent-color);
