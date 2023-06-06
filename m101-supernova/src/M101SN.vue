@@ -245,10 +245,15 @@
 
       <div id="tools">
           <div id="chart-container">
+            <div id="yaxis-text">
+              Supernova<br/>
+              Brightness
+            </div>
             <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
           <chartjs-scatter
             reversedY
             hideXAxis
+            hideYAxis
             scatter
             line
             :animation=false
@@ -261,26 +266,27 @@
             borderColor="#DD6BD9"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
+            :yAxisOptions="{
+              title: { display: false,
+                text: 'Supernova Brightness',
+                color: 'white',
+                },
+              border: { display: true,
+                color: 'white',
+                width: 3,
+              },
+              ticks: {display: false},
+              }"
             @offset="(val: number) => { chartXOffset = val, onResize() }"
             
           />
+          
+          <div id="xaxis-text">
+              Time
+            </div>
+          
           </div>
-          <!-- <d3-scatter
-            scatter
-            line
-            reversedY
-            hideYAxis
-            :height="200"
-            :animation=false
-            :keys="{ x: 'time', y: 'magnitude' }"
-            :xrange="[new Date(Math.min(...dates.map(d => d))), new Date(Math.max(...dates.map(d => d)))]"
-            :yrange="[10.5,14]"
-            :color="accentColor"
-            :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
-            :lineData="dates.map(d => {return {x: d, y: 12.5}}).filter(d => (d.x < selectedTime ))"
-            @offset="(val: number) => { chartXOffset = val, onResize() }"
-          />
-          </div> -->
+          
         
         <span class="tool-container">
           <!-- <v-chip
