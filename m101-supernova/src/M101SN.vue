@@ -1243,7 +1243,8 @@ export default defineComponent({
         return;
       }
 
-      inputRailWidth += (this.chartXOffset + 8);
+      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
+      inputRailWidth += (this.chartXOffset + 8 + borderWidth*2);
       
       chartContainer.style.width = `${inputRailWidth}px`;
       // chartContainer.style.left = `${inputRail.offsetLeft}px`;
