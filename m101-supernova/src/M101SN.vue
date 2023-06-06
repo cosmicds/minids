@@ -204,15 +204,13 @@
               @keyup.enter="showConstellations = !showConstellations"
               tabindex="0"
             >
-              <!-- add svg from url -->
-              <!-- https://github.com/johnarban/minids/blob/2fbeed8791a553f6360928b4fa38bc7c80726fe4/m101-supernova/src/assets/dipper.svg -->
-              <img src="https://raw.githubusercontent.com/johnarban/minids/m101-supernova-minids/m101-supernova/src/assets/dipper.svg" style="filter:invert(0)">
-              <!-- <font-awesome-icon
-                id="reset-icon"
-                class="control-icon"
-                icon="star"
-                size="lg"
-              ></font-awesome-icon> -->
+              <constellation-icon 
+                :selected="showConstellations"
+                width="20px"
+                :color="accentColor"
+                fill
+              />
+
             </div>
           </template>
           <span>Show Constellations</span>
