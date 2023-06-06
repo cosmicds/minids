@@ -1035,7 +1035,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.getLocation(true);
+      // this.getLocation(true);
       this.setClockSync(false);
       // create date with y m d h m s
 
