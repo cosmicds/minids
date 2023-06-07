@@ -266,8 +266,6 @@
             <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
           <chartjs-scatter
             reversedY
-            hideXAxis
-            hideYAxis
             scatter
             line
             :animation=false
@@ -275,9 +273,9 @@
             :lineData="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
-            :yrange="[10.5, 16]"
+            :yrange="[10.5, 17]"
             :color="accentColor"
-            borderColor="#DD6BD9"
+            :borderColor="accentColor3"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
             :yAxisOptions="{
@@ -287,9 +285,17 @@
                 },
               border: { display: true,
                 color: 'white',
-                width: 3,
+                width: 4,
               },
               ticks: {display: false},
+              }"
+              :xAxisOptions="{
+                border: { display: true,
+                  color: 'white',
+                  width: 4,
+                },
+                title: {display: false},
+                ticks: {display: false},
               }"
             @offset="(val: number) => { chartXOffset = val, onResize() }"
             
@@ -357,7 +363,7 @@
             @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
-            tooltip-placement="top"
+            tooltip-placement="bottom"
             tooltip-style="opacity: 0.75"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
@@ -960,7 +966,7 @@ export default defineComponent({
       ephemerisColor: "#D60493",
       accentColor: "#a0009b",
       accentColor2: "#9A2976",
-      accentColor3: "#d6046d",
+      accentColor3: "#DD6BD9",
       accentColor4: " #0493d6",
       activeButtonColor: "#aa00fb68",
       todayColor: "#D6B004",
@@ -2448,19 +2454,24 @@ body {
 }
 
 #chart-container {
+  --line-color: white;
   pointer-events: auto;
   margin-left: auto;
   margin-right: 30px;
-  box-shadow: -4px 0 0 0 #ccc;
-  color: #ccc;
+  // box-shadow: -4px 0 0 0 var(--line-color);
+  color: var(--line-color);
+  margin-bottom: -33px;
   
   // makes the y-axis border look like an arrow
   &:before {
     content: "^";
+    // display: none;
     position: absolute;
     font-size: 1.5em;
     font-weight: bold;
-    transform: translateX(-.51em) translateY(-.55em);
+    // for box-shadow axis
+    // transform: translateX(-.51em) translateY(-.55em);
+    transform: translateX(-10%) translateY(-.35em);
     transform-origin: 0 0;
     pointer-events: none;
   }
@@ -2472,6 +2483,7 @@ body {
     top: 50%;
     transform: translate(calc(-100% - 20px), -150%);
     background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
   }
   
   #xaxis-text {
@@ -2480,22 +2492,25 @@ body {
     position: absolute;
     left: 50%;
     bottom: 1em;
-    box-shadow: 0px -4px 0px 0px #ccc;
+    // box-shadow: 0px -4px 0px 0px var(--line-color);
     transform: translate(-50%, 0);
-    
-    &:after {
-      content: "^";
-      position: absolute;
-      right: 0;
-      top: calc(-1.5em/3);
-      font-size: 1.5em;
-      line-height: 0;
-      font-weight: bold;
-      transform: translateX(75%) rotate(90deg);
-      transform-origin: 0 0;
-      pointer-events: none;
-    }
+    padding: 2px 5px;
   }
+  &:after {
+    content: "^";
+    position: absolute;
+    right: 0;
+    // top: calc(-1.5em/3);
+    font-size: 1.5em;
+    line-height: 0;
+    font-weight: bold;
+    // transform: translateX(75%) rotate(90deg);
+    transform: translateX(-.9em) translateY(-.75em) rotate(90deg);
+    color: #ccc;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+  
   
   @media (max-width: 600px) {
     font-size: 0.75em;
@@ -2570,6 +2585,7 @@ div.opacity-slider-wrapper {
     font-size: 0.75em;
   }
 }
+
 
 
 .bottom-content {
