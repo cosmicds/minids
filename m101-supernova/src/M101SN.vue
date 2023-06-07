@@ -1109,6 +1109,9 @@ export default defineComponent({
         });
       });
 
+      // set to use SDSS as background
+      // this.wwtControl.setBackgroundImageByName("SDSS: Sloan Digital Sky Survey (Optical) [DR7]");
+      this.wwtControl.setBackgroundImageByName(this.bgName ? this.bgName : "Digitized Sky Survey (Color)");
       this.wwtSettings.set_localHorizonMode(false);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
