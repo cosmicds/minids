@@ -5,6 +5,10 @@ import FolderView from "./FolderView.vue";
 import Credits from "./Credits.vue";
 import Toggle from "./Toggle.vue";
 import TransitionExpand from "./TransitionExpand.vue";
+import chartjsScatter from "./chartjs-scatter.vue";
+import d3Scatter from "./d3-scatter.vue";
+// import PlotDataPlotly from "./PlotDataPlotly.vue";
+import ConstellationIcon from "./ConstellationIcon.vue";
 
 import "./polyfills";
 
@@ -31,7 +35,9 @@ import {
   faTimes,
   faVideo,
   faCameraRetro,
-  faImages
+  faImages,
+  faRefresh,
+  faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
@@ -49,6 +55,8 @@ library.add(faImages);
 library.add(faGear);
 library.add(faPause);
 library.add(faPlay);
+library.add(faRefresh);
+library.add(faStar);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
@@ -65,10 +73,10 @@ createApp(M101SN, {
   wtml: { // images are listed in chronological order earliest to latest
     imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/m101_all.wtml",
   },
-  url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/",
-  thumbnailUrl: "https://cdn.worldwidetelescope.org/thumbnails/jwst.jpg",
-  bgWtml: "https://data1.wwtassets.org/packages/2022/07_jwst/smacs0723/jwst_smacs0723.wtml",
-  bgName: "unwise"
+  url: "https://cosmicds.github.io/minids/m101-supernova/",
+  thumbnailUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/M101_hires_STScI-PRC2006-10a.jpg/307px-M101_hires_STScI-PRC2006-10a.jpg",
+  bgWtml: "",
+  bgName: ""
 })
 
   // Plugins
@@ -102,6 +110,10 @@ createApp(M101SN, {
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
   .component('toggle', Toggle)
+  .component('chartjs-scatter', chartjsScatter)
+  .component('d3-scatter', d3Scatter)
+  // .component('plot-plotly', PlotDataPlotly)
+  .component('constellation-icon', ConstellationIcon)
 
   // Mount
   .mount("#app");

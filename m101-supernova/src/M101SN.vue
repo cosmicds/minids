@@ -20,12 +20,39 @@
       :model-value="showSplashScreen"
       absolute
       opacity="0.6"
+      :style="cssVars"
       id="splash-overlay"
     >
       <div id="splash-screen"
         @click="closeSplashScreen"
       >
-      <p> M101 Supernova</p>
+        <div id="splash-screen-text">
+          <p> Want to see a </p> 
+          <p class="highlight"> Star Explode </p> 
+          <p class="small"> in a galaxy far far away... </p>
+        </div>
+        
+        <div id="splash-screen-guide">
+          Watch the demo <font-awesome-icon
+            id="video-icon"
+            class="control-icon"
+            icon="video"
+            size="lg"
+          />,
+          read the guide <font-awesome-icon
+            id="text-icon"
+            class="control-icon"
+            icon="book-open"
+            size="lg"/> or close me to get started!
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This mini data story is brought to you by NASA's SciAct <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS program</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank">AAS WorldWide Telescope</a>.
+        </div>
+        
+        <div id="splash-screen-icons">
+          <mini-credits/>
+        </div>
     </div>
     </v-overlay>
 
@@ -44,6 +71,7 @@
 
     <div class="top-content">
       <div
+        v-if="false"
         id="video-icon-dummy"
         class="control-icon-wrapper"
       >
@@ -56,6 +84,7 @@
       </div>
       <div id="center-buttons">
         <v-tooltip
+          v-if="false"
           v-model="showMapTooltip"
           location="bottom"
           :open-on-click="false"
@@ -143,6 +172,65 @@
           </template>
           <span>Watch video</span>
         </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showResetTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="video-icon-wrapper"
+              class="control-icon-wrapper"
+              @mouseover="showResetTooltip = true"
+              @mouseleave="showResetTooltip = false"
+              v-bind="props"
+              @click="centerView"
+              @keyup.enter="centerView"
+              tabindex="0"
+            >
+              <font-awesome-icon
+                id="reset-icon"
+                class="control-icon"
+                icon="refresh"
+                size="lg"
+              ></font-awesome-icon>
+            </div>
+          </template>
+          <span>Center the Pinwheel</span>
+        </v-tooltip>
+        <v-tooltip
+          location="start"
+          :open-on-click="false"
+          :open-on-focus="false"
+          :open-on-hover="true"
+          v-model="showConstellationTooltip"
+          :offset="smallSize ? 0 : '45px'"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+              id="const-icon-wrapper"
+              :class='["control-icon-wrapper", showConstellations ? "active" : ""]'
+              @mouseover="showConstellationTooltip = true"
+              @mouseleave="showConstellationTooltip = false"
+              v-bind="props"
+              @click="showConstellations = !showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
+              tabindex="0"
+            >
+              <constellation-icon 
+                :selected="showConstellations"
+                width="20px"
+                :color="accentColor"
+                fill
+              />
+
+            </div>
+          </template>
+          <span>Show Constellations</span>
+        </v-tooltip>
       </div>
     </div>
     
@@ -168,98 +256,52 @@
     </div>
     
     <div class="bottom-content">
-      <div
-        id="controls"
-        class="control-icon-wrapper"
-      >
-        <div id="controls-top-row">
-          <font-awesome-icon
-            size="lg"
-            class="ma-1"
-            :color="accentColor"
-            :icon="showControls ? `chevron-down` : `gear`"
-            @click="showControls = !showControls"
-            @keyup.enter="showControls = !showControls"
-            tabindex="0"
-          />
-        </div>
-        <transition-expand>
-          <div v-if="showControls" class="controls-content">
-            <toggle
-              :show="false"
-              :color="accentColor"
-              :item="showAltAzGrid"
-              label="Grid"
-              @toggle="showAltAzGrid = $event"
-            />
-            <toggle
-              :color="accentColor"
-              :item="showConstellations"
-              label="Constellations"
-              @toggle="showConstellations = $event"
-            />
-            <toggle
-              :show="false"
-              :color="accentColor"
-              :item="showHorizon"
-              label="Horizon"
-              @toggle="showHorizon = $event"
-            />
-            <div
-              style="color:white;"
-              class="mt-3"
-            >
-              Selected location's time:
-            </div>
-            <date-picker
-              dark
-              time-picker
-              enable-seconds
-              :is-24="false"
-              v-model="timeOfDay"
-              :clearable="false"
-              close-on-scroll
-              class="mb-4 mt-1"
-            >
-              <template #input-icon>
-                <font-awesome-icon
-                  icon="clock"
-                  class="mx-2"
-                  :color="accentColor"
-                ></font-awesome-icon>
-              </template>
-            </date-picker>
-            <v-btn
-              block
-              :color="accentColor"
-              @click="centerOnCurrentDate"
-              @keyup.enter="centerOnCurrentDate"
-              class="mb-2"
-            >
-              Center on Now
-            </v-btn>
-            <v-btn
-              block
-              :color="accentColor"
-              @click="() => {
-                playing = false;
-                playingImagePath = !playingImagePath;
-              }"
-            >
-              {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
-            </v-btn>
-            <!--
-            <v-btn
-              block
-              :color="accentColor"
-              @click="setToFirstCometImage"
-            >
-              Best view for comet images
-            </v-btn> -->
-          </div>
-        </transition-expand>
-      </div>
+
       <div id="tools">
+          <div id="chart-container">
+            <div id="yaxis-text">
+              Supernova<br/>
+              Brightness
+            </div>
+            <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
+          <chartjs-scatter
+            reversedY
+            hideXAxis
+            hideYAxis
+            scatter
+            line
+            :animation=false
+            :data="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            :lineData="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
+            :keys="{ x: 'time', y: 'magnitude' }"
+            :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
+            :yrange="[10.5, 16]"
+            :color="accentColor"
+            borderColor="#DD6BD9"
+            :scatterOptions="{radius: 5, borderWidth: 2}"
+            :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
+            :yAxisOptions="{
+              title: { display: false,
+                text: 'Supernova Brightness',
+                color: 'white',
+                },
+              border: { display: true,
+                color: 'white',
+                width: 3,
+              },
+              ticks: {display: false},
+              }"
+            @offset="(val: number) => { chartXOffset = val, onResize() }"
+            
+          />
+          
+          <div id="xaxis-text">
+              Time
+            </div>
+          
+          </div>
+          
+        
         <span class="tool-container">
           <!-- <v-chip
             id="sliderlabel"
@@ -292,17 +334,20 @@
                 }"
                 tabindex="0"
               >
+              Watch over time
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
                   :icon="!(playing || playingImagePath) ? 'play' : 'pause'"
-                  size="lg"
+                  size="sm"
                 ></font-awesome-icon>
+                
               </div>
             </template>
-            <span>Play/Pause</span>
+            <span>Watch the supernova change over time!</span>
           </v-tooltip>
           <vue-slider
+            adsorb
             id="slider"
             :marks="(d: number) => {
               return allDates.includes(d) || imageDates.includes(d);
@@ -312,6 +357,8 @@
             @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
+            tooltip-placement="top"
+            tooltip-style="opacity: 0.75"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
@@ -325,6 +372,123 @@
             </vue-slider>
           </span>
       </div>
+      
+      <div
+        v-if="false"
+        id="controls"
+        class="control-icon-wrapper"
+      >
+        <div id="controls-top-row">
+          <font-awesome-icon
+            size="lg"
+            class="ma-1"
+            :color="accentColor"
+            :icon="showControls ? `chevron-down` : `gear`"
+            @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
+            tabindex="0"
+          />
+        </div>
+        <transition-expand>
+          <div v-if="showControls" class="controls-content">
+            <v-btn
+                block
+                :color="accentColor"
+                @click="() => {
+                  playing =  !(playing || playingImagePath);;
+                  playingImagePath = !playingImagePath;
+                }"
+              >
+                {{ `${playingImagePath ? 'Stop' : 'Play'} supernova images` }}
+              </v-btn>
+            
+            <!-- <v-btn
+                block
+                :color="accentColor"
+                @click="centerView"
+                @keyup.enter="centerView"
+                class="mb-2"
+              >
+                Center the Pinwheel
+            </v-btn> -->
+          
+            <toggle
+              :show="false"
+              :color="accentColor"
+              :item="showAltAzGrid"
+              label="Grid"
+              @toggle="showAltAzGrid = $event"
+            />
+            <toggle
+              :color="accentColor"
+              :item="showConstellations"
+              label="Constellations"
+              @toggle="showConstellations = $event"
+            />
+            <toggle
+              :show="false"
+              :color="accentColor"
+              :item="showHorizon"
+              label="Horizon"
+              @toggle="showHorizon = $event"
+            />
+            <div 
+              v-if="false"
+              id="time-picker-wrapper">
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
+            <date-picker
+              v-if="false"
+              dark
+              time-picker
+              enable-seconds
+              :is-24="false"
+              v-model="timeOfDay"
+              :clearable="false"
+              close-on-scroll
+              class="mb-4 mt-1"
+            >
+              <template #input-icon>
+                <font-awesome-icon
+                  icon="clock"
+                  class="mx-2"
+                  :color="accentColor"
+                ></font-awesome-icon>
+              </template>
+            </date-picker>
+          </div>
+            <!--
+            <v-btn
+              block
+              :color="accentColor"
+              @click="setToFirstCometImage"
+            >
+              Best view for comet images
+            </v-btn> -->
+          </div>
+        </transition-expand>
+      </div>
+      <div class="opacity-slider-wrapper">
+        <vue-slider
+              v-if="!smallSize"
+              class="opacity-slider"
+              adsorb
+              :min="0"
+              :max="1"
+              :interval="0.01"
+              id="slider"
+              :order="false"
+              tooltipPlacement="bottom"
+              v-model="currentOpacity"
+              @change="(opacity: number) => setLayerOpacityForImageSet(currentLayer ? currentLayer.get_name() : '', opacity, false)"
+              >
+              <span>Change image opacity</span>
+      </vue-slider>
+    </div>
       <mini-credits></mini-credits>
     </div>
 
@@ -607,6 +771,10 @@ import {
 } from "./m101";
 
 
+import {
+  aavsoLightCurve,
+} from "./aavsolightcurve";
+
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
 
@@ -623,9 +791,9 @@ function parseCsvTable(csv: string) {
       objectName: d.objectName as string,
       bandpass: d.Bandpass as string,
       wtmlName: d.wtmlName as string,
-      // get a date that looks like Month DD HH:MM
+      magnitude: +(d.magnitude ?? ""),
       dateString: thisDate.toUTCString().slice(4, 11) + " " + `${thisDate.getUTCHours()}` + ":" + thisDate.getUTCMinutes().toString().padStart(2, "0") + ` (${index})`,
-      // dateString: thisDate.toUTCString().slice(4, 10) + " " + thisDate.toTimeString().slice(0, 5),
+
       _filename: d.pngFilename as string,
       _index: index as number,
     };
@@ -634,9 +802,17 @@ function parseCsvTable(csv: string) {
 const fullDatesTable = parseCsvTable(m101DataList);
 const imageDatesTable = parseCsvTable(m101DataList);
 
-// convert m101DataList to a DSVParsedArray
-// columns are pngFilename,objectName,wtmlName,Date,Bandpass,Ra,Dec
 
+// parse the lightCurve data into a D3 table
+const aavsoLightCurveTable = csvParse(aavsoLightCurve, (d) => {
+  // d.timestamp
+  // d.magnitude
+  return {
+    time: new Date(+(d.timestamp ?? "")),
+    magnitude: +(d.magnitude ?? ""),
+
+  };
+});
 
 
 
@@ -664,8 +840,8 @@ function formatCsvTable(table: Table): string {
   // to be CRLF // lol
 }
 
-const fullDatesString = formatCsvTable(fullDatesTable);
-const imageDatesString = formatCsvTable(imageDatesTable);
+// const fullDatesString = formatCsvTable(fullDatesTable);
+// const imageDatesString = formatCsvTable(imageDatesTable);
 
 const allDates = fullDatesTable.map(r => r.date.getTime());
 const imageDates = [... new Set(imageDatesTable.map(r => r.date.getTime()))];
@@ -676,7 +852,7 @@ const dates: number[] = [];
 let t = minDate - (minDate % MILLISECONDS_PER_DAY);
 while (t <= maxDate) {
   dates.push(t);
-  t += MILLISECONDS_PER_DAY/12;
+  t += MILLISECONDS_PER_DAY/6;
 }
 
 for (const d of imageDates) {
@@ -744,6 +920,7 @@ export default defineComponent({
       positionSet: false,
       imagesetFolder: null as Folder | null,
       backgroundImagesets: [] as BackgroundImageset[],
+      places: {} as Record<string, Place>,
 
       playing: false,
       playingImagePath: false,
@@ -759,9 +936,12 @@ export default defineComponent({
       m101RADeg: 3.681181581357794 * R2D,
       m101DecDeg: 0.9480289529731357 * R2D,
 
+      showSpeadSheetLater: false,
+
       currentCometImageLayer: null as SpreadSheetLayer | null,
       currentAllLayer: null as SpreadSheetLayer | null,
       interpolatedDailyTable: null as Table | null,
+      currentLayer: null as Layer | null,
 
       imageDates: imageDates,
       allDates: allDates,
@@ -771,7 +951,7 @@ export default defineComponent({
 
       // imageNames: {} as Record<string, string>,
       // imageSortBy: {} as Record<string, number>,
-      imageNames: Object.fromEntries(imageDatesTable.map( d => [d.wtmlName, d.dateString] )),
+      imageNames: Object.fromEntries(imageDatesTable.map(d => [d.wtmlName, d.dateString])),
       imageSortBy: Object.fromEntries(imageDatesTable.map(d => [d.wtmlName, d.date.getTime()])),
       imageDateRef: { 'names': imageDatesTable.map(d => d.wtmlName), 'dates': imageDatesTable.map(d => d.date.getTime()) },
       imageDateRefInv: Object.fromEntries(imageDatesTable.map(d => [d.date.getTime(), d.wtmlName])),
@@ -779,15 +959,35 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
       accentColor: "#a0009b",
+      accentColor2: "#9A2976",
+      accentColor3: "#d6046d",
+      accentColor4: " #0493d6",
+      activeButtonColor: "#aa00fb68",
       todayColor: "#D6B004",
 
+      aavsoLightCurveData: aavsoLightCurveTable,
+      // lightCurveData: imageDatesTable.map(d => { 'time': d.date, 'magnitude': d.magnitude };),
+      lightCurveData: imageDatesTable.map(d => {
+        return {
+          time: d.date,
+          magnitude: d.magnitude
+        };
+      }),
+
+      currentOpacity: 0,
+      
       incomingItemSelect: null as Thumbnail | null,
+      m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
+
+      chartXOffset: 0,
 
       sheet: null as SheetType,
       showMapTooltip: false,
       showTextTooltip: false,
       showVideoTooltip: false,
       showPlayPauseTooltip: false,
+      showResetTooltip: false,
+      showConstellationTooltip: false,
       showLocationSelector: false,
       showControls: false,
       tab: 0,
@@ -813,6 +1013,11 @@ export default defineComponent({
   },
 
   mounted() {
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
+    });
 
     this.waitForReady().then(async () => {
 
@@ -841,6 +1046,7 @@ export default defineComponent({
           goto: false
         }).then((layer) => {
           this.imagesetLayers[name] = layer;
+          this.places[name] = item;
           applyImageSetLayerSetting(layer, ["opacity", 0]);
           return layer;
         }));
@@ -854,7 +1060,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.getLocation(true);
+      // this.getLocation(true);
       this.setClockSync(false);
       // create date with y m d h m s
 
@@ -881,6 +1087,9 @@ export default defineComponent({
         });
       });
 
+      // set to use SDSS as background
+      // this.wwtControl.setBackgroundImageByName("SDSS: Sloan Digital Sky Survey (Optical) [DR7]");
+      this.wwtControl.setBackgroundImageByName(this.bgName ? this.bgName : "Digitized Sky Survey (Color)");
       this.wwtSettings.set_localHorizonMode(false);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
@@ -907,7 +1116,7 @@ export default defineComponent({
       // and it was the same in nextTick
       // so give just a bit of a delay
       setTimeout(() => {
-        this.centerOnCurrentDate();
+        this.centerView();
         this.positionSet = true;
       }, 100);
 
@@ -955,7 +1164,11 @@ export default defineComponent({
     },
     cssVars() {
       return {
-        '--comet-color': this.accentColor,
+        '--accent-color': this.accentColor,
+        '--accent-color-2': this.accentColor2,
+        '--accent-color-3': this.accentColor3,
+        '--accent-color-4': this.accentColor4,
+        '--active-button-color': this.activeButtonColor,
         '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
@@ -1012,6 +1225,28 @@ export default defineComponent({
   },
 
   methods: {
+    
+    onResize() {
+      const toolsDiv = document.getElementById("tools");
+      if (toolsDiv == null) {
+        return;
+      }
+      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
+      let inputRailWidth = inputRail.clientWidth;
+
+      const chartContainer = document.getElementById("chart-container");
+      if (chartContainer == null) {
+        return;
+      }
+
+      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
+      inputRailWidth += (this.chartXOffset + 8 + borderWidth*2);
+      
+      chartContainer.style.width = `${inputRailWidth}px`;
+      // chartContainer.style.left = `${inputRail.offsetLeft}px`;
+      
+      return;
+    },
 
     createArrow() {
     
@@ -1188,7 +1423,8 @@ export default defineComponent({
     },
 
     updateLayersForDate() {
-
+      if (!this.showSpeadSheetLater) { return; }
+      
       this.interpolatedDailyTable = this.interpolatedTable(fullDatesTable);
       if (this.currentAllLayer !== null) {
         this.deleteLayer(this.currentAllLayer.id);
@@ -1258,7 +1494,6 @@ export default defineComponent({
       if (iset == null) { return null; }
       const names = this.imageDateRef['names'];
       const dates = this.imageDateRef['dates'];
-      console.log(names.indexOf(iset.get_name()));
       return new Date(dates[names.indexOf(iset.get_name())]);
     },
     
@@ -1266,7 +1501,6 @@ export default defineComponent({
     onItemSelected(place: Place) {
 
       if (place == null) {
-        console.log("place is null");
         this.hideAllImagesets();
       }
       
@@ -1297,7 +1531,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * iset.get_centerX(),
               decRad: D2R * iset.get_centerY(),
-              zoomDeg: place.get_zoomLevel() * 2.5,
+              zoomDeg: place.get_zoomLevel(),
               instant: true
             });
           }
@@ -1389,12 +1623,13 @@ export default defineComponent({
       this.updateImageOpacity(place, opacity);
 
       this.$nextTick(() => {
-        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() * 2.5 : this.wwtZoomDeg;
+        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
-          const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-          if (month && day && year) {
-            this.selectedTime = Date.UTC(year, month - 1, day); 
-          }
+          this.selectedTime = this.imageSortBy[iset.get_name()];
+          // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
+          // if (month && day && year) {
+          //   this.selectedTime = Date.UTC(year, month - 1, day); 
+          // }
           
           
           this.incomingItemSelect = place;
@@ -1797,14 +2032,13 @@ export default defineComponent({
     matchImageSetName(date: Date): string {
       const thisDate = date.getTime();
       if (this.imageDateSorted.includes(thisDate)) {
-        console.log('matchImageSetName: found exact match');
         return this.imageDateRefInv[thisDate];
       }
       
       const closestDate = this.binarySearch(this.imageDateSorted, thisDate);
 
       // within 1 hour, in milliseconds
-      if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
+      // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
       if (this.incomingItemSelect?.get_name() == name) {
@@ -1868,14 +2102,19 @@ export default defineComponent({
               this.incomingItemSelect = place[0];
             }
           }
-          // const iset = this.wwtControl.getImagesetByName(iname)
-          // if (iset == null) { return; }
-          // this.gotoRADecZoom({
-          //   raRad: D2R * iset.get_centerX(),
-          //   decRad: D2R * iset.get_centerY(),
-          //   zoomDeg: this.wwtZoomDeg,
-          //   instant: true
-          // });
+          const iset = this.wwtControl.getImagesetByName(iname);
+          const place = this.places[iname];
+          if (iset == null) { return; }
+          if (place == null) { return; }
+          this.$nextTick(() => {
+            this.gotoRADecZoom({
+              raRad: D2R * place.get_RA() * 15,
+              decRad: D2R * place.get_dec(),
+              zoomDeg: this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg,
+              instant: true
+            });
+          });
+          
         }
       });
       return shown;
@@ -1887,20 +2126,31 @@ export default defineComponent({
         // this.incomingItemSelect = null;
         return false;
       }
-      console.log(`showImageForDateTime: ${name}`);
+      this.currentLayer = this.imagesetLayers[name];
+      this.currentOpacity = 1;
       return this.showImagesetByName(name);
 
     },
 
     
-    centerOnCurrentDate(options?: MoveOptions) {
-      const now = new Date();
-      const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
-      this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      this.selectedTime = this.binarySearch(this.dates, now.getTime());
-      this.$nextTick(() => {
-        this.updateViewForDate(options);
+    centerView(_options?: MoveOptions) {
+      const firstPlace = this.places[Object.keys(this.places)[0]];
+      this.gotoRADecZoom({
+        raRad: this.m101Position.ra * D2R,
+        decRad: this.m101Position.dec * D2R,
+        zoomDeg: firstPlace.get_zoomLevel()*6,
+        instant: false,
       });
+      // show the first image
+      this.selectedTime = this.imageDates[0];
+      this.onTimeSliderChange({zoomDeg: firstPlace.get_zoomLevel()});
+      // const now = new Date();
+      // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
+      // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
+      // this.selectedTime = this.binarySearch(this.dates, now.getTime());
+      // this.$nextTick(() => {
+      //   this.updateViewForDate(options);
+      // });
     },
 
     updateForDateTime() {
@@ -1939,6 +2189,17 @@ export default defineComponent({
     showConstellations(show: boolean) {
       this.wwtSettings.set_showConstellationLabels(show);
       this.wwtSettings.set_showConstellationFigures(show);
+      if (show) {
+        this.playing = false;
+        this.$nextTick(() => {
+          this.gotoRADecZoom({
+            raRad: this.wwtRARad,
+            decRad: this.wwtDecRad,
+            zoomDeg: 120,
+            instant: false
+          });
+        });
+      }
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
@@ -2046,6 +2307,8 @@ export default defineComponent({
       }, 500);
     }
   }
+
+  
 });
 
 </script>
@@ -2061,9 +2324,6 @@ html {
   
   -ms-overflow-style: none;
   // scrollbar-width: none;
-  
-  --accent-color: #a0009b;
-  --accent-color2: #55a5e9;
 }
 
 body {
@@ -2167,11 +2427,11 @@ body {
 }
 
 .control-icon-wrapper {
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: #040404;
-  padding: 8px 16px;
-  border: 1px solid var(--comet-color);
-  border-radius: 20px;
+  padding: .5em 1em;
+  border: 1px solid var(--accent-color);
+  border-radius: 1.25em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2187,10 +2447,67 @@ body {
   }
 }
 
+#chart-container {
+  pointer-events: auto;
+  margin-left: auto;
+  margin-right: 30px;
+  box-shadow: -4px 0 0 0 #ccc;
+  color: #ccc;
+  
+  // makes the y-axis border look like an arrow
+  &:before {
+    content: "^";
+    position: absolute;
+    font-size: 1.5em;
+    font-weight: bold;
+    transform: translateX(-.51em) translateY(-.55em);
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+
+  #yaxis-text {
+    font-size: 1.15em;
+    max-width: fit-content;
+    position: absolute;
+    top: 50%;
+    transform: translate(calc(-100% - 20px), -150%);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  #xaxis-text {
+    width: 30%;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    bottom: 1em;
+    box-shadow: 0px -4px 0px 0px #ccc;
+    transform: translate(-50%, 0);
+    
+    &:after {
+      content: "^";
+      position: absolute;
+      right: 0;
+      top: calc(-1.5em/3);
+      font-size: 1.5em;
+      line-height: 0;
+      font-weight: bold;
+      transform: translateX(75%) rotate(90deg);
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    font-size: 0.75em;
+  }
+  
+}
+
 #play-pause-icon-wrapper {
-  color: var(--ephemeris-color);
-  border-color: var(--ephemeris-color);
-  margin-left: 2rem;
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  margin-left: 0;
+  font-size: 0.75em;
 
   &:focus {
     color: white;
@@ -2203,7 +2520,23 @@ body {
 }
 
 #video-icon-wrapper {
-  display: none;
+  display: initial;
+}
+
+#const-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  svg {
+    fill: var(--accent-color);
+    stroke: white;
+  }
+}
+
+.active {
+  // background-color: var(--active-button-color);
+  box-shadow: 0px 0px 10px 3px var(--accent-color);
 }
 
 .top-content {
@@ -2213,9 +2546,31 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
 }
+
+
+div.opacity-slider-wrapper {
+  display:flex;
+  position:absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 200px;
+  border-radius: 20px;
+  
+  .opacity-slider {
+    pointer-events: auto;
+
+  }
+  span {
+    color: white;
+    margin-top: 0.75em;
+    font-size: 0.75em;
+  }
+}
+
 
 .bottom-content {
   display: flex;
@@ -2227,6 +2582,16 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+div#main-content > div {
+  content: "";
+  // outline: 1px solid orange;
+}
+
+div.bottom-content > div {
+  content: "";
+  // outline: 1px solid rgb(154, 154, 251);
 }
 
 #tools {
@@ -2264,10 +2629,13 @@ body {
 }
 
 #controls {
+  position: absolute;
+  bottom: 8rem;
+  z-index: 10;
   background: black;
   padding: 10px;
   border-radius: 10px;
-  border: solid 1px var(--comet-color);
+  border: solid 1px var(--accent-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
@@ -2276,7 +2644,8 @@ body {
   pointer-events: auto;
 
   .v-label {
-    color: var(--comet-color);
+    // color: var(--accent-color);
+    color: white;
     opacity: 1;
   }
 
@@ -2284,12 +2653,13 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 0.5rem;
 
     .v-btn {
       align-self: center;
       padding-left: 5px;
       padding-right: 5px;
-      border: solid 1px #899499;
+      border: solid 1.5px #ffc5fd;
 
       &:focus {
         border: 2px solid white;
@@ -2306,10 +2676,8 @@ body {
   }
 
   #controls-top-row {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-end;
+    margin-right: 0px;
+    margin-left: auto;
   }
 }
 
@@ -2318,7 +2686,7 @@ body {
 }
 
 #show-controls {
-  color: var(--comet-color);
+  color: var(--accent-color);
 }
 
 .v-selection-control--focus-visible .v-selection-control__input::before {
@@ -2326,7 +2694,7 @@ body {
 }
 
 .ui-text {
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: black;
   padding: 5px 5px;
   border: 2px solid black;
@@ -2340,10 +2708,10 @@ body {
 
 .ui-button {
   text-align: center;
-  color: var(--comet-color);
+  color: var(--accent-color);
   background: black;
   padding: 5px 5px;
-  border: 2px solid var(--comet-color);
+  border: 2px solid var(--accent-color);
   border-radius: 10px;
   font-size: calc(0.7em + 0.2vw);
   user-select: none;
@@ -2500,7 +2868,7 @@ video {
   padding: 5px 10px;
   margin:0 5px;
   color:#fff !important;
-  background-color: rgba(214, 4, 147,0.7);
+  background-color: var(--accent-color-2);
   overflow: visible;
 }
 
@@ -2517,8 +2885,8 @@ video {
   cursor: grab;
   padding: 4px 10px !important;
   color: white !important;
-  background-color: #9A2976 !important;
-  border: 1px solid #9A2976 !important;
+  background-color: var(--accent-color-2) !important;
+  border: 1px solid var(--accent-color-2) !important;
 
   &:active {
     cursor: grabbing;
@@ -2527,7 +2895,7 @@ video {
 
 .vue-slider-dot-handle {
   cursor: grab;
-  background-color: #9A2976 !important;
+  background-color: var(--accent-color-2) !important;
   border: 1px solid black !important;
 
   &:active {
@@ -2535,17 +2903,29 @@ video {
   }
 }
 
+// adds a vertical line to track it better
+// .vue-slider-dot-handle::before {
+//   content:"";
+//   // position: absolute;
+//   // border-left: 3px solid white;
+//   // height: 500px;
+//   // transform: translateY(-500px) translateX(150%);
+//   // transform-origin: 0 100%;
+// }
+
+
 .mark-line {
   position: absolute;
   height: 20px;
   width: 2px;
   margin: 0;
-  background-color: var(--comet-color);
+  background-color: var(--accent-color);
   transform: translateX(-50%) translateY(calc(-50% + 2px));
 
 }
 
 .left-content {
+  display: none !important;
   position: absolute;
   left: 1rem;
   top: 1rem;
@@ -2588,49 +2968,93 @@ video {
   // for some reason the view props don't work
   // for max-width and max-height
   // splash image size 1908 × 2040 px
-  max-width: calc(min(90vw,1908px)); 
+  display: grid;
+  // grid of 4 rows equally sized
+  grid-template-rows: repeat(4, 1fr);
   max-height: calc(min(90vh,2040px)); 
-  /* prevent the image from being stretched */
-  object-fit: contain;
-}
-
-div#splash-screen {
-  // max-width: calc(min(90vw,1908px)); 
-  // max-height: calc(min(90vh,2040px)); 
-  width: max(90vw);
-  // height: max(90vh, 700px);
   aspect-ratio: 8 / 10;
-  object-fit: contain;
-  
   background-color: black;
+  justify-content: center;
+  font-size: 2.5rem;
   
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size: 50pt;
-  
-  border-radius: 20%;
-  border: 10px solid var(--accent-color2);
+  border-radius: 10%;
+  border: 10px solid var(--accent-color-2);
   overflow: auto;
+  // the order for padding is top right bottom left
+  padding-top: 2.5em;
+  font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
+  &::after {
+    content: "X";
+    color: gold;
+    position: absolute;
+    height: 8%;
+    top: 5%;
+    left: 90%;
+  }
+  
+  div {
+    margin: auto;
+    text-align: center;
+  }
   // make a paragraph inside the div centered horizontally and vertically
   p {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
   }
+
+    
+  p.highlight {
+    color: #EF5FA7;
+    filter: drop-shadow(0 0 .15em #e4a0c2);
+    // make uppercase
+    font-size: 1.15em;
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: .5em;
+    font-weight: bold;
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  #splash-screen-guide {
+    grid-row: 2;
+    font-size: .6em;
+    width: 70%;
+    
+    .svg-inline--fa {
+      color:gold;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    grid-row: 3;
+    font-size: .5em;
+    width: 70%
+  }
+
+  #splash-screen-icons {
+    grid-row: 4;
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--accent-color-4);
+    white-space: nowrap;
+  }
+    
 }
 
-#splash-close {
-  // outline: 1px solid rgba(255, 255, 255, 0.094);
-  position: absolute;
-  width: 7%;
-  height: 8%;
-  top: 4%;
-  left: 84%;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
 
 #overlays {
   margin: 5px;
@@ -2674,7 +3098,7 @@ div.credits {
 // }
 
 span.ui-element-ref-comet {
-  background-color: #9A2976; /* #d6046d; */
+  background-color:var(--accent-color-2);
   padding: 0em 0.1em;
   border-radius: 0.2em;
 }
@@ -2687,20 +3111,20 @@ input[type="range"] {
     margin: 2px;
     --track-height: 1em;
     --thumb-radius: 0.8em;
-    --thumb-color: rgba(205, 54, 157  , 0.7);
+    --thumb-color: var(--accent-color-3);
     // --thumb-color: #444;
-    --track-color: rgba(4, 147, 214, .1);
+    --track-color: #0493d61a;
     // --thumb-border: 1px solid #899499;
     --thumb-border-width: 1px;
-    --thumb-border: var(--thumb-border-width) solid rgb(255, 255, 255);
+    --thumb-border: var(--thumb-border-width) solid white;
     --track-border-width: 1px;
-    --track-border: var(--track-border-width) solid rgba(4, 147, 214, 1);
+    --track-border: var(--track-border-width) solid var(--accent-color-4);
     --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
     
     &:hover {
       opacity: 1;
       --track-color: rgba(217, 234, 242,0.2);
-      --thumb-color: rgba(205, 54, 157  , 1);
+      --thumb-color: #cd369d;
     }
 
     &:focus {
