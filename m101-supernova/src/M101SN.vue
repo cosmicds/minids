@@ -20,23 +20,39 @@
       :model-value="showSplashScreen"
       absolute
       opacity="0.6"
+      :style="cssVars"
       id="splash-overlay"
     >
       <div id="splash-screen"
         @click="closeSplashScreen"
       >
-      <p> Want to see the </p>
-      <p> Supernova </p>
-      <p> Go off in the Pinwheel Galaxy? </p>
-      
-      <div class="guide">
-        Watch the demo <font-awesome-icon
-          id="video-icon"
-          class="control-icon"
-          icon="video"
-          size="lg"
-        ></font-awesome-icon>
-      </div>
+        <div id="splash-screen-text">
+          <p> Want to see a </p> 
+          <p class="highlight"> Star Explode </p> 
+          <p class="small"> in a galaxy far far away... </p>
+        </div>
+        
+        <div id="splash-screen-guide">
+          Watch the demo <font-awesome-icon
+            id="video-icon"
+            class="control-icon"
+            icon="video"
+            size="lg"
+          />,
+          read the guide <font-awesome-icon
+            id="text-icon"
+            class="control-icon"
+            icon="book-open"
+            size="lg"/> or close me to get started!
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This mini data story is brought to you by NASA's SciAct <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS program</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank">AAS WorldWide Telescope</a>.
+        </div>
+        
+        <div id="splash-screen-icons">
+          <mini-credits/>
+        </div>
     </div>
     </v-overlay>
 
@@ -898,7 +914,7 @@ export default defineComponent({
   data() {
     const now = new Date();
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
       positionSet: false,
@@ -2917,35 +2933,82 @@ video {
   // for some reason the view props don't work
   // for max-width and max-height
   // splash image size 1908 × 2040 px
-  max-width: calc(min(90vw,1908px)); 
+  display: grid;
+  // grid of 4 rows equally sized
+  grid-template-rows: repeat(4, 1fr);
   max-height: calc(min(90vh,2040px)); 
-  /* prevent the image from being stretched */
-  object-fit: contain;
-}
-
-div#splash-screen {
-  // max-width: calc(min(90vw,1908px)); 
-  // max-height: calc(min(90vh,2040px)); 
-  width: max(90vw);
-  // height: max(90vh, 700px);
   aspect-ratio: 8 / 10;
-  object-fit: contain;
-  
   background-color: black;
+  justify-content: center;
+  font-size: 2.5rem;
   
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size: 50pt;
-  
-  border-radius: 20%;
+  border-radius: 10%;
   border: 10px solid var(--accent-color-2);
   overflow: auto;
+  // the order for padding is top right bottom left
+  padding-top: 2.5em;
+  font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
+  div {
+    margin: auto;
+    text-align: center;
+  }
   // make a paragraph inside the div centered horizontally and vertically
   p {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
   }
+
+    
+  p.highlight {
+    color: #EF5FA7;
+    filter: drop-shadow(0 0 .15em #e4a0c2);
+    // make uppercase
+    font-size: 1.15em;
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: .5em;
+    font-weight: bold;
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  #splash-screen-guide {
+    grid-row: 2;
+    font-size: .6em;
+    width: 70%;
+    
+    .svg-inline--fa {
+      color:gold;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    grid-row: 3;
+    font-size: .5em;
+    width: 70%
+  }
+
+  #splash-screen-icons {
+    grid-row: 4;
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--accent-color-4);
+    white-space: nowrap;
+  }
+    
 }
 
 #splash-close {
