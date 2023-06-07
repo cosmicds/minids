@@ -2949,6 +2949,15 @@ video {
   padding-top: 2.5em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
+  &::after {
+    content: "X";
+    color: gold;
+    position: absolute;
+    height: 8%;
+    top: 5%;
+    left: 90%;
+  }
+  
   div {
     margin: auto;
     text-align: center;
@@ -3011,18 +3020,6 @@ video {
     
 }
 
-#splash-close {
-  // outline: 1px solid rgba(255, 255, 255, 0.094);
-  position: absolute;
-  width: 7%;
-  height: 8%;
-  top: 4%;
-  left: 84%;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
 
 #overlays {
   margin: 5px;
