@@ -938,6 +938,10 @@ export default defineComponent({
       lastClosePt: null as TableRow | null,
       ephemerisColor: "#D60493",
       accentColor: "#a0009b",
+      accentColor2: "#9A2976",
+      accentColor3: "#d6046d",
+      accentColor4: " #0493d6",
+      activeButtonColor: "#aa00fb68",
       todayColor: "#D6B004",
 
       aavsoLightCurveData: aavsoLightCurveTable,
@@ -1171,6 +1175,10 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color-2': this.accentColor2,
+        '--accent-color-3': this.accentColor3,
+        '--accent-color-4': this.accentColor4,
+        '--active-button-color': this.activeButtonColor,
         '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
@@ -2262,9 +2270,6 @@ html {
   
   -ms-overflow-style: none;
   // scrollbar-width: none;
-  
-  --accent-color: #a0009b;
-  --accent-color2: #55a5e9;
 }
 
 body {
@@ -2476,7 +2481,8 @@ body {
 }
 
 .active {
-  background-color: #340032a7;
+  // background-color: var(--active-button-color);
+  box-shadow: 0px 0px 10px 3px var(--accent-color);
 }
 
 .top-content {
@@ -2808,7 +2814,7 @@ video {
   padding: 5px 10px;
   margin:0 5px;
   color:#fff !important;
-  background-color: rgba(214, 4, 147,0.7);
+  background-color: var(--accent-color-2);
   overflow: visible;
 }
 
@@ -2825,8 +2831,8 @@ video {
   cursor: grab;
   padding: 4px 10px !important;
   color: white !important;
-  background-color: #9A2976 !important;
-  border: 1px solid #9A2976 !important;
+  background-color: var(--accent-color-2) !important;
+  border: 1px solid var(--accent-color-2) !important;
 
   &:active {
     cursor: grabbing;
@@ -2835,7 +2841,7 @@ video {
 
 .vue-slider-dot-handle {
   cursor: grab;
-  background-color: #9A2976 !important;
+  background-color: var(--accent-color-2) !important;
   border: 1px solid black !important;
 
   &:active {
@@ -2930,7 +2936,7 @@ div#splash-screen {
   font-size: 50pt;
   
   border-radius: 20%;
-  border: 10px solid var(--accent-color2);
+  border: 10px solid var(--accent-color-2);
   overflow: auto;
   
   // make a paragraph inside the div centered horizontally and vertically
@@ -2994,7 +3000,7 @@ div.credits {
 // }
 
 span.ui-element-ref-comet {
-  background-color: #9A2976; /* #d6046d; */
+  background-color:var(--accent-color-2);
   padding: 0em 0.1em;
   border-radius: 0.2em;
 }
@@ -3007,20 +3013,20 @@ input[type="range"] {
     margin: 2px;
     --track-height: 1em;
     --thumb-radius: 0.8em;
-    --thumb-color: rgba(205, 54, 157  , 0.7);
+    --thumb-color: var(--accent-color-3);
     // --thumb-color: #444;
-    --track-color: rgba(4, 147, 214, .1);
+    --track-color: #0493d61a;
     // --thumb-border: 1px solid #899499;
     --thumb-border-width: 1px;
-    --thumb-border: var(--thumb-border-width) solid rgb(255, 255, 255);
+    --thumb-border: var(--thumb-border-width) solid white;
     --track-border-width: 1px;
-    --track-border: var(--track-border-width) solid rgba(4, 147, 214, 1);
+    --track-border: var(--track-border-width) solid var(--accent-color-4);
     --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
     
     &:hover {
       opacity: 1;
       --track-color: rgba(217, 234, 242,0.2);
-      --thumb-color: rgba(205, 54, 157  , 1);
+      --thumb-color: #cd369d;
     }
 
     &:focus {
