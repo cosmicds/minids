@@ -2080,7 +2080,7 @@ export default defineComponent({
         raRad: this.m101Position.ra * D2R,
         decRad: this.m101Position.dec * D2R,
         zoomDeg: firstPlace.get_zoomLevel()*6,
-        instant: true,
+        instant: false,
       });
       // show the first image
       this.selectedTime = this.imageDates[0];
@@ -2127,6 +2127,17 @@ export default defineComponent({
     showConstellations(show: boolean) {
       this.wwtSettings.set_showConstellationLabels(show);
       this.wwtSettings.set_showConstellationFigures(show);
+      if (show) {
+        this.playing = false;
+        this.$nextTick(() => {
+          this.gotoRADecZoom({
+            raRad: this.wwtRARad,
+            decRad: this.wwtDecRad,
+            zoomDeg: 120,
+            instant: false
+          });
+        });
+      }
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
