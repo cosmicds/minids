@@ -116,11 +116,11 @@ export default defineComponent({
 
 </script>
 
-<style scoped type="text/css">
+<style style lang="less">
 .dipper_svg_icon {
   width: v-bind(width);
-}
-
+  
+  
 .circle {
   fill-rule:"evenodd";
   stroke-width: 7px ;
@@ -138,5 +138,7 @@ export default defineComponent({
 .filled {
   fill: v-bind(computedFillColor);
 }
+}
+
 
 </style>
