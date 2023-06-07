@@ -929,7 +929,12 @@ export default defineComponent({
 
       showAltAzGrid: false,
       showConstellations: true,
+      showArrow: true,
       showHorizon: false,
+      outerArrow: null as Poly | null,
+      innerArrow: null as Poly | null,
+      m101RADeg: 3.681181581357794 * R2D,
+      m101DecDeg: 0.9480289529731357 * R2D,
 
       showSpeadSheetLater: false,
 
@@ -1059,49 +1064,6 @@ export default defineComponent({
       this.setClockSync(false);
       // create date with y m d h m s
 
-      // layerPromises.push(this.createTableLayer({
-      //   name: "All Dates",
-      //   referenceFrame: "Sky",
-      //   dataCsv: fullDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 2.5],
-      //       ["plotType", PlotTypes.point],
-      //       ["color", Color.fromHex(this.ephemerisColor)],
-      //       //["sizeColumn", 4],
-      //       //["pointScaleType", PointScaleTypes.log],
-      //       ["opacity", 0.8]
-      //     ]
-      //   });
-      //   return layer;
-      // }));
-
-      // layerPromises.push(this.createTableLayer({
-      //   name: "Comet Image Dates",
-      //   referenceFrame: "Sky",
-      //   dataCsv: imageDatesString
-      // }).then((layer) => {
-      //   layer.set_lngColumn(1);
-      //   layer.set_latColumn(2);
-      //   layer.set_markerScale(MarkerScales.screen);
-      //   this.applyTableLayerSettings({
-      //     id: layer.id.toString(),
-      //     settings: [
-      //       ["scaleFactor", 4],
-      //       ["color", Color.fromHex('#FFFFFF')],
-      //       ["plotType", PlotTypes.point],
-      //       //["sizeColumn", 3],
-      //       ["opacity", 0.4]
-      //     ]
-      //   });
-      //   return layer;
-      // }));
-
       this.setTime(this.dateTime);
 
       this.showControls = !this.mobile;
@@ -1158,10 +1120,19 @@ export default defineComponent({
         this.positionSet = true;
       }, 100);
 
+      this.createArrow();
+      if (this.showArrow) {
+        this.displayArrow();
+      }
+
+      this.gotoRADecZoom({
+        raRad: D2R * this.m101RADeg,
+        decRad: D2R * this.m101DecDeg,
+        zoomDeg: 1,
+        instant: true
+      });
+
     });
-
-    
-
   },
 
   computed: {
@@ -1277,6 +1248,91 @@ export default defineComponent({
       return;
     },
 
+    createArrow() {
+    
+      // Create the outer (purple) arrow
+      this.outerArrow = new Poly();
+
+      const pointRA = this.m101RADeg + 0.05;
+      const centerDec = this.m101DecDeg;
+      const arrowHalfHeight = 0.02;
+      const stemFraction = 0.4;
+      const headWidth = 0.05;
+      const stemWidth = 0.05;
+      const headBackRA = pointRA + headWidth;
+      const stemBackRA = headBackRA + stemWidth;
+      const topDec = centerDec + arrowHalfHeight;
+      const bottomDec = centerDec - arrowHalfHeight;
+      const stemHalfHeight = stemFraction * arrowHalfHeight;
+      const stemTopDec = centerDec + stemHalfHeight;
+      const stemBottomDec = centerDec - stemHalfHeight;
+      this.outerArrow.addPoint(pointRA, centerDec);
+      this.outerArrow.addPoint(headBackRA, topDec);
+      this.outerArrow.addPoint(headBackRA, stemTopDec);
+      this.outerArrow.addPoint(stemBackRA, stemTopDec);
+      this.outerArrow.addPoint(stemBackRA, stemBottomDec);
+      this.outerArrow.addPoint(headBackRA, stemBottomDec);
+      this.outerArrow.addPoint(headBackRA, bottomDec);
+
+      this.outerArrow.set_lineColor(this.accentColor);
+      this.outerArrow.set_fillColor(this.accentColor);
+      this.outerArrow.set_fill(true);
+      
+      // Create the inner (white) arrow
+      this.innerArrow = new Poly();
+     
+      const delta = 0.002; // The thickness of the outer "border"
+      const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
+      const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
+      const innerHeadBackRA = headBackRA - delta; 
+      const innerStemBackRA = stemBackRA - delta;
+      const innerTopDec = headSlope * (innerHeadBackRA - innerPointRA) + centerDec;
+      const innerBottomDec = 2 * centerDec - innerTopDec;
+      const innerStemTopDec = stemTopDec - 0.75 * delta;
+      const innerStemBottomDec = stemBottomDec + 0.75 * delta;
+      this.innerArrow.addPoint(innerPointRA, centerDec);
+      this.innerArrow.addPoint(innerHeadBackRA, innerTopDec); 
+      this.innerArrow.addPoint(innerHeadBackRA, innerStemTopDec);
+      this.innerArrow.addPoint(innerStemBackRA, innerStemTopDec); 
+      this.innerArrow.addPoint(innerStemBackRA, innerStemBottomDec);
+      this.innerArrow.addPoint(innerHeadBackRA, innerStemBottomDec);
+      this.innerArrow.addPoint(innerHeadBackRA, innerBottomDec);
+
+      const innerColor = "#ffffff";
+      this.innerArrow.set_lineColor(innerColor);
+      this.innerArrow.set_fillColor(innerColor);
+      this.innerArrow.set_fill(true);
+    },
+
+    displayArrow() {
+      if (this.outerArrow == null || this.innerArrow == null) {
+        this.createArrow();
+      }
+      if (this.outerArrow) {
+        this.addAnnotation(this.outerArrow);
+      }
+      if (this.innerArrow) {
+        this.addAnnotation(this.innerArrow);
+      }
+    },
+
+    hideArrow() {
+      if (this.outerArrow) {
+        this.removeAnnotation(this.outerArrow);
+      }
+      if (this.innerArrow) {
+        this.removeAnnotation(this.innerArrow);
+      }
+    },
+
+    updateArrow(show: boolean) {
+      if (show) {
+        this.displayArrow();
+      } else {
+        this.hideArrow();
+      }
+    },
+
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
         clearInterval(this.playingIntervalId);
@@ -1373,30 +1429,6 @@ export default defineComponent({
       if (this.currentAllLayer !== null) {
         this.deleteLayer(this.currentAllLayer.id);
         this.currentAllLayer = null;
-      }
-
-      if (this.interpolatedDailyTable !== null) {
-        this.createTableLayer({
-          name: "Daily Date Layer",
-          referenceFrame: "Sky",
-          dataCsv: formatCsvTable(this.interpolatedDailyTable)
-        }).then((layer) => {
-          this.currentAllLayer = layer;
-          layer.set_lngColumn(1);
-          layer.set_latColumn(2);
-          layer.set_markerScale(MarkerScales.screen);
-          this.setSpreadSheetLayerOrder(layer.id.toString(), 0);
-          this.applyTableLayerSettings({
-            id: layer.id.toString(),
-            settings: [
-              ["scaleFactor", 5],
-              ["plotType", PlotTypes.point],
-              ["color", Color.fromHex('#E562BC')],
-              //["sizeColumn", 3],
-              ["opacity", 1],
-            ]
-          });
-        });
       }
     },
 
@@ -1698,7 +1730,7 @@ export default defineComponent({
           } else {
             this.locationErrorMessage = msg;
           }
-          this.updateHorizon();
+          //this.updateHorizon();
         },
         options
       );
@@ -1877,7 +1909,7 @@ export default defineComponent({
     },
 
     removeHorizon() {
-      this.clearAnnotations();
+      //this.clearAnnotations();
     },
 
     updateLastClosePoint(event: PointerEvent) {
@@ -2147,6 +2179,9 @@ export default defineComponent({
   },
 
   watch: {
+    showArrow(show: boolean) {
+      this.updateArrow(show);
+    },
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
