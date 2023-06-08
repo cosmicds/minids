@@ -1,6 +1,6 @@
 <!-- Vue component for plotting a scatter plot of x,y data in Chart.js -->
 <template>
-    <div id="plot">
+    <div v-show="show" id="plot">
       <canvas id="chartjs" class="chartjs"></canvas>
     </div>
     
@@ -162,6 +162,12 @@ export default defineComponent({
       type: Object,
       required: false,
       default: () => ({}),
+    },
+
+    show: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     
   },
