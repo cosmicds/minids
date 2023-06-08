@@ -2170,6 +2170,14 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
+    },
+
+
+    optionalZoom(place: Place, factor = 3): number {
+      if (this.needToZoomIn(place, factor)) {
+        console.log('optionalZoom: zoom in');
+      }
+      return this.needToZoomIn(place, factor) ? place.get_zoomLevel() : this.wwtZoomDeg;
     }
   },
 
