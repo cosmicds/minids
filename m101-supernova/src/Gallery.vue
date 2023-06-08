@@ -1,0 +1,229 @@
+<template>
+  <div class="gallery-root">
+    <slot
+      name="closed"
+      v-if="!open"
+    >
+      <div
+        class="default-activator blurred"
+        @click="open = true"
+      >
+        <span class="default-activator-title">Image Gallery</span>
+        <img
+          :src="places[0] ? (getImageset(places[0])?.get_thumbnailUrl() ?? '') : ''"
+        />
+      </div>
+    </slot>
+    <div
+      :style="cssVars"
+      class="gallery blurred"
+      v-if="open"
+    >
+      <div
+        class="gallery-header noselect"
+      >
+        <span class="gallery-title">{{ title }}</span>
+        <button
+          class="gallery-close"
+          @click="open = false"  
+        >
+          Close
+        </button> 
+      </div>
+      <div
+        class="gallery-content"
+      >
+        <div
+          v-for="[index, place] of places.entries()"
+          :key="index"
+          :class="['gallery-item', 'noselect', {'selected': selectedIndex === index}]"
+          @click="selectedIndex = index"
+        >
+          <img :src="getImageset(place)?.get_thumbnailUrl() ?? ''"/>
+          <span class="place-name">{{ place.get_name() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { Folder, Imageset, Place } from "@wwtelescope/engine";
+import { engineStore } from "@wwtelescope/engine-pinia";
+import { mapActions } from "pinia";
+
+export default defineComponent({
+  
+  props: {
+    wtmlUrl: { type: String, required: true },
+    columns: { type: [Number, String], default: "auto-fit" },
+    width: { type: String, default: "300px" },
+    maxHeight: { type: String, default: "500px" },
+    title: { type: String, default: "Gallery" },
+    selectedColor: { type: String, default: "dodgerblue" }
+  },
+
+  async created() {
+    this.waitForReady().then(async () => {
+      this.places = await this.placesFromWtml(this.wtmlUrl);
+    });
+  },
+
+  data() {
+    return {
+      open: false,
+      places: [] as Place[],
+      selectedIndex: null as number | null
+    };
+  },
+
+  methods: {
+    ...mapActions(engineStore, ["loadImageCollection", "waitForReady"]),
+
+    getImageset(place: Place): Imageset | null {
+      return place.get_backgroundImageset() ?? place.get_studyImageset();
+    },
+
+    extractPlaces(folder: Folder): Place[] {
+      let places: Place[] = [];
+      for (const child of folder.get_children() ?? []) {
+        if (child instanceof Place) {
+          const iset = this.getImageset(child);
+          if (iset !== null) {
+            places.push(child);
+          }
+        } else if (child instanceof Folder) {
+          places = places.concat(this.extractPlaces(child));
+        }
+      }
+      return places;
+    },
+
+    async placesFromWtml(wtmlUrl: string): Promise<Place[]> {
+      return this.loadImageCollection({
+        url: wtmlUrl,
+        loadChildFolders: true
+      }).then((folder) => this.extractPlaces(folder));  
+    }
+  },
+
+  computed: {
+    cssVars() {
+      return {
+        "--column-count": this.columns,
+        "--selected-color": this.selectedColor,
+        "--gallery-width": this.width,
+        "--gallery-max-height": this.maxHeight
+      };
+    }
+  },
+
+  watch: {
+    selectedIndex(newIndex) {
+      this.$emit("select", newIndex);
+    }
+  }
+});
+
+</script>
+
+<style scoped lang="less">
+.blurred {
+  background: transparent;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+.gallery {
+  border-radius: 5px;
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  width: var(--gallery-width);
+  max-height: var(--galaxy-max-height);
+}
+
+.noselect {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.gallery-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.gallery-title {
+  font-size: 16pt;
+}
+
+.gallery-close {
+  position: absolute;
+  right: 3px;
+}
+
+.gallery-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  column-gap: 10px;
+  row-gap: 5px;
+  padding: 5px
+}
+
+.default-activator {
+  border-radius: 3px;
+  border: solid 1px white;
+  position: relative;
+  height: fit-content;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+
+  img {
+    padding: 5px;
+    border-radius: 3px;
+  }
+}
+
+.default-activator-title {
+  margin: auto;
+}
+
+.gallery-item {
+  border-radius: 3px;
+  border: 1px solid white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  img {
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 3px;
+  }
+
+  span {
+    flex-grow: 1;
+    display: inline-grid;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.selected {
+  border: 1px solid var(--selected-color);
+
+  span {
+    color: var(--selected-color);
+  }
+}
+
+.place-name {
+  font-size: 10pt;
+}
+</style>
+

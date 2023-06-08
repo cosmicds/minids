@@ -10,6 +10,9 @@ import d3Scatter from "./d3-scatter.vue";
 // import PlotDataPlotly from "./PlotDataPlotly.vue";
 import ConstellationIcon from "./ConstellationIcon.vue";
 
+import Gallery from "./Gallery.vue";
+// import { Gallery } from "@minids/common";
+
 import "./polyfills";
 
 import VueSlider from "vue-slider-component";
@@ -114,6 +117,7 @@ createApp(M101SN, {
   .component('d3-scatter', d3Scatter)
   // .component('plot-plotly', PlotDataPlotly)
   .component('constellation-icon', ConstellationIcon)
+  .component('gallery', Gallery)
 
   // Mount
   .mount("#app");

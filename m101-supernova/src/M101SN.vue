@@ -1,4 +1,3 @@
-
 <template>
   <v-app
     id="app"
@@ -253,6 +252,14 @@
         @opacity="(place: Place, opacity: number, m: boolean) => onOpacityChanged(place, opacity, false)" 
         @toggle="onToggle"
       ></folder-view>
+    </div>
+
+    <div class="right-content">
+      <gallery
+        wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
+        :columns="3"
+        width="1000px"
+      />
     </div>
     
     <div class="bottom-content">
@@ -2592,6 +2599,12 @@ div#main-content > div {
 div.bottom-content > div {
   content: "";
   // outline: 1px solid rgb(154, 154, 251);
+}
+
+.right-content {
+  position: absolute;
+  right: 1rem;
+  top: 30px;
 }
 
 #tools {
