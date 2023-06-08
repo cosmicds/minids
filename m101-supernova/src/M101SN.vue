@@ -24,6 +24,7 @@
       id="splash-overlay"
     >
       <div id="splash-screen"
+        :style="cssVars"
         @click="closeSplashScreen"
       >
         <div id="splash-screen-text">
@@ -277,7 +278,7 @@
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
             :yrange="[10.5, 16]"
             :color="accentColor"
-            borderColor="#DD6BD9"
+            :borderColor="accentColor"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
             :yAxisOptions="{
@@ -957,13 +958,10 @@ export default defineComponent({
       imageDateRefInv: Object.fromEntries(imageDatesTable.map(d => [d.date.getTime(), d.wtmlName])),
       imageDateSorted: imageDatesTable.map(d => d.date.getTime()).sort((a, b) => a - b),
       lastClosePt: null as TableRow | null,
-      ephemerisColor: "#D60493",
-      accentColor: "#a0009b",
-      accentColor2: "#9A2976",
-      accentColor3: "#d6046d",
+      accentColor: "#CB6BFF",
+      accentColor2: "#ffd220",
+      accentColor3: "#ff74cb",
       accentColor4: " #0493d6",
-      activeButtonColor: "#aa00fb68",
-      todayColor: "#D6B004",
 
       aavsoLightCurveData: aavsoLightCurveTable,
       // lightCurveData: imageDatesTable.map(d => { 'time': d.date, 'magnitude': d.magnitude };),
@@ -1168,8 +1166,6 @@ export default defineComponent({
         '--accent-color-2': this.accentColor2,
         '--accent-color-3': this.accentColor3,
         '--accent-color-4': this.accentColor4,
-        '--active-button-color': this.activeButtonColor,
-        '--ephemeris-color': this.ephemerisColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -2885,8 +2881,8 @@ video {
   cursor: grab;
   padding: 4px 10px !important;
   color: white !important;
-  background-color: var(--accent-color-2) !important;
-  border: 1px solid var(--accent-color-2) !important;
+  background-color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
 
   &:active {
     cursor: grabbing;
@@ -2895,7 +2891,7 @@ video {
 
 .vue-slider-dot-handle {
   cursor: grab;
-  background-color: var(--accent-color-2) !important;
+  background-color: var(--accent-color) !important;
   border: 1px solid black !important;
 
   &:active {
@@ -2978,7 +2974,7 @@ video {
   font-size: 2.5rem;
   
   border-radius: 10%;
-  border: 10px solid var(--accent-color-2);
+  border: 10px solid var(--accent-color);
   overflow: auto;
   // the order for padding is top right bottom left
   padding-top: 2.5em;
@@ -3006,8 +3002,8 @@ video {
 
     
   p.highlight {
-    color: #EF5FA7;
-    filter: drop-shadow(0 0 .15em #e4a0c2);
+    color: var(--accent-color-3);
+    filter: drop-shadow(0 0 .15em var(--accent-color-3));
     // make uppercase
     font-size: 1.15em;
     text-transform: uppercase;
