@@ -254,12 +254,23 @@
         @toggle="onToggle"
       ></folder-view>
     </div>
-    
     <div class="bottom-content">
 
       <div id="tools">
+        <div v-if="((playCount > 0) && (playCount %2 == 0)) && !chartVisible " id="chart-button">
+          <v-btn
+            flat
+            @click="chartVisible = !chartVisible"
+            @keyup.enter="chartVisible = !chartVisible"
+            :color="accentColor"
+            >
+            Show change in brightness
+          </v-btn>
+        </div>
           <div id="chart-container" v-show="chartVisible" >
-          <div id="chart-container">
+            <div id="chart-title">
+              Supernova Lightcurve (Change in Brightness Over Time)
+            </div>
             <div id="yaxis-text">
               Supernova<br/>
               Brightness
@@ -999,7 +1010,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
-      chartVisible: true,
+      chartVisible: false,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -2187,7 +2198,6 @@ export default defineComponent({
     },
 
     showChart() {
-      console.log("show the chart");
       this.chartVisible = true;
     }
   },
@@ -2279,7 +2289,7 @@ export default defineComponent({
             this.selectedTime = this.nextDate();
           } else {
             this.playCount += 1;
-            console.log(`Play count: ${this.playCount}`);
+            this.showChart();
             this.selectedTime = minDate;
           }
           this.$nextTick(() => {
@@ -2329,7 +2339,8 @@ export default defineComponent({
     playCount(count: number) {
       if (count % 2) {
         // if playcount is even then we have either finished a loop or paused
-        this.showChart();
+        // this.showChart();
+        return;
       }
     },
   }
@@ -2471,6 +2482,15 @@ body {
     color: white;
     border-color: white;
   }
+}
+
+#chart-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  margin-bottom: 2em;
 }
 
 #chart-container {
