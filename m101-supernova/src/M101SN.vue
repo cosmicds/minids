@@ -977,7 +977,7 @@ export default defineComponent({
       currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,
-      m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
+      intialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
       chartXOffset: 0,
 
@@ -2134,23 +2134,18 @@ export default defineComponent({
 
     
     centerView(_options?: MoveOptions) {
-      const firstPlace = this.places[Object.keys(this.places)[0]];
+      
       this.gotoRADecZoom({
-        raRad: this.m101Position.ra * D2R,
-        decRad: this.m101Position.dec * D2R,
-        zoomDeg: firstPlace.get_zoomLevel()*6,
+        raRad: this.intialPosition.ra * D2R,
+        decRad: this.intialPosition.dec * D2R,
+        zoomDeg: this.intialPosition.zoom,
         instant: false,
       });
       // show the first image
-      this.selectedTime = this.imageDates[0];
-      this.onTimeSliderChange({zoomDeg: firstPlace.get_zoomLevel()});
-      // const now = new Date();
-      // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
-      // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      // this.selectedTime = this.binarySearch(this.dates, now.getTime());
-      // this.$nextTick(() => {
-      //   this.updateViewForDate(options);
-      // });
+      if (!this.playing) {
+        this.selectedTime = this.imageDates[0];
+        this.onTimeSliderChange({ zoomDeg: this.intialPosition.zoom });
+      }
     },
 
     updateForDateTime() {
