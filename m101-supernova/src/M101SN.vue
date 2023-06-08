@@ -2309,7 +2309,7 @@ export default defineComponent({
       }
     },
 
-    playingCometPath(play: boolean) {
+    playingImagePath(play: boolean) {
       this.clearPlayingInterval();
       if (!play) {
         return;
@@ -2321,7 +2321,7 @@ export default defineComponent({
         this.selectedTime = minTime;
       }
 
-      this.updateViewForDate({ zoomDeg: 60 });
+      this.updateViewForDate({ zoomDeg: this.intialPosition.zoom });
 
       this.playingIntervalId = setInterval(() => {
         if (this.playingWaitCount > 0) {
