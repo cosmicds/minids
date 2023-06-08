@@ -2302,7 +2302,7 @@ export default defineComponent({
           }
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate();
+            // this.updateViewForDate();
           });
         }, 100);
       }
