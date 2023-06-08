@@ -2172,6 +2172,29 @@ export default defineComponent({
       this.onItemSelected(place);
     },
 
+    wwtMove(options: GotoRADecZoomParams) {
+      this.$nextTick(() => {
+        this.gotoRADecZoom(options);
+      });
+    },
+
+    moveToPlace(place: Place, fovDeg = null as number | null) {
+      let zoomDeg: number;
+
+      if (fovDeg) {
+        zoomDeg = fovDeg * 6;
+      } else {
+        zoomDeg = this.optionalZoom(place);
+      }
+
+      this.wwtMove({
+        raRad: D2R * place.get_RA() * 15,
+        decRad: D2R * place.get_dec(),
+        zoomDeg: zoomDeg,
+        instant: true
+      });
+
+    },
 
     optionalZoom(place: Place, factor = 3): number {
       if (this.needToZoomIn(place, factor)) {
