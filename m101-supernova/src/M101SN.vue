@@ -753,6 +753,8 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
+import {GotoRADecZoomParams} from "@wwtelescope/engine-pinia";
+
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
 
 interface MoveOptions {
@@ -933,8 +935,8 @@ export default defineComponent({
       showHorizon: false,
       outerArrow: null as Poly | null,
       innerArrow: null as Poly | null,
-      m101RADeg: 3.681181581357794 * R2D,
-      m101DecDeg: 0.9480289529731357 * R2D,
+      m101RADeg:  210.802,
+      m101DecDeg: 54.348,
 
       showSpeadSheetLater: false,
 
@@ -1280,7 +1282,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-     
+      
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
       const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
@@ -1593,12 +1595,18 @@ export default defineComponent({
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
-    imageOutOfView(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place); },
+    imageOutOfView(place: Place): boolean {
+      return !this.checkIfPlaceIsInTheCurrentFOV(place);
+    },
 
-    needToZoomIn(place: Place, factor = 5): boolean {
+    needToZoomIn(place = null as Place | null, factor = 5): boolean {
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
+      if (place == null) {
+        if (this.incomingItemSelect == null) { return false; }
+        place = this.incomingItemSelect as Place;
+      }
       // 2) the image is too small (so it's fov < 1/6 of the current fov)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset != null) {
@@ -1607,10 +1615,20 @@ export default defineComponent({
       
       return false;
     },
+    
+    viewIsBad(place: Place, factor = 5): boolean {
+      if (place == null) {
+        place = this.incomingItemSelect as Place;
+      }
 
+      if (place == null) { return false; }
+
+      return this.imageOutOfView(place) || this.needToZoomIn(place, factor);
+    },
+    
     onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
-        this.showImageForDateTime(this.dateTime);
+        this.showImageForDateTime(this.dateTime, true);
         this.updateViewForDate(options);
       });
     },
@@ -1623,7 +1641,6 @@ export default defineComponent({
       this.updateImageOpacity(place, opacity);
 
       this.$nextTick(() => {
-        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
           this.selectedTime = this.imageSortBy[iset.get_name()];
           // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
@@ -1637,7 +1654,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: zoom,
+            zoomDeg: this.optionalZoom(place), // zoom if factor of 2.5x image zoomLevel
             instant: false
           });
         }
@@ -1951,7 +1968,6 @@ export default defineComponent({
           this.selectedTime = this.lastClosePt.date.getTime();
           this.$nextTick(() => {
             this.onTimeSliderChange();
-            this.updateViewForDate();
           });
         }
       }
@@ -2041,9 +2057,7 @@ export default defineComponent({
       // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
-      if (this.incomingItemSelect?.get_name() == name) {
-        return'';
-      }
+      
       return name;
     },
 
@@ -2230,7 +2244,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: this.wwtRARad,
             decRad: this.wwtDecRad,
-            zoomDeg: 120,
+            zoomDeg: this.wwtZoomDeg > 120 ? this.wwtZoomDeg : 120,
             instant: false
           });
         });
@@ -2572,7 +2586,7 @@ body {
 
 .active {
   // background-color: var(--active-button-color);
-  box-shadow: 0px 0px 10px 3px var(--accent-color);
+  box-shadow: inset 0px 0px 10px 3px var(--accent-color), 0px 0px 10px 3px var(--accent-color);
 }
 
 .top-content {
