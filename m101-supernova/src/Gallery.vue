@@ -1,5 +1,6 @@
 <template>
-  <div class="gallery-root">
+  <div
+    :class="['gallery-root', {'open': open}]">
     <slot
       name="closed"
       v-if="!open"
@@ -7,9 +8,15 @@
       <div
         class="default-activator blurred"
         @click="open = true"
+        @keyup.enter="open = true"
       >
-        <span class="default-activator-title">Image Gallery</span>
+        <span
+          class="default-activator-title noselect"
+        >
+          Image Gallery
+        </span>
         <img
+          class="noselect"
           :src="places[0] ? (getImageset(places[0])?.get_thumbnailUrl() ?? '') : ''"
         />
       </div>
@@ -20,15 +27,17 @@
       v-if="open"
     >
       <div
-        class="gallery-header noselect"
+        class="gallery-header"
       >
         <span class="gallery-title">{{ title }}</span>
-        <button
+        <font-awesome-icon
           class="gallery-close"
-          @click="open = false"  
-        >
-          Close
-        </button> 
+          icon="times"
+          size="lg"
+          @click="open = false"
+          @keyup.enter="open = false"
+          tabindex="0"
+        ></font-awesome-icon>
       </div>
       <div
         class="gallery-content"
@@ -36,11 +45,14 @@
         <div
           v-for="[index, place] of places.entries()"
           :key="index"
-          :class="['gallery-item', 'noselect', {'selected': selectedIndex === index}]"
-          @click="selectedIndex = index"
+          :class="['gallery-item', {'selected': selectedPlace === place}]"
+          @click="selectedPlace = place"
         >
-          <img :src="getImageset(place)?.get_thumbnailUrl() ?? ''"/>
-          <span class="place-name">{{ place.get_name() }}</span>
+          <img
+            class="noselect"
+            :src="getImageset(place)?.get_thumbnailUrl() ?? ''"
+          />
+          <span class="place-name noselect">{{ place.get_name() }}</span>
         </div>
       </div>
     </div>
@@ -53,7 +65,17 @@ import { Folder, Imageset, Place } from "@wwtelescope/engine";
 import { engineStore } from "@wwtelescope/engine-pinia";
 import { mapActions } from "pinia";
 
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
+library.add(faTimes);
+
 export default defineComponent({
+
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
   
   props: {
     wtmlUrl: { type: String, required: true },
@@ -74,7 +96,7 @@ export default defineComponent({
     return {
       open: false,
       places: [] as Place[],
-      selectedIndex: null as number | null
+      selectedPlace: null as Place | null
     };
   },
 
@@ -120,8 +142,8 @@ export default defineComponent({
   },
 
   watch: {
-    selectedIndex(newIndex) {
-      this.$emit("select", newIndex);
+    selectedPlace(place) {
+      this.$emit("select", place);
     }
   }
 });
@@ -135,14 +157,24 @@ export default defineComponent({
   backdrop-filter: blur(6px);
 }
 
+.gallery-root {
+  transition-property: height, width;
+  transition: 0.5s ease-out;
+}
+
 .gallery {
   border-radius: 5px;
   border: 1px solid white;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: var(--gallery-max-height);
   width: var(--gallery-width);
-  max-height: var(--galaxy-max-height);
+
+  // Better way to do this?
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .noselect {
@@ -164,11 +196,12 @@ export default defineComponent({
 .gallery-close {
   position: absolute;
   right: 3px;
+  cursor: pointer;
 }
 
 .gallery-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(var(--column-count), minmax(100px, 1fr));
   column-gap: 10px;
   row-gap: 5px;
   padding: 5px
@@ -182,6 +215,7 @@ export default defineComponent({
   width: fit-content;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 
   img {
     padding: 5px;
@@ -199,6 +233,7 @@ export default defineComponent({
   height: 100%;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 
   img {
     margin-left: auto;

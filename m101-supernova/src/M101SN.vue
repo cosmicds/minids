@@ -257,7 +257,6 @@
     <div class="right-content">
       <gallery
         wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
-        :columns="3"
         width="1000px"
       />
     </div>
