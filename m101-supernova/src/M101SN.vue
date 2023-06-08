@@ -2455,34 +2455,45 @@ body {
 
 #chart-container {
   --line-color: white;
-  pointer-events: auto;
   margin-left: auto;
   margin-right: 30px;
   // box-shadow: -4px 0 0 0 var(--line-color);
   color: var(--line-color);
   margin-bottom: -33px;
   
-  // makes the y-axis border look like an arrow
-  &:before {
-    content: "^";
-    // display: none;
-    position: absolute;
-    font-size: 1.5em;
-    font-weight: bold;
-    // for box-shadow axis
-    // transform: translateX(-.51em) translateY(-.55em);
-    transform: translateX(-10%) translateY(-.35em);
-    transform-origin: 0 0;
-    pointer-events: none;
+  div {
+    // outline: 1px solid orange;
   }
-
+  
+  #plot {
+    // box-shadow: -4px 0 0 0 var(--line-color);
+  
+    // makes the y-axis border look like an arrow
+    &:before {
+      content: "^";
+      position: absolute;
+      font-size: 1.5em;
+      font-weight: bold;
+      // transform: translateX(-.51em) translateY(-.55em);
+      transform: translateX(-10%) translateY(-.35em);
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+  }
+  
+  #chart-title {
+    text-align: center;
+    font-weight: bold;
+    color: var(--accent-color);
+  }
+  
   #yaxis-text {
     font-size: 1.15em;
     max-width: fit-content;
     position: absolute;
     top: 50%;
     transform: translate(calc(-100% - 20px), -150%);
-    background-color: rgba(0, 0, 0, 0.5);
+    // background-color: rgba(0, 0, 0, 0.5);
     padding: 2px 5px;
   }
   
