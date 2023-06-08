@@ -258,6 +258,7 @@
     <div class="bottom-content">
 
       <div id="tools">
+          <div id="chart-container" v-show="chartVisible" >
           <div id="chart-container">
             <div id="yaxis-text">
               Supernova<br/>
@@ -932,6 +933,7 @@ export default defineComponent({
       playingImagePath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
+      playCount: 0,
 
       showAltAzGrid: false,
       showConstellations: true,
@@ -997,6 +999,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
+      chartVisible: true,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -1363,10 +1366,10 @@ export default defineComponent({
     nextDate(wrap = false) {
       const index = this.getClosest(this.dates, this.selectedTime, true);
       if (this.dates[index] > this.selectedTime) {
-        this.selectedTime = this.dates[index];
+        return this.dates[index];
       } else {
         const next = index + 1;
-        this.selectedTime = this.dates[(wrap || next === this.dates.length) ? 0 : next];
+        return this.dates[(wrap || next === this.dates.length) ? 0 : next];
 
       }
     },
@@ -2181,6 +2184,11 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
+    },
+
+    showChart() {
+      console.log("show the chart");
+      this.chartVisible = true;
     }
   },
 
@@ -2265,10 +2273,13 @@ export default defineComponent({
     playing(play: boolean) {
       this.clearPlayingInterval();
       if (play) {
+        this.playCount += 1;
         this.playingIntervalId = setInterval(() => {
-          if (this.selectedTime < maxDate) {
-            this.nextDate();
+          if (this.selectedTime < Math.max(...this.dates)) {
+            this.selectedTime = this.nextDate();
           } else {
+            this.playCount += 1;
+            console.log(`Play count: ${this.playCount}`);
             this.selectedTime = minDate;
           }
           this.$nextTick(() => {
@@ -2276,6 +2287,8 @@ export default defineComponent({
             this.updateViewForDate();
           });
         }, 100);
+      } else if (this.playCount > 0) {
+        this.playCount += 1;
       }
     },
 
@@ -2299,7 +2312,7 @@ export default defineComponent({
           return;
         }
         if (this.selectedTime < maxTime) {
-          this.nextDate();
+          this.selectedTime = this.nextDate();
           this.$nextTick(() => {
             const image = this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
@@ -2311,7 +2324,14 @@ export default defineComponent({
           this.playingImagePath = false;
         }
       }, 500);
-    }
+    },
+
+    playCount(count: number) {
+      if (count % 2) {
+        // if playcount is even then we have either finished a loop or paused
+        this.showChart();
+      }
+    },
   }
 
   
