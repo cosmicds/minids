@@ -2085,7 +2085,7 @@ export default defineComponent({
       }
     },
 
-    showImagesetByName(name: string): boolean {
+    showImagesetByName(name: string, moveTo = false): boolean {
       const imagesetNames = Object.keys(this.imagesetLayers);
       let shown = false;
       imagesetNames.forEach((iname: string) => {
@@ -2093,6 +2093,8 @@ export default defineComponent({
           this.setLayerOpacityForImageSet(iname, 0);
         } else {
           this.setLayerOpacityForImageSet(iname, 1);
+          this.currentLayer = this.imagesetLayers[iname];
+          this.currentOpacity = 1;
           shown = true;
           // need to get the Place object for the image set and use it to set the view
           if (this.imagesetFolder != null) {
@@ -2102,6 +2104,9 @@ export default defineComponent({
               this.incomingItemSelect = place[0];
             }
           }
+          
+          if (!moveTo) { return; }
+          
           const iset = this.wwtControl.getImagesetByName(iname);
           const place = this.places[iname];
           if (iset == null) { return; }
@@ -2110,7 +2115,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * place.get_RA() * 15,
               decRad: D2R * place.get_dec(),
-              zoomDeg: this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg,
+              zoomDeg: this.optionalZoom(place),
               instant: true
             });
           });
@@ -2120,15 +2125,19 @@ export default defineComponent({
       return shown;
     },
     
-    showImageForDateTime(date: Date): boolean {
+    showImageForDateTime(date: Date, moveTo = false): boolean {
       const name = this.matchImageSetName(date);
       if (name == null || name == '') {
         // this.incomingItemSelect = null;
         return false;
       }
-      this.currentLayer = this.imagesetLayers[name];
-      this.currentOpacity = 1;
-      return this.showImagesetByName(name);
+      
+      if ((this.incomingItemSelect?.get_name() == name) && (!this.viewIsBad(this.places[name]))) {
+        // console.log('image already shown and view is good, so it has been "shown"');
+        return true;
+      }
+
+      return this.showImagesetByName(name, moveTo);
 
     },
 
