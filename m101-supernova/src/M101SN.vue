@@ -2294,6 +2294,7 @@ export default defineComponent({
     playing(play: boolean) {
       this.clearPlayingInterval();
       if (play) {
+        this.showImageForDateTime(this.dateTime, true);
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < maxDate) {
             this.nextDate();
