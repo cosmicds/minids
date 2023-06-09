@@ -2514,7 +2514,7 @@ body {
 }
   
 #chart-container {
-  pointer-events: auto;
+  // pointer-events: auto;
   position: relative;
   --line-color: white;
   margin-left: auto;
