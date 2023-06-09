@@ -169,7 +169,7 @@ export default defineComponent({
   flex-direction: column;
   overflow-y: auto;
   max-height: var(--gallery-max-height);
-  width: var(--gallery-width);
+  width: min(calc(var(--gallery-width)), calc(100%));
 
   // Better way to do this?
   position: fixed;
