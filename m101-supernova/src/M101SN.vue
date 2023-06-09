@@ -483,25 +483,27 @@
           </div>
         </transition-expand>
       </div>
-      <div class="opacity-slider-wrapper">
-        <vue-slider
-              v-if="!smallSize"
-              class="opacity-slider"
-              adsorb
-              :min="0"
-              :max="1"
-              :interval="0.01"
-              id="slider"
-              :order="false"
-              tooltipPlacement="bottom"
-              v-model="currentOpacity"
-              @change="(opacity: number) => setLayerOpacityForImageSet(currentLayer ? currentLayer.get_name() : '', opacity, false)"
-              >
-              <span>Change image opacity</span>
-      </vue-slider>
-    </div>
 
     </div>
+    
+    <div class="opacity-slider-wrapper">
+        <vue-slider
+          v-if="!smallSize"
+          class="opacity-slider"
+          adsorb
+          :min="0"
+          :max="1"
+          :interval="0.01"
+          id="slider"
+          :order="false"
+          tooltipPlacement="bottom"
+          v-model="currentOpacity"
+          @change="(opacity: number) => setLayerOpacityForImageSet(currentLayer ? currentLayer.get_name() : '', opacity, false)"
+          >
+          <span>Change image opacity</span>
+      </vue-slider>
+    </div>
+    
     <mini-credits class="bottom-credits"></mini-credits>
     
     <v-dialog
@@ -2640,8 +2642,8 @@ body {
 div.opacity-slider-wrapper {
   display:flex;
   position:absolute;
-  bottom: 1em;
-  left: 1em;
+  bottom: 1rem;
+  left: 1rem;
   width: 200px;
   border-radius: 20px;
   
