@@ -257,14 +257,24 @@
     <div class="bottom-content">
 
       <div id="tools">
-        <div v-if="((playCount > 0) && (playCount %2 == 0))" id="chart-button">
+        <div 
+        v-if="(playCount >=2)" 
+        id="chart-button"
+        :class="[(playCount >= 2) && (chartVisible) ? 'collapse-button': '']"
+        >
           <v-btn
             flat
             @click="chartVisible = !chartVisible"
             @keyup.enter="chartVisible = !chartVisible"
             :color="accentColor"
             >
-            {{ chartVisible ? 'Hide' : 'Show' }} supernova brightness graph
+              <font-awesome-icon
+                id="chart-icon"
+                class="control-icon"
+                :icon="chartVisible ? 'circle-xmark' : 'chart-line'"
+                size="xl"
+              />
+            <span id="button-text">{{ chartVisible ? 'Hide' : 'Show' }} supernova brightness graph</span>
           </v-btn>
         </div>
           <div id="chart-container" v-show="chartVisible" >
@@ -928,7 +938,7 @@ export default defineComponent({
   data() {
     const now = new Date();
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
       positionSet: false,
@@ -1006,7 +1016,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
-      chartVisible: true,
+      chartVisible: false,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -2489,9 +2499,20 @@ body {
   align-items: center;
   pointer-events: auto;
   margin-bottom: 2em;
+  span {
+    text-transform: none;
+  }
 }
 
-
+#chart-button.collapse-button {
+  justify-content: right;
+  margin-right: calc(30px + 1em);
+  margin-bottom: 0em;
+  background-color: transparent;
+  span#button-text {
+    display: none;
+  }
+}
   
 #chart-container {
   pointer-events: auto;
