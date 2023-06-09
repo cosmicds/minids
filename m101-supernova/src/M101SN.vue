@@ -257,14 +257,14 @@
     <div class="bottom-content">
 
       <div id="tools">
-        <div v-if="((playCount > 0) && (playCount %2 == 0)) && !chartVisible " id="chart-button">
+        <div v-if="((playCount > 0) && (playCount %2 == 0))" id="chart-button">
           <v-btn
             flat
             @click="chartVisible = !chartVisible"
             @keyup.enter="chartVisible = !chartVisible"
             :color="accentColor"
             >
-            Show change in brightness
+            {{ chartVisible ? 'Hide' : 'Show' }} supernova brightness graph
           </v-btn>
         </div>
           <div id="chart-container" v-show="chartVisible" >
