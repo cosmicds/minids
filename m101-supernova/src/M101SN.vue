@@ -232,32 +232,12 @@
         </v-tooltip>
       </div>
     </div>
-    
-    <div class="left-content">
-      <folder-view
-        v-if="imagesetFolder !== null"
-        class="folder-view"
-        :sliders="false"
-        expandable
-        :thumbnails="true"
-        :open="mobile ? false : true"
-        :root-folder="imagesetFolder"
-        :wwt-namespace="wwtNamespace"
-        :incomingItemSelect="incomingItemSelect"
-        :showName="true"
-        :itemNames="imageNames"
-        :sortBy="imageSortBy"
-        flex-direction="column"
-        @select="onItemSelected"
-        @opacity="(place: Place, opacity: number, m: boolean) => onOpacityChanged(place, opacity, false)" 
-        @toggle="onToggle"
-      ></folder-view>
-    </div>
 
     <div class="right-content">
       <gallery
         wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
         width="1000px"
+        @select="onItemSelected"
       />
     </div>
     
@@ -364,7 +344,7 @@
             :data="dates"
             tooltip="always"
             tooltip-placement="top"
-            tooltip-style="opacity: 0.75"
+            :tooltip-style="{opacity: 0.75}"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
@@ -490,7 +470,7 @@
               :order="false"
               tooltipPlacement="bottom"
               v-model="currentOpacity"
-              @change="(opacity: number) => setLayerOpacityForImageSet(currentLayer ? currentLayer.get_name() : '', opacity, false)"
+              @change="(opacity: number) => currentLayer?.set_opacity(opacity)"
               >
               <span>Change image opacity</span>
       </vue-slider>
@@ -1504,7 +1484,7 @@ export default defineComponent({
     },
     
     
-    onItemSelected(place: Place) {
+    async onItemSelected(place: Place) {
 
       if (place == null) {
         this.hideAllImagesets();
@@ -1513,23 +1493,22 @@ export default defineComponent({
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
 
-      const layer = this.imagesetLayers[iset.get_name()];
-      this.resetImagesetLayerOrder();
-      this.setImageSetLayerOrder({
-        id: layer.id.toString(),
-        order: this.wwtActiveLayers.length + 1
-      });
-      this.setLayerOpacityForImageSet(iset.get_name(), 1);
-      this.showImagesetByName(iset.get_name());
-      // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
-      this.selectedTime = this.imageSortBy[iset.get_name()];
-      // this.showImageForDateTime(this.dateTime);
-      
-      // this.updateViewForDate();
-
+      const name = iset.get_name();
+      let layer = this.imagesetLayers[name];
+      if (layer == null) {
+        layer = await this.addImageSetLayer({
+          url: iset.get_url(),
+          mode: "autodetect",
+          name: iset.get_name(),
+          goto: false 
+        });
+        this.imagesetLayers[name] = layer;
+      }
+      this.currentLayer = layer;
+            
       this.playing = false;
       this.playingImagePath = false;
-      
+ 
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
