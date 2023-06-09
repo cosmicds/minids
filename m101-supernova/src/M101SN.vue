@@ -272,7 +272,7 @@
               Supernova Lightcurve (Change in Brightness Over Time)
             </div>
             <div id="yaxis-text">
-              Supernova<br/>
+              Supernova <br />
               Brightness
             </div>
             <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
@@ -321,13 +321,6 @@
           
         
         <span class="tool-container">
-          <!-- <v-chip
-            id="sliderlabel"
-            outlined
-            label
-            >
-            Date
-          </v-chip> -->
           <v-tooltip
             location="top"
             :open-on-click="false"
@@ -352,7 +345,7 @@
                 }"
                 tabindex="0"
               >
-              Watch over time
+              <span id="play-icon-text">Watch <br /> over time</span>
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
@@ -933,7 +926,7 @@ export default defineComponent({
   data() {
     const now = new Date();
     return {
-      showSplashScreen: true,
+      showSplashScreen: false,
       imagesetLayers: {} as Record<string, ImageSetLayer>,
       layersLoaded: false,
       positionSet: false,
@@ -948,7 +941,7 @@ export default defineComponent({
       playCount: 0,
 
       showAltAzGrid: false,
-      showConstellations: true,
+      showConstellations: false,
       showArrow: true,
       showHorizon: false,
       outerArrow: null as Poly | null,
@@ -1011,7 +1004,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
-      chartVisible: false,
+      chartVisible: true,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -1407,7 +1400,9 @@ export default defineComponent({
 
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
-      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+      const dateString = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+      // const timeString = `${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+      return dateString;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -2290,7 +2285,7 @@ export default defineComponent({
             this.selectedTime = this.nextDate();
           } else {
             this.playCount += 1;
-            this.showChart();
+            // this.showChart();
             this.selectedTime = minDate;
           }
           this.$nextTick(() => {
@@ -2494,7 +2489,11 @@ body {
   margin-bottom: 2em;
 }
 
+
+  
 #chart-container {
+  pointer-events: auto;
+  position: relative;
   --line-color: white;
   margin-left: auto;
   margin-right: 30px;
@@ -2502,40 +2501,54 @@ body {
   color: var(--line-color);
   margin-bottom: -33px;
   
-  div {
-    // outline: 1px solid orange;
-  }
-  
-  #plot {
-    // box-shadow: -4px 0 0 0 var(--line-color);
-  
-    // makes the y-axis border look like an arrow
-    &:before {
-      content: "^";
-      position: absolute;
-      font-size: 1.5em;
-      font-weight: bold;
-      // transform: translateX(-.51em) translateY(-.55em);
-      transform: translateX(-10%) translateY(-.35em);
-      transform-origin: 0 0;
-      pointer-events: none;
-    }
+  // makes the y-axis border look like an arrow
+  #plot::before {
+    content: "^";
+    position: absolute;
+    font-size: 1.5em;
+    font-weight: bold;
+    // transform: translateX(-.51em) translateY(-.55em);
+    transform: translateX(-10%) translateY(-.35em);
+    transform-origin: 0 0;
+    pointer-events: none;
   }
   
   #chart-title {
+    display: none;
     text-align: center;
     font-weight: bold;
     color: var(--accent-color);
+    @media (max-width: 600px) {
+      font-size: 0.75em;
+    }
   }
   
   #yaxis-text {
+    // outline: 1px solid gold;
     font-size: 1.15em;
     max-width: fit-content;
     position: absolute;
     top: 50%;
-    transform: translate(calc(-100% - 20px), -150%);
-    // background-color: rgba(0, 0, 0, 0.5);
-    padding: 2px 5px;
+    transform: translateX(calc(-100% - 0.5em)) translateY(-50%);
+    
+    @media (max-width: 600px) {
+      font-size: 0.75em;
+    }
+    
+    
+    @media (max-width: 400px) {
+      position: relative;
+      top: unset;
+      max-width: none;
+      text-align: center;
+      transform: none;
+      font-size: 1em;
+      // transform: translateX(50%)
+      br {
+        display: none;
+      }
+      
+    }
   }
   
   #xaxis-text {
@@ -2543,11 +2556,16 @@ body {
     text-align: center;
     position: absolute;
     left: 50%;
-    bottom: 1em;
+    bottom: -2em;
     // box-shadow: 0px -4px 0px 0px var(--line-color);
     transform: translate(-50%, 0);
     padding: 2px 5px;
+    
+    @media (max-width: 600px) {
+      font-size: 0.75em;
+    }
   }
+  
   &:after {
     content: "^";
     position: absolute;
@@ -2557,16 +2575,12 @@ body {
     line-height: 0;
     font-weight: bold;
     // transform: translateX(75%) rotate(90deg);
-    transform: translateX(-.9em) translateY(-.75em) rotate(90deg);
+    transform: translateX(0.4em) translateY(-.75em) rotate(90deg);
     color: #ccc;
     transform-origin: 0 0;
     pointer-events: none;
   }
   
-  
-  @media (max-width: 600px) {
-    font-size: 0.75em;
-  }
   
 }
 
@@ -2579,6 +2593,10 @@ body {
   &:focus {
     color: white;
   }
+}
+
+#play-pause-icon-wrapper > #play-icon-text {
+  white-space: nowrap;
 }
 
 #video-icon-dummy {
@@ -2663,10 +2681,6 @@ div#main-content > div {
   // outline: 1px solid orange;
 }
 
-div.bottom-content > div {
-  content: "";
-  // outline: 1px solid rgb(154, 154, 251);
-}
 
 #tools {
   z-index: 10;
@@ -2686,6 +2700,7 @@ div.bottom-content > div {
     color: black;
     border-radius: 3px;
   }
+    
 }
 
 .tool-container {
@@ -2695,6 +2710,17 @@ div.bottom-content > div {
   align-items: center;
   gap: 5px;
   pointer-events: auto;
+  
+  @media (max-width: 400px) {
+    margin-top: 11px;
+    padding-left: 6px;
+    flex-direction: column-reverse;
+    align-items: center;
+    
+    #play-pause-icon-wrapper {
+      margin-top: 1em;
+    }
+  }
 }
 
 .folder-view {
