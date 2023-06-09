@@ -2597,7 +2597,7 @@ body {
     line-height: 0;
     font-weight: bold;
     // transform: translateX(75%) rotate(90deg);
-    transform: translateX(0.4em) translateY(-.75em) rotate(90deg);
+    transform: translateX(0.6em) translateY(-.76em) rotate(90deg);
     color: #ccc;
     transform-origin: 0 0;
     pointer-events: none;
@@ -2727,7 +2727,7 @@ div#main-content > div {
 
 .tool-container {
   display: flex;
-  width: 99%;
+  width: 100%;
   flex-direction: row;
   align-items: center;
   gap: 5px;
