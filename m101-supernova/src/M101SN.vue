@@ -507,9 +507,10 @@
               <span>Change image opacity</span>
       </vue-slider>
     </div>
-      <mini-credits></mini-credits>
-    </div>
 
+    </div>
+    <mini-credits class="bottom-credits"></mini-credits>
+    
     <v-dialog
       id="video-container"
       v-model="showVideoSheet"
@@ -2643,12 +2644,18 @@ div.opacity-slider-wrapper {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
+  bottom: 4rem;
   right: 1rem;
   width: calc(100% - 2rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+  
+.bottom-credits {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
 }
 
 div#main-content > div {
