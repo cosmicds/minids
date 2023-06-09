@@ -125,7 +125,7 @@
           <template v-slot:activator="{ props }">
             <div
               id="text-icon-wrapper"
-              class="control-icon-wrapper"
+              :class='["control-icon-wrapper", showTextSheet ? "active" : ""]'
               @mouseover="showTextTooltip = true"
               @mouseleave="showTextTooltip = false"
               v-bind="props"
