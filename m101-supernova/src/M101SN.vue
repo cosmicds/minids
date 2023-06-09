@@ -935,8 +935,8 @@ export default defineComponent({
       showHorizon: false,
       outerArrow: null as Poly | null,
       innerArrow: null as Poly | null,
-      m101RADeg:  210.802,
-      m101DecDeg: 54.348,
+      m101RADeg: 3.681181581357794 * R2D,
+      m101DecDeg: 0.9480289529731357 * R2D,
 
       showSpeadSheetLater: false,
 
