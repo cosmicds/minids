@@ -44,35 +44,16 @@
       </transition>
 
       <div id="top-content">
-        <v-tooltip
-          v-model="showVideoTooltip"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          close-on-content-click
-          :location="smallSize ? 'bottom' : 'end'"
+        <icon-button
+          v-model="showVideoSheet"
+          :color="accentColor"
+          fa-icon="video" 
+          :tooltip-location="smallSize ? 'bottom' : 'end'"
+          tooltip-text="Watch video"
+          tooltip-offset="10px"
+          :show-tooltip="!mobile"
         >
-          <template v-slot:activator="{ props }">
-            <div
-              @mouseover="showVideoTooltip = true"
-              @mouseleave="showVideoTooltip = false"
-              id="video-icon-wrapper"
-              class="control-icon-wrapper"
-              v-bind="props"
-              @click="showVideoSheet = true"
-              @keyup.enter="showVideoSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="video-icon"
-                class="control-icon"
-                icon="video"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Watch video</span>
-        </v-tooltip>
+        </icon-button>
         <div id="center-buttons-wrapper">
           <button
             id="show-layers-button"
@@ -81,70 +62,27 @@
           >
             {{ showLayers ? "Hide Images" : "Show Images" }}
           </button>
-          <v-tooltip
-            location="bottom"
-            :open-on-click="false"
-            :open-on-focus="false"
-            :open-on-hover="true"
-            v-model="showResetTooltip"
-          >
-            <template v-slot:activator="{ props }">
-              <div
-                @mouseover="showResetTooltip = true"
-                @mouseleave="showResetTooltip = false"
-                id="reset-icon-wrapper"
-                class="control-icon-wrapper"
-                v-bind="props"
-                tabindex="0"
-                @keyup.enter="() => {
-                  resetView(false);
-                  showResetTooltip = false;
-                }"
-                @click="() => {
-                  resetView(false);
-                  showResetTooltip = false;
-                }"
-              >
-                <font-awesome-icon
-                  id="reset-icon"
-                  class="control-icon"
-                  icon="redo"
-                  size="lg"
-                ></font-awesome-icon>
-              </div>
-            </template>
-            <span>Return to Carina</span>
-          </v-tooltip>
+          <icon-button
+            id="reset-icon"
+            fa-icon="redo"
+            :color="accentColor"
+            @activate="() => resetView(false)"
+            tooltip-text="Return to Carina"
+            tooltip-location="bottom"
+            tooltip-offset="3px"
+            :show-tooltip="!mobile"
+          ></icon-button> 
         </div>
-        <v-tooltip
-          :location="smallSize ? 'bottom' : 'start'"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showTextTooltip"
-          :offset="smallSize ? 0 : '45px'"
+        <icon-button
+          fa-icon="book-open"
+          :color="accentColor"
+          v-model="showTextSheet"
+          tooltip-text="Learn more"
+          :tooltip-location="smallSize ? 'bottom' : 'start'"
+          :tooltip-offset="smallSize ? '0' : '10px'"
+          :show-tooltip="!mobile"
         >
-          <template v-slot:activator="{ props }">
-            <div
-              id="text-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showTextTooltip = true"
-              @mouseleave="showTextTooltip = false"
-              v-bind="props"
-              @click="showTextSheet = true"
-              @keyup.enter="showTextSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="text-icon"
-                class="control-icon"
-                icon="book-open"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Learn more</span>
-        </v-tooltip>
+        </icon-button>
       </div>
 
       <div id="bottom-content">
@@ -443,12 +381,10 @@ export default defineComponent({
       showSplashScreen: false,
       showLayers: true,
       layersLoaded: false,
-      showResetTooltip: false,
-      showTextTooltip: false,
-      showVideoTooltip: false,
       sheet: null as SheetType,
       currentTool: "crossfade" as ToolType,
       tab: 0,
+      accentColor: "#F0AB52",
       networks: [
         { name: "facebook", color: "#1877f2", text: "Share" },
         { name: "twitter", color: "#1da1f2", text: "Tweet" },
@@ -458,6 +394,8 @@ export default defineComponent({
 
   created() {
     this.waitForReady().then(() => {
+
+      console.log(this);
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
@@ -565,7 +503,6 @@ export default defineComponent({
       },
       set(_value: boolean) {
         this.selectSheet('text');
-        this.showTextTooltip = false;
       }
     },
 
@@ -579,7 +516,6 @@ export default defineComponent({
           const video = document.querySelector("#info-video") as HTMLVideoElement;
           video.pause();
         }
-        this.showVideoTooltip = false;
       }
     },
 
