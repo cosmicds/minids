@@ -1,6 +1,7 @@
 {
   "name": "@minids/common",
   "version": "0.0.0",
+  "browser": "dist/index.umd.js",
   "dependencies": {
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@wwtelescope/engine-pinia": "^0.2.0",
@@ -20,6 +21,9 @@
   },
   "main": "./dist/index.common.js",
   "module": "dist/",
+  "publicConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "vue-cli-service build --target lib --name index src/index.ts",
     "clean": "rimraf dist",
