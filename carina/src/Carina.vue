@@ -726,26 +726,6 @@ body {
   }
 }
 
-.control-icon-wrapper {
-  color: #F0AB52;
-  background: #040404;
-  padding: 6px;
-  border: 1px solid #F0AB52;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  pointer-events: auto;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &:focus {
-    color: #FFFFFF;
-    border-color: #FFFFFF;
-  }
-}
-
 #bottom-content {
   display: flex;
   flex-direction: column;
