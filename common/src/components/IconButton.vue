@@ -50,8 +50,6 @@ export default defineComponent({
     color: { type: String, default: "#ffffff" },
     focusColor: { type: String, default: "#ffffff" },
     backgroundColor: { type: String, default: "#040404" },
-    padding: { type: String, default: "6px" },
-    borderRadius: { type: String, default: "20px" },
     border: { type: Boolean, default: true },
     tooltipText: { type: String, required: false },
     tooltipLocation: { type: String, default: "start" },
@@ -89,9 +87,7 @@ export default defineComponent({
       return {
         "--color": this.color,
         "--background-color": this.backgroundColor,
-        "--focus-color": this.focusColor,
-        "--padding": this.padding,
-        "--border-radius": this.borderRadius
+        "--focus-color": this.focusColor
       };
     }
   }
@@ -104,12 +100,12 @@ export default defineComponent({
   color: var(--color);
   border-color: var(--color);
   background: var(--background-color);
-  padding: var(--padding);
+  padding: 6px 8px;
   border: 1px solid var(--color);
   display: flex;
   align-items: center;
   pointer-events: auto;
-  border-radius: var(--border-radius);
+  border-radius: 20px;
 
   &:hover {
     cursor: pointer;
