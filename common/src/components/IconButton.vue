@@ -10,14 +10,16 @@
   >
     <template v-slot:activator>
       <div
-        class="icon-wrapper"
+        :class="['icon-wrapper', {'active': modelValue}]"
+        @click="updateValue"
+        :style="cssVars"
       >
         <slot name="button">
           <font-awesome-icon
             v-if="faIcon"
             :icon="faIcon"
             size="lg"
-            :class="['fa-icon', {'active': modelValue}]"
+            class="fa-icon"
           ></font-awesome-icon>
         </slot>
       </div>
@@ -49,18 +51,37 @@ export default defineComponent({
     tooltipOnClick: { type: Boolean, default: true },
     tooltipOnFocus: { type: Boolean, default: true },
     tooltipOnHover: { type: Boolean, default: true },
-    tooltipOffset: { type: String, default: "0" }
-  },
-
-  data() {
-    return {
-      tooltip: false
-    };
+    tooltipOffset: { type: String, default: "0" },
+    padding: { type: String, default: "6px" },
+    borderRadius: { type: String, default: "20px" }
   },
 
   methods: {
     updateValue() {
-      this.$emit('update:modelValue', !this.modelValue); 
+      if (this.modelValue === undefined) { return; }
+      this.active = !this.active;
+      this.$emit('update:modelValue', this.active); 
+    }
+  },
+
+  data() {
+    return {
+      active: false,
+      tooltip: false,
+    };
+  },
+
+  // Since our colors are used in compound values like e.g. box-shadows,
+  // we need to directly bind to CSS variables
+  computed: {
+    cssVars() {
+      return {
+        "--color": this.color,
+        "--background-color": this.backgroundColor,
+        "--focus-color": this.focusColor,
+        "--padding": this.padding,
+        "--border-radius": this.borderRadius
+      };
     }
   }
 
@@ -69,26 +90,27 @@ export default defineComponent({
 
 <style lang="less">
 .icon-wrapper {
-  color: v-bind(color);
-  border-color: v-bind(color);
-  background: v-bind(backgroundColor);
-  padding: .5em 1em;
-  border: 1px solid v-bind(color);
+  color: var(--color);
+  border-color: var(--color);
+  background: var(--background-color);
+  padding: var(--padding);
+  border: 1px solid var(--color);
   display: flex;
   align-items: center;
   pointer-events: auto;
+  border-radius: var(--border-radius);
 
   &:hover {
     cursor: pointer;
   }
 
   &:focus {
-    color: v-bind(focusColor);
-    border-color: v-bind(focusColor);
+    color: var(--focus-color);
+    border-color: var(--focus-color);
   }
 }
 
 .active { 
-  box-shadow: 0px 0px 10px 3px v-bind(color);
+  box-shadow: 0px 0px 10px 3px var(--color);
 }
 </style>
