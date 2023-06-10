@@ -379,7 +379,7 @@
             :data="dates"
             tooltip="always"
             tooltip-placement="bottom"
-            ::tooltip-style="{{opacity: 0.75}}"
+            :tooltip-style="{opacity: 0.75}"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
