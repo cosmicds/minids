@@ -2,9 +2,11 @@
   "name": "@minids/common",
   "version": "0.0.0",
   "dependencies": {
+    "@fortawesome/vue-fontawesome": "^3.0.3",
     "@wwtelescope/engine-pinia": "^0.2.0",
     "screenfull": "^6.0.2",
-    "vue": "^3"
+    "vue": "^3",
+    "vuetify": "^3.3.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "^5.0.8",
