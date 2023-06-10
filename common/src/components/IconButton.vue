@@ -1,18 +1,22 @@
 <template>
   <v-tooltip
     v-model="tooltip"
+    ref="tooltip"
     :location="tooltipLocation"
     :open-on-click="tooltipOnClick"
     :open-on-focus="tooltipOnFocus"
     :open-on-hover="tooltipOnHover"
     :offset="tooltipOffset"
-    :disabled="!tooltipText"
+    :disabled="!tooltipText || !showTooltip"
   >
-    <template v-slot:activator>
+  <template v-slot:activator="{ props }: { props: Record<string,any> }">
       <div
+        v-bind="props"
         :class="['icon-wrapper', {'active': modelValue}]"
-        @click="updateValue"
+        @click="handleAction"
+        @keyup.enter="handleAction"
         :style="cssVars"
+        tabindex="0"
       >
         <slot name="button">
           <font-awesome-icon
@@ -46,14 +50,16 @@ export default defineComponent({
     color: { type: String, default: "#ffffff" },
     focusColor: { type: String, default: "#ffffff" },
     backgroundColor: { type: String, default: "#040404" },
+    padding: { type: String, default: "6px" },
+    borderRadius: { type: String, default: "20px" },
+    border: { type: Boolean, default: true },
     tooltipText: { type: String, required: false },
     tooltipLocation: { type: String, default: "start" },
-    tooltipOnClick: { type: Boolean, default: true },
-    tooltipOnFocus: { type: Boolean, default: true },
+    tooltipOnClick: { type: Boolean, default: false },
+    tooltipOnFocus: { type: Boolean, default: false },
     tooltipOnHover: { type: Boolean, default: true },
-    tooltipOffset: { type: String, default: "0" },
-    padding: { type: String, default: "6px" },
-    borderRadius: { type: String, default: "20px" }
+    tooltipOffset: { type: [String, Number], default: 0 },
+    showTooltip: { type: Boolean, default: true }
   },
 
   methods: {
@@ -61,6 +67,11 @@ export default defineComponent({
       if (this.modelValue === undefined) { return; }
       this.active = !this.active;
       this.$emit('update:modelValue', this.active); 
+    },
+
+    handleAction() {
+      this.updateValue();
+      this.$emit('activate');
     }
   },
 
@@ -112,5 +123,9 @@ export default defineComponent({
 
 .active { 
   box-shadow: 0px 0px 10px 3px var(--color);
+
+  &:focus {
+    box-shadow: 0px 0px 10px 3px var(--focus-color);
+  }
 }
 </style>
