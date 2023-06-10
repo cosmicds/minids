@@ -379,7 +379,7 @@
             :data="dates"
             tooltip="always"
             tooltip-placement="bottom"
-            :tooltip-style="{opacity: 0.75}"
+            ::tooltip-style="{{opacity: 0.75}}"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
             "
@@ -777,6 +777,8 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
+import {GotoRADecZoomParams} from "@wwtelescope/engine-pinia";
+
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
 
 interface MoveOptions {
@@ -1002,7 +1004,7 @@ export default defineComponent({
       currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,
-      m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
+      intialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
       chartXOffset: 0,
 
@@ -1306,7 +1308,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-     
+      
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
       const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
@@ -1621,12 +1623,18 @@ export default defineComponent({
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
-    imageOutOfView(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place); },
+    imageOutOfView(place: Place): boolean {
+      return !this.checkIfPlaceIsInTheCurrentFOV(place);
+    },
 
-    needToZoomIn(place: Place, factor = 5): boolean {
+    needToZoomIn(place = null as Place | null, factor = 5): boolean {
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
+      if (place == null) {
+        if (this.incomingItemSelect == null) { return false; }
+        place = this.incomingItemSelect as Place;
+      }
       // 2) the image is too small (so it's fov < 1/6 of the current fov)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset != null) {
@@ -1635,10 +1643,20 @@ export default defineComponent({
       
       return false;
     },
+    
+    viewIsBad(place: Place, factor = 5): boolean {
+      if (place == null) {
+        place = this.incomingItemSelect as Place;
+      }
 
+      if (place == null) { return false; }
+
+      return this.imageOutOfView(place) || this.needToZoomIn(place, factor);
+    },
+    
     onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
-        this.showImageForDateTime(this.dateTime);
+        this.showImageForDateTime(this.dateTime, true);
         this.updateViewForDate(options);
       });
     },
@@ -1651,7 +1669,6 @@ export default defineComponent({
       this.updateImageOpacity(place, opacity);
 
       this.$nextTick(() => {
-        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
           this.selectedTime = this.imageSortBy[iset.get_name()];
           // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
@@ -1665,7 +1682,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: zoom,
+            zoomDeg: this.optionalZoom(place), // zoom if factor of 2.5x image zoomLevel
             instant: false
           });
         }
@@ -1979,7 +1996,6 @@ export default defineComponent({
           this.selectedTime = this.lastClosePt.date.getTime();
           this.$nextTick(() => {
             this.onTimeSliderChange();
-            this.updateViewForDate();
           });
         }
       }
@@ -2069,9 +2085,7 @@ export default defineComponent({
       // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
-      if (this.incomingItemSelect?.get_name() == name) {
-        return'';
-      }
+      
       return name;
     },
 
@@ -2113,7 +2127,7 @@ export default defineComponent({
       }
     },
 
-    showImagesetByName(name: string): boolean {
+    showImagesetByName(name: string, moveTo = false): boolean {
       const imagesetNames = Object.keys(this.imagesetLayers);
       let shown = false;
       imagesetNames.forEach((iname: string) => {
@@ -2121,6 +2135,8 @@ export default defineComponent({
           this.setLayerOpacityForImageSet(iname, 0);
         } else {
           this.setLayerOpacityForImageSet(iname, 1);
+          this.currentLayer = this.imagesetLayers[iname];
+          this.currentOpacity = 1;
           shown = true;
           // need to get the Place object for the image set and use it to set the view
           if (this.imagesetFolder != null) {
@@ -2130,6 +2146,9 @@ export default defineComponent({
               this.incomingItemSelect = place[0];
             }
           }
+          
+          if (!moveTo) { return; }
+          
           const iset = this.wwtControl.getImagesetByName(iname);
           const place = this.places[iname];
           if (iset == null) { return; }
@@ -2138,7 +2157,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * place.get_RA() * 15,
               decRad: D2R * place.get_dec(),
-              zoomDeg: this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg,
+              zoomDeg: this.optionalZoom(place),
               instant: true
             });
           });
@@ -2148,37 +2167,36 @@ export default defineComponent({
       return shown;
     },
     
-    showImageForDateTime(date: Date): boolean {
+    showImageForDateTime(date: Date, moveTo = false): boolean {
       const name = this.matchImageSetName(date);
       if (name == null || name == '') {
         // this.incomingItemSelect = null;
         return false;
       }
-      this.currentLayer = this.imagesetLayers[name];
-      this.currentOpacity = 1;
-      return this.showImagesetByName(name);
+      
+      if ((this.incomingItemSelect?.get_name() == name) && (!this.viewIsBad(this.places[name]))) {
+        // console.log('image already shown and view is good, so it has been "shown"');
+        return true;
+      }
+
+      return this.showImagesetByName(name, moveTo);
 
     },
 
     
     centerView(_options?: MoveOptions) {
-      const firstPlace = this.places[Object.keys(this.places)[0]];
+      
       this.gotoRADecZoom({
-        raRad: this.m101Position.ra * D2R,
-        decRad: this.m101Position.dec * D2R,
-        zoomDeg: firstPlace.get_zoomLevel()*6,
+        raRad: this.intialPosition.ra * D2R,
+        decRad: this.intialPosition.dec * D2R,
+        zoomDeg: this.intialPosition.zoom,
         instant: false,
       });
       // show the first image
-      this.selectedTime = this.imageDates[0];
-      this.onTimeSliderChange({zoomDeg: firstPlace.get_zoomLevel()});
-      // const now = new Date();
-      // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
-      // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      // this.selectedTime = this.binarySearch(this.dates, now.getTime());
-      // this.$nextTick(() => {
-      //   this.updateViewForDate(options);
-      // });
+      if (!this.playing) {
+        this.selectedTime = this.imageDates[0];
+        this.onTimeSliderChange({ zoomDeg: this.intialPosition.zoom });
+      }
     },
 
     updateForDateTime() {
@@ -2207,6 +2225,37 @@ export default defineComponent({
 
     showChart() {
       this.chartVisible = true;
+    },
+
+    wwtMove(options: GotoRADecZoomParams) {
+      this.$nextTick(() => {
+        this.gotoRADecZoom(options);
+      });
+    },
+
+    moveToPlace(place: Place, fovDeg = null as number | null) {
+      let zoomDeg: number;
+
+      if (fovDeg) {
+        zoomDeg = fovDeg * 6;
+      } else {
+        zoomDeg = this.optionalZoom(place);
+      }
+
+      this.wwtMove({
+        raRad: D2R * place.get_RA() * 15,
+        decRad: D2R * place.get_dec(),
+        zoomDeg: zoomDeg,
+        instant: true
+      });
+
+    },
+
+    optionalZoom(place: Place, factor = 3): number {
+      if (this.needToZoomIn(place, factor)) {
+        console.log('optionalZoom: zoom in');
+      }
+      return this.needToZoomIn(place, factor) ? place.get_zoomLevel() : this.wwtZoomDeg;
     }
   },
 
@@ -2227,7 +2276,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: this.wwtRARad,
             decRad: this.wwtDecRad,
-            zoomDeg: 120,
+            zoomDeg: this.wwtZoomDeg > 120 ? this.wwtZoomDeg : 120,
             instant: false
           });
         });
@@ -2292,6 +2341,7 @@ export default defineComponent({
       this.clearPlayingInterval();
       if (play) {
         this.playCount += 1;
+        this.showImageForDateTime(this.dateTime, true);
         this.playingIntervalId = setInterval(() => {
           if (this.selectedTime < Math.max(...this.dates)) {
             this.selectedTime = this.nextDate();
@@ -2302,7 +2352,7 @@ export default defineComponent({
           }
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate();
+            // this.updateViewForDate();
           });
         }, 100);
       } else if (this.playCount > 0) {
@@ -2310,7 +2360,7 @@ export default defineComponent({
       }
     },
 
-    playingCometPath(play: boolean) {
+    playingImagePath(play: boolean) {
       this.clearPlayingInterval();
       if (!play) {
         return;
@@ -2322,7 +2372,7 @@ export default defineComponent({
         this.selectedTime = minTime;
       }
 
-      this.updateViewForDate({ zoomDeg: 60 });
+      this.updateViewForDate({ zoomDeg: this.intialPosition.zoom });
 
       this.playingIntervalId = setInterval(() => {
         if (this.playingWaitCount > 0) {
@@ -2643,7 +2693,7 @@ body {
 
 .active {
   // background-color: var(--active-button-color);
-  box-shadow: 0px 0px 10px 3px var(--accent-color);
+  box-shadow: inset 0px 0px 10px 3px var(--accent-color), 0px 0px 10px 3px var(--accent-color);
 }
 
 .top-content {
