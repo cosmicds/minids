@@ -42,17 +42,17 @@ const topContent = {
   commands: {},
   sections: {},
   elements: {
-    videoIconWrapper: {
-      selector: "#video-icon-wrapper"
+    videoIcon: {
+      selector: "#video-icon-button"
     },
     showHideButton: {
       selector: "#show-layers-button"
     },
-    resetIconWrapper: {
-      selector: "#reset-icon-wrapper"
+    resetIcon: {
+      selector: "#reset-icon-button"
     },
-    textIconWrapper: {
-      selector: "#text-icon-wrapper"
+    textIcon: {
+      selector: "#text-icon-button"
     }
   }
 };
