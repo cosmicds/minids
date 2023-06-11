@@ -46,6 +46,7 @@
       <div id="top-content">
         <icon-button
           v-model="showVideoSheet"
+          id="video-icon"
           :color="accentColor"
           fa-icon="video" 
           :tooltip-location="smallSize ? 'bottom' : 'end'"
@@ -74,6 +75,7 @@
           ></icon-button> 
         </div>
         <icon-button
+          id="text-icon"
           fa-icon="book-open"
           :color="accentColor"
           v-model="showTextSheet"

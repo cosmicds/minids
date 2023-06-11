@@ -63,7 +63,7 @@
         <icon-button
           v-model="showLocationSelector"
           fa-icon="location-pin"
-          id="map-icon-wrapper"
+          id="map-icon"
           :color="cometColor"
           tooltip-text="Select location"
           tooltip-location="bottom"
