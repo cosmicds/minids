@@ -1,7 +1,6 @@
 <template>
   <v-tooltip
     v-model="tooltip"
-    ref="tooltip"
     :location="tooltipLocation"
     :open-on-click="tooltipOnClick"
     :open-on-focus="tooltipOnFocus"
@@ -12,6 +11,7 @@
   <template v-slot:activator="{ props }: { props: Record<string,any> }">
       <div
         v-bind="props"
+        :id="buttonID"
         :class="['icon-wrapper', {'active': modelValue}]"
         @click="handleAction"
         @keyup.enter="handleAction"
@@ -23,7 +23,7 @@
             v-if="faIcon"
             :icon="faIcon"
             size="lg"
-            class="fa-icon"
+            :class="['fa-icon', faIcon]"
           ></font-awesome-icon>
         </slot>
       </div>
@@ -89,6 +89,11 @@ export default defineComponent({
         "--background-color": this.backgroundColor,
         "--focus-color": this.focusColor
       };
+    },
+
+    buttonID() {
+      const id = this.$attrs['id'];
+      return id ? `${id}-button` : null;
     }
   }
 
