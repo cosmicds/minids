@@ -8,7 +8,7 @@
     :offset="tooltipOffset"
     :disabled="!tooltipText || !showTooltip"
   >
-  <template v-slot:activator="{ props }: { props: Record<string,any> }">
+    <template v-slot:activator="{ props }: { props: Record<string,any> }">
       <div
         v-bind="props"
         :id="buttonID"
