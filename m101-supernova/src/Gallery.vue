@@ -1,6 +1,11 @@
 <template>
   <div
     :class="['gallery-root', {'open': open}]">
+    <div class="just-holding-events"
+        @click="open = true"
+        @keyup.enter="open = true"
+        tabindex="0"
+    >
     <slot
       name="closed"
       v-if="!open"
@@ -21,6 +26,7 @@
         />
       </div>
     </slot>
+  </div>
     <div
       :style="cssVars"
       class="gallery blurred"
