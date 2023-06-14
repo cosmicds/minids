@@ -883,7 +883,12 @@ while (t <= maxDate) {
 
 for (const d of imageDates) {
   if (!dates.includes(d)) {
-    dates.push(d);
+    // dates.push(d);
+    // find the nearest value in dates to d and replace it with d
+    const closest = dates.reduce((a, b) => {
+      return Math.abs(b - d) < Math.abs(a - d) ? b : a;
+    });
+    dates.splice(dates.indexOf(closest), 1, d);
   }
 }
 
