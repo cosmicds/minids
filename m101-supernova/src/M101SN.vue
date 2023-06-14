@@ -1154,9 +1154,9 @@ export default defineComponent({
       }
 
       this.gotoRADecZoom({
-        raRad: D2R * this.m101Position.ra,
-        decRad: D2R * this.m101Position.dec,
-        zoomDeg: this.m101Position.zoom,
+        raRad: D2R * this.intialPosition.ra,
+        decRad: D2R * this.intialPosition.dec,
+        zoomDeg: this.intialPosition.zoom,
         instant: true
       });
 
