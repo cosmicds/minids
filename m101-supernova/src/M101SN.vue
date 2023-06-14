@@ -237,7 +237,9 @@
       <gallery
         wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
         width="1000px"
+        :single-select="false"
         @select="onItemSelected"
+        @deselect="onItemDeselected"
       />
     </div>
     
@@ -1266,7 +1268,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-     
+    
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
       const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
@@ -1483,11 +1485,31 @@ export default defineComponent({
       return new Date(dates[names.indexOf(iset.get_name())]);
     },
     
+    onItemDeselected(place: Place) {
+      
+      if (place == null) {
+        return;
+      }
+      const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
+      if (iset == null) { return; }
+
+      const name = iset.get_name();
+      const layer = this.imagesetLayers[name];
+      console.log('onItemDeselected', name);
+      if (layer == null) {
+        return;
+      } else {
+        this.setLayerOpacityForImageSet(name, 0);
+      }
+      
+    },
     
     async onItemSelected(place: Place) {
 
       if (place == null) {
+        console.log('place is null');
         this.hideAllImagesets();
+        return;
       }
       
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
@@ -1505,10 +1527,11 @@ export default defineComponent({
         this.imagesetLayers[name] = layer;
       }
       this.currentLayer = layer;
+      this.setLayerOpacityForImageSet(name, 1);
             
       this.playing = false;
       this.playingImagePath = false;
- 
+      console.log('onItemSelected', name);
       // Give time for the selectedTime changes to propagate
       setTimeout(() => {
         this.$nextTick(() => {
@@ -1524,6 +1547,7 @@ export default defineComponent({
       }, 10);
       
     },
+    
 
     wwtSmallestFov(): number {
       // ignore the possibility of rotation
@@ -2033,6 +2057,7 @@ export default defineComponent({
     },
 
     hideAllImagesets() {
+      console.log('hiding everything');
       for (const name of Object.keys(this.imagesetLayers)) {
         this.setLayerOpacityForImageSet(name, 0);
       }
@@ -2044,27 +2069,38 @@ export default defineComponent({
         // update the image opacity in the WWT control
         applyImageSetLayerSetting(layer, ['opacity', opacity]);
 
-        // update the value for the slider only if we are not setting the opacity from the UI
-        if (!setting_opacity_from_ui) {
-          const selector = `#items div.item[id='fv-${name}'] input.opacity-range[type='range']`;
-          const el = (document.querySelector(selector) as HTMLInputElement);
-          if (el != null) {
-            el.value = `${opacity * 100}`;
+        try {
+          // update the value for the slider only if we are not setting the opacity from the UI
+          if (!setting_opacity_from_ui) {
+            // check if name is a valid queryselector
+            const selector = `#items div.item[id='fv-${name}'] input.opacity-range[type='range']`;
+            const el = (document.querySelector(selector) as HTMLInputElement);
+            if (el != null) {
+              el.value = `${opacity * 100}`;
+            }
           }
         }
+        catch (error) {
+          //
+        }
 
-        const toggleSelector = `#items input[type='checkbox'][title='${name}']`;
-        const el2 = (document.querySelector(toggleSelector) as HTMLInputElement);
-        // truth table: opacity == 0 and el.checked == false => do nothing
-        // truth table: opacity == 0 and el.checked == true => set el.checked = false
-        // truth table: opacity > 0 and el.checked == false => set el.checked = true
-        // truth table: opacity > 0 and el.checked == true => do nothing
-        if (el2 != null) {
-          if (opacity == 0 && el2.checked) {
-            el2.checked = false;
-          } else if (opacity > 0 && !el2.checked) {
-            el2.checked = true;
+        try {
+          const toggleSelector = `#items input[type='checkbox'][title='${name}']`;
+          const el2 = (document.querySelector(toggleSelector) as HTMLInputElement);
+          // truth table: opacity == 0 and el.checked == false => do nothing
+          // truth table: opacity == 0 and el.checked == true => set el.checked = false
+          // truth table: opacity > 0 and el.checked == false => set el.checked = true
+          // truth table: opacity > 0 and el.checked == true => do nothing
+          if (el2 != null) {
+            if (opacity == 0 && el2.checked) {
+              el2.checked = false;
+            } else if (opacity > 0 && !el2.checked) {
+              el2.checked = true;
+            }
           }
+        }
+        catch (error) {
+          //
         }
         
       }

@@ -51,8 +51,8 @@
         <div
           v-for="[index, place] of places.entries()"
           :key="index"
-          :class="['gallery-item', {'selected': selectedPlace === place}]"
-          @click="selectedPlace = place"
+          :class="['gallery-item', {'selected': highlightLastOnly ? selectedPlace === place : selectedPlaces.includes(place)}]"
+          @click="selectPlace(place)"
         >
           <img
             class="noselect"
@@ -89,7 +89,9 @@ export default defineComponent({
     width: { type: String, default: "300px" },
     maxHeight: { type: String, default: "500px" },
     title: { type: String, default: "Gallery" },
-    selectedColor: { type: String, default: "dodgerblue" }
+    selectedColor: { type: String, default: "dodgerblue" },
+    singleSelect: { type: Boolean, default: true },
+    highlightLastOnly: { type: Boolean, default: false },
   },
 
   async created() {
@@ -102,7 +104,8 @@ export default defineComponent({
     return {
       open: false,
       places: [] as Place[],
-      selectedPlace: null as Place | null
+      selectedPlace: null as Place | null,
+      selectedPlaces: [] as Place[],
     };
   },
 
@@ -133,6 +136,36 @@ export default defineComponent({
         url: wtmlUrl,
         loadChildFolders: true
       }).then((folder) => this.extractPlaces(folder));  
+    },
+
+    selectPlace(place: Place) {
+      if (this.singleSelect) {
+        // if we're already selected, deselect
+        if (this.selectedPlace === place) {
+          this.$emit("deselect", place);
+          this.selectedPlaces = [];
+          this.selectedPlace = null;
+          return;
+        } else {
+          // else deselect whatever was there before, and select this
+          this.selectedPlaces.forEach((p) => this.$emit("deselect", p));
+          this.selectedPlaces = [place];
+          this.selectedPlace = place;
+          return;
+        }
+      }
+
+      // for multi-select
+      // if we're already selected, deselect
+      if (this.selectedPlaces.includes(place)) {
+        this.$emit("deselect", place);
+        this.selectedPlace = null;
+        this.selectedPlaces.splice(this.selectedPlaces.indexOf(place), 1);
+      } else {
+        this.selectedPlace = place;
+        this.selectedPlaces = this.singleSelect ? [place] : [...this.selectedPlaces, place];
+      }
+      
     }
   },
 
@@ -149,7 +182,11 @@ export default defineComponent({
 
   watch: {
     selectedPlace(place) {
+      if (place == null) { return; }
       this.$emit("select", place);
+      if (!this.singleSelect) {
+        this.$emit("listAllSelected", this.selectedPlaces);
+      }
     }
   }
 });
