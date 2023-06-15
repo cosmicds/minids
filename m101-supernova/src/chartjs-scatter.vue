@@ -376,8 +376,8 @@ export default defineComponent({
         ymin: ymin,
         ymax: ymax,
       };
-      console.log('plot corners');
-      console.log(bounds);
+
+
       // check for nan values
       if (Object.values(bounds).some(v => isNaN(v))) {
         console.log('bounds has nan values');
@@ -388,7 +388,6 @@ export default defineComponent({
         'bounds': bounds,
         'borders': this.getBorders,
       };
-      console.log('emitting bounds', emitThis);
       this.$emit("bounds", emitThis);
       
       return bounds;
@@ -431,14 +430,12 @@ export default defineComponent({
 
 .chartjs {
   pointer-events: auto;
-  outline: 1px solid red;
   width: 100%;
 }
 
 
 #plot {
   position: relative;
-  outline: 1px solid greenyellow;
   width: 100%;
   max-height: 20dvh;
   height: 100%;

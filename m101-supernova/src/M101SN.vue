@@ -2613,7 +2613,6 @@ body {
   // box-shadow: -4px 0 0 0 var(--line-color);
   color: var(--line-color);
   margin-bottom: -33px;
-  outline: 1px solid blue;
   
   // makes the y-axis border look like an arrow
   #plot::before {
