@@ -130,6 +130,7 @@
         wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
         width="1000px"
         :single-select="false"
+        :selected-color="accentColor3"
         @select="onItemSelected"
         @deselect="onItemDeselected"
       />
