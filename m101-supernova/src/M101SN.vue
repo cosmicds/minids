@@ -889,7 +889,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
-      chartVisible: true,
+      chartVisible: false,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
