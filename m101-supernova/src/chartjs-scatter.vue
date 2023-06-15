@@ -429,7 +429,7 @@ export default defineComponent({
 <style scoped lang="less">
 
 .chartjs {
-  pointer-events: auto;
+  // pointer-events: auto;
   width: 100%;
 }
 
