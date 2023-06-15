@@ -9,6 +9,10 @@ import chartjsScatter from "./chartjs-scatter.vue";
 import d3Scatter from "./d3-scatter.vue";
 // import PlotDataPlotly from "./PlotDataPlotly.vue";
 import ConstellationIcon from "./ConstellationIcon.vue";
+import { IconButton } from "@minids/common";
+
+import Gallery from "./Gallery.vue";
+// import { Gallery } from "@minids/common";
 
 import "./polyfills";
 
@@ -38,6 +42,8 @@ import {
   faImages,
   faRefresh,
   faStar,
+  faChartLine,
+  faCircleXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
@@ -57,6 +63,8 @@ library.add(faPause);
 library.add(faPlay);
 library.add(faRefresh);
 library.add(faStar);
+library.add(faChartLine);
+library.add(faCircleXmark);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
@@ -114,6 +122,8 @@ createApp(M101SN, {
   .component('d3-scatter', d3Scatter)
   // .component('plot-plotly', PlotDataPlotly)
   .component('constellation-icon', ConstellationIcon)
+  .component('gallery', Gallery)
+  .component('icon-button', IconButton)
 
   // Mount
   .mount("#app");

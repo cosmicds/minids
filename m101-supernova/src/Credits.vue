@@ -7,6 +7,9 @@
       <a href="https://worldwidetelescope.org/home/" target="_blank"
         ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
       /></a>
+      <a href="https://mo-www.cfa.harvard.edu/MicroObservatory/" target="_blank" class="pl-1"
+        ><img alt="MicroObservatory at CfA" src="../src/assets/MicroObservatory_Logo.png"
+      /></a>
       <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
         ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
       /></a>

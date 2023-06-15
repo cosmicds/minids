@@ -60,94 +60,35 @@
         ></font-awesome-icon>
       </div>
       <div id="center-buttons">
-        <v-tooltip
-          v-model="showMapTooltip"
-          location="bottom"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="map-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showMapTooltip = true"
-              @mouseleave="showMapTooltip = false"
-              v-bind="props"
-              @click="showLocationSelector = true"
-              @keyup.enter="showLocationSelector = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="location-icon"
-                class="control-icon px-1"
-                icon="location-pin"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Select location</span>
-        </v-tooltip>
+        <icon-button
+          v-model="showLocationSelector"
+          fa-icon="location-pin"
+          id="map-icon"
+          :color="cometColor"
+          tooltip-text="Select location"
+          tooltip-location="bottom"
+          tooltip-offset="5px"
+        ></icon-button> 
       </div>
       <div id="right-buttons">
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showTextTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="text-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showTextTooltip = true"
-              @mouseleave="showTextTooltip = false"
-              v-bind="props"
-              @click="showTextSheet = true"
-              @keyup.enter="showTextSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="text-icon"
-                class="control-icon"
-                icon="book-open"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Learn more</span>
-        </v-tooltip>
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showVideoTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="video-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showVideoTooltip = true"
-              @mouseleave="showVideoTooltip = false"
-              v-bind="props"
-              @click="showVideoSheet = true"
-              @keyup.enter="showVideoSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="video-icon"
-                class="control-icon"
-                icon="video"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Watch video</span>
-        </v-tooltip>
+        <icon-button
+          v-model="showTextSheet"
+          id="text-icon"
+          :color="cometColor"
+          fa-icon="book-open"
+          tooltip-text="Learn more"
+          tooltip-location="start"
+          :tooltip-offset="smallSize ? 0 : '10px'"
+        ></icon-button>
+        <icon-button
+          v-model="showVideoSheet"
+          id="video-icon"
+          fa-icon="video"
+          :color="cometColor"
+          tooltip-text="Watch video"
+          tooltip-location="start"
+          :tooltip-offset="smallSize ? 0 : '10px'"
+        ></icon-button>
       </div>
     </div>
     
@@ -183,7 +124,7 @@
             @click="showControls = !showControls"
             @keyup.enter="showControls = !showControls"
             tabindex="0"
-          />
+          /> 
         </div>
         <transition-expand>
           <div v-if="showControls" class="controls-content">
@@ -271,40 +212,18 @@
             >
             Date
           </v-chip> -->
-          <v-tooltip
-            location="top"
-            :open-on-click="false"
-            :open-on-focus="false"
-            :open-on-hover="true"
-            v-model="showPlayPauseTooltip"
-          >
-            <template v-slot:activator="{ props }">
-              <div
-                id="play-pause-icon-wrapper"
-                class="control-icon-wrapper"
-                @mouseover="showPlayPauseTooltip = true"
-                @mouseleave="showPlayPauseTooltip = false"
-                v-bind="props"
-                @click="() => {
-                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
-                }"
-                @keyup.enter="() => {
-                  playing = !(playing || playingCometPath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingCometPath = false; // don't reverse the order of this line and previous or logic will break.
-                }"
-                tabindex="0"
-              >
-                <font-awesome-icon
-                  id="play-pause-icon"
-                  class="control-icon"
-                  :icon="!(playing || playingCometPath) ? 'play' : 'pause'"
-                  size="lg"
-                ></font-awesome-icon>
-              </div>
-            </template>
-            <span>Play/Pause</span>
-          </v-tooltip>
+          <icon-button
+            id="play-pause-icon"
+            :fa-icon="!(playing || playingCometPath) ? 'play' : 'pause'"
+            @activate="() => {
+              playing = !(playing || playingCometPath);
+              playingCometPath = false;
+            }"
+            :color="ephemerisColor"
+            tooltip-text="Play/Pause"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
           <vue-slider
             id="slider"
             adsorb
@@ -2029,25 +1948,8 @@ body {
   }
 }
 
-.control-icon-wrapper {
-  color: var(--comet-color);
-  background: #040404;
+.icon-wrapper {
   padding: 8px 16px;
-  border: 1px solid var(--comet-color);
-  border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: auto;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &:focus {
-    color: white;
-    border-color: white;
-  }
 }
 
 #play-pause-icon-wrapper {

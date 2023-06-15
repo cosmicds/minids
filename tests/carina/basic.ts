@@ -50,10 +50,10 @@ const tests: CarinaTests = {
     ]);
 
     expectAllVisible(this.sections.topContent, [
-      "@videoIconWrapper",
+      "@videoIcon",
       "@showHideButton",
-      "@resetIconWrapper",
-      "@textIconWrapper"
+      "@resetIcon",
+      "@textIcon"
     ]);
 
     const bottomContent = this.sections.bottomContent;
@@ -99,7 +99,7 @@ const tests: CarinaTests = {
   },
 
   'Open video': function() {
-    this.sections.topContent.click("@videoIconWrapper");
+    this.sections.topContent.click("@videoIcon");
     this.app.expect.element("@videoDialog").to.be.visible;
     expectAllVisible(this.sections.videoDialog, [
       "@video", "@closeIcon",
@@ -110,7 +110,7 @@ const tests: CarinaTests = {
   },
 
   'Info text': function(browser: NightwatchBrowser) {
-    this.sections.topContent.click("@textIconWrapper");
+    this.sections.topContent.click("@textIcon");
     this.app.expect.element("@infoSheet").to.be.visible;
 
     const infoSheet = this.sections.infoSheet;
