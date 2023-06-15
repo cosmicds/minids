@@ -319,7 +319,7 @@
                 title: {display: false},
                 ticks: {display: false},
               }"
-            @offset="(val: number) => { chartXOffset = val, onResize() }"
+            @bounds="(val: any) => { chartBounds = val, onResize() }"
             
           />
           
@@ -355,7 +355,7 @@
                 }"
                 tabindex="0"
               >
-              <span id="play-icon-text">Watch <br /> over time</span>
+              <span id="play-icon-text">Watch over time&nbsp;</span>
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
@@ -1011,7 +1011,10 @@ export default defineComponent({
       incomingItemSelect: null as Thumbnail | null,
       intialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
-      chartXOffset: 0,
+      chartBounds: {} as {
+        'bounds': { xmin: number, xmax: number, ymin: number, ymax: number },
+        'borders': { left: number, right: number, top: number, bottom: number }
+      },  
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -1023,7 +1026,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
-      chartVisible: false,
+      chartVisible: true,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -1259,24 +1262,57 @@ export default defineComponent({
 
   methods: {
     
+    
+    getCssVal(element: HTMLElement, property: string): number {
+      const val = window.getComputedStyle(element).getPropertyValue(property);
+      return val ? parseFloat(val.slice(0,-1)) : 0;
+    }, 
+    
     onResize() {
       const toolsDiv = document.getElementById("tools");
       if (toolsDiv == null) {
         return;
       }
-      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
-      let inputRailWidth = inputRail.clientWidth;
 
       const chartContainer = document.getElementById("chart-container");
       if (chartContainer == null) {
         return;
       }
 
-      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
-      inputRailWidth += (this.chartXOffset + 8 + borderWidth*2);
+      const slider = document.getElementById("slider") as HTMLElement;
+      if (slider == null) {
+        return;
+      }
+
+      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
+      if (inputRail == null) {
+        return;
+      }
       
-      chartContainer.style.width = `${inputRailWidth}px`;
+      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
+      const inputRailWidth = inputRail.clientWidth;
+      const chartContainerNewWidth = Math.round(inputRailWidth + this.chartBounds.borders.left + this.chartBounds.borders.right +  borderWidth);
+      
+      chartContainer.style.width = `${chartContainerNewWidth}px`;
       // chartContainer.style.left = `${inputRail.offsetLeft}px`;
+      const sliderMarginRight = this.getCssVal(slider, 'margin-right');
+      const chartContainerMarginRight = sliderMarginRight - this.chartBounds.borders.right;
+      chartContainer.style.marginRight = `${chartContainerMarginRight}px`; 
+
+
+
+      // fix updown position
+      const inputRailBounds = inputRail.getBoundingClientRect();
+
+
+      const chartYAxisDelta = this.chartBounds.borders.bottom;
+      const chartYAxisPosition = chartContainer.getBoundingClientRect().bottom - chartYAxisDelta;
+      const inputRailMid = (inputRailBounds.top + inputRailBounds.bottom) / 2;
+      const difference = chartYAxisPosition - inputRailMid;
+
+      const newMargin = this.getCssVal(chartContainer, 'margin-bottom') + difference;
+
+      chartContainer.style.marginBottom = `${Math.round(newMargin)}px`;
       
       return;
     },
@@ -2573,19 +2609,20 @@ body {
   position: relative;
   --line-color: white;
   margin-left: auto;
-  margin-right: 30px;
+  // margin-right: 30px;
   // box-shadow: -4px 0 0 0 var(--line-color);
   color: var(--line-color);
   margin-bottom: -33px;
+  outline: 1px solid blue;
   
   // makes the y-axis border look like an arrow
   #plot::before {
     content: "^";
     position: absolute;
-    font-size: 1.5em;
+    font-size: 1.5rem;
     font-weight: bold;
     // transform: translateX(-.51em) translateY(-.55em);
-    transform: translateX(-10%) translateY(-.35em);
+    transform: translateX(-.14rem) translateY(-.52rem);
     transform-origin: 0 0;
     pointer-events: none;
   }
@@ -2643,21 +2680,6 @@ body {
     }
   }
   
-  &:after {
-    content: "^";
-    position: absolute;
-    right: 0;
-    // top: calc(-1.5em/3);
-    font-size: 1.5em;
-    line-height: 0;
-    font-weight: bold;
-    // transform: translateX(75%) rotate(90deg);
-    transform: translateX(0.6em) translateY(-.76em) rotate(90deg);
-    color: #ccc;
-    transform-origin: 0 0;
-    pointer-events: none;
-  }
-  
   
 }
 
@@ -2666,15 +2688,22 @@ body {
   border-color: var(--accent-color);
   margin-left: 0;
   font-size: 0.75em;
+  max-height: 50px;
 
   &:focus {
     color: white;
   }
 }
 
-#play-pause-icon-wrapper > #play-icon-text {
-  white-space: nowrap;
-}
+// #play-pause-icon-wrapper > #play-icon-text {
+//   white-space: nowrap;
+// }
+
+// @media (max-width: 600px) {
+//   #play-pause-icon-wrapper {
+//     max-width: unset;
+//   }
+// }
 
 #video-icon-dummy {
   pointer-events: none;
@@ -3052,6 +3081,20 @@ video {
 #slider {
   width: 100% !important;
   margin: 5px 30px;
+
+  
+  &:after {
+    content: "^";
+    position: absolute;
+    right: 0;
+    line-height: 1;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: translateX(0.36rem) translateY(-0.86rem) rotate(90deg);
+    color: #ccc;
+    transform-origin: 50% 50%;
+    pointer-events: none;
+  }
 }
 
 .vue-slider-process {
@@ -3081,13 +3124,16 @@ video {
 }
 
 // adds a vertical line to track it better
+// .tool-container {
 // .vue-slider-dot-handle::before {
 //   content:"";
-//   // position: absolute;
-//   // border-left: 3px solid white;
-//   // height: 500px;
-//   // transform: translateY(-500px) translateX(150%);
-//   // transform-origin: 0 100%;
+//   --length: 200px;
+//   position: absolute;
+//   border: 1px solid white;
+//   width: 100%;
+//   height: var(--length);
+//   transform: translateY(calc(-1 * var(--length)));
+// }
 // }
 
 

@@ -16,7 +16,7 @@ export default defineComponent({
 
   data() {
     return {
-      chart: null as ChartItem | null,
+      chart: null as unknown as ChartItem,
       canvasel: null as HTMLCanvasElement | null,
     };
   },
@@ -208,7 +208,7 @@ export default defineComponent({
         
       });
 
-      this.x0;
+      this.getBounds;
 
       return ;
     },
@@ -354,8 +354,9 @@ export default defineComponent({
 
     // get the x-pixel postion of the first data point
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    x0(): any {
+    getBounds(): any {
       if (this.chart == null) {
+        console.log('chart is null');
         return;
       }
       const chart = this.chart as Chart;
@@ -363,15 +364,54 @@ export default defineComponent({
         return;
       }
       
-      const val = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.min as number);
+      const xmin = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.min as number);
+      const xmax = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.max as number);
+      const ymin = chart.scales.y.getPixelForValue(this.chartOptions.scales.y.min as number);
+      const ymax = chart.scales.y.getPixelForValue(this.chartOptions.scales.y.max as number);
 
-      if (isNaN(val)) {
-        return ;
+      
+      const bounds = {
+        xmin: xmin,
+        xmax: xmax,
+        ymin: ymin,
+        ymax: ymax,
+      };
+      console.log('plot corners');
+      console.log(bounds);
+      // check for nan values
+      if (Object.values(bounds).some(v => isNaN(v))) {
+        console.log('bounds has nan values');
+        return;
       }
-      this.$emit("offset", val);
-      return val;
+
+      const emitThis = {
+        'bounds': bounds,
+        'borders': this.getBorders,
+      };
+      console.log('emitting bounds', emitThis);
+      this.$emit("bounds", emitThis);
+      
+      return bounds;
 
     },
+
+    getBorders() {
+
+      const chart = this.chart as Chart;
+      if (chart == null) { return; }
+
+      const boundary = chart.canvas.getBoundingClientRect();
+
+
+      const borders = {
+        left: Math.round(chart.chartArea.left),
+        right: Math.round(boundary.width - chart.chartArea.right),
+        top: Math.round(chart.chartArea.top),
+        bottom: Math.round(boundary.height - chart.chartArea.bottom),
+      };
+
+      return borders;
+    }
     
   },
 
@@ -389,18 +429,20 @@ export default defineComponent({
 
 <style scoped lang="less">
 
+.chartjs {
+  pointer-events: auto;
+  outline: 1px solid red;
+  width: 100%;
+}
+
 
 #plot {
   position: relative;
-  // border: 2px solid greenyellow;
+  outline: 1px solid greenyellow;
   width: 100%;
   max-height: 20dvh;
   height: 100%;
 }
 
-.chartjs {
-  // border: 1px solid #eee;
-  width: 100%;
-}
 
 </style>
