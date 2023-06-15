@@ -492,7 +492,7 @@
           :min="0"
           :max="1"
           :interval="0.01"
-          id="slider"
+          id="opacity-slider"
           :order="false"
           tooltipPlacement="bottom"
           v-model="currentOpacity"
@@ -3121,6 +3121,11 @@ video {
     transform-origin: 50% 50%;
     pointer-events: none;
   }
+}
+
+#opacity-slider {
+  width: 100% !important;
+  margin: 5px 30px;
 }
 
 .vue-slider-process {
