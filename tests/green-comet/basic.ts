@@ -49,14 +49,14 @@ const tests: GreenCometTests = {
     ]);
 
     expectAllVisible(this.sections.topContent, [
-      "@videoIconWrapper",
-      "@textIconWrapper",
-      "@mapIconWrapper"
+      "@videoIcon",
+      "@textIcon",
+      "@mapIcon"
     ]);
 
     const bottomContent = this.sections.bottomContent;
     expectAllVisible(bottomContent, [
-      "@playPauseIconWrapper",
+      "@playPauseIcon",
       "@slider"
     ]);
 
@@ -86,7 +86,7 @@ const tests: GreenCometTests = {
   },
 
   'Open video': function() {
-    this.sections.topContent.click("@videoIconWrapper");
+    this.sections.topContent.click("@videoIcon");
     this.app.expect.element("@videoDialog").to.be.visible;
     expectAllVisible(this.sections.videoDialog, [
       "@video", "@closeIcon"
@@ -97,7 +97,7 @@ const tests: GreenCometTests = {
   },
 
   'Info text': function(browser: NightwatchBrowser) {
-    this.sections.topContent.click("@textIconWrapper");
+    this.sections.topContent.click("@textIcon");
     this.app.expect.element("@infoSheet").to.be.visible;
 
     const infoSheet = this.sections.infoSheet;
@@ -135,7 +135,7 @@ const tests: GreenCometTests = {
   },
 
   'Location selector': function() {
-    this.sections.topContent.click("@mapIconWrapper");
+    this.sections.topContent.click("@mapIcon");
   
     const locationDialog = this.sections.locationDialog;
     expectAllVisible(locationDialog, [

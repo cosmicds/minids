@@ -124,7 +124,7 @@
           <template v-slot:activator="{ props }">
             <div
               id="text-icon-wrapper"
-              class="control-icon-wrapper"
+              :class='["control-icon-wrapper", showTextSheet ? "active" : ""]'
               @mouseover="showTextTooltip = true"
               @mouseleave="showTextTooltip = false"
               v-bind="props"
@@ -242,20 +242,40 @@
         @deselect="onItemDeselected"
       />
     </div>
-    
     <div class="bottom-content">
 
       <div id="tools">
-          <div id="chart-container">
+        <div 
+        v-if="(playCount >=2)" 
+        id="chart-button"
+        :class="[(playCount >= 2) && (chartVisible) ? 'collapse-button': '']"
+        >
+          <v-btn
+            flat
+            @click="chartVisible = !chartVisible"
+            @keyup.enter="chartVisible = !chartVisible"
+            :color="accentColor"
+            >
+              <font-awesome-icon
+                id="chart-icon"
+                class="control-icon"
+                :icon="chartVisible ? 'circle-xmark' : 'chart-line'"
+                size="xl"
+              />
+            <span id="button-text">{{ chartVisible ? 'Hide' : 'Show' }} supernova brightness graph</span>
+          </v-btn>
+        </div>
+          <div id="chart-container" v-show="chartVisible" >
+            <div id="chart-title">
+              Supernova Lightcurve (Change in Brightness Over Time)
+            </div>
             <div id="yaxis-text">
-              Supernova<br/>
+              Supernova <br />
               Brightness
             </div>
             <!-- :lineData="dates.map(d => {return {x: d, y: 12.5}})" -->
           <chartjs-scatter
             reversedY
-            hideXAxis
-            hideYAxis
             scatter
             line
             :animation=false
@@ -263,9 +283,9 @@
             :lineData="lightCurveData.filter(d => (d.time.getTime() < selectedTime ))"
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
-            :yrange="[10.5, 16]"
+            :yrange="[10.5, 17]"
             :color="accentColor"
-            borderColor="#DD6BD9"
+            :borderColor="accentColor3"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
             :yAxisOptions="{
@@ -275,11 +295,19 @@
                 },
               border: { display: true,
                 color: 'white',
-                width: 3,
+                width: 4,
               },
               ticks: {display: false},
               }"
-            @offset="(val: number) => { chartXOffset = val, onResize() }"
+              :xAxisOptions="{
+                border: { display: true,
+                  color: 'white',
+                  width: 4,
+                },
+                title: {display: false},
+                ticks: {display: false},
+              }"
+            @bounds="(val: any) => { chartBounds = val, onResize() }"
             
           />
           
@@ -291,13 +319,6 @@
           
         
         <span class="tool-container">
-          <!-- <v-chip
-            id="sliderlabel"
-            outlined
-            label
-            >
-            Date
-          </v-chip> -->
           <v-tooltip
             location="top"
             :open-on-click="false"
@@ -322,7 +343,7 @@
                 }"
                 tabindex="0"
               >
-              Watch over time
+              <span id="play-icon-text">Watch over time&nbsp;</span>
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
@@ -345,7 +366,7 @@
             @change="onTimeSliderChange"
             :data="dates"
             tooltip="always"
-            tooltip-placement="top"
+            tooltip-placement="bottom"
             :tooltip-style="{opacity: 0.75}"
             :tooltip-formatter="(v: number) => 
               toDateString(new Date(v))
@@ -460,26 +481,29 @@
           </div>
         </transition-expand>
       </div>
-      <div class="opacity-slider-wrapper">
+
+    </div>
+    
+    <div class="opacity-slider-wrapper">
         <vue-slider
-              v-if="!smallSize"
-              class="opacity-slider"
-              adsorb
-              :min="0"
-              :max="1"
-              :interval="0.01"
-              id="slider"
-              :order="false"
-              tooltipPlacement="bottom"
-              v-model="currentOpacity"
-              @change="(opacity: number) => currentLayer?.set_opacity(opacity)"
-              >
-              <span>Change image opacity</span>
+          v-if="!smallSize"
+          class="opacity-slider"
+          adsorb
+          :min="0"
+          :max="1"
+          :interval="0.01"
+          id="slider"
+          :order="false"
+          tooltipPlacement="bottom"
+          v-model="currentOpacity"
+          @change="(opacity: number) => currentLayer?.set_opacity(opacity)"
+          >
+          <span>Change image opacity</span>
       </vue-slider>
     </div>
-      <mini-credits></mini-credits>
-    </div>
-
+    
+    <mini-credits class="bottom-credits"></mini-credits>
+    
     <v-dialog
       id="video-container"
       v-model="showVideoSheet"
@@ -741,6 +765,8 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { ImageSetLayer, Place } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 
+import {GotoRADecZoomParams} from "@wwtelescope/engine-pinia";
+
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, drawSpreadSheetLayer, layerManagerDraw } from "./wwt-hacks";
 
 interface MoveOptions {
@@ -845,7 +871,12 @@ while (t <= maxDate) {
 
 for (const d of imageDates) {
   if (!dates.includes(d)) {
-    dates.push(d);
+    // dates.push(d);
+    // find the nearest value in dates to d and replace it with d
+    const closest = dates.reduce((a, b) => {
+      return Math.abs(b - d) < Math.abs(a - d) ? b : a;
+    });
+    dates.splice(dates.indexOf(closest), 1, d);
   }
 }
 
@@ -914,9 +945,10 @@ export default defineComponent({
       playingImagePath: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
+      playCount: 0,
 
       showAltAzGrid: false,
-      showConstellations: true,
+      showConstellations: false,
       showArrow: true,
       showHorizon: false,
       outerArrow: null as Poly | null,
@@ -948,7 +980,7 @@ export default defineComponent({
       ephemerisColor: "#D60493",
       accentColor: "#a0009b",
       accentColor2: "#9A2976",
-      accentColor3: "#d6046d",
+      accentColor3: "#DD6BD9",
       accentColor4: " #0493d6",
       activeButtonColor: "#aa00fb68",
       todayColor: "#D6B004",
@@ -965,9 +997,12 @@ export default defineComponent({
       currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,
-      m101Position: {ra: 210.802, dec: 54.348, zoom: 7.75},
+      intialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
-      chartXOffset: 0,
+      chartBounds: {} as {
+        'bounds': { xmin: number, xmax: number, ymin: number, ymax: number },
+        'borders': { left: number, right: number, top: number, bottom: number }
+      },  
 
       sheet: null as SheetType,
       showMapTooltip: false,
@@ -979,6 +1014,7 @@ export default defineComponent({
       showLocationSelector: false,
       showControls: false,
       tab: 0,
+      chartVisible: true,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -1114,9 +1150,9 @@ export default defineComponent({
       }
 
       this.gotoRADecZoom({
-        raRad: D2R * this.m101RADeg,
-        decRad: D2R * this.m101DecDeg,
-        zoomDeg: 1,
+        raRad: D2R * this.intialPosition.ra,
+        decRad: D2R * this.intialPosition.dec,
+        zoomDeg: this.intialPosition.zoom,
         instant: true
       });
 
@@ -1214,24 +1250,57 @@ export default defineComponent({
 
   methods: {
     
+    
+    getCssVal(element: HTMLElement, property: string): number {
+      const val = window.getComputedStyle(element).getPropertyValue(property);
+      return val ? parseFloat(val.slice(0,-1)) : 0;
+    }, 
+    
     onResize() {
       const toolsDiv = document.getElementById("tools");
       if (toolsDiv == null) {
         return;
       }
-      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
-      let inputRailWidth = inputRail.clientWidth;
 
       const chartContainer = document.getElementById("chart-container");
       if (chartContainer == null) {
         return;
       }
 
-      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
-      inputRailWidth += (this.chartXOffset + 8 + borderWidth*2);
+      const slider = document.getElementById("slider") as HTMLElement;
+      if (slider == null) {
+        return;
+      }
+
+      const inputRail = toolsDiv.getElementsByClassName("vue-slider-rail")[0] as HTMLElement;
+      if (inputRail == null) {
+        return;
+      }
       
-      chartContainer.style.width = `${inputRailWidth}px`;
+      const borderWidth = chartContainer.style.borderWidth ? parseInt(chartContainer.style.borderWidth) : 0;
+      const inputRailWidth = inputRail.clientWidth;
+      const chartContainerNewWidth = Math.round(inputRailWidth + this.chartBounds.borders.left + this.chartBounds.borders.right +  borderWidth);
+      
+      chartContainer.style.width = `${chartContainerNewWidth}px`;
       // chartContainer.style.left = `${inputRail.offsetLeft}px`;
+      const sliderMarginRight = this.getCssVal(slider, 'margin-right');
+      const chartContainerMarginRight = sliderMarginRight - this.chartBounds.borders.right;
+      chartContainer.style.marginRight = `${chartContainerMarginRight}px`; 
+
+
+
+      // fix updown position
+      const inputRailBounds = inputRail.getBoundingClientRect();
+
+
+      const chartYAxisDelta = this.chartBounds.borders.bottom;
+      const chartYAxisPosition = chartContainer.getBoundingClientRect().bottom - chartYAxisDelta;
+      const inputRailMid = (inputRailBounds.top + inputRailBounds.bottom) / 2;
+      const difference = chartYAxisPosition - inputRailMid;
+
+      const newMargin = this.getCssVal(chartContainer, 'margin-bottom') + difference;
+
+      chartContainer.style.marginBottom = `${Math.round(newMargin)}px`;
       
       return;
     },
@@ -1268,7 +1337,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-    
+      
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
       const innerPointRA = pointRA + delta * Math.sqrt(1 + (headSlope ** 2) ) / headSlope;
@@ -1345,10 +1414,10 @@ export default defineComponent({
     nextDate(wrap = false) {
       const index = this.getClosest(this.dates, this.selectedTime, true);
       if (this.dates[index] > this.selectedTime) {
-        this.selectedTime = this.dates[index];
+        return this.dates[index];
       } else {
         const next = index + 1;
-        this.selectedTime = this.dates[(wrap || next === this.dates.length) ? 0 : next];
+        return this.dates[(wrap || next === this.dates.length) ? 0 : next];
 
       }
     },
@@ -1374,7 +1443,9 @@ export default defineComponent({
 
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
-      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+      const dateString = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+      // const timeString = `${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+      return dateString;
     },
 
     interpolatedTable(table: Table): Table | null {
@@ -1602,12 +1673,18 @@ export default defineComponent({
     },
 
     // convenience wrapper for (not checkIfPlaceIsInTheCurrentFOV)
-    imageOutOfView(place: Place): boolean { return !this.checkIfPlaceIsInTheCurrentFOV(place); },
+    imageOutOfView(place: Place): boolean {
+      return !this.checkIfPlaceIsInTheCurrentFOV(place);
+    },
 
-    needToZoomIn(place: Place, factor = 5): boolean {
+    needToZoomIn(place = null as Place | null, factor = 5): boolean {
       // 1) we are already zoomed all the way out (if FOV > 50)
       if (this.wwtZoomDeg > 300) { return true; }
 
+      if (place == null) {
+        if (this.incomingItemSelect == null) { return false; }
+        place = this.incomingItemSelect as Place;
+      }
       // 2) the image is too small (so it's fov < 1/6 of the current fov)
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset != null) {
@@ -1616,10 +1693,20 @@ export default defineComponent({
       
       return false;
     },
+    
+    viewIsBad(place: Place, factor = 5): boolean {
+      if (place == null) {
+        place = this.incomingItemSelect as Place;
+      }
 
+      if (place == null) { return false; }
+
+      return this.imageOutOfView(place) || this.needToZoomIn(place, factor);
+    },
+    
     onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
-        this.showImageForDateTime(this.dateTime);
+        this.showImageForDateTime(this.dateTime, true);
         this.updateViewForDate(options);
       });
     },
@@ -1632,7 +1719,6 @@ export default defineComponent({
       this.updateImageOpacity(place, opacity);
 
       this.$nextTick(() => {
-        const zoom = this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg;
         if ((this.imageOutOfView(place) && move) || (this.needToZoomIn(place, 8) && move)) {
           this.selectedTime = this.imageSortBy[iset.get_name()];
           // const [month, day, year] = iset.get_name().split("/").map(x => parseInt(x));
@@ -1646,7 +1732,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: D2R * iset.get_centerX(),
             decRad: D2R * iset.get_centerY(),
-            zoomDeg: zoom,
+            zoomDeg: this.optionalZoom(place), // zoom if factor of 2.5x image zoomLevel
             instant: false
           });
         }
@@ -1960,7 +2046,6 @@ export default defineComponent({
           this.selectedTime = this.lastClosePt.date.getTime();
           this.$nextTick(() => {
             this.onTimeSliderChange();
-            this.updateViewForDate();
           });
         }
       }
@@ -2050,9 +2135,7 @@ export default defineComponent({
       // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
-      if (this.incomingItemSelect?.get_name() == name) {
-        return'';
-      }
+      
       return name;
     },
 
@@ -2106,7 +2189,7 @@ export default defineComponent({
       }
     },
 
-    showImagesetByName(name: string): boolean {
+    showImagesetByName(name: string, moveTo = false): boolean {
       const imagesetNames = Object.keys(this.imagesetLayers);
       let shown = false;
       imagesetNames.forEach((iname: string) => {
@@ -2114,6 +2197,8 @@ export default defineComponent({
           this.setLayerOpacityForImageSet(iname, 0);
         } else {
           this.setLayerOpacityForImageSet(iname, 1);
+          this.currentLayer = this.imagesetLayers[iname];
+          this.currentOpacity = 1;
           shown = true;
           // need to get the Place object for the image set and use it to set the view
           if (this.imagesetFolder != null) {
@@ -2123,6 +2208,9 @@ export default defineComponent({
               this.incomingItemSelect = place[0];
             }
           }
+          
+          if (!moveTo) { return; }
+          
           const iset = this.wwtControl.getImagesetByName(iname);
           const place = this.places[iname];
           if (iset == null) { return; }
@@ -2131,7 +2219,7 @@ export default defineComponent({
             this.gotoRADecZoom({
               raRad: D2R * place.get_RA() * 15,
               decRad: D2R * place.get_dec(),
-              zoomDeg: this.needToZoomIn(place, 2.5) ? place.get_zoomLevel() : this.wwtZoomDeg,
+              zoomDeg: this.optionalZoom(place),
               instant: true
             });
           });
@@ -2141,37 +2229,36 @@ export default defineComponent({
       return shown;
     },
     
-    showImageForDateTime(date: Date): boolean {
+    showImageForDateTime(date: Date, moveTo = false): boolean {
       const name = this.matchImageSetName(date);
       if (name == null || name == '') {
         // this.incomingItemSelect = null;
         return false;
       }
-      this.currentLayer = this.imagesetLayers[name];
-      this.currentOpacity = 1;
-      return this.showImagesetByName(name);
+      
+      if ((this.incomingItemSelect?.get_name() == name) && (!this.viewIsBad(this.places[name]))) {
+        // console.log('image already shown and view is good, so it has been "shown"');
+        return true;
+      }
+
+      return this.showImagesetByName(name, moveTo);
 
     },
 
     
     centerView(_options?: MoveOptions) {
-      const firstPlace = this.places[Object.keys(this.places)[0]];
+      
       this.gotoRADecZoom({
-        raRad: this.m101Position.ra * D2R,
-        decRad: this.m101Position.dec * D2R,
-        zoomDeg: firstPlace.get_zoomLevel()*6,
+        raRad: this.intialPosition.ra * D2R,
+        decRad: this.intialPosition.dec * D2R,
+        zoomDeg: this.intialPosition.zoom,
         instant: false,
       });
       // show the first image
-      this.selectedTime = this.imageDates[0];
-      this.onTimeSliderChange({zoomDeg: firstPlace.get_zoomLevel()});
-      // const now = new Date();
-      // const hours = now.getUTCHours() + (this.selectedTimezoneOffset) / (1000 * 60 * 60);
-      // this.timeOfDay = { hours: hours, minutes: now.getMinutes(), seconds: now.getSeconds() };
-      // this.selectedTime = this.binarySearch(this.dates, now.getTime());
-      // this.$nextTick(() => {
-      //   this.updateViewForDate(options);
-      // });
+      if (!this.playing) {
+        this.selectedTime = this.imageDates[0];
+        this.onTimeSliderChange({ zoomDeg: this.intialPosition.zoom });
+      }
     },
 
     updateForDateTime() {
@@ -2196,6 +2283,41 @@ export default defineComponent({
       if (children == null) { return; }
       const place = children[0] as Place;
       this.onItemSelected(place);
+    },
+
+    showChart() {
+      this.chartVisible = true;
+    },
+
+    wwtMove(options: GotoRADecZoomParams) {
+      this.$nextTick(() => {
+        this.gotoRADecZoom(options);
+      });
+    },
+
+    moveToPlace(place: Place, fovDeg = null as number | null) {
+      let zoomDeg: number;
+
+      if (fovDeg) {
+        zoomDeg = fovDeg * 6;
+      } else {
+        zoomDeg = this.optionalZoom(place);
+      }
+
+      this.wwtMove({
+        raRad: D2R * place.get_RA() * 15,
+        decRad: D2R * place.get_dec(),
+        zoomDeg: zoomDeg,
+        instant: true
+      });
+
+    },
+
+    optionalZoom(place: Place, factor = 3): number {
+      if (this.needToZoomIn(place, factor)) {
+        console.log('optionalZoom: zoom in');
+      }
+      return this.needToZoomIn(place, factor) ? place.get_zoomLevel() : this.wwtZoomDeg;
     }
   },
 
@@ -2216,7 +2338,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: this.wwtRARad,
             decRad: this.wwtDecRad,
-            zoomDeg: 120,
+            zoomDeg: this.wwtZoomDeg > 120 ? this.wwtZoomDeg : 120,
             instant: false
           });
         });
@@ -2280,21 +2402,27 @@ export default defineComponent({
     playing(play: boolean) {
       this.clearPlayingInterval();
       if (play) {
+        this.playCount += 1;
+        this.showImageForDateTime(this.dateTime, true);
         this.playingIntervalId = setInterval(() => {
-          if (this.selectedTime < maxDate) {
-            this.nextDate();
+          if (this.selectedTime < Math.max(...this.dates)) {
+            this.selectedTime = this.nextDate();
           } else {
+            this.playCount += 1;
+            // this.showChart();
             this.selectedTime = minDate;
           }
           this.$nextTick(() => {
             this.showImageForDateTime(this.dateTime);
-            this.updateViewForDate();
+            // this.updateViewForDate();
           });
         }, 100);
+      } else if (this.playCount > 0) {
+        this.playCount += 1;
       }
     },
 
-    playingCometPath(play: boolean) {
+    playingImagePath(play: boolean) {
       this.clearPlayingInterval();
       if (!play) {
         return;
@@ -2306,7 +2434,7 @@ export default defineComponent({
         this.selectedTime = minTime;
       }
 
-      this.updateViewForDate({ zoomDeg: 60 });
+      this.updateViewForDate({ zoomDeg: this.intialPosition.zoom });
 
       this.playingIntervalId = setInterval(() => {
         if (this.playingWaitCount > 0) {
@@ -2314,7 +2442,7 @@ export default defineComponent({
           return;
         }
         if (this.selectedTime < maxTime) {
-          this.nextDate();
+          this.selectedTime = this.nextDate();
           this.$nextTick(() => {
             const image = this.showImageForDateTime(this.dateTime);
             this.updateViewForDate();
@@ -2326,7 +2454,15 @@ export default defineComponent({
           this.playingImagePath = false;
         }
       }, 500);
-    }
+    },
+
+    playCount(count: number) {
+      if (count % 2) {
+        // if playcount is even then we have either finished a loop or paused
+        // this.showChart();
+        return;
+      }
+    },
   }
 
   
@@ -2467,32 +2603,86 @@ body {
     border-color: white;
   }
 }
-
-#chart-container {
+#chart-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   pointer-events: auto;
+  margin-bottom: 2em;
+  span {
+    text-transform: none;
+  }
+}
+
+#chart-button.collapse-button {
+  justify-content: right;
+  margin-right: calc(30px + 1em);
+  margin-bottom: 0em;
+  background-color: transparent;
+  span#button-text {
+    display: none;
+  }
+}
+  
+#chart-container {
+  // pointer-events: auto;
+  position: relative;
+  --line-color: white;
   margin-left: auto;
-  margin-right: 30px;
-  box-shadow: -4px 0 0 0 #ccc;
-  color: #ccc;
+  // margin-right: 30px;
+  // box-shadow: -4px 0 0 0 var(--line-color);
+  color: var(--line-color);
+  margin-bottom: -33px;
   
   // makes the y-axis border look like an arrow
-  &:before {
+  #plot::before {
     content: "^";
     position: absolute;
-    font-size: 1.5em;
+    font-size: 1.5rem;
     font-weight: bold;
-    transform: translateX(-.51em) translateY(-.55em);
+    // transform: translateX(-.51em) translateY(-.55em);
+    transform: translateX(-.14rem) translateY(-.52rem);
     transform-origin: 0 0;
     pointer-events: none;
   }
-
+  
+  #chart-title {
+    display: none;
+    text-align: center;
+    font-weight: bold;
+    color: var(--accent-color);
+    @media (max-width: 600px) {
+      font-size: 0.75em;
+    }
+  }
+  
   #yaxis-text {
+    // outline: 1px solid gold;
     font-size: 1.15em;
     max-width: fit-content;
     position: absolute;
     top: 50%;
-    transform: translate(calc(-100% - 20px), -150%);
-    background-color: rgba(0, 0, 0, 0.5);
+    transform: translateX(calc(-100% - 0.5em)) translateY(-50%);
+    
+    @media (max-width: 600px) {
+      font-size: 0.75em;
+    }
+    
+    
+    @media (max-width: 400px) {
+      position: relative;
+      top: unset;
+      max-width: none;
+      text-align: center;
+      transform: none;
+      font-size: 1em;
+      // transform: translateX(50%)
+      br {
+        display: none;
+      }
+      
+    }
   }
   
   #xaxis-text {
@@ -2500,27 +2690,16 @@ body {
     text-align: center;
     position: absolute;
     left: 50%;
-    bottom: 1em;
-    box-shadow: 0px -4px 0px 0px #ccc;
+    bottom: -2em;
+    // box-shadow: 0px -4px 0px 0px var(--line-color);
     transform: translate(-50%, 0);
+    padding: 2px 5px;
     
-    &:after {
-      content: "^";
-      position: absolute;
-      right: 0;
-      top: calc(-1.5em/3);
-      font-size: 1.5em;
-      line-height: 0;
-      font-weight: bold;
-      transform: translateX(75%) rotate(90deg);
-      transform-origin: 0 0;
-      pointer-events: none;
+    @media (max-width: 600px) {
+      font-size: 0.75em;
     }
   }
   
-  @media (max-width: 600px) {
-    font-size: 0.75em;
-  }
   
 }
 
@@ -2529,11 +2708,22 @@ body {
   border-color: var(--accent-color);
   margin-left: 0;
   font-size: 0.75em;
+  max-height: 50px;
 
   &:focus {
     color: white;
   }
 }
+
+// #play-pause-icon-wrapper > #play-icon-text {
+//   white-space: nowrap;
+// }
+
+// @media (max-width: 600px) {
+//   #play-pause-icon-wrapper {
+//     max-width: unset;
+//   }
+// }
 
 #video-icon-dummy {
   pointer-events: none;
@@ -2557,7 +2747,7 @@ body {
 
 .active {
   // background-color: var(--active-button-color);
-  box-shadow: 0px 0px 10px 3px var(--accent-color);
+  box-shadow: inset 0px 0px 10px 3px var(--accent-color), 0px 0px 10px 3px var(--accent-color);
 }
 
 .top-content {
@@ -2576,8 +2766,8 @@ body {
 div.opacity-slider-wrapper {
   display:flex;
   position:absolute;
-  bottom: 1em;
-  left: 1em;
+  bottom: 1rem;
+  left: 1rem;
   width: 200px;
   border-radius: 20px;
   
@@ -2593,16 +2783,23 @@ div.opacity-slider-wrapper {
 }
 
 
+
 .bottom-content {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
+  bottom: 4rem;
   right: 1rem;
   width: calc(100% - 2rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+  
+.bottom-credits {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
 }
 
 div#main-content > div {
@@ -2610,10 +2807,6 @@ div#main-content > div {
   // outline: 1px solid orange;
 }
 
-div.bottom-content > div {
-  content: "";
-  // outline: 1px solid rgb(154, 154, 251);
-}
 
 .right-content {
   position: absolute;
@@ -2639,15 +2832,27 @@ div.bottom-content > div {
     color: black;
     border-radius: 3px;
   }
+    
 }
 
 .tool-container {
   display: flex;
-  width: 99%;
+  width: 100%;
   flex-direction: row;
   align-items: center;
   gap: 5px;
   pointer-events: auto;
+  
+  @media (max-width: 400px) {
+    margin-top: 11px;
+    padding-left: 6px;
+    flex-direction: column-reverse;
+    align-items: center;
+    
+    #play-pause-icon-wrapper {
+      margin-top: 1em;
+    }
+  }
 }
 
 .folder-view {
@@ -2902,6 +3107,20 @@ video {
 #slider {
   width: 100% !important;
   margin: 5px 30px;
+
+  
+  &:after {
+    content: "^";
+    position: absolute;
+    right: 0;
+    line-height: 1;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: translateX(0.36rem) translateY(-0.86rem) rotate(90deg);
+    color: #ccc;
+    transform-origin: 50% 50%;
+    pointer-events: none;
+  }
 }
 
 .vue-slider-process {
@@ -2931,13 +3150,16 @@ video {
 }
 
 // adds a vertical line to track it better
+// .tool-container {
 // .vue-slider-dot-handle::before {
 //   content:"";
-//   // position: absolute;
-//   // border-left: 3px solid white;
-//   // height: 500px;
-//   // transform: translateY(-500px) translateX(150%);
-//   // transform-origin: 0 100%;
+//   --length: 200px;
+//   position: absolute;
+//   border: 1px solid white;
+//   width: 100%;
+//   height: var(--length);
+//   transform: translateY(calc(-1 * var(--length)));
+// }
 // }
 
 

@@ -54,14 +54,14 @@ const topContent = {
   commands: {},
   sections: {},
   elements: {
-    videoIconWrapper: {
-      selector: "#video-icon-wrapper"
+    videoIcon: {
+      selector: "#video-icon-button"
     },
-    mapIconWrapper: {
-      selector: "#map-icon-wrapper"
+    mapIcon: {
+      selector: "#map-icon-button"
     },
-    textIconWrapper: {
-      selector: "#text-icon-wrapper"
+    textIcon: {
+      selector: "#text-icon-button"
     }
   }
 };
@@ -199,8 +199,8 @@ const bottomContent = {
   commands: {},
   sections: {},
   elements: {
-    playPauseIconWrapper: {
-      selector: "#play-pause-icon-wrapper"
+    playPauseIcon: {
+      selector: "#play-pause-icon-button"
     },
     slider: {
       selector: "#slider"

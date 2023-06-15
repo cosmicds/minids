@@ -41,6 +41,8 @@ import {
   faImages,
   faRefresh,
   faStar,
+  faChartLine,
+  faCircleXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
@@ -60,6 +62,8 @@ library.add(faPause);
 library.add(faPlay);
 library.add(faRefresh);
 library.add(faStar);
+library.add(faChartLine);
+library.add(faCircleXmark);
 
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
