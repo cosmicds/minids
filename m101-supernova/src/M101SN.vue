@@ -69,167 +69,58 @@
     </transition>
 
     <div class="top-content">
-      <div
-        v-if="false"
-        id="video-icon-dummy"
-        class="control-icon-wrapper"
-      >
-        <font-awesome-icon
-          id="video-icon"
-          class="control-icon"
-          icon="video"
-          size="lg"
-        ></font-awesome-icon>
-      </div>
       <div id="center-buttons">
-        <v-tooltip
+        <!-- add iconbutton for location -->
+        <icon-button
           v-if="false"
-          v-model="showMapTooltip"
-          location="bottom"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="map-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showMapTooltip = true"
-              @mouseleave="showMapTooltip = false"
-              v-bind="props"
-              @click="showLocationSelector = true"
-              @keyup.enter="showLocationSelector = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="location-icon"
-                class="control-icon px-1"
-                icon="location-pin"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Select location</span>
-        </v-tooltip>
+          v-model="showLocationSelector"
+          fa-icon="location-pin"
+          :color="accentColor"
+          tooltip-text="Select location"
+          tooltip-location="bottom"
+          >
+      </icon-button>
       </div>
       <div id="right-buttons">
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showTextTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="text-icon-wrapper"
-              :class='["control-icon-wrapper", showTextSheet ? "active" : ""]'
-              @mouseover="showTextTooltip = true"
-              @mouseleave="showTextTooltip = false"
-              v-bind="props"
-              @click="showTextSheet = true"
-              @keyup.enter="showTextSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="text-icon"
-                class="control-icon"
-                icon="book-open"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Learn more</span>
-        </v-tooltip>
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showVideoTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="video-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showVideoTooltip = true"
-              @mouseleave="showVideoTooltip = false"
-              v-bind="props"
-              @click="showVideoSheet = true"
-              @keyup.enter="showVideoSheet = true"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="video-icon"
-                class="control-icon"
-                icon="video"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Watch video</span>
-        </v-tooltip>
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showResetTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="video-icon-wrapper"
-              class="control-icon-wrapper"
-              @mouseover="showResetTooltip = true"
-              @mouseleave="showResetTooltip = false"
-              v-bind="props"
-              @click="centerView"
-              @keyup.enter="centerView"
-              tabindex="0"
-            >
-              <font-awesome-icon
-                id="reset-icon"
-                class="control-icon"
-                icon="refresh"
-                size="lg"
-              ></font-awesome-icon>
-            </div>
-          </template>
-          <span>Center the Pinwheel</span>
-        </v-tooltip>
-        <v-tooltip
-          location="start"
-          :open-on-click="false"
-          :open-on-focus="false"
-          :open-on-hover="true"
-          v-model="showConstellationTooltip"
-          :offset="smallSize ? 0 : '45px'"
-        >
-          <template v-slot:activator="{ props }">
-            <div
-              id="const-icon-wrapper"
-              :class='["control-icon-wrapper", showConstellations ? "active" : ""]'
-              @mouseover="showConstellationTooltip = true"
-              @mouseleave="showConstellationTooltip = false"
-              v-bind="props"
-              @click="showConstellations = !showConstellations"
-              @keyup.enter="showConstellations = !showConstellations"
-              tabindex="0"
-            >
-              <constellation-icon 
-                :selected="showConstellations"
-                width="20px"
-                :color="accentColor"
-                fill
+        <icon-button
+          v-model="showTextSheet"
+          fa-icon="book-open"
+          :color="accentColor"
+          tooltip-text="Learn more"
+          tooltip-location="start"
+          >
+      </icon-button>
+      <icon-button
+          v-model="showVideoSheet"
+          fa-icon="video"
+          :color="accentColor"
+          tooltip-text="Watch video"
+          tooltip-location="start"
+          >
+      </icon-button>
+      <icon-button
+          @activate="centerView"
+          fa-icon="refresh"
+          :color="accentColor"
+          tooltip-text="Center the Pinwheel"
+          tooltip-location="start"
+          >
+      </icon-button>
+      <icon-button
+          v-model="showConstellations"
+          :color="accentColor"
+          tooltip-text="Show Constellations"
+          tooltip-location="start"
+          >
+          <template #button>
+            <constellation-icon 
+              :selected="showConstellations"
+              width="20px"
+              :color="accentColor"
+              fill
               />
-
-            </div>
           </template>
-          <span>Show Constellations</span>
-        </v-tooltip>
+      </icon-button>
       </div>
     </div>
 
@@ -319,42 +210,26 @@
           
         
         <span class="tool-container">
-          <v-tooltip
-            location="top"
-            :open-on-click="false"
-            :open-on-focus="false"
-            :open-on-hover="true"
-            v-model="showPlayPauseTooltip"
+          <icon-button
+          class="play-pause-icon-wrapper"
+          tooltip-location="top"
+          :color="accentColor"
+          tooltip-text="Watch the supernova change over time!"
+          @activate="() => {
+                  playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
+                  playingImagePath = false; // don't reverse the order of this line and previous or logic will break.
+                }"
           >
-            <template v-slot:activator="{ props }">
-              <div
-                id="play-pause-icon-wrapper"
-                class="control-icon-wrapper"
-                @mouseover="showPlayPauseTooltip = true"
-                @mouseleave="showPlayPauseTooltip = false"
-                v-bind="props"
-                @click="() => {
-                  playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingImagePath = false; // don't reverse the order of this line and previous or logic will break.
-                }"
-                @keyup.enter="() => {
-                  playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
-                  playingImagePath = false; // don't reverse the order of this line and previous or logic will break.
-                }"
-                tabindex="0"
-              >
-              <span id="play-icon-text">Watch over time&nbsp;</span>
+          <template #button>
+          <span class="play-icon-text">Watch over time&nbsp;</span>
                 <font-awesome-icon
                   id="play-pause-icon"
                   class="control-icon"
                   :icon="!(playing || playingImagePath) ? 'play' : 'pause'"
                   size="sm"
                 ></font-awesome-icon>
-                
-              </div>
-            </template>
-            <span>Watch the supernova change over time!</span>
-          </v-tooltip>
+          </template>
+        </icon-button>
           <vue-slider
             adsorb
             id="slider"
@@ -2583,6 +2458,10 @@ body {
   }
 }
 
+.icon-wrapper {
+  padding:  .5em 1em;
+}
+
 .control-icon-wrapper {
   color: var(--accent-color);
   background: #040404;
@@ -2701,6 +2580,17 @@ body {
   }
   
   
+}
+
+.icon-wrapper:has(.play-icon-text) {
+  // padding: 0.5em .75em;
+  line-height: 1.15;
+  max-height: 50px;
+}
+
+.play-icon-text {
+  font-size: 0.75em;
+  margin: 0.5em;
 }
 
 #play-pause-icon-wrapper {
