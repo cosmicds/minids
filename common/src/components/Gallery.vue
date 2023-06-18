@@ -193,7 +193,7 @@ export default defineComponent({
 
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .blurred {
   background: transparent;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);

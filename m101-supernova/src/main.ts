@@ -11,8 +11,7 @@ import d3Scatter from "./d3-scatter.vue";
 import ConstellationIcon from "./ConstellationIcon.vue";
 import { IconButton } from "@minids/common";
 
-import Gallery from "./Gallery.vue";
-// import { Gallery } from "@minids/common";
+import { Gallery } from "@minids/common";
 
 import "./polyfills";
 
