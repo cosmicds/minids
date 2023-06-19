@@ -194,114 +194,115 @@ export default defineComponent({
 </script>
 
 <style lang="less">
-.blurred {
-  background: transparent;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6px);
-}
-
 .gallery-root {
   transition-property: height, width;
   transition: 0.5s ease-out;
-}
 
-.gallery {
-  border-radius: 5px;
-  border: 1px solid white;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  max-height: var(--gallery-max-height);
-  width: min(calc(var(--gallery-width)), calc(100%));
+  .blurred {
+    background: transparent;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6px);
+  }
 
-  // Better way to do this?
+  .gallery {
+    border-radius: 5px;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: var(--gallery-max-height);
+    width: min(calc(var(--gallery-width)), calc(100%));
+
+    // Better way to do this?
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-}
+  }
 
-.noselect {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
+  .noselect {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
 
-.gallery-header {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
+  .gallery-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
 
-.gallery-title {
-  font-size: 16pt;
-}
+  .gallery-title {
+    font-size: 16pt;
+  }
 
-.gallery-close {
-  position: absolute;
-  right: 3px;
-  cursor: pointer;
-}
+  .gallery-close {
+    position: absolute;
+    right: 3px;
+    cursor: pointer;
+  }
 
-.gallery-content {
-  display: grid;
-  grid-template-columns: repeat(var(--column-count), minmax(100px, 1fr));
-  column-gap: 10px;
-  row-gap: 5px;
-  padding: 5px
-}
+  .gallery-content {
+    display: grid;
+    grid-template-columns: repeat(var(--column-count), minmax(100px, 1fr));
+    column-gap: 10px;
+    row-gap: 5px;
+    padding: 5px
+  }
 
-.default-activator {
-  border-radius: 3px;
-  border: solid 1px white;
-  position: relative;
-  height: fit-content;
-  width: fit-content;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-
-  img {
-    padding: 5px;
+  .default-activator {
     border-radius: 3px;
+    border: solid 1px white;
+    position: relative;
+    height: fit-content;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    img {
+      padding: 5px;
+      border-radius: 3px;
+    }
   }
-}
 
-.default-activator-title {
-  margin: auto;
-}
+  .default-activator-title {
+    margin: auto;
+  }
 
-.gallery-item {
-  border-radius: 3px;
-  border: 1px solid white;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-
-  img {
-    margin-left: auto;
-    margin-right: auto;
+  .gallery-item {
     border-radius: 3px;
+    border: 1px solid white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    img {
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 3px;
+    }
+
+    span {
+      flex-grow: 1;
+      display: inline-grid;
+      align-items: center;
+      text-align: center;
+    }
   }
 
-  span {
-    flex-grow: 1;
-    display: inline-grid;
-    align-items: center;
-    text-align: center;
+  .selected {
+    border: 1px solid var(--selected-color);
+
+    span {
+      color: var(--selected-color);
+    }
   }
-}
 
-.selected {
-  border: 1px solid var(--selected-color);
-
-  span {
-    color: var(--selected-color);
+  .place-name {
+    font-size: 10pt;
   }
-}
 
-.place-name {
-  font-size: 10pt;
 }
 </style>
 
