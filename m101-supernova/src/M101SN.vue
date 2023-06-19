@@ -129,7 +129,7 @@
       <gallery
         wtml-url="https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/gallery.wtml"
         width="1000px"
-        :single-select="false"
+        :single-select="true"
         :selected-color="accentColor3"
         @select="onItemSelected"
         @deselect="onItemDeselected"
@@ -1454,6 +1454,8 @@ export default defineComponent({
         this.hideAllImagesets();
         return;
       }
+      // hide previous so it compares to background
+      this.hideAllImagesets();
       
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
