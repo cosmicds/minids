@@ -832,6 +832,7 @@ export default defineComponent({
       innerArrow: null as Poly | null,
       m101RADeg: 3.681181581357794 * R2D,
       m101DecDeg: 0.9480289529731357 * R2D,
+      arrowAngleDeg: 25,
 
       showSpeadSheetLater: false,
 
@@ -1177,10 +1178,21 @@ export default defineComponent({
       return;
     },
 
+    rotatePoint(point: [number, number], angleDeg: number): [number, number] {
+      const xp = point[0] - this.m101RADeg;
+      const yp = point[1] - this.m101DecDeg;
+      const angleRad = angleDeg * D2R;
+      return [
+        this.m101RADeg + xp * Math.cos(angleRad) - yp * Math.sin(angleRad),
+        this.m101DecDeg + xp * Math.sin(angleRad) + yp * Math.cos(angleRad)
+      ];
+    },
+
     createArrow() {
     
       // Create the outer (purple) arrow
       this.outerArrow = new Poly();
+      const outerArrowPoints: [number, number][] = [];
 
       const pointRA = this.m101RADeg + 0.05;
       const centerDec = this.m101DecDeg;
@@ -1195,13 +1207,17 @@ export default defineComponent({
       const stemHalfHeight = stemFraction * arrowHalfHeight;
       const stemTopDec = centerDec + stemHalfHeight;
       const stemBottomDec = centerDec - stemHalfHeight;
-      this.outerArrow.addPoint(pointRA, centerDec);
-      this.outerArrow.addPoint(headBackRA, topDec);
-      this.outerArrow.addPoint(headBackRA, stemTopDec);
-      this.outerArrow.addPoint(stemBackRA, stemTopDec);
-      this.outerArrow.addPoint(stemBackRA, stemBottomDec);
-      this.outerArrow.addPoint(headBackRA, stemBottomDec);
-      this.outerArrow.addPoint(headBackRA, bottomDec);
+      outerArrowPoints.push([pointRA, centerDec]);
+      outerArrowPoints.push([headBackRA, topDec]);
+      outerArrowPoints.push([headBackRA, stemTopDec]);
+      outerArrowPoints.push([stemBackRA, stemTopDec]);
+      outerArrowPoints.push([stemBackRA, stemBottomDec]);
+      outerArrowPoints.push([headBackRA, stemBottomDec]);
+      outerArrowPoints.push([headBackRA, bottomDec]);
+
+      for (const point of outerArrowPoints) {
+        this.outerArrow.addPoint(...this.rotatePoint(point, this.arrowAngleDeg));
+      }
 
       this.outerArrow.set_lineColor(this.accentColor);
       this.outerArrow.set_fillColor(this.accentColor);
@@ -1209,6 +1225,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
+      const innerArrowPoints: [number, number][] = [];
       
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
@@ -1219,13 +1236,17 @@ export default defineComponent({
       const innerBottomDec = 2 * centerDec - innerTopDec;
       const innerStemTopDec = stemTopDec - 0.75 * delta;
       const innerStemBottomDec = stemBottomDec + 0.75 * delta;
-      this.innerArrow.addPoint(innerPointRA, centerDec);
-      this.innerArrow.addPoint(innerHeadBackRA, innerTopDec); 
-      this.innerArrow.addPoint(innerHeadBackRA, innerStemTopDec);
-      this.innerArrow.addPoint(innerStemBackRA, innerStemTopDec); 
-      this.innerArrow.addPoint(innerStemBackRA, innerStemBottomDec);
-      this.innerArrow.addPoint(innerHeadBackRA, innerStemBottomDec);
-      this.innerArrow.addPoint(innerHeadBackRA, innerBottomDec);
+      innerArrowPoints.push([innerPointRA, centerDec]);
+      innerArrowPoints.push([innerHeadBackRA, innerTopDec]); 
+      innerArrowPoints.push([innerHeadBackRA, innerStemTopDec]);
+      innerArrowPoints.push([innerStemBackRA, innerStemTopDec]); 
+      innerArrowPoints.push([innerStemBackRA, innerStemBottomDec]);
+      innerArrowPoints.push([innerHeadBackRA, innerStemBottomDec]);
+      innerArrowPoints.push([innerHeadBackRA, innerBottomDec]);
+
+      for (const point of innerArrowPoints) {
+        this.innerArrow.addPoint(...this.rotatePoint(point, this.arrowAngleDeg));
+      }
 
       const innerColor = "#ffffff";
       this.innerArrow.set_lineColor(innerColor);
