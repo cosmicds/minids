@@ -120,13 +120,13 @@ export default defineComponent({
     color: var(--focus-color);
     border-color: var(--focus-color);
   }
-}
 
-.active { 
-  box-shadow: 0px 0px 10px 3px var(--color);
+  &.active {
+    box-shadow: 0px 0px 10px 3px var(--color);
 
-  &:focus {
-    box-shadow: 0px 0px 10px 3px var(--focus-color);
+    &:focus {
+      box-shadow: 0px 0px 10px 3px var(--focus-color);
+    }
   }
 }
 </style>
