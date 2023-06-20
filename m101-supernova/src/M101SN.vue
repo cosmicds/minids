@@ -1221,16 +1221,10 @@ export default defineComponent({
       outerArrowCoordinates.push([headBackRA, bottomDec]);
 
       for (const coords of outerArrowCoordinates) {
-        console.log(m101Point);
-        console.log(coords);
         const point = this.findScreenPointForRADec({ra: coords[0], dec: coords[1]});
-        console.log(point);
         const rotatedPoint = this.rotatePoint([point.x, point.y], m101Point, this.arrowAngleDeg);
-        console.log(rotatedPoint);
         const rotatedCoords = this.findRADecForScreenPoint({x: rotatedPoint[0], y: rotatedPoint[1]});
-        console.log(rotatedCoords);
         this.outerArrow.addPoint(rotatedCoords.ra, rotatedCoords.dec);
-        console.log("=======");
       }
 
 
