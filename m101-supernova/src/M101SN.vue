@@ -1019,17 +1019,19 @@ export default defineComponent({
         this.positionSet = true;
       }, 100);
 
-      this.createArrow();
-      if (this.showArrow) {
-        this.displayArrow();
-      }
-
       this.gotoRADecZoom({
         raRad: D2R * this.intialPosition.ra,
         decRad: D2R * this.intialPosition.dec,
         zoomDeg: this.intialPosition.zoom,
         instant: true
       });
+
+      setTimeout(() => {
+        this.createArrow();
+        if (this.showArrow) {
+          this.displayArrow();
+        }
+      }, 100);
 
     });
   },
@@ -1178,21 +1180,24 @@ export default defineComponent({
       return;
     },
 
-    rotatePoint(point: [number, number], angleDeg: number): [number, number] {
-      const xp = point[0] - this.m101RADeg;
-      const yp = point[1] - this.m101DecDeg;
+    rotatePoint(point: [number, number], origin: [number, number], angleDeg: number): [number, number] {
+      const xp = point[0] - origin[0];
+      const yp = point[1] - origin[1];
       const angleRad = angleDeg * D2R;
       return [
-        this.m101RADeg + xp * Math.cos(angleRad) - yp * Math.sin(angleRad),
-        this.m101DecDeg + xp * Math.sin(angleRad) + yp * Math.cos(angleRad)
+        origin[0] + xp * Math.cos(angleRad) - yp * Math.sin(angleRad),
+        origin[1] + xp * Math.sin(angleRad) + yp * Math.cos(angleRad)
       ];
     },
 
     createArrow() {
+
+      const m101XY = this.findScreenPointForRADec({ra: this.m101RADeg, dec: this.m101DecDeg});
+      const m101Point: [number, number] = [m101XY.x, m101XY.y];
     
       // Create the outer (purple) arrow
       this.outerArrow = new Poly();
-      const outerArrowPoints: [number, number][] = [];
+      const outerArrowCoordinates: [number, number][] = [];
 
       const pointRA = this.m101RADeg + 0.05;
       const centerDec = this.m101DecDeg;
@@ -1207,17 +1212,27 @@ export default defineComponent({
       const stemHalfHeight = stemFraction * arrowHalfHeight;
       const stemTopDec = centerDec + stemHalfHeight;
       const stemBottomDec = centerDec - stemHalfHeight;
-      outerArrowPoints.push([pointRA, centerDec]);
-      outerArrowPoints.push([headBackRA, topDec]);
-      outerArrowPoints.push([headBackRA, stemTopDec]);
-      outerArrowPoints.push([stemBackRA, stemTopDec]);
-      outerArrowPoints.push([stemBackRA, stemBottomDec]);
-      outerArrowPoints.push([headBackRA, stemBottomDec]);
-      outerArrowPoints.push([headBackRA, bottomDec]);
+      outerArrowCoordinates.push([pointRA, centerDec]);
+      outerArrowCoordinates.push([headBackRA, topDec]);
+      outerArrowCoordinates.push([headBackRA, stemTopDec]);
+      outerArrowCoordinates.push([stemBackRA, stemTopDec]);
+      outerArrowCoordinates.push([stemBackRA, stemBottomDec]);
+      outerArrowCoordinates.push([headBackRA, stemBottomDec]);
+      outerArrowCoordinates.push([headBackRA, bottomDec]);
 
-      for (const point of outerArrowPoints) {
-        this.outerArrow.addPoint(...this.rotatePoint(point, this.arrowAngleDeg));
+      for (const coords of outerArrowCoordinates) {
+        console.log(m101Point);
+        console.log(coords);
+        const point = this.findScreenPointForRADec({ra: coords[0], dec: coords[1]});
+        console.log(point);
+        const rotatedPoint = this.rotatePoint([point.x, point.y], m101Point, this.arrowAngleDeg);
+        console.log(rotatedPoint);
+        const rotatedCoords = this.findRADecForScreenPoint({x: rotatedPoint[0], y: rotatedPoint[1]});
+        console.log(rotatedCoords);
+        this.outerArrow.addPoint(rotatedCoords.ra, rotatedCoords.dec);
+        console.log("=======");
       }
+
 
       this.outerArrow.set_lineColor(this.accentColor);
       this.outerArrow.set_fillColor(this.accentColor);
@@ -1225,7 +1240,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-      const innerArrowPoints: [number, number][] = [];
+      const innerArrowCoordinates: [number, number][] = [];
       
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
@@ -1234,18 +1249,21 @@ export default defineComponent({
       const innerStemBackRA = stemBackRA - delta;
       const innerTopDec = headSlope * (innerHeadBackRA - innerPointRA) + centerDec;
       const innerBottomDec = 2 * centerDec - innerTopDec;
-      const innerStemTopDec = stemTopDec - 0.75 * delta;
-      const innerStemBottomDec = stemBottomDec + 0.75 * delta;
-      innerArrowPoints.push([innerPointRA, centerDec]);
-      innerArrowPoints.push([innerHeadBackRA, innerTopDec]); 
-      innerArrowPoints.push([innerHeadBackRA, innerStemTopDec]);
-      innerArrowPoints.push([innerStemBackRA, innerStemTopDec]); 
-      innerArrowPoints.push([innerStemBackRA, innerStemBottomDec]);
-      innerArrowPoints.push([innerHeadBackRA, innerStemBottomDec]);
-      innerArrowPoints.push([innerHeadBackRA, innerBottomDec]);
+      const innerStemTopDec = stemTopDec - delta;
+      const innerStemBottomDec = stemBottomDec + delta;
+      innerArrowCoordinates.push([innerPointRA, centerDec]);
+      innerArrowCoordinates.push([innerHeadBackRA, innerTopDec]); 
+      innerArrowCoordinates.push([innerHeadBackRA, innerStemTopDec]);
+      innerArrowCoordinates.push([innerStemBackRA, innerStemTopDec]); 
+      innerArrowCoordinates.push([innerStemBackRA, innerStemBottomDec]);
+      innerArrowCoordinates.push([innerHeadBackRA, innerStemBottomDec]);
+      innerArrowCoordinates.push([innerHeadBackRA, innerBottomDec]);
 
-      for (const point of innerArrowPoints) {
-        this.innerArrow.addPoint(...this.rotatePoint(point, this.arrowAngleDeg));
+      for (const coords of innerArrowCoordinates) {
+        const point = this.findScreenPointForRADec({ra: coords[0], dec: coords[1]});
+        const rotatedPoint = this.rotatePoint([point.x, point.y], m101Point, this.arrowAngleDeg);
+        const rotatedCoords = this.findRADecForScreenPoint({x: rotatedPoint[0], y: rotatedPoint[1]});
+        this.innerArrow.addPoint(rotatedCoords.ra, rotatedCoords.dec);
       }
 
       const innerColor = "#ffffff";
