@@ -830,9 +830,9 @@ export default defineComponent({
       showHorizon: false,
       outerArrow: null as Poly | null,
       innerArrow: null as Poly | null,
-      m101RADeg: 3.681181581357794 * R2D,
-      m101DecDeg: 0.9480289529731357 * R2D,
-      arrowAngleDeg: 25,
+      m101RADeg: 3.681181581357794 * R2D + 0.2/60,
+      m101DecDeg: 0.9480289529731357 * R2D - 1/60,
+      arrowAngleDeg: -60,
 
       showSpeadSheetLater: false,
 
@@ -1199,7 +1199,7 @@ export default defineComponent({
       this.outerArrow = new Poly();
       const outerArrowCoordinates: [number, number][] = [];
 
-      const pointRA = this.m101RADeg + 0.05;
+      const pointRA = this.m101RADeg;
       const centerDec = this.m101DecDeg;
       const arrowHalfHeight = 0.02;
       const stemFraction = 0.4;
