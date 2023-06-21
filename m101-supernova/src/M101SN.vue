@@ -77,6 +77,7 @@
           v-model="showLocationSelector"
           fa-icon="location-pin"
           :color="accentColor"
+          :focus="accentColor2"
           tooltip-text="Select location"
           tooltip-location="bottom"
           >
@@ -129,8 +130,9 @@
       <gallery
         wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
         width="1000px"
-        :single-select="false"
-        :selected-color="accentColor3"
+        :single-select="true"
+        :selected-color="accentColor"
+        :style="cssVars"
         @select="onItemSelected"
         @deselect="onItemDeselected"
       />
@@ -177,8 +179,8 @@
             :keys="{ x: 'time', y: 'magnitude' }"
             :xrange="[Math.min(...dates.map(d => d)), Math.max(...dates.map(d => d))]"
             :yrange="[10.5, 17]"
-            :color="accentColor"
-            :borderColor="accentColor"
+            :color="accentColor2"
+            :borderColor="accentColor2"
             :scatterOptions="{radius: 5, borderWidth: 2}"
             :lineOptions="{borderColor: 'white', borderWidth: 1.5}"
             :yAxisOptions="{
@@ -216,6 +218,7 @@
           class="play-pause-icon-wrapper"
           tooltip-location="top"
           :color="accentColor"
+          :focus-color="accentColor"
           tooltip-text="Watch the supernova change over time!"
           @activate="() => {
                   playing = !(playing || playingImagePath); // set playing to true if both playing & pCP are false. set playing to false if either playing or pCP are true.
@@ -737,7 +740,7 @@ function formatCsvTable(table: Table): string {
 const allDates = fullDatesTable.map(r => r.date.getTime());
 const imageDates = [... new Set(imageDatesTable.map(r => r.date.getTime()))];
 const minDate = Math.min(...allDates, ...imageDates)-2*MILLISECONDS_PER_DAY;
-const maxDate = Math.max(...allDates, ...imageDates, (new Date()).getTime())+2*MILLISECONDS_PER_DAY;
+const maxDate = Math.max(...allDates, ...imageDates)+2*MILLISECONDS_PER_DAY;
 const dates: number[] = [];
 
 let t = minDate - (minDate % MILLISECONDS_PER_DAY);
@@ -854,10 +857,9 @@ export default defineComponent({
       imageDateRefInv: Object.fromEntries(imageDatesTable.map(d => [d.date.getTime(), d.wtmlName])),
       imageDateSorted: imageDatesTable.map(d => d.date.getTime()).sort((a, b) => a - b),
       lastClosePt: null as TableRow | null,
-      accentColor: "#CB6BFF",
-      accentColor2: "#ffd220",
-      accentColor3: "#ff74cb",
-      accentColor4: " #0493d6",
+      accentColor: "#ED6D5E",
+      accentColor2: "#b3d3e0",
+      accentColor3: " #0493d6",
 
       aavsoLightCurveData: aavsoLightCurveTable,
       // lightCurveData: imageDatesTable.map(d => { 'time': d.date, 'magnitude': d.magnitude };),
@@ -1065,7 +1067,6 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--accent-color-2': this.accentColor2,
         '--accent-color-3': this.accentColor3,
-        '--accent-color-4': this.accentColor4,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -2451,7 +2452,7 @@ body {
   }
 
   &:focus {
-    color: white;
+    color: var(--accent-color-2);
   }
 }
 
@@ -2586,7 +2587,7 @@ body {
 }
 
 .play-icon-text {
-  font-size: 0.75em;
+  font-size: 1em;
   margin: 0.5em;
 }
 
@@ -2766,32 +2767,6 @@ div#main-content > div {
     // color: var(--accent-color);
     color: white;
     opacity: 1;
-  }
-
-  .controls-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 0.5rem;
-
-    .v-btn {
-      align-self: center;
-      padding-left: 5px;
-      padding-right: 5px;
-      border: solid 1.5px #ffc5fd;
-
-      &:focus {
-        border: 2px solid white;
-      }
-    }
-
-    .v-btn__content {
-      color: black;
-      font-weight: 900;
-      font-size: 0.75em;
-      white-space: break-spaces;
-      width: 150px;
-    }
   }
 
   #controls-top-row {
@@ -3022,9 +2997,10 @@ video {
 .vue-slider-dot-tooltip-inner {
   cursor: grab;
   padding: 4px 10px !important;
-  color: white !important;
-  background-color: var(--accent-color) !important;
-  border: 1px solid var(--accent-color) !important;
+  color: black !important;
+  background-color: var(--accent-color-2) !important;
+  border: 1px solid var(--accent-color-2) !important;
+  opacity: 1 !important;
 
   &:active {
     cursor: grabbing;
@@ -3033,7 +3009,7 @@ video {
 
 .vue-slider-dot-handle {
   cursor: grab;
-  background-color: var(--accent-color) !important;
+  background-color: var(--accent-color-2) !important;
   border: 1px solid black !important;
 
   &:active {
@@ -3060,7 +3036,7 @@ video {
   height: 20px;
   width: 2px;
   margin: 0;
-  background-color: var(--accent-color);
+  background-color: var(--accent-color-2);
   transform: translateX(-50%) translateY(calc(-50% + 2px));
 
 }
@@ -3129,7 +3105,7 @@ video {
   
   &::after {
     content: "X";
-    color: gold;
+    color: var(--accent-color-2);
     position: absolute;
     height: 8%;
     top: 5%;
@@ -3149,8 +3125,8 @@ video {
 
     
   p.highlight {
-    color: var(--accent-color-3);
-    filter: drop-shadow(0 0 .15em var(--accent-color-3));
+    color: var(--accent-color-2);
+    filter: drop-shadow(0 0 .15em var(--accent-color-2));
     // make uppercase
     font-size: 1.15em;
     text-transform: uppercase;
@@ -3176,7 +3152,7 @@ video {
     width: 70%;
     
     .svg-inline--fa {
-      color:gold;
+      color:var(--accent-color);
     }
   }
 
@@ -3192,12 +3168,11 @@ video {
   
   a {
     text-decoration: none;
-    color: var(--accent-color-4);
+    color: var(--accent-color-3);
     white-space: nowrap;
   }
     
 }
-
 
 #overlays {
   margin: 5px;
@@ -3230,96 +3205,12 @@ div.credits {
   --v-input-control-height: 40px;
 }
 
-// :root {
-//   --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-// }
-
-// @media (prefers-color-scheme: dark) {
-//   .map-tiles {
-//     filter:var(--map-tiles-filter, none);
-//   }
-// }
-
-span.ui-element-ref-comet {
-  background-color:var(--accent-color-2);
-  padding: 0em 0.1em;
-  border-radius: 0.2em;
+.gallery, .default-activator, .gallery-item {
+  border: 1px solid var(--accent-color-2) !important;
 }
 
-/* from https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/ */
-input[type="range"] {
-    -webkit-appearance: inherit;
-    -moz-appearance: inherit;
-    appearance: inherit;
-    margin: 2px;
-    --track-height: 1em;
-    --thumb-radius: 0.8em;
-    --thumb-color: var(--accent-color-3);
-    // --thumb-color: #444;
-    --track-color: #0493d61a;
-    // --thumb-border: 1px solid #899499;
-    --thumb-border-width: 1px;
-    --thumb-border: var(--thumb-border-width) solid white;
-    --track-border-width: 1px;
-    --track-border: var(--track-border-width) solid var(--accent-color-4);
-    --thumb-margin-top: calc((var(--track-height) - 2*var(--track-border-width)) / 2 - (var(--thumb-radius)) / 2);
-    
-    &:hover {
-      opacity: 1;
-      --track-color: rgba(217, 234, 242,0.2);
-      --thumb-color: #cd369d;
-    }
+.dipper_svg_icon:focus {
+  color: var(--accent-color-2) !important;
+}
 
-    &:focus {
-      border-radius: calc(var(--track-height) / 2);
-    }
-  }
-  
-  
-  
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: inherit;
-    -moz-appearance: inherit;
-    appearance: inherit;
-    width: var(--thumb-radius);
-    height: var(--thumb-radius);
-    margin-top: var(--thumb-margin-top);
-    border-radius: 50%;
-    background: var(--thumb-color);
-    border: var(--thumb-border);
-  }
-  
-  input[type="range"]::-moz-range-thumb {
-    -webkit-appearance: inherit;
-    -moz-appearance: inherit;
-    appearance: inherit;
-    width: var(--thumb-radius);
-    height: var(--thumb-radius);
-    margin-top: var(--thumb-margin-top);
-    border-radius: 50%;
-    background: var(--thumb-color);
-    cursor: pointer;
-    border: var(--thumb-border)
-  }
-  
-  input[type="range"]::-webkit-slider-runnable-track {
-    background: var(--track-color);
-    /* outline: 1px solid white; */
-    border-radius: calc(var(--track-height) / 2);
-    border: var(--track-border);
-    height: var(--track-height);
-    margin-top: 0;
-    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
-  }
-  
-  
-input[type="range"]::-moz-range-track {
-    background: var(--track-color);
-    /* outline: 1px solid white; */
-    border-radius: calc(var(--track-height) / 2);
-    border: var(--track-border);
-    height:var(--track-height);
-    margin-top: 0;
-    padding: 0 calc((var(--track-height) - var(--thumb-radius))/2);
-  }
 </style>
