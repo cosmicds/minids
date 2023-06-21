@@ -191,6 +191,64 @@ export default defineComponent({
     },
     
     draw() {
+      // arrow adapted from 
+      // https://stackoverflow.com/questions/72214227/chart-js-add-direction-arrows-to-the-x-and-y-axes
+      const arrowBorder = {
+        id: 'arrowBorder',
+        afterDatasetsDraw(chart: Chart, args: any, pluginOptions: any) {
+          const {
+            ctx,
+            chartArea: {
+              top,
+              bottom,
+              left,
+              right,
+              width,
+              height
+            }
+          } = chart;
+
+
+          
+          ctx.save();
+          ctx.beginPath();
+          ctx.lineWidth = pluginOptions.yWidth;
+          ctx.strokeStyle = "white";
+
+          const headLength = 6;
+          const headWidth = 5;
+
+          const arrowUpTip = -4;
+          // stem
+          ctx.moveTo(left, bottom + 1);
+          ctx.lineTo(left, top + arrowUpTip);
+          // arrowhead
+          ctx.moveTo(left - headWidth, top + arrowUpTip + headLength);
+          ctx.lineTo(left, top + arrowUpTip);
+          ctx.lineTo(left + headWidth, top + arrowUpTip + headLength);
+          ctx.stroke();
+          ctx.closePath();
+          // 
+
+          ctx.beginPath();
+          ctx.lineWidth = pluginOptions.xWidth;
+          ctx.strokeStyle = "#ccc";
+          const arrowRightTip = 4;
+          // stem
+          ctx.moveTo(left-1, bottom);
+          ctx.lineTo(right + arrowRightTip, bottom);
+          // arrowhead
+          ctx.moveTo(right + arrowRightTip - headLength, bottom - headWidth);
+          ctx.lineTo(right + arrowRightTip, bottom);
+          ctx.lineTo(right + arrowRightTip - headLength, bottom + headWidth);
+          ctx.stroke();
+          ctx.closePath();
+        },
+        defaults: {
+          yWidth: this.chartOptions.scales.y.border.width - 1,
+          xWidth: this.chartOptions.scales.x.border.width - 1,
+        }
+      };
       
       const ctx = this.$el.querySelector("#chartjs");
       
@@ -205,6 +263,7 @@ export default defineComponent({
   
         data: this.chartData,
         options: this.chartOptions,
+        plugins: [arrowBorder],
         
       });
 
@@ -325,6 +384,7 @@ export default defineComponent({
             min: this.xrange[0],
             max: this.xrange[1],
             reverse: this.reversedX,
+            width: 3,
             ...this.axisOptions,
             ...this.xAxisOptions,
           },
@@ -335,6 +395,7 @@ export default defineComponent({
             reverse: this.reversedY,
             min: this.computedYRange[0],
             max: this.computedYRange[1],
+            width: 3,
             ...this.axisOptions,
             ...this.yAxisOptions,
             

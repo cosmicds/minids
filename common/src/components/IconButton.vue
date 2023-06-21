@@ -15,6 +15,8 @@
         :class="['icon-wrapper', {'active': modelValue}]"
         @click="handleAction"
         @keyup.enter="handleAction"
+        @touchstart="handleTouchStart"
+        @touchend="handleTouchEnd"
         :style="cssVars"
         tabindex="0"
       >
@@ -51,6 +53,7 @@ export default defineComponent({
     focusColor: { type: String, default: "#ffffff" },
     backgroundColor: { type: String, default: "#040404" },
     border: { type: Boolean, default: true },
+    longPressTimeMs: { type: Number, default: 500 },
     tooltipText: { type: String, required: false },
     tooltipLocation: { type: String, default: "start" },
     tooltipOnClick: { type: Boolean, default: false },
@@ -70,6 +73,20 @@ export default defineComponent({
     handleAction() {
       this.updateValue();
       this.$emit('activate');
+    },
+
+    handleTouchStart() {
+      this.longPressTimeout = setTimeout(() => {
+        this.tooltip = true;
+      }, this.longPressTimeMs);
+    },
+
+    handleTouchEnd() {
+      if (this.longPressTimeout) {
+        clearTimeout(this.longPressTimeout);
+        this.longPressTimeout = null;
+      }
+      this.tooltip = false;
     }
   },
 
@@ -77,6 +94,7 @@ export default defineComponent({
     return {
       active: false,
       tooltip: false,
+      longPressTimeout: null as ReturnType<typeof setTimeout> | null
     };
   },
 
@@ -120,13 +138,13 @@ export default defineComponent({
     color: var(--focus-color);
     border-color: var(--focus-color);
   }
-}
 
-.active { 
-  box-shadow: 0px 0px 10px 3px var(--color);
+  &.active {
+    box-shadow: 0px 0px 10px 3px var(--color);
 
-  &:focus {
-    box-shadow: 0px 0px 10px 3px var(--focus-color);
+    &:focus {
+      box-shadow: 0px 0px 10px 3px var(--focus-color);
+    }
   }
 }
 </style>

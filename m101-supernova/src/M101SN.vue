@@ -128,7 +128,7 @@
 
     <div class="right-content">
       <gallery
-        wtml-url="http://data1.wwtassets.org/packages/2022/07_jwst/jwst_first_v2.wtml"
+        wtml-url="https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/gallery.wtml"
         width="1000px"
         :single-select="true"
         :selected-color="accentColor"
@@ -1455,6 +1455,8 @@ export default defineComponent({
         this.hideAllImagesets();
         return;
       }
+      // hide previous so it compares to background
+      this.hideAllImagesets();
       
       const iset = place.get_studyImageset() ?? place.get_backgroundImageset();
       if (iset == null) { return; }
@@ -2513,16 +2515,16 @@ body {
   margin-bottom: -33px;
   
   // makes the y-axis border look like an arrow
-  #plot::before {
-    content: "^";
-    position: absolute;
-    font-size: 1.5rem;
-    font-weight: bold;
-    // transform: translateX(-.51em) translateY(-.55em);
-    transform: translateX(-.14rem) translateY(-.52rem);
-    transform-origin: 0 0;
-    pointer-events: none;
-  }
+  // #plot::before {
+  //   content: "^";
+  //   position: absolute;
+  //   font-size: 1.5rem;
+  //   font-weight: bold;
+  //   // transform: translateX(-.51em) translateY(-.55em);
+  //   transform: translateX(-.14rem) translateY(-.52rem);
+  //   transform-origin: 0 0;
+  //   pointer-events: none;
+  // }
   
   #chart-title {
     display: none;
@@ -2969,20 +2971,22 @@ video {
 #slider {
   width: 100% !important;
   margin: 5px 30px;
+  // display: none;
+  // opacity: 0;
 
   
-  &:after {
-    content: "^";
-    position: absolute;
-    right: 0;
-    line-height: 1;
-    font-size: 1.5rem;
-    font-weight: bold;
-    transform: translateX(0.36rem) translateY(-0.86rem) rotate(90deg);
-    color: #ccc;
-    transform-origin: 50% 50%;
-    pointer-events: none;
-  }
+  // &:after {
+  //   content: "^";
+  //   position: absolute;
+  //   right: 0;
+  //   line-height: 1;
+  //   font-size: 1.5rem;
+  //   font-weight: bold;
+  //   transform: translateX(0.36rem) translateY(-0.86rem) rotate(90deg);
+  //   color: #ccc;
+  //   transform-origin: 50% 50%;
+  //   pointer-events: none;
+  // }
 }
 
 #opacity-slider {
