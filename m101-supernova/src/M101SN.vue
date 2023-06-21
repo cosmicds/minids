@@ -3102,6 +3102,7 @@ video {
   //  vue components are flex, so we can easy center
   align-items: center;
   justify-content: center;
+  font-size: 7vw;
 }
 
 
@@ -3113,16 +3114,17 @@ video {
   // grid of 4 rows equally sized
   grid-template-rows: repeat(4, 1fr);
   max-height: calc(min(90vh,2040px)); 
+  max-width: 90vw;
   aspect-ratio: 8 / 10;
   background-color: black;
   justify-content: center;
-  font-size: 2.5rem;
+  
   
   border-radius: 10%;
   border: 10px solid var(--accent-color);
   overflow: auto;
   // the order for padding is top right bottom left
-  padding-top: 2.5em;
+  padding-top: 1.5em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
   &::after {
