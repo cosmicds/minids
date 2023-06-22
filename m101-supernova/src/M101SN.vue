@@ -523,6 +523,9 @@
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
+                <h4> Images and Data Processing:</h4>
+                <p>Martin Fowler (<a href="https://solarsystem.nasa.gov/people/647/martin-fowler/" target="_blank">NASA Citizen Scientist</a>)</p>
+
                 <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
                 Jon Carifio<br>
                 John Lewis<br>
