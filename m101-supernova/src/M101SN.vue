@@ -1616,7 +1616,7 @@ export default defineComponent({
     
     onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
-        this.showImageForDateTime(this.dateTime, true);
+        this.showImageForDateTime(new Date(this.selectedTime), true);
         this.updateViewForDate(options);
       });
     },
