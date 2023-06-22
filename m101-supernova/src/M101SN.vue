@@ -133,6 +133,7 @@
         :single-select="true"
         :selected-color="accentColor"
         :style="cssVars"
+        :preview-index="1"
         @select="onItemSelected"
         @deselect="onItemDeselected"
       />
