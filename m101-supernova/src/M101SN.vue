@@ -430,6 +430,7 @@
     </v-dialog>
 
     <v-dialog
+      :style="cssVars"
       class="bottom-sheet"
       id="text-bottom-sheet"  
       hide-overlay
@@ -468,26 +469,57 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
+
+                <h3><i>Something has gone off in the Pinwheel Galaxy!</i></h3>
+
                 <p>
-                  In the Pinwheel Galaxy (Messier object 101, M101) a massive star has exploded in what is known as a supernova.
+                  On May 19, 2023 - renowned supernova hunter 
+                  <a href="https://www.scientificamerican.com/article/astronomers-have-spotted-a-once-in-a-decade-supernova-and-you-can-too/" target="_blank">Koichi Itagaki discovered</a>
+                  a new bright object in the very nearby Pinwheel Galaxy. This bright object was a <strong>new supernova</strong>. 
                 </p>
-                In particular, it has died in what is called a core-collapse supernova. These occur when a star several times the mass of our Sun dies. 
-                A star dies when it can no longer produce energy through the fusion of elements in it's core. 
-                Stars generate energy through the fusion of elements. 
-                Initially stars fuse hydrogen into helium. 
-                Star like the Sun are not massive enough to fuse helium into heavier elements.
-                Eventually, as the core runs out of hydrogen, the star will fuse hydrogen in an ever expanding shell until it gets too hot too close to the surface. T
-                he outer layers to expand forming a plantary nebular like the Ring Nebua.
+                <h3>Types of Supernova</h3>
+                <p>
+                Broadly speaking, supernovae are formed in one of two ways 
+                <ul>
+                  <li>
+                    By the <strong>thermonuclear explosion</strong> of a white dwarf accreting mass from a massive stellar companion. These are called <strong>Type Ia</strong> supernovae.
+                    These are used to measure the cosmological expansion of the universe. 
+                  </li>
+                  <li>
+                    By the collapse of the core of a massive star (several solar masses) and its subsequent explosion. These are <strong>core-collapse</strong> supernova. 
+                    These supernovae teach us about the evolution and environment of massive stars. There are several types, the main one being <strong>Type II</strong> supernova
+                  </li>
+                </ul>
+                The distinction between the Type II and Type I designations is based on the presence (II) or absence (I) of hydrogen in the spectrum. 
+                There are many subclasses of each, with 1b and 1c being types of hydrogren-free core-collapse supernova. A simple overview can be found <a href="https://astronomy.swin.edu.au/cosmos/S/supernova+classification" target="_blank">here</a>. 
+                </p>
+                <p>
+                  When either of these explosions occur they put out an incredible amount of energy ~ the power of nearly 10 billion(!) Suns, outshining their home galaxies
+                </p>
+
+                <h3>The Lightcurve</h3>
+                A light curve is the change in brightness over time. 
+                By looking at the shape of a lightcurve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
+                Type Ia are characterized by a rapid rise and rapid fall off. Type II supernovae have a rapid rise followed by a long plateau. 
+
+                <img src="http://hyperphysics.phy-astr.gsu.edu/hbase/Astro/imgast/sntyp.gif">
+
                 
-                Stars several times the mass of the Sun however can fuse helium into heaver elements - fusing helium into carbon, carbon to oxygen, all the way up to iron - the "star killer".
-                Unlike the lighter elements, the fusion of iron does not release any energy. 
-                The sudden cessation of fusion in the core is a literal shock to the star, initiating a series of shockwaves which crush the core into a nuetron star or black and hole and cause the star to explode!!
+                <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong> 
                 
-                During this process, the star is also shedding it's outer layers into the surrounding space. 
-                After the initial explosion, the layers of the exploding star ram into the layers it have previously expelled. 
-                This causes a gradual rise in brightness over time during the early stages of a supernova. 
-                After a certain amount of time the the lightcurve (the change of brightness over time) peaks and then begins to fall-off as material continues to cool and expand. 
+                <div
+                  v-if="!revealAnswer"
+                  style="max-width: fit-content"
+                  class="control-icon-wrapper"
+                  @click="revealAnswer = true"
+                >
+                  Click to reveal the answer
+              </div>
+              <p v-if="revealAnswer"> With the rapid rise and long plateau this looks most similar to a Type II supernova. </p>
+
+
                 
+
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
@@ -890,6 +922,7 @@ export default defineComponent({
       showControls: false,
       tab: 0,
       chartVisible: false,
+      revealAnswer: false,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -2885,6 +2918,30 @@ video {
   & a {
     text-decoration: none;
   }
+  
+  & h3 {
+    margin-bottom: 1em;
+    margin-top: 1em;
+  }
+  
+  & img {
+    display: block;
+    margin-inline: auto;
+    margin-block: 10px;
+    background-color: white;
+    width: 200px;
+  }
+  
+  & ul {
+    margin-left: 1em;
+    margin-block: 0.5em;
+    font-size: 0.95em;
+  }
+  
+  & strong {
+    color: var(--accent-color-2);
+  }
+
 }
 
 .close-icon {
