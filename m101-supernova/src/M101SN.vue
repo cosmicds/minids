@@ -123,6 +123,14 @@
               />
           </template>
       </icon-button>
+      <icon-button
+          v-model="showArrow"
+          :color="accentColor"
+          fa-icon="arrow-right"
+          :tooltip-text="showArrow ? 'Hide the arrow' : 'Show the arrow'"
+          tooltip-location="start"
+        >
+      </icon-button>
       </div>
     </div>
 
