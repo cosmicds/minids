@@ -141,9 +141,8 @@
 
       <div id="tools">
         <div 
-        v-if="(playCount >=2)" 
         id="chart-button"
-        :class="[(playCount >= 2) && (chartVisible) ? 'collapse-button': '']"
+        :class="[chartVisible ? 'collapse-button': '']"
         >
           <v-btn
             flat
@@ -202,7 +201,7 @@
                 title: {display: false},
                 ticks: {display: false},
               }"
-            @bounds="(val: any) => { chartBounds = val, onResize() }"
+            @bounds="(val: any) => { chartBounds = val; onResize() }"
             
           />
           
