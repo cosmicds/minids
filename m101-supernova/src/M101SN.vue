@@ -236,6 +236,7 @@
         </icon-button>
           <vue-slider
             adsorb
+            :duration="0.1"
             id="slider"
             :marks="(d: number) => {
               return allDates.includes(d) || imageDates.includes(d);
