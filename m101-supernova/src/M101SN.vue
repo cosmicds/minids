@@ -88,7 +88,7 @@
           v-model="showTextSheet"
           fa-icon="book-open"
           :color="accentColor"
-          :tooltip-text="showTextSheetLearn more"
+          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
           tooltip-location="start"
           >
       </icon-button>
@@ -2289,7 +2289,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: this.wwtRARad,
             decRad: this.wwtDecRad,
-            zoomDeg: this.wwtZoomDeg > 120 ? this.wwtZoomDeg : 120,
+            zoomDeg: this.wwtZoomDeg > 300 ? this.wwtZoomDeg : 300,
             instant: false
           });
         });
