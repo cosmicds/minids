@@ -42,7 +42,8 @@ import {
   faRefresh,
   faStar,
   faChartLine,
-  faCircleXmark
+  faCircleXmark,
+  faArrowRight
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
@@ -64,6 +65,8 @@ library.add(faRefresh);
 library.add(faStar);
 library.add(faChartLine);
 library.add(faCircleXmark);
+library.add(faArrowRight);
+
 
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { faConstellation } from "./assets/constellation_icon";

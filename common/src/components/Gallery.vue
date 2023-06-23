@@ -22,7 +22,7 @@
         </span>
         <img
           class="noselect"
-          :src="places[0] ? (getImageset(places[0])?.get_thumbnailUrl() ?? '') : ''"
+          :src="places[previewIndex] ? (getImageset(places[previewIndex])?.get_thumbnailUrl() ?? '') : ''"
         />
       </div>
     </slot>
@@ -92,6 +92,7 @@ export default defineComponent({
     selectedColor: { type: String, default: "dodgerblue" },
     singleSelect: { type: Boolean, default: true },
     highlightLastOnly: { type: Boolean, default: false },
+    previewIndex: { type: Number, default: 0 }
   },
 
   async created() {
