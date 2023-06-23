@@ -652,10 +652,7 @@ interface MoveOptions {
   rollRad?: number;
 }
 
-// import {
-//   ephemerisFullDatesCsv,
-//   ephemerisImageDatesCsv
-// } from "./data";
+type Point = [number, number];
 
 import {
   m101DataList,
@@ -872,7 +869,7 @@ export default defineComponent({
       currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,
-      intialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
+      initialPosition: {ra: 210.802, dec: 54.348, zoom: 7.75},
 
       chartBounds: {} as {
         'bounds': { xmin: number, xmax: number, ymin: number, ymax: number },
@@ -1020,9 +1017,9 @@ export default defineComponent({
       }, 100);
 
       this.gotoRADecZoom({
-        raRad: D2R * this.intialPosition.ra,
-        decRad: D2R * this.intialPosition.dec,
-        zoomDeg: this.intialPosition.zoom,
+        raRad: D2R * this.initialPosition.ra,
+        decRad: D2R * this.initialPosition.dec,
+        zoomDeg: 2,
         instant: true
       });
 
@@ -1031,6 +1028,12 @@ export default defineComponent({
         if (this.showArrow) {
           this.displayArrow();
         }
+        this.gotoRADecZoom({
+          raRad: this.wwtRARad,
+          decRad: this.wwtDecRad,
+          zoomDeg: this.initialPosition.zoom,
+          instant: true
+        });
       }, 100);
 
     });
@@ -1180,7 +1183,7 @@ export default defineComponent({
       return;
     },
 
-    rotatePoint(point: [number, number], origin: [number, number], angleDeg: number): [number, number] {
+    rotatePoint(point: Point, origin: Point, angleDeg: number): Point {
       const xp = point[0] - origin[0];
       const yp = point[1] - origin[1];
       const angleRad = angleDeg * D2R;
@@ -1193,11 +1196,11 @@ export default defineComponent({
     createArrow() {
 
       const m101XY = this.findScreenPointForRADec({ra: this.m101RADeg, dec: this.m101DecDeg});
-      const m101Point: [number, number] = [m101XY.x, m101XY.y];
+      const m101Point: Point = [m101XY.x, m101XY.y];
     
       // Create the outer (purple) arrow
       this.outerArrow = new Poly();
-      const outerArrowCoordinates: [number, number][] = [];
+      const outerArrowCoordinates: Point[] = [];
 
       const pointRA = this.m101RADeg;
       const centerDec = this.m101DecDeg;
@@ -1234,7 +1237,7 @@ export default defineComponent({
       
       // Create the inner (white) arrow
       this.innerArrow = new Poly();
-      const innerArrowCoordinates: [number, number][] = [];
+      const innerArrowCoordinates: Point[] = [];
       
       const delta = 0.002; // The thickness of the outer "border"
       const headSlope = (topDec - centerDec) / (headBackRA - pointRA);
@@ -2154,15 +2157,15 @@ export default defineComponent({
     centerView(_options?: MoveOptions) {
       
       this.gotoRADecZoom({
-        raRad: this.intialPosition.ra * D2R,
-        decRad: this.intialPosition.dec * D2R,
-        zoomDeg: this.intialPosition.zoom,
+        raRad: this.initialPosition.ra * D2R,
+        decRad: this.initialPosition.dec * D2R,
+        zoomDeg: this.initialPosition.zoom,
         instant: false,
       });
       // show the first image
       if (!this.playing) {
         this.selectedTime = this.imageDates[0];
-        this.onTimeSliderChange({ zoomDeg: this.intialPosition.zoom });
+        this.onTimeSliderChange({ zoomDeg: this.initialPosition.zoom });
       }
     },
 
@@ -2339,7 +2342,7 @@ export default defineComponent({
         this.selectedTime = minTime;
       }
 
-      this.updateViewForDate({ zoomDeg: this.intialPosition.zoom });
+      this.updateViewForDate({ zoomDeg: this.initialPosition.zoom });
 
       this.playingIntervalId = setInterval(() => {
         if (this.playingWaitCount > 0) {
