@@ -112,7 +112,7 @@
           v-model="showConstellations"
           :color="accentColor"
           fa-icon="constellation"
-          tooltip-text="Show Constellations"
+          :tooltip-text="showConstellations ? 'Hide constellations' : 'Show constellations'"
           tooltip-location="start"
           >
       </icon-button>
