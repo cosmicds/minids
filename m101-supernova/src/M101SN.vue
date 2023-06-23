@@ -111,17 +111,10 @@
       <icon-button
           v-model="showConstellations"
           :color="accentColor"
+          fa-icon="constellation"
           tooltip-text="Show Constellations"
           tooltip-location="start"
           >
-          <template #button>
-            <constellation-icon 
-              :selected="showConstellations"
-              width="20px"
-              :color="accentColor"
-              fill
-              />
-          </template>
       </icon-button>
       </div>
     </div>

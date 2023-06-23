@@ -65,6 +65,10 @@ library.add(faStar);
 library.add(faChartLine);
 library.add(faCircleXmark);
 
+import { IconDefinition } from "@fortawesome/fontawesome-common-types";
+import { faConstellation } from "./assets/constellation_icon";
+library.add(faConstellation as IconDefinition);
+
 import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 
 import Notifications from '@kyvg/vue3-notification';
