@@ -88,7 +88,7 @@
           v-model="showTextSheet"
           fa-icon="book-open"
           :color="accentColor"
-          :tooltip-text="showTextSheet ? 'Learn more' : 'Hide Info'"
+          :tooltip-text="showTextSheetLearn more"
           tooltip-location="start"
           >
       </icon-button>
