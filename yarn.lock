@@ -554,9 +554,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@minids/m101-supernova@workspace:m101-supernova":
+"@minids/pinwheel-supernova@workspace:pinwheel-supernova":
   version: 0.0.0-use.local
-  resolution: "@minids/m101-supernova@workspace:m101-supernova"
+  resolution: "@minids/pinwheel-supernova@workspace:pinwheel-supernova"
   dependencies:
     "@kyvg/vue3-notification": ^2.8.0
     "@minids/common": "workspace:0.0.0"

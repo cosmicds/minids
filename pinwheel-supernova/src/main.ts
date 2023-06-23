@@ -87,7 +87,7 @@ createApp(M101SN, {
   wtml: { // images are listed in chronological order earliest to latest
     imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/m101_all.wtml",
   },
-  url: "https://cosmicds.github.io/minids/m101-supernova/",
+  url: "https://cosmicds.github.io/minids/pinwheel-supernova/",
   thumbnailUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/M101_hires_STScI-PRC2006-10a.jpg/307px-M101_hires_STScI-PRC2006-10a.jpg",
   bgWtml: "",
   bgName: ""

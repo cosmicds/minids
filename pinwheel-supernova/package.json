@@ -1,5 +1,5 @@
 {
-  "name": "@minids/m101-supernova",
+  "name": "@minids/pinwheel-supernova",
   "version": "0.0.0",
   "dependencies": {
     "@kyvg/vue3-notification": "^2.8.0",
