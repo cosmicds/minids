@@ -163,7 +163,7 @@
         </div>
           <div id="chart-container" v-show="chartVisible" >
             <div id="chart-title">
-              Supernova Lightcurve (Change in Brightness Over Time)
+              Supernova Light Curve (Change in Brightness Over Time)
             </div>
             <div id="yaxis-text">
               Supernova <br />
@@ -478,46 +478,49 @@
                 <p>
                   On May 19, 2023 - renowned supernova hunter 
                   <a href="https://www.scientificamerican.com/article/astronomers-have-spotted-a-once-in-a-decade-supernova-and-you-can-too/" target="_blank">Koichi Itagaki discovered</a>
-                  a new bright object in the very nearby Pinwheel Galaxy. This bright object was a <strong>new supernova</strong>. 
+                  a new bright object in the very nearby Pinwheel Galaxy (also known as M101). This bright object was a <strong>new supernova</strong>. 
                 </p>
+                <br/>
                 <h3>Types of Supernova</h3>
                 <p>
-                Broadly speaking, supernovae are formed in one of two ways 
+                Broadly speaking, supernovae are formed in one of two ways: 
                 <ul>
                   <li>
-                    By the <strong>thermonuclear explosion</strong> of a white dwarf accreting mass from a massive stellar companion. These are called <strong>Type Ia</strong> supernovae.
+                    By the <strong>thermonuclear explosion</strong> of a white dwarf pulling gas from a massive companion star onto itself. These are called <strong>Type Ia</strong> supernovae.
                     These are used to measure the cosmological expansion of the universe. 
                   </li>
                   <li>
-                    By the collapse of the core of a massive star (several solar masses) and its subsequent explosion. These are <strong>core-collapse</strong> supernova. 
+                    By the collapse of the core of a massive star (that has 8+ times the mass of our sun) and its subsequent explosion. These are <strong>core-collapse</strong> supernova. 
                     These supernovae teach us about the evolution and environment of massive stars. There are several types, the main one being <strong>Type II</strong> supernova
                   </li>
                 </ul>
-                The distinction between the Type II and Type I designations is based on the presence (II) or absence (I) of hydrogen in the spectrum. 
-                There are many subclasses of each, with 1b and 1c being types of hydrogren-free core-collapse supernova. A simple overview can be found <a href="https://astronomy.swin.edu.au/cosmos/S/supernova+classification" target="_blank">here</a>. 
+                <!-- The distinction between the Type II and Type I designations is based on the presence (II) or absence (I) of hydrogen in the spectrum.  -->
+                An overview of the different supernova types can be found <a href="https://astronomy.swin.edu.au/cosmos/S/supernova+classification" target="_blank">here</a>. 
                 </p>
                 <p>
-                  When either of these explosions occur they put out an incredible amount of energy ~ the power of nearly 10 billion(!) Suns, outshining their home galaxies
+                  When either of these explosions occur they put out an incredible amount of energy&mdash;the power of nearly 10 billion(!) Suns, outshining their home galaxies
                 </p>
-
-                <h3>The Lightcurve</h3>
-                A light curve is the change in brightness over time. 
-                By looking at the shape of a lightcurve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
+                <br/>
+                <h3>The Brightness Graph</h3>
+                A <strong>light curve</strong> is a graph of the change in brightness over time. 
+                By looking at the shape of a light curve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
                 Type Ia are characterized by a rapid rise and rapid fall off. Type II supernovae have a rapid rise followed by a long plateau. 
 
                 <img src="http://hyperphysics.phy-astr.gsu.edu/hbase/Astro/imgast/sntyp.gif">
 
-                
-                <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong> 
+                <br/>
+                <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
+                <br/>
                 
                 <div
                   v-if="!revealAnswer"
-                  style="max-width: fit-content"
+                  style="max-width: fit-content; margin-block: 1em"
                   class="control-icon-wrapper"
                   @click="revealAnswer = true"
                 >
                   Click to reveal the answer
               </div>
+              <br>
               <p v-if="revealAnswer"> With the rapid rise and long plateau this looks most similar to a Type II supernova. </p>
 
 
@@ -526,12 +529,19 @@
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
-                <h4> Images and Data Processing:</h4>
+                <h4> MicroObservatory:</h4>
+                <p>
+                  The images shown in the "Watch over time" sequence were taken with MicroObservatory (put in a link). We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
+                </p>
+
+                <br/>
+                <h4> MicroObservatory Images and Data Processing:</h4>
                 <p>Martin Fowler (<a href="https://solarsystem.nasa.gov/people/647/martin-fowler/" target="_blank">NASA Citizen Scientist</a>)</p>
+                <br/>
 
                 <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
-                Jon Carifio<br>
                 John Lewis<br>
+                Jon Carifio<br>
                 Pat Udomprasert<br>
                 Alyssa Goodman<br>
                 Mary Dussault<br>
@@ -588,17 +598,6 @@
                         <h4>Tips:</h4>
                         <ul class="text-list">
                           <li>
-                            Click <font-awesome-icon
-                                  class="control-icon"
-                                  icon="location-pin"
-                                  size="lg" 
-                                ></font-awesome-icon>
-                            to adjust your location.
-                          </li>
-                          <li>
-                            Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
-                          </li>
-                          <li>
                             Click 
                               <font-awesome-icon
                                 id="play-pause-icon"
@@ -606,19 +605,22 @@
                                 icon="play"
                                 size="lg"
                               ></font-awesome-icon>
-                            to auto-advance time.
+                            to watch the supernova brightness change over time.
                           </li>
                           <li>
-                            Click a thumbnail image in the panel in the upper left to make the image show up in the sky
+                            Adjust the date slider at the bottom to move to a specific time.
                           </li>
                           <li>
-                            Use the slider to change the transparency so see multiple images overlayed. 
+                            Click "Show supernova brightness graph" to see how its brightness changes with time.
+                          </li>
+                          <li>
+                            Click the Image Gallery to see higher resolution images of the galaxy.
+                          </li>
+                          <li>
+                            Use the "Change image opacity" slider to change the tranparency of the overlaid. 
                           </li>                          
                           <li>
-                            Choose whether to display the sky grid, constellations, or the horizon.
-                          </li>
-                          <li>
-                            Adjust the displayed time for your chosen location using the time controller.
+                            Choose whether to display constellations or the arrow pointing to the supernova.
                           </li>
                           <li>
                             Re-center the view on the Pinwheel Galaxy's location "now" or Play the supernova images, in order, over time
@@ -635,8 +637,8 @@
                       <div class="credits">
                       <h3>Credits:</h3>
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
-                      Jon Carifio<br>
                       John Lewis<br>
+                      Jon Carifio<br>
                       Pat Udomprasert<br>
                       Alyssa Goodman<br>
                       Mary Dussault<br>
@@ -2975,9 +2977,9 @@ video {
   & img {
     display: block;
     margin-inline: auto;
-    margin-block: 10px;
+    margin-block: 20px;
     background-color: white;
-    width: 200px;
+    width: 300px;
   }
   
   & ul {
