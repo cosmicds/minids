@@ -3188,7 +3188,7 @@ video {
   //  vue components are flex, so we can easy center
   align-items: center;
   justify-content: center;
-  font-size: 5vh;
+  font-size: min(7vw,5vh);
 }
 
 
