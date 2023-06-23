@@ -531,7 +531,7 @@
                 <h3>Credits:</h3>
                 <h4> MicroObservatory:</h4>
                 <p>
-                  The images shown in the "Watch over time" sequence were taken with MicroObservatory (put in a link). We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
+                  The images shown in the "Watch over time" sequence were taken with <a href="https://mo-www.cfa.harvard.edu/MicroObservatory/" target="_blank">MicroObservatory</a>. We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
                 </p>
 
                 <br/>
