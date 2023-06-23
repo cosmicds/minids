@@ -2346,6 +2346,11 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+@font-face {
+  font-family: "Highway Gothic Narrow";
+  src: url("../../assets/HighwayGothicNarrow.ttf");
+}
+
 html {
   height: 100%;
   margin: 0;
