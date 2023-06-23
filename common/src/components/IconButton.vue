@@ -66,8 +66,7 @@ export default defineComponent({
   methods: {
     updateValue() {
       if (this.modelValue === undefined) { return; }
-      this.active = !this.active;
-      this.$emit('update:modelValue', this.active); 
+      this.$emit('update:modelValue', !this.modelValue); 
     },
 
     handleAction() {
@@ -92,7 +91,6 @@ export default defineComponent({
 
   data() {
     return {
-      active: false,
       tooltip: false,
       longPressTimeout: null as ReturnType<typeof setTimeout> | null
     };
