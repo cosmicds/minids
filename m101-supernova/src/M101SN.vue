@@ -88,7 +88,7 @@
           v-model="showTextSheet"
           fa-icon="book-open"
           :color="accentColor"
-          tooltip-text="Learn more"
+          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
           tooltip-location="start"
           >
       </icon-button>
@@ -111,17 +111,10 @@
       <icon-button
           v-model="showConstellations"
           :color="accentColor"
-          tooltip-text="Show Constellations"
+          fa-icon="constellation"
+          :tooltip-text="showConstellations ? 'Hide constellations' : 'Show constellations'"
           tooltip-location="start"
           >
-          <template #button>
-            <constellation-icon 
-              :selected="showConstellations"
-              width="20px"
-              :color="accentColor"
-              fill
-              />
-          </template>
       </icon-button>
       <icon-button
           v-model="showArrow"
@@ -150,9 +143,8 @@
 
       <div id="tools">
         <div 
-        v-if="(playCount >=2)" 
         id="chart-button"
-        :class="[(playCount >= 2) && (chartVisible) ? 'collapse-button': '']"
+        :class="[chartVisible ? 'collapse-button': '']"
         >
           <v-btn
             flat
@@ -171,7 +163,7 @@
         </div>
           <div id="chart-container" v-show="chartVisible" >
             <div id="chart-title">
-              Supernova Lightcurve (Change in Brightness Over Time)
+              Supernova Light Curve (Change in Brightness Over Time)
             </div>
             <div id="yaxis-text">
               Supernova <br />
@@ -211,7 +203,7 @@
                 title: {display: false},
                 ticks: {display: false},
               }"
-            @bounds="(val: any) => { chartBounds = val, onResize() }"
+            @bounds="(val: any) => { chartBounds = val; onResize() }"
             
           />
           
@@ -246,6 +238,7 @@
         </icon-button>
           <vue-slider
             adsorb
+            :duration="0.1"
             id="slider"
             :marks="(d: number) => {
               return allDates.includes(d) || imageDates.includes(d);
@@ -440,6 +433,7 @@
     </v-dialog>
 
     <v-dialog
+      :style="cssVars"
       class="bottom-sheet"
       id="text-bottom-sheet"  
       hide-overlay
@@ -478,32 +472,76 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
+
+                <h3><i>Something has gone off in the Pinwheel Galaxy!</i></h3>
+
                 <p>
-                  In the Pinwheel Galaxy (Messier object 101, M101) a massive star has exploded in what is known as a supernova.
+                  On May 19, 2023 - renowned supernova hunter 
+                  <a href="https://www.scientificamerican.com/article/astronomers-have-spotted-a-once-in-a-decade-supernova-and-you-can-too/" target="_blank">Koichi Itagaki discovered</a>
+                  a new bright object in the very nearby Pinwheel Galaxy (also known as M101). This bright object was a <strong>new supernova</strong>. 
                 </p>
-                In particular, it has died in what is called a core-collapse supernova. These occur when a star several times the mass of our Sun dies. 
-                A star dies when it can no longer produce energy through the fusion of elements in it's core. 
-                Stars generate energy through the fusion of elements. 
-                Initially stars fuse hydrogen into helium. 
-                Star like the Sun are not massive enough to fuse helium into heavier elements.
-                Eventually, as the core runs out of hydrogen, the star will fuse hydrogen in an ever expanding shell until it gets too hot too close to the surface. T
-                he outer layers to expand forming a plantary nebular like the Ring Nebua.
+                <br/>
+                <h3>Types of Supernova</h3>
+                <p>
+                Broadly speaking, supernovae are formed in one of two ways: 
+                <ul>
+                  <li>
+                    By the <strong>thermonuclear explosion</strong> of a white dwarf pulling gas from a massive companion star onto itself. These are called <strong>Type Ia</strong> supernovae.
+                    These are used to measure the cosmological expansion of the universe. 
+                  </li>
+                  <li>
+                    By the collapse of the core of a massive star (that has 8+ times the mass of our sun) and its subsequent explosion. These are <strong>core-collapse</strong> supernova. 
+                    These supernovae teach us about the evolution and environment of massive stars. There are several types, the main one being <strong>Type II</strong> supernova
+                  </li>
+                </ul>
+                <!-- The distinction between the Type II and Type I designations is based on the presence (II) or absence (I) of hydrogen in the spectrum.  -->
+                An overview of the different supernova types can be found <a href="https://astronomy.swin.edu.au/cosmos/S/supernova+classification" target="_blank">here</a>. 
+                </p>
+                <p>
+                  When either of these explosions occur they put out an incredible amount of energy&mdash;the power of nearly 10 billion(!) Suns, outshining their home galaxies
+                </p>
+                <br/>
+                <h3>The Brightness Graph</h3>
+                A <strong>light curve</strong> is a graph of the change in brightness over time. 
+                By looking at the shape of a light curve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
+                Type Ia are characterized by a rapid rise and rapid fall off. Type II supernovae have a rapid rise followed by a long plateau. 
+
+                <img src="http://hyperphysics.phy-astr.gsu.edu/hbase/Astro/imgast/sntyp.gif">
+
+                <br/>
+                <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
+                <br/>
                 
-                Stars several times the mass of the Sun however can fuse helium into heaver elements - fusing helium into carbon, carbon to oxygen, all the way up to iron - the "star killer".
-                Unlike the lighter elements, the fusion of iron does not release any energy. 
-                The sudden cessation of fusion in the core is a literal shock to the star, initiating a series of shockwaves which crush the core into a nuetron star or black and hole and cause the star to explode!!
+                <div
+                  v-if="!revealAnswer"
+                  style="max-width: fit-content; margin-block: 1em"
+                  class="control-icon-wrapper"
+                  @click="revealAnswer = true"
+                >
+                  Click to reveal the answer
+              </div>
+              <br>
+              <p v-if="revealAnswer"> With the rapid rise and long plateau this looks most similar to a Type II supernova. </p>
+
+
                 
-                During this process, the star is also shedding it's outer layers into the surrounding space. 
-                After the initial explosion, the layers of the exploding star ram into the layers it have previously expelled. 
-                This causes a gradual rise in brightness over time during the early stages of a supernova. 
-                After a certain amount of time the the lightcurve (the change of brightness over time) peaks and then begins to fall-off as material continues to cool and expand. 
-                
+
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
+                <h4> MicroObservatory:</h4>
+                <p>
+                  The images shown in the "Watch over time" sequence were taken with <a href="https://mo-www.cfa.harvard.edu/MicroObservatory/" target="_blank">MicroObservatory</a>. We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
+                </p>
+
+                <br/>
+                <h4> MicroObservatory Images and Data Processing:</h4>
+                <p>Martin Fowler (<a href="https://solarsystem.nasa.gov/people/647/martin-fowler/" target="_blank">NASA Citizen Scientist</a>)</p>
+                <br/>
+
                 <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
-                Jon Carifio<br>
                 John Lewis<br>
+                Jon Carifio<br>
                 Pat Udomprasert<br>
                 Alyssa Goodman<br>
                 Mary Dussault<br>
@@ -560,17 +598,6 @@
                         <h4>Tips:</h4>
                         <ul class="text-list">
                           <li>
-                            Click <font-awesome-icon
-                                  class="control-icon"
-                                  icon="location-pin"
-                                  size="lg" 
-                                ></font-awesome-icon>
-                            to adjust your location.
-                          </li>
-                          <li>
-                            Adjust the date slider at the bottom to see the location of the Green Comet on a particular day.
-                          </li>
-                          <li>
                             Click 
                               <font-awesome-icon
                                 id="play-pause-icon"
@@ -578,19 +605,22 @@
                                 icon="play"
                                 size="lg"
                               ></font-awesome-icon>
-                            to auto-advance time.
+                            to watch the supernova brightness change over time.
                           </li>
                           <li>
-                            Click a thumbnail image in the panel in the upper left to make the image show up in the sky
+                            Adjust the date slider at the bottom to move to a specific time.
                           </li>
                           <li>
-                            Use the slider to change the transparency so see multiple images overlayed. 
+                            Click "Show supernova brightness graph" to see how its brightness changes with time.
+                          </li>
+                          <li>
+                            Click the Image Gallery to see higher resolution images of the galaxy.
+                          </li>
+                          <li>
+                            Use the "Change image opacity" slider to change the tranparency of the overlaid. 
                           </li>                          
                           <li>
-                            Choose whether to display the sky grid, constellations, or the horizon.
-                          </li>
-                          <li>
-                            Adjust the displayed time for your chosen location using the time controller.
+                            Choose whether to display constellations or the arrow pointing to the supernova.
                           </li>
                           <li>
                             Re-center the view on the Pinwheel Galaxy's location "now" or Play the supernova images, in order, over time
@@ -607,8 +637,8 @@
                       <div class="credits">
                       <h3>Credits:</h3>
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
-                      Jon Carifio<br>
                       John Lewis<br>
+                      Jon Carifio<br>
                       Pat Udomprasert<br>
                       Alyssa Goodman<br>
                       Mary Dussault<br>
@@ -898,6 +928,7 @@ export default defineComponent({
       showControls: false,
       tab: 0,
       chartVisible: false,
+      revealAnswer: false,
 
       circle: null as L.Circle | null,
       map: null as Map | null,
@@ -1626,7 +1657,7 @@ export default defineComponent({
     
     onTimeSliderChange(options?: MoveOptions) {
       this.$nextTick(() => {
-        this.showImageForDateTime(this.dateTime, true);
+        this.showImageForDateTime(new Date(this.selectedTime), true);
         this.updateViewForDate(options);
       });
     },
@@ -2258,7 +2289,7 @@ export default defineComponent({
           this.gotoRADecZoom({
             raRad: this.wwtRARad,
             decRad: this.wwtDecRad,
-            zoomDeg: this.wwtZoomDeg > 120 ? this.wwtZoomDeg : 120,
+            zoomDeg: this.wwtZoomDeg > 300 ? this.wwtZoomDeg : 300,
             instant: false
           });
         });
@@ -2433,6 +2464,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  font-size: 11pt;
 
   .wwtelescope-component {
     position: absolute;
@@ -2936,6 +2968,30 @@ video {
   & a {
     text-decoration: none;
   }
+  
+  & h3 {
+    margin-bottom: 1em;
+    margin-top: 1em;
+  }
+  
+  & img {
+    display: block;
+    margin-inline: auto;
+    margin-block: 20px;
+    background-color: white;
+    width: 300px;
+  }
+  
+  & ul {
+    margin-left: 1em;
+    margin-block: 0.5em;
+    font-size: 0.95em;
+  }
+  
+  & strong {
+    color: var(--accent-color-2);
+  }
+
 }
 
 .close-icon {
@@ -3132,7 +3188,7 @@ video {
   //  vue components are flex, so we can easy center
   align-items: center;
   justify-content: center;
-  font-size: 7vw;
+  font-size: 5vw;
 }
 
 
@@ -3142,7 +3198,7 @@ video {
   // splash image size 1908 × 2040 px
   display: grid;
   // grid of 4 rows equally sized
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(4, auto-fit, minmax(.25fr, 1fr));
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
@@ -3154,7 +3210,7 @@ video {
   border: 10px solid var(--accent-color);
   overflow: auto;
   // the order for padding is top right bottom left
-  padding-top: 1.5em;
+  padding-top: 1.2em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
   &::after {
@@ -3167,7 +3223,7 @@ video {
   }
   
   div {
-    margin: auto;
+    margin-inline: auto;
     text-align: center;
   }
   // make a paragraph inside the div centered horizontally and vertically

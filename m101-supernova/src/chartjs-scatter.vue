@@ -422,7 +422,7 @@ export default defineComponent({
       }
       const chart = this.chart as Chart;
       if (this.computedData[0].x == null) {
-        return;
+        console.log('data is null');
       }
       
       const xmin = chart.scales.x.getPixelForValue(this.chartOptions.scales.x.min as number);
