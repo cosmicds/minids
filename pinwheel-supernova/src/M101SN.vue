@@ -406,7 +406,7 @@
           controls
           id="info-video"
         >
-          <source src="./assets/video2.mp4" type="video/mp4">
+          <source src="./assets/video_2.mp4" type="video/mp4" autoplay>
         </video>
       </div>
     </v-dialog>
@@ -2920,17 +2920,23 @@ div#main-content > div {
   gap: 10px;
 }
 
-.video-wrapper {
+.video-wrapper {  
+  display: flex;
+  padding: 10px;
   height: 100%;
-  background: black;
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   text-align: center;
   z-index: 1000;
+  // border: 1px solid white;
 }
 
 video {
-  height: 100%;
+  margin: auto;
+  height: 90%;
   width: auto;
-  max-width: 100%;
+  max-width: 95%;
   object-fit: contain;
 }
 
