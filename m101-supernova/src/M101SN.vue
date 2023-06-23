@@ -2412,6 +2412,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  font-size: 11pt;
 
   .wwtelescope-component {
     position: absolute;
@@ -3135,7 +3136,7 @@ video {
   //  vue components are flex, so we can easy center
   align-items: center;
   justify-content: center;
-  font-size: 7vw;
+  font-size: 5vw;
 }
 
 
@@ -3145,7 +3146,7 @@ video {
   // splash image size 1908 × 2040 px
   display: grid;
   // grid of 4 rows equally sized
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-rows: repeat(4, auto-fit, minmax(.25fr, 1fr));
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
@@ -3157,7 +3158,7 @@ video {
   border: 10px solid var(--accent-color);
   overflow: auto;
   // the order for padding is top right bottom left
-  padding-top: 1.5em;
+  padding-top: 1.2em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
   &::after {
@@ -3170,7 +3171,7 @@ video {
   }
   
   div {
-    margin: auto;
+    margin-inline: auto;
     text-align: center;
   }
   // make a paragraph inside the div centered horizontally and vertically
