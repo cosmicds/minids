@@ -506,7 +506,7 @@
                 By looking at the shape of a light curve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
                 Type Ia are characterized by a rapid rise and rapid fall off. Type II supernovae have a rapid rise followed by a long plateau. 
 
-                <img src="http://hyperphysics.phy-astr.gsu.edu/hbase/Astro/imgast/sntyp.gif">
+                <img src="./assets/sntyp.gif">
 
                 <br/>
                 <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
