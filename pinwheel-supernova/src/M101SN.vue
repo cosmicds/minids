@@ -35,13 +35,11 @@
         <div id="splash-screen-guide">
           Watch the demo <font-awesome-icon
             id="video-icon"
-            class="control-icon"
             icon="video"
             size="lg"
           />,
           read the guide <font-awesome-icon
             id="text-icon"
-            class="control-icon"
             icon="book-open"
             size="lg"/> or close me to get started!
         </div>
