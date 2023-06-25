@@ -24,8 +24,13 @@
     >
       <div id="splash-screen"
         :style="cssVars"
-        @click="closeSplashScreen"
       >
+        <font-awesome-icon
+          id="close-splash-icon"
+          class="control-icon"
+          icon="times"
+          @click="closeSplashScreen"
+        />
         <div id="splash-screen-text">
           <p> Want to see a </p> 
           <p class="highlight"> Star Explode </p> 
@@ -2722,7 +2727,7 @@ body {
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: flex-start;
 }
 
@@ -3194,31 +3199,19 @@ video {
   // for some reason the view props don't work
   // for max-width and max-height
   // splash image size 1908 × 2040 px
-  display: grid;
-  // grid of 4 rows equally sized
-  grid-template-rows: repeat(4, auto-fit, minmax(.25fr, 1fr));
+  display: flex;
+  flex-direction: column;
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
   background-color: black;
-  justify-content: center;
-  
+  align-content: center;
+  justify-content: space-around;
   
   border-radius: 10%;
   border: 10px solid var(--accent-color);
   overflow: auto;
-  // the order for padding is top right bottom left
-  padding-top: 1.2em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-  
-  &::after {
-    content: "X";
-    color: var(--accent-color-2);
-    position: absolute;
-    height: 8%;
-    top: 5%;
-    left: 90%;
-  }
   
   div {
     margin-inline: auto;
@@ -3246,16 +3239,20 @@ video {
     font-weight: bold;
   }
 
+  #close-splash-icon {
+    align-self: end;
+    margin-right: 10%;
+    color: var(--accent-color-2);
+  }
+
   #splash-screen-text {
     // in the grid, the text is in the 2nd column
-    grid-row: 1;
     display: flex;
     flex-direction: column;
     
   }
 
   #splash-screen-guide {
-    grid-row: 2;
     font-size: .6em;
     width: 70%;
     
@@ -3265,13 +3262,8 @@ video {
   }
 
   #splash-screen-acknowledgements {
-    grid-row: 3;
     font-size: .5em;
     width: 70%
-  }
-
-  #splash-screen-icons {
-    grid-row: 4;
   }
   
   a {
