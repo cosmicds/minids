@@ -273,7 +273,6 @@ export default defineComponent({
   .gallery-item {
     border-radius: 3px;
     border: 1px solid white;
-    height: 100%;
     display: flex;
     flex-direction: column;
     cursor: pointer;
