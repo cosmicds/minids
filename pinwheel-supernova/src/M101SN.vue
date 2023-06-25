@@ -1552,20 +1552,14 @@ export default defineComponent({
       this.playing = false;
       this.playingImagePath = false;
       console.log('onItemSelected', name);
-      // Give time for the selectedTime changes to propagate
-      setTimeout(() => {
-        this.$nextTick(() => {
-          if (this.imageOutOfView(place) || this.needToZoomIn(place)) {
-            this.gotoRADecZoom({
-              raRad: D2R * iset.get_centerX(),
-              decRad: D2R * iset.get_centerY(),
-              zoomDeg: place.get_zoomLevel(),
-              instant: true
-            });
-          }
+      if (this.imageOutOfView(place) || this.needToZoomIn(place)) {
+        this.gotoRADecZoom({
+          raRad: D2R * iset.get_centerX(),
+          decRad: D2R * iset.get_centerY(),
+          zoomDeg: this.wwtZoomDeg,
+          instant: true
         });
-      }, 10);
-      
+      }
     },
     
 
