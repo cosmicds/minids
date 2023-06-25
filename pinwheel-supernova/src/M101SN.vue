@@ -25,16 +25,18 @@
       <div id="splash-screen"
         :style="cssVars"
       >
-        <font-awesome-icon
-          id="close-splash-icon"
-          class="control-icon"
-          icon="times"
-          @click="closeSplashScreen"
-        />
-        <div id="splash-screen-text">
-          <p> Want to see a </p> 
-          <p class="highlight"> Star Explode </p> 
-          <p class="small"> in a galaxy far far away... </p>
+        <div
+          id="first-splash-row"
+        >
+          <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >X</div>
+          <div id="splash-screen-text">
+            <p> Want to see a </p>
+            <p class="highlight"> Star Explode </p>
+            <p class="small"> in a galaxy far far away... </p>
+          </div>
         </div>
         
         <div id="splash-screen-guide">
@@ -3239,10 +3241,20 @@ video {
     font-weight: bold;
   }
 
-  #close-splash-icon {
-    align-self: end;
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    text-align: end;
     margin-right: 10%;
     color: var(--accent-color-2);
+    font-size: 2rem;
+    margin-bottom: 5px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   #splash-screen-text {
