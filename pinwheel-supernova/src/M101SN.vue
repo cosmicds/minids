@@ -500,7 +500,7 @@
                 <h3>The Brightness Graph</h3>
                 <p>
                 The graph of how an object's brightness changes over time is called its <strong>lightcurve</strong>. 
-                Observing supernovae (the plural of supernova), experts have discover an entire <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">zoo</a> of supernova types. 
+                Observing supernovae (the plural of supernova), experts have discovered an entire <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">zoo</a> of supernova types. 
                 </p>
                 <p>
                 The lightcurves fall broadly into two types - type I and type II. 
