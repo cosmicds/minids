@@ -24,24 +24,29 @@
     >
       <div id="splash-screen"
         :style="cssVars"
-        @click="closeSplashScreen"
       >
-        <div id="splash-screen-text">
-          <p> Want to see a </p> 
-          <p class="highlight"> Star Explode </p> 
-          <p class="small"> in a galaxy far far away... </p>
+        <div
+          id="first-splash-row"
+        >
+          <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >X</div>
+          <div id="splash-screen-text">
+            <p> Want to see a </p>
+            <p class="highlight"> Star Explode </p>
+            <p class="small"> in a galaxy far far away... </p>
+          </div>
         </div>
         
         <div id="splash-screen-guide">
           Watch the demo <font-awesome-icon
             id="video-icon"
-            class="control-icon"
             icon="video"
             size="lg"
           />,
           read the guide <font-awesome-icon
             id="text-icon"
-            class="control-icon"
             icon="book-open"
             size="lg"/> or close me to get started!
         </div>
@@ -1554,20 +1559,14 @@ export default defineComponent({
       this.playing = false;
       this.playingImagePath = false;
       console.log('onItemSelected', name);
-      // Give time for the selectedTime changes to propagate
-      setTimeout(() => {
-        this.$nextTick(() => {
-          if (this.imageOutOfView(place) || this.needToZoomIn(place)) {
-            this.gotoRADecZoom({
-              raRad: D2R * iset.get_centerX(),
-              decRad: D2R * iset.get_centerY(),
-              zoomDeg: place.get_zoomLevel(),
-              instant: true
-            });
-          }
+      if (this.imageOutOfView(place) || this.needToZoomIn(place)) {
+        this.gotoRADecZoom({
+          raRad: D2R * iset.get_centerX(),
+          decRad: D2R * iset.get_centerY(),
+          zoomDeg: this.wwtZoomDeg,
+          instant: true
         });
-      }, 10);
-      
+      }
     },
     
 
@@ -2730,7 +2729,7 @@ body {
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: flex-start;
 }
 
@@ -3202,31 +3201,19 @@ video {
   // for some reason the view props don't work
   // for max-width and max-height
   // splash image size 1908 × 2040 px
-  display: grid;
-  // grid of 4 rows equally sized
-  grid-template-rows: repeat(4, auto-fit, minmax(.25fr, 1fr));
+  display: flex;
+  flex-direction: column;
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
   background-color: black;
-  justify-content: center;
-  
+  align-content: center;
+  justify-content: space-around;
   
   border-radius: 10%;
   border: 10px solid var(--accent-color);
   overflow: auto;
-  // the order for padding is top right bottom left
-  padding-top: 1.2em;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-  
-  &::after {
-    content: "X";
-    color: var(--accent-color-2);
-    position: absolute;
-    height: 8%;
-    top: 5%;
-    left: 90%;
-  }
   
   div {
     margin-inline: auto;
@@ -3254,16 +3241,30 @@ video {
     font-weight: bold;
   }
 
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    text-align: end;
+    margin-right: 10%;
+    color: var(--accent-color-2);
+    font-size: 2rem;
+    margin-bottom: 5px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
   #splash-screen-text {
     // in the grid, the text is in the 2nd column
-    grid-row: 1;
     display: flex;
     flex-direction: column;
     
   }
 
   #splash-screen-guide {
-    grid-row: 2;
     font-size: .6em;
     width: 70%;
     
@@ -3273,13 +3274,8 @@ video {
   }
 
   #splash-screen-acknowledgements {
-    grid-row: 3;
     font-size: .5em;
     width: 70%
-  }
-
-  #splash-screen-icons {
-    grid-row: 4;
   }
   
   a {
