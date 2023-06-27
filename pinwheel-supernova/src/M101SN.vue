@@ -478,7 +478,7 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
 
-                <h3><i>Something has gone off in the Pinwheel Galaxy!</i></h3>
+                <h3><i>Something new has burst upon the scene in the Pinwheel Galaxy!</i></h3>
 
                 <p>
                   On May 19, 2023 - renowned supernova hunter 
@@ -486,36 +486,36 @@
                   a new bright object in the very nearby Pinwheel Galaxy (also known as M101). This bright object was a <strong>new supernova</strong>. 
                 </p>
                 <br/>
-                <h3>Types of Supernova</h3>
+                <h3>What is a Supernova?</h3>
                 <p>
-                Broadly speaking, supernovae are formed in one of two ways: 
-                <ul>
-                  <li>
-                    By the <strong>thermonuclear explosion</strong> of a white dwarf pulling gas from a massive companion star onto itself. These are called <strong>Type Ia</strong> supernovae.
-                    These are used to measure the cosmological expansion of the universe. 
-                  </li>
-                  <li>
-                    By the collapse of the core of a massive star (that has 8+ times the mass of our sun) and its subsequent explosion. These are <strong>core-collapse</strong> supernova. 
-                    These supernovae teach us about the evolution and environment of massive stars. There are several types, the main one being <strong>Type II</strong> supernova
-                  </li>
-                </ul>
-                <!-- The distinction between the Type II and Type I designations is based on the presence (II) or absence (I) of hydrogen in the spectrum.  -->
-                An overview of the different supernova types can be found <a href="https://astronomy.swin.edu.au/cosmos/S/supernova+classification" target="_blank">here</a>. 
+                A supernova occurs when a massive star (a star 8+ times the Sun's mass) runs out of fuel.
                 </p>
                 <p>
-                  When either of these explosions occur they put out an incredible amount of energy&mdash;the power of nearly 10 billion(!) Suns, outshining their home galaxies
+                Stars are fueled by energy from <strong>nuclear fusion</strong> happening in the core. 
+                The incredible heat and energy created by this fusion prevents the star from collapsing under its own weight. 
+                Massive stars can fuse elements from hydrogen all the way up to iron in their cores. 
+                However, once iron forms, fusion has to stop (<a href="https://imagine.gsfc.nasa.gov/science/objects/stars1.html">why?</a>); and the core of the star collapses into a neutron star, or even a black hole. 
+                This creates a powerful shockwave that blasts the star apart. 
+                This incredibly powerful explosion is what we see as a <strong>core-collaps supernova</strong>!  
+                </p>
+                <p>
+                At its peak, a supernova puts out the power of nearly a trillion (1,000 billion) Suns.
                 </p>
                 <br/>
                 <h3>The Brightness Graph</h3>
-                A <strong>light curve</strong> is a graph of the change in brightness over time. 
-                By looking at the shape of a light curve astronomers can tell the difference between a Type Ia and core-collapse supernova. 
-                Type Ia are characterized by a rapid rise and rapid fall off. Type II supernovae have a rapid rise followed by a long plateau. 
-
+                <p>
+                The graph of how an object's brightness changes over time is called its <strong>lightcurve</strong>. 
+                Observing supernovae (the plural of supernova), experts have discovered an entire <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">zoo</a> of supernova types. 
+                </p>
+                <p>
+                The lightcurves fall broadly into two types - type I and type II. 
+                Type I have a rapid rise followed by a more rapid dimming. 
+                Type II are characterized by a rapid rise followed by a plateau and or gradual dimming. 
+                </p>
                 <img src="./assets/sntyp.gif">
 
-                <br/>
                 <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
-                <br/>
+                <br>
                 
                 <div
                   v-if="!revealAnswer"
@@ -2977,6 +2977,10 @@ video {
   & h3 {
     margin-bottom: 1em;
     margin-top: 1em;
+  }
+  
+  & p {
+    margin-bottom: 1em;
   }
   
   & img {
