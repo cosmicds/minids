@@ -83,7 +83,7 @@
           >
       </icon-button>
       </div>
-      <div id="right-buttons">
+      <div id="left-buttons">
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
@@ -2914,7 +2914,7 @@ div#main-content > div {
   margin-bottom: 25px;
 }
 
-#right-buttons {
+#left-buttons {
   display: flex;
   flex-direction: column;
   gap: 10px;
