@@ -703,7 +703,7 @@ type Point = [number, number];
 
 import {
   m101DataList,
-} from "./m101";
+} from "./m101_combined";
 
 
 import {
@@ -737,7 +737,7 @@ function parseCsvTable(csv: string) {
 const fullDatesTable = parseCsvTable(m101DataList);
 const imageDatesTable = parseCsvTable(m101DataList);
 
-
+console.log(fullDatesTable);
 // parse the lightCurve data into a D3 table
 const aavsoLightCurveTable = csvParse(aavsoLightCurve, (d) => {
   // d.timestamp
@@ -780,6 +780,7 @@ function formatCsvTable(table: Table): string {
 
 const allDates = fullDatesTable.map(r => r.date.getTime());
 const imageDates = [... new Set(imageDatesTable.map(r => r.date.getTime()))];
+console.log(allDates);
 const minDate = Math.min(...allDates, ...imageDates)-2*MILLISECONDS_PER_DAY;
 const maxDate = Math.max(...allDates, ...imageDates)+2*MILLISECONDS_PER_DAY;
 const dates: number[] = [];
@@ -903,7 +904,14 @@ export default defineComponent({
       accentColor2: "#b3d3e0",
       accentColor3: " #0493d6",
 
-      aavsoLightCurveData: aavsoLightCurveTable,
+      // aavsoLightCurveData: aavsoLightCurveTable,
+      // merge aavsoLightCurveTable and imageDatesTable into one table
+      aavsoLightCurveData: imageDatesTable.map(d => {
+        return {
+          time: d.date,
+          magnitude: d.magnitude
+        };
+      }).concat(aavsoLightCurveTable).sort((a, b) => a.time.getTime() - b.time.getTime()),
       // lightCurveData: imageDatesTable.map(d => { 'time': d.date, 'magnitude': d.magnitude };),
       lightCurveData: imageDatesTable.map(d => {
         return {
@@ -911,7 +919,7 @@ export default defineComponent({
           magnitude: d.magnitude
         };
       }),
-
+      
       currentOpacity: 0,
       
       incomingItemSelect: null as Thumbnail | null,

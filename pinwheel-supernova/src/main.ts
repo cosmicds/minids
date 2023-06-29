@@ -85,7 +85,7 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 createApp(M101SN, {
   wwtNamespace: "wwt-minids-m101-supernova",
   wtml: { // images are listed in chronological order earliest to latest
-    imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/m101_all.wtml",
+    imageCollection: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/combined.wtml",
   },
   url: "https://cosmicds.github.io/minids/pinwheel-supernova/",
   thumbnailUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/M101_hires_STScI-PRC2006-10a.jpg/307px-M101_hires_STScI-PRC2006-10a.jpg",
