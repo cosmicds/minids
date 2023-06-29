@@ -3327,6 +3327,11 @@ div.credits {
   border: 1px solid var(--accent-color-2) !important;
 }
 
+.gallery-content img {
+  box-shadow: 0 0 1px var(--accent-color-2);
+  margin-top: 2px;
+}
+
 .dipper_svg_icon:focus {
   color: var(--accent-color-2) !important;
 }
