@@ -137,6 +137,8 @@
         wtml-url="https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/m101/gallery.wtml"
         width="1000px"
         :single-select="true"
+        title="Click Image to Overlay"
+        closed-text="Image Gallery"
         :selected-color="accentColor"
         :style="cssVars"
         :preview-index="1"
