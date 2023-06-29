@@ -282,6 +282,9 @@ export default defineComponent({
       margin-left: auto;
       margin-right: auto;
       border-radius: 3px;
+      width: 96px;
+      height: 45px;
+      object-fit: cover;
     }
 
     span {
