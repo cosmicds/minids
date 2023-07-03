@@ -33,7 +33,7 @@
             @click="closeSplashScreen"
             >X</div>
           <div id="splash-screen-text">
-            <p> Want to see a </p>
+            <p> See a </p>
             <p class="highlight"> Star Explode </p>
             <p class="small"> in a galaxy far far away... </p>
           </div>
