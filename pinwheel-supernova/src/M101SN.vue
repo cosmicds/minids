@@ -480,7 +480,7 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
 
-                <h3><i>Something new has burst upon the scene in the Pinwheel Galaxy!</i></h3>
+                <h3><i>Something new has burst onto the scene in the Pinwheel Galaxy!</i></h3>
 
                 <p>
                   On May 19, 2023 - renowned supernova hunter 
@@ -489,33 +489,31 @@
                 </p>
                 <br/>
                 <h3>What is a Supernova?</h3>
+                
                 <p>
-                A supernova occurs when a massive star (a star 8+ times the Sun's mass) runs out of fuel.
+                  A <strong>supernova</strong> is an extremely bright, energetic explosion of a star. 
+                  They are so bright that you can see when they occur in galaxies millions of light years away.
                 </p>
                 <p>
-                Stars are fueled by energy from <strong>nuclear fusion</strong> happening in the core. 
-                The incredible heat and energy created by this fusion prevents the star from collapsing under its own weight. 
-                Massive stars can fuse elements from hydrogen all the way up to iron in their cores. 
-                However, once iron forms, fusion has to stop (<a href="https://imagine.gsfc.nasa.gov/science/objects/stars1.html">why?</a>); and the core of the star collapses into a neutron star, or even a black hole. 
-                This creates a powerful shockwave that blasts the star apart. 
-                This incredibly powerful explosion is what we see as a <strong>core-collaps supernova</strong>!  
+                  There are two situations which trigger a supernova&mdash;
+                  a very large star (8+ times our Sun's mass) runs out of fuel and then blows up;
+                  or a white dwarf (the remnants of stars like our Sun) pulls enough extra gas onto itself from a companion star that it blows up. 
                 </p>
                 <p>
-                At its peak, a supernova puts out the power of nearly a trillion (1,000 billion) Suns.
+                  The first type of supernova is called a <a href="https://astronomy.swin.edu.au/cosmos/c/core-collapse">core-collapse supernova</a> (Type II) and can teach us about the evolution and environment of massive stars. 
+                  The second type (<a href="https://astronomy.swin.edu.au/cosmos/T/Type+Ia+Supernova">Type Ia</a>) have predictable brightness and are used to measure the cosmological expansion of the universe.
                 </p>
-                <br/>
+                
                 <h3>The Brightness Graph</h3>
                 <p>
-                The graph of how an object's brightness changes over time is called its <strong>lightcurve</strong>. 
-                Observing supernovae (the plural of supernova), experts have discovered an entire <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">zoo</a> of supernova types. 
-                </p>
-                <p>
-                The lightcurves fall broadly into two types - type I and type II. 
-                Type I have a rapid rise followed by a more rapid dimming. 
+                Astronomers graph how a supernova's brightness changes over time (called a <strong>lightcurve</strong>) to distinguish between the two main types of supernovae. 
                 Type II are characterized by a rapid rise followed by a plateau and or gradual dimming. 
+                Type I have a rapid rise followed by a more rapid dimming. 
                 </p>
                 <img src="./assets/sntyp.gif">
-
+                <p>
+                You can learn about other types of supernovae <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">here</a>.
+                </p>
                 <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
                 <br>
                 
