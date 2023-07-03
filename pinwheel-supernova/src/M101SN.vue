@@ -245,6 +245,7 @@
         </icon-button>
           <vue-slider
             adsorb
+            included
             :duration="0.1"
             id="slider"
             :marks="(d: number) => {
