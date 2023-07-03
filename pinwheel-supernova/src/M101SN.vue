@@ -2082,7 +2082,7 @@ export default defineComponent({
       const closestDate = this.binarySearch(this.imageDateSorted, thisDate);
 
       // within 1 hour, in milliseconds
-      // if (Math.abs(thisDate - closestDate) > (60 * 60 * 1000)) { return '';}
+      if (Math.abs(thisDate - closestDate) > (12 * 60 * 60 * 1000)) { return '';}
       
       const name = this.imageDateRefInv[closestDate];
       
