@@ -414,7 +414,7 @@
           controls
           id="info-video"
         >
-          <source src="./assets/video_2.mp4" type="video/mp4" autoplay>
+          <source src="./assets/PinwheelSN-editedaudio.mp4" type="video/mp4" autoplay>
         </video>
       </div>
     </v-dialog>
