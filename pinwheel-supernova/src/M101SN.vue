@@ -31,32 +31,32 @@
           <div
             id="close-splash-button"
             @click="closeSplashScreen"
-            >X</div>
+            >&times;</div>
           <div id="splash-screen-text">
             <p> See a </p>
             <p class="highlight"> Star Explode </p>
-            <p class="small"> in a galaxy far far away... </p>
+            <p class="small"> in a galaxy far, far away... </p>
           </div>
         </div>
         
         <div id="splash-screen-guide">
-          Watch the demo <font-awesome-icon
-            id="video-icon"
-            icon="video"
-            size="lg"
-          />,
-          read the guide <font-awesome-icon
+          <font-awesome-icon
             id="text-icon"
             icon="book-open"
-            size="lg"/> or close me to get started!
+          /> Read the guide 
+          <br>
+          <font-awesome-icon
+            id="video-icon"
+            icon="video"
+          /> Watch the demo 
         </div>
         
         <div id="splash-screen-acknowledgements">
-          This mini data story is brought to you by NASA's SciAct <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS program</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank">AAS WorldWide Telescope</a>.
-        </div>
-        
-        <div id="splash-screen-icons">
-          <mini-credits/>
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank">WorldWide Telescope</a>.
+          
+          <div id="splash-screen-icons">
+            <mini-credits/>
+          </div>
         </div>
     </div>
     </v-overlay>
@@ -3208,8 +3208,8 @@ video {
   // splash image size 1908 × 2040 px
   display: flex;
   flex-direction: column;
-  max-height: calc(min(90vh,2040px)); 
-  max-width: 90vw;
+  max-height: calc(min(80vh,2040px)); 
+  max-width: 80vw;
   aspect-ratio: 8 / 10;
   background-color: black;
   align-content: center;
@@ -3242,7 +3242,7 @@ video {
   }
   
   p.small {
-    font-size: .5em;
+    font-size: .75em;
     font-weight: bold;
   }
 
@@ -3252,10 +3252,10 @@ video {
 
   #close-splash-button {
     text-align: end;
-    margin-right: 10%;
+    margin-top: -5%;
+    margin-right: 7%;
     color: var(--accent-color-2);
-    font-size: 2rem;
-    margin-bottom: 5px;
+    font-size: 3.5rem;
 
     &:hover {
       cursor: pointer;
@@ -3271,16 +3271,22 @@ video {
 
   #splash-screen-guide {
     font-size: .6em;
-    width: 70%;
+    line-height: 2em;
+    width: 75%;
     
     .svg-inline--fa {
       color:var(--accent-color);
+      margin: 0 10px;
     }
   }
 
   #splash-screen-acknowledgements {
     font-size: .5em;
-    width: 70%
+    width: 70%; 
+  }
+
+  #splash-screen-icons {
+    margin-top: 1em;
   }
   
   a {
