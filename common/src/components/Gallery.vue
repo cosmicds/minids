@@ -18,7 +18,7 @@
         <span
           class="default-activator-title noselect"
         >
-          Image Gallery
+          {{ closedText }}
         </span>
         <img
           class="noselect"
@@ -92,7 +92,8 @@ export default defineComponent({
     selectedColor: { type: String, default: "dodgerblue" },
     singleSelect: { type: Boolean, default: true },
     highlightLastOnly: { type: Boolean, default: false },
-    previewIndex: { type: Number, default: 0 }
+    previewIndex: { type: Number, default: 0 },
+    closedText: { type: String, default: "Image Gallery" }
   },
 
   async created() {
@@ -281,6 +282,9 @@ export default defineComponent({
       margin-left: auto;
       margin-right: auto;
       border-radius: 3px;
+      width: 96px;
+      height: 45px;
+      object-fit: cover;
     }
 
     span {
