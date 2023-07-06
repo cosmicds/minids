@@ -3212,13 +3212,13 @@ video {
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 1);
   backdrop-filter: blur(5px);
   align-content: center;
   justify-content: space-around;
   
   border-radius: 10%;
-  border: 10px solid var(--accent-color);
+  border: min(1.2vw,0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
   
@@ -3254,10 +3254,10 @@ video {
 
   #close-splash-button {
     text-align: end;
-    margin-top: -5%;
-    margin-right: 7%;
+    margin-top: 0%;
+    margin-right: 6%;
     color: var(--accent-color-2);
-    font-size: 3rem;
+    font-size: min(8vw, 5vh);
 
     &:hover {
       cursor: pointer;
@@ -3288,7 +3288,8 @@ video {
   }
 
   #splash-screen-icons {
-    margin-top: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
     
     #credits {
       background-color: transparent;
