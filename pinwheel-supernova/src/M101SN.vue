@@ -3198,7 +3198,8 @@ video {
   //  vue components are flex, so we can easy center
   align-items: center;
   justify-content: center;
-  font-size: min(7vw,5vh);
+  font-size: min(8vw,7vh);
+
 }
 
 
@@ -3211,7 +3212,8 @@ video {
   max-height: calc(min(90vh,2040px)); 
   max-width: 90vw;
   aspect-ratio: 8 / 10;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
   align-content: center;
   justify-content: space-around;
   
@@ -3287,6 +3289,11 @@ video {
 
   #splash-screen-icons {
     margin-top: 1em;
+    
+    #credits {
+      background-color: transparent;
+      border: 2px solid transparent;
+    }
   }
   
   a {
