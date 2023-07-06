@@ -3208,8 +3208,8 @@ video {
   // splash image size 1908 × 2040 px
   display: flex;
   flex-direction: column;
-  max-height: calc(min(80vh,2040px)); 
-  max-width: 80vw;
+  max-height: calc(min(90vh,2040px)); 
+  max-width: 90vw;
   aspect-ratio: 8 / 10;
   background-color: black;
   align-content: center;
@@ -3255,7 +3255,7 @@ video {
     margin-top: -5%;
     margin-right: 7%;
     color: var(--accent-color-2);
-    font-size: 3.5rem;
+    font-size: 3rem;
 
     &:hover {
       cursor: pointer;
