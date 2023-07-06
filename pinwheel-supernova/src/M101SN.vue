@@ -410,12 +410,15 @@
           @keyup.enter="showVideoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
-        <video
-          controls
+
+        <iframe height="700"
           id="info-video"
-        >
-          <source src="./assets/PinwheelSN-editedaudio.mp4" type="video/mp4" autoplay>
-        </video>
+          src="https://www.youtube.com/embed/CY2XMeY8w3w?&autoplay=1"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+
       </div>
     </v-dialog>
 
@@ -2932,12 +2935,13 @@ div#main-content > div {
   // border: 1px solid white;
 }
 
-video {
+video, #info-video {
   margin: auto;
-  height: 90%;
-  width: auto;
+  height: 90%; 
+  // width: fit-content;
   max-width: 95%;
   object-fit: contain;
+  aspect-ratio: 9/17;
 }
 
 #video-container {
