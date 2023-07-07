@@ -14,6 +14,7 @@
       >
         <icon-button
           v-model="show"
+          :color="activatorColor"
           fa-icon="location-pin"
           class="map-icon"
           tooltip-text="Select location"
@@ -66,6 +67,13 @@ export default defineComponent({
     'v-card': VCard,
     'v-dialog': VDialog,
     'icon-button': IconButton
+  },
+
+  props: {
+    activatorColor: {
+      type: String,
+      default: "#ffffff"
+    }
   },
 
   mounted() {
