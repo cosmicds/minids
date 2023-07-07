@@ -4,10 +4,13 @@
     class="location-selector-dialog"
   >
     <template v-slot:activator="{ on, attrs }">
-      <slot name="activator">
+      <slot
+        name="activator"
+        :on="on"
+        :attrs="attrs"
+      >
         <icon-button
-          v-bind="attrs"
-          v-on="on"
+          v-model="show"
           fa-icon="location-pin"
           class="map-icon"
           tooltip-text="Select location"
@@ -27,12 +30,17 @@
         Use My Location
       </v-btn>
       <div class="text-center red--text">{{ locationErrorMessage }}</div>
-      <div class="map-container"></div>
+      <div id="map-container"></div>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
+import { VDialog } from "vuetify/components/VDialog";
+import { VCard } from "vuetify/components/VCard";
+import { VBtn } from "vuetify/components/VBtn";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
 import tzlookup from "tz-lookup";
 import { getTimezoneOffset } from "date-fns-tz";
 import L, { LeafletMouseEvent, Map } from "leaflet";
@@ -40,6 +48,8 @@ import "leaflet/dist/leaflet.css";
 import Notifications from "@kyvg/vue3-notification";
 import { defineComponent } from "vue";
 import IconButton from "./IconButton.vue";
+
+library.add(faLocationPin);
 
 export type LocationDeg = {
   longitudeDeg: number;
@@ -49,6 +59,9 @@ export type LocationDeg = {
 export default defineComponent({
 
   components: {
+    'v-btn': VBtn,
+    'v-card': VCard,
+    'v-dialog': VDialog,
     'icon-button': IconButton
   },
 
@@ -118,8 +131,7 @@ export default defineComponent({
     },
 
     setup() {
-      const mapContainer = this.$el.querySelector(".map-container");
-      const map = L.map(mapContainer).setView([this.location.latitudeDeg, this.location.longitudeDeg], 4);
+      const map = L.map("map-container").setView([this.location.latitudeDeg, this.location.longitudeDeg], 4);
       
       L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
@@ -156,6 +168,8 @@ export default defineComponent({
     },
 
     show(show: boolean) {
+      console.log("Show was updated");
+      console.log(show);
       if (show) {
         this.locationErrorMessage = "";
         this.$nextTick(() => {
@@ -185,7 +199,7 @@ export default defineComponent({
     height: fit-content;
   }
 
-  .map-container {
+  #map-container {
     width: 60vw;
     height: 70vh;
     margin: auto;
