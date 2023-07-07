@@ -1,0 +1,52 @@
+{
+  "name": "@minids/pinwheel-supernova",
+  "version": "0.0.0",
+  "dependencies": {
+    "@kyvg/vue3-notification": "^2.8.0",
+    "@minids/common": "workspace:0.0.0",
+    "@vuepic/vue-datepicker": "^3.6.5",
+    "@wwtelescope/astro": "^0.2.2",
+    "assert": "^2.0.0",
+    "chart.js": "^4.3.0",
+    "d3": "^7.8.4",
+    "d3-dsv": "^3.0.1",
+    "date-fns": "^2.29.3",
+    "date-fns-tz": "^2.0.0",
+    "leaflet": "^1.9.3",
+    "stream": "^0.0.2",
+    "stream-parser": "^0.3.1",
+    "tz-lookup": "^6.1.25",
+    "vue": "^3",
+    "vue-slider-component": "next",
+    "vuetify": "^3.1.1",
+    "webpack-plugin-vuetify": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/chart.js": "^2.9.37",
+    "@types/d3": "^7.4.0",
+    "@types/d3-dsv": "^3.0.1",
+    "@types/leaflet": "^1.9.0",
+    "@types/probe-image-size": "^7.2.0",
+    "@types/tz-lookup": "^6.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "@vue/compiler-sfc": "^3.2.45",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.31.0",
+    "eslint-plugin-vue": "^9.8.0",
+    "less": "^4.1.3",
+    "less-loader": "^11.1.0",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0"
+  },
+  "scripts": {
+    "build": "vue-cli-service build",
+    "clean": "rimraf dist",
+    "lint": "vue-cli-service lint src --no-fix",
+    "serve": "vue-cli-service serve"
+  }
+}
