@@ -184,7 +184,7 @@ export default defineComponent({
 
       this.timezone = tzlookup(location.latitudeDeg, location.longitudeDeg);
 
-      this.$emit('locationChange', location);
+      this.$emit('locationChange', { location, timezone: this.timezone });
     },
 
     show(show: boolean) {
