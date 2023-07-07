@@ -3,11 +3,14 @@
     v-model="show"
     class="location-selector-dialog"
   >
-    <template v-slot:activator="{ on, attrs }">
+    <!-- TODO: What should the real types here be?
+              We don't need them so it doesn't matter,
+              but would be good to know.
+    -->
+    <template v-slot:activator>
       <slot
         name="activator"
-        :on="on"
-        :attrs="attrs"
+        :open="open"
       >
         <icon-button
           v-model="show"
@@ -65,6 +68,10 @@ export default defineComponent({
     'icon-button': IconButton
   },
 
+  mounted() {
+    this.getLocation(true);
+  },
+
   data() {
     return {
       circle: null as L.Circle | null,
@@ -80,6 +87,11 @@ export default defineComponent({
   },
 
   methods: {
+
+    open() {
+      this.show = true;
+    },
+
     getLocation(startup=false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
 
@@ -168,8 +180,6 @@ export default defineComponent({
     },
 
     show(show: boolean) {
-      console.log("Show was updated");
-      console.log(show);
       if (show) {
         this.locationErrorMessage = "";
         this.$nextTick(() => {
