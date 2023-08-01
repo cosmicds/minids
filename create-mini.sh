@@ -2,7 +2,11 @@
 
 # TODO(?): Make a PowerShell version of this
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 ]]; then
+    echo "Mini name is missing!"
+    exit 2
+fi
+if [[ $# -ge 1 ]]; then
     echo "Should only specify one parameter!"
     exit 2
 fi
