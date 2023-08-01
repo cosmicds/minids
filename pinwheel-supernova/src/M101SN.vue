@@ -52,7 +52,7 @@
         </div>
         
         <div id="splash-screen-acknowledgements">
-          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank">WorldWide Telescope</a>.
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
           
           <div id="splash-screen-icons">
             <mini-credits/>
@@ -488,7 +488,7 @@
 
                 <p>
                   On May 19, 2023 - renowned supernova hunter 
-                  <a href="https://www.scientificamerican.com/article/astronomers-have-spotted-a-once-in-a-decade-supernova-and-you-can-too/" target="_blank">Koichi Itagaki discovered</a>
+                  <a href="https://www.scientificamerican.com/article/astronomers-have-spotted-a-once-in-a-decade-supernova-and-you-can-too/" target="_blank" rel="noopener noreferrer">Koichi Itagaki discovered</a>
                   a new bright object in the very nearby Pinwheel Galaxy (also known as M101). This bright object was a <strong>new supernova</strong>. 
                 </p>
                 <br/>
@@ -504,8 +504,8 @@
                   or a white dwarf (the remnants of stars like our Sun) pulls enough extra gas onto itself from a companion star that it blows up. 
                 </p>
                 <p>
-                  The first type of supernova is called a <a href="https://astronomy.swin.edu.au/cosmos/c/core-collapse">core-collapse supernova</a> (Type II) and can teach us about the evolution and environment of massive stars. 
-                  The second type (<a href="https://astronomy.swin.edu.au/cosmos/T/Type+Ia+Supernova">Type Ia</a>) have predictable brightness and are used to measure the cosmological expansion of the universe.
+                  The first type of supernova is called a <a href="https://astronomy.swin.edu.au/cosmos/c/core-collapse" target="_blank" rel="noopener noreferrer">core-collapse supernova</a> (Type II) and can teach us about the evolution and environment of massive stars. 
+                  The second type (<a href="https://astronomy.swin.edu.au/cosmos/T/Type+Ia+Supernova" target="_blank" rel="noopener noreferrer">Type Ia</a>) have predictable brightness and are used to measure the cosmological expansion of the universe.
                 </p>
                 
                 <h3>The Brightness Graph</h3>
@@ -516,7 +516,7 @@
                 </p>
                 <img src="./assets/sntyp.gif">
                 <p>
-                You can learn about other types of supernovae <a href="https://astrobites.org/2016/12/02/classifying-supernovae/">here</a>.
+                You can learn about other types of supernovae <a href="https://astrobites.org/2016/12/02/classifying-supernovae/" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
                 <strong>What type of supernova do you think the one in the Pinwheel Galaxy is?</strong>
                 <br>
@@ -540,15 +540,15 @@
                 <h3>Credits:</h3>
                 <h4> MicroObservatory:</h4>
                 <p>
-                  The images shown in the "Watch over time" sequence were taken with <a href="https://mo-www.cfa.harvard.edu/MicroObservatory/" target="_blank">MicroObservatory</a>. We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
+                  The images shown in the "Watch over time" sequence were taken with <a href="https://mo-www.cfa.harvard.edu/MicroObservatory/" target="_blank" rel="noopener noreferrer">MicroObservatory</a>. We use them here because they observe the Pinwheel Galaxy every night in a consistent way. (Dates without MicroObservatory images had bad weather). 
                 </p>
 
                 <br/>
                 <h4> MicroObservatory Images and Data Processing:</h4>
-                <p>Martin Fowler (<a href="https://solarsystem.nasa.gov/people/647/martin-fowler/" target="_blank">NASA Citizen Scientist</a>)</p>
+                <p>Martin Fowler (<a href="https://solarsystem.nasa.gov/people/647/martin-fowler/" target="_blank" rel="noopener noreferrer">NASA Citizen Scientist</a>)</p>
                 <br/>
 
-                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                 John Lewis<br>
                 Jon Carifio<br>
                 Pat Udomprasert<br>
@@ -645,7 +645,7 @@
                     <v-col cols="12">
                       <div class="credits">
                       <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                       John Lewis<br>
                       Jon Carifio<br>
                       Pat Udomprasert<br>
@@ -1716,13 +1716,13 @@ export default defineComponent({
       const map = L.map("map-container").setView(locationDeg, 4);
       // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   maxZoom: 19,
-      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
       //   className: 'map-tiles'
       // }).addTo(map);
       L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
-        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+        attribution: `&copy <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>`,
         className: 'map-tiles'
       }).addTo(map);
 
