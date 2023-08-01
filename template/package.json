@@ -1,0 +1,12 @@
+{
+  "version": "0.0.0",
+  "dependencies": {
+    "@minids/common": "workspace:0.0.0"
+  },
+  "scripts": {
+    "build": "vue-cli-service-build",
+    "clean": "rimraf dist",
+    "lint": "vue-cli-service lint src --no-fix",
+    "serve": "vue-cli-service serve"
+  }
+}
