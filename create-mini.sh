@@ -2,7 +2,7 @@
 
 # TODO(?): Make a PowerShell version of this
 
-function to_camel_case {
+function to_pascal_case {
     echo $1 | sed -r 's/(^|_|-)([a-z])/\U\2/g'
 }
 
@@ -36,7 +36,7 @@ yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @f
 yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/cli-plugin-eslint @vue/cli-plugin-typescript \
     @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
 cat package.json | jq --arg name $name '.name = $name'
-pascal_case_name=$(to_camel_case $name)
+pascal_case_name=$(to_pascal_case $name)
 
 cd src
 sed -i "s/MainComponent/${pascal_case_name}/g" MainComponent.vue
