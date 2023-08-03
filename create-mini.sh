@@ -3,7 +3,7 @@
 # TODO(?): Make a PowerShell version of this
 
 function to_camel_case {
-    echo $1 | | sed -r 's/(^|_)([a-z])/\U\2/g'
+    echo $1 | sed -r 's/(^|_|-)([a-z])/\U\2/g'
 }
 
 if [[ $# -lt 1 ]]; then
