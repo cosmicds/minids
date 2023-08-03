@@ -251,16 +251,16 @@
       </div>
       <div id="credits" class="ui-text">
         <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
+          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
           /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank"
+          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
             ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
           /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" class="pl-1"
+          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
           /></a>
-          <a href="https://nasa.gov/" target="_blank" class="pl-1"
+          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
           /></a>
           <!-- <ShareNetwork
@@ -372,7 +372,7 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
                 
-                Comets are dusty snowballs, large clumps of rock and ice, that originate in the outer solar system. The “Green Comet” (or <a href="https://science.nasa.gov/comet-2022-e3-ztf" target="_blank">C/2022 E3</a>) makes its closest approach to the Sun (and to Earth) in early 2023. The comet images in this interactive view were taken on different dates from December 2022 through January 2023 by astrophotographer <a href="http://www.astrostudio.at/" target="_blank">Gerald Rhemann</a>.
+                Comets are dusty snowballs, large clumps of rock and ice, that originate in the outer solar system. The “Green Comet” (or <a href="https://science.nasa.gov/comet-2022-e3-ztf" target="_blank" rel="noopener noreferrer">C/2022 E3</a>) makes its closest approach to the Sun (and to Earth) in early 2023. The comet images in this interactive view were taken on different dates from December 2022 through January 2023 by astrophotographer <a href="http://www.astrostudio.at/" target="_blank" rel="noopener noreferrer">Gerald Rhemann</a>.
                 <br><br>
 
                 <h3>Explore!</h3>
@@ -394,7 +394,7 @@
                 <br><br><br>
                 <div class="credits">
                 <h3>Credits:</h3>
-                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                 Jon Carifio<br>
                 John Lewis<br>
                 Pat Udomprasert<br>
@@ -502,7 +502,7 @@
                     <v-col cols="12">
                       <div class="credits">
                       <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank">CosmicDS</a> Mini Stories Team:</h4>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                       Jon Carifio<br>
                       John Lewis<br>
                       Pat Udomprasert<br>
@@ -1265,13 +1265,14 @@ export default defineComponent({
       const map = L.map("map-container").setView(locationDeg, 4);
       // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   maxZoom: 19,
-      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
       //   className: 'map-tiles'
       // }).addTo(map);
+      map.attributionControl.setPrefix('<a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet</a>');
       L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3'],
-        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+        attribution: `&copy <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>`,
         className: 'map-tiles'
       }).addTo(map);
 
