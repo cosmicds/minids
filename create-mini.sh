@@ -39,6 +39,8 @@ cat package.json | jq --arg name $name '.name = $name'
 pascal_case_name=$(to_pascal_case $name)
 
 cd src
-sed -i "s/MainComponent/${pascal_case_name}/g" MainComponent.vue
 sed -i "s/MainComponent/${pascal_case_name}/g" main.ts
 mv MainComponent.vue ${pascal_case_name}.vue
+
+cd ../public
+sed -i "s/minids-template/$name/g" index.html
