@@ -40,6 +40,7 @@ pascal_case_name=$(to_pascal_case $name)
 
 cd src
 sed -i "s/MainComponent/${pascal_case_name}/g" main.ts
+sed -i "s/wwt-minids-template/wwt-minids-$name/g" main.ts
 mv MainComponent.vue ${pascal_case_name}.vue
 
 cd ../public

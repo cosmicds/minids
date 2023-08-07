@@ -1,7 +1,7 @@
 import Vue, { createApp } from "vue";
 
 import { IconButton } from "@minids/common";
-import MainComponent from "../src/MainComponent.vue";
+import MainComponent from "./MainComponent.vue";
 
 import vuetify from "../plugins/vuetify";
 
@@ -22,7 +22,9 @@ library.add(faVideo);
 // Extract the function out, up here, so I'm not writing it twice
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
-createApp(MainComponent, {})
+createApp(MainComponent, {
+  wwtNamespace: "wwt-minids-template"
+})
  
   // Plugins
   .use(wwtPinia)
