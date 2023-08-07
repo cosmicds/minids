@@ -32,9 +32,9 @@ mv tmp.json package.json
 
 # Do some setup in the new directory
 cd $name
-yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @fortawesome/vue-fontawesome
+yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @fortawesome/vue-fontawesome @fortawesome/free-solid-svg-icons
 yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/cli-plugin-eslint @vue/cli-plugin-typescript \
-    @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
+     @vue/cli-service @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
 cat package.json | jq --arg name $name '.name = $name'
 pascal_case_name=$(to_pascal_case $name)
 
