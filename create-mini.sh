@@ -26,9 +26,7 @@ fi
 cp -r template $name
 
 # Add the new story as a workspace in package.json
-cat package.json |
-    jq --arg name $name '.workspaces[.workspaces | length] |= . + $name' | jq '.workspaces |= if . then sort else empty end' > tmp.json
-mv tmp.json package.json
+node ./add-workspace.js $name
 
 # Do some setup in the new directory
 cd $name
