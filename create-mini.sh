@@ -2,8 +2,10 @@
 
 # TODO(?): Make a PowerShell version of this
 
+# The idea for this comes from https://unix.stackexchange.com/a/196246
+# I've modified it to remove hyphens as well
 function to_pascal_case {
-    echo $1 | sed -r 's/(^|_|-)([a-z])/\U\2/g'
+    echo $1 | perl -pe 's/(^|(_|-))./uc($&)/ge;s/_|-//g'
 }
 
 if [[ $# -lt 1 ]]; then
@@ -26,20 +28,24 @@ fi
 cp -r template $name
 
 # Add the new story as a workspace in package.json
-node ./add-workspace.js $name
+node scripts/add-workspace.js $name
+
+pascal_case_name=$(to_pascal_case $name)
 
 # Do some setup in the new directory
 cd $name
 yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @fortawesome/vue-fontawesome @fortawesome/free-solid-svg-icons
 yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/cli-plugin-eslint @vue/cli-plugin-typescript \
      @vue/cli-service @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
-cat package.json | jq --arg name $name '.name = $name'
+node ../scripts/update-name.js "@minids/${name}"
 pascal_case_name=$(to_pascal_case $name)
 
 cd src
-sed -i "s/MainComponent/${pascal_case_name}/g" main.ts
-sed -i "s/wwt-minids-template/wwt-minids-$name/g" main.ts
+sed -i.bak "s/MainComponent/${pascal_case_name}/g" main.ts
+sed -i.bak "s/wwt-minids-template/wwt-minids-$name/g" main.ts
+rm -f main.ts.bak
 mv MainComponent.vue ${pascal_case_name}.vue
 
 cd ../public
-sed -i "s/minids-template/$name/g" index.html
+sed -i.bak "s/minids-template/$name/g" index.html
+rm -f index.html.bak
