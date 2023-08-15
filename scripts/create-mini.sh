@@ -30,8 +30,6 @@ cp -r template $name
 # Add the new story as a workspace in package.json
 node scripts/add-workspace.js $name
 
-pascal_case_name=$(to_pascal_case $name)
-
 # Do some setup in the new directory
 cd $name
 yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @fortawesome/vue-fontawesome @fortawesome/free-solid-svg-icons
