@@ -11,7 +11,8 @@
   "scripts": {
     "build": "yarn workspaces foreach -vt run build",
     "clean": "yarn workspaces foreach -vt run clean",
-    "lint": "yarn workspaces foreach -vt run lint"
+    "lint": "yarn workspaces foreach -vt run lint",
+    "create-mini": "scripts/create-mini.sh"
   },
   "dependencies": {
     "@mdi/font": "^7.1.96",
