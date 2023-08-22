@@ -68,6 +68,31 @@
     </div>
 
     <v-dialog
+      id="video-container"
+      v-model="showVideoSheet"
+      transition="slide-y-transition"
+      fullscreen
+    >
+      <div class="video-wrapper">
+        <font-awesome-icon
+          id="video-close-icon"
+          class="close-icon"
+          icon="times"
+          size="lg"
+          @click="showVideoSheet = false"
+          @keyup.enter="showVideoSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
+        <video
+          controls
+          id="info-video"
+        >
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+    </v-dialog>
+
+    <v-dialog
       :style="cssVars"
       class="bottom-sheet"
       id="text-bottom-sheet"
@@ -168,7 +193,6 @@
             </v-card>
           </v-window-item>
         </v-window>
-
       </v-card>
     </v-dialog>
 
@@ -493,6 +517,32 @@ body {
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
 }
 
+.video-wrapper {
+  height: 100%;
+  background: black;
+  text-align: center;
+  z-index: 1000;
+}
+
+video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+#video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+  z-index: 1000;
+}
+
 .bottom-sheet {
   .v-overlay__content {
     align-self: flex-end;
@@ -514,6 +564,22 @@ body {
 
   & a {
     text-decoration: none;
+  }
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
   }
 }
 
