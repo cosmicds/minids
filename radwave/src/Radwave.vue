@@ -281,7 +281,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
 
-      accentColor: "#ffffff",
+      accentColor: "#ff0000",
 
       layer: null as SpreadSheetLayer | null,
       phase: 0
