@@ -65,6 +65,13 @@
     </div>
 
     <div class="bottom-content">
+      <v-slider
+        discrete
+        v-model="phase"
+        min="0"
+        max="360"
+        step="1"
+      ></v-slider>
     </div>
 
     <v-dialog
@@ -592,5 +599,114 @@ body {
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+}
+
+.video-wrapper {
+  height: 100%;
+  background: black;
+  text-align: center;
+  z-index: 1000;
+}
+
+video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+#video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+  z-index: 1000;
+}
+
+.bottom-sheet {
+  .v-overlay__content {
+    align-self: flex-end;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+    height: 34%;
+  }
+}
+
+#tabs {
+  width: calc(100% - 3em);
+  align-self: left;
+}
+
+.info-text {
+  height: 33vh;
+  padding-bottom: 25px;
+
+  & a {
+    text-decoration: none;
+  }
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
+  }
+}
+
+.scrollable {
+  overflow-y: auto;
+}
+
+.no-bottom-border-radius {
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+#tab-items {
+  // padding-bottom: 2px !important;
+
+  .v-card-text {
+    font-size: ~"max(14px, calc(0.7em + 0.3vw))";
+    padding-top: ~"max(2vw, 16px)";
+    padding-left: ~"max(4vw, 16px)";
+    padding-right: ~"max(4vw, 16px)";
+
+    .end-spacer {
+      height: 25px;
+    }
+  }
+
+}
+
+#close-text-icon {
+  position: absolute;
+  top: 0.25em;
+  right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
+  color: white;
+}
+
+// This prevents the tabs from having some extra space to the left when the screen is small
+// (around 400px or less)
+.v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
+  display: none;
+}
+
+.v-slider {
+  width: 100%;
+  pointer-events: auto;
 }
 </style>
