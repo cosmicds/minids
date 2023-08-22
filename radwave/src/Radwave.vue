@@ -65,12 +65,23 @@
     </div>
 
     <div class="bottom-content">
+      <icon-button
+        id="play-wave-button"
+        v-model="playWaveMotion"
+        :fa-icon="playWaveMotion ? 'pause' : 'play'"
+        :color="accentColor"
+        :tooltip-text="playWaveMotion ? 'Pause motion' : 'Play motion'"
+        tooltip-location="top"
+      >
+      </icon-button>
       <v-slider
+        ref="slider"
         discrete
         v-model="phase"
-        min="0"
-        max="360"
-        step="1"
+        :min="0"
+        :max="360"
+        :step="1"
+        @update:model-value="playWaveMotion = false"
       ></v-slider>
     </div>
 
@@ -283,8 +294,12 @@ export default defineComponent({
 
       accentColor: "#ff0000",
 
+      tab: 0,
+
       layer: null as SpreadSheetLayer | null,
-      phase: 0
+      phase: 0,
+      playWaveMotion: false,
+      playInterval: null as ReturnType<typeof setInterval> | null
     };
   },
 
@@ -395,6 +410,17 @@ export default defineComponent({
   watch: {
     phase(phase: number) {
       this.updateLayer(phase);
+    },
+
+    playWaveMotion(play: boolean) {
+      if (this.playInterval !== null) {
+        clearInterval(this.playInterval);
+      }
+      if (play) {
+        this.playInterval = setInterval(() => {
+          this.phase = (this.phase + 1) % 360; 
+        }, 50);
+      }
     }
   }
 });
@@ -564,12 +590,13 @@ body {
 
 .bottom-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   position: absolute;
   bottom: 1rem;
   right: 1rem;
   width: calc(100% - 2rem);
   pointer-events: none;
+  justify-content: center;
   align-items: center;
   gap: 5px;
 }
@@ -706,7 +733,15 @@ video {
 }
 
 .v-slider {
-  width: 100%;
+  width: 100px;
   pointer-events: auto;
+
+  & .v-input__details {
+    display: none;
+  }
+}
+
+#play-wave-button {
+  flex: 0;
 }
 </style>
