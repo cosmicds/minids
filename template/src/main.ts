@@ -12,10 +12,12 @@ import { WWTComponent, wwtPinia } from "@wwtelescope/engine-pinia";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faBookOpen,
+  faTimes,
   faVideo,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
+library.add(faTimes);
 library.add(faVideo);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
