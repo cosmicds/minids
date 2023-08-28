@@ -2,6 +2,8 @@
   "name": "minids-monorepo",
   "private": true,
   "workspaces": [
+    "2023-annular-eclipse",
+    "annular-eclipse-2023",
     "carina",
     "common",
     "green-comet",
