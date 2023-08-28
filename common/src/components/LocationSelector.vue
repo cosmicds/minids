@@ -49,6 +49,7 @@ import tzlookup from "tz-lookup";
 import { getTimezoneOffset } from "date-fns-tz";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
+// eslint-disable-next-line
 import Notifications from "@kyvg/vue3-notification";
 import { defineComponent } from "vue";
 import IconButton from "./IconButton.vue";
