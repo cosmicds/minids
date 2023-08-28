@@ -234,7 +234,7 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#ffffff",
+      accentColor: "#ef7e3d",
 
       tab: 0
     };
