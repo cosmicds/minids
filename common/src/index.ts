@@ -1,6 +1,7 @@
 import { KeyboardControlSettings } from "./keyboard";
 import MiniDSBase from "./components/MiniDSBase";
 import IconButton from "./components/IconButton.vue";
+import LocationSelector from "./components/LocationSelector.vue";
 import { BackgroundImageset, skyBackgroundImagesets } from "./background";
 import Gallery from "./components/Gallery.vue";
 
@@ -10,5 +11,6 @@ export {
   MiniDSBase,
   Gallery,
   IconButton,
+  LocationSelector,
   skyBackgroundImagesets
 };

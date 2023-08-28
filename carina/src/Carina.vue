@@ -397,8 +397,6 @@ export default defineComponent({
   created() {
     this.waitForReady().then(() => {
 
-      console.log(this);
-
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>

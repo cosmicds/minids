@@ -212,6 +212,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.21.0":
+  version: 7.22.5
+  resolution: "@babel/runtime@npm:7.22.5"
+  dependencies:
+    regenerator-runtime: ^0.13.11
+  checksum: 12a50b7de2531beef38840d17af50c55a094253697600cee255311222390c68eed704829308d4fd305e1b3dfbce113272e428e9d9d45b1730e0fede997eaceb1
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.18.10, @babel/template@npm:^7.20.7":
   version: 7.20.7
   resolution: "@babel/template@npm:7.20.7"
@@ -456,6 +465,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kyvg/vue3-notification@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "@kyvg/vue3-notification@npm:2.9.1"
+  peerDependencies:
+    vue: ^3.0.0
+  checksum: 1475134d0a0602645fbe53869373cf8f65e7c827cdc78fc1912b5cd1ed826f7755d046834acae6b9fb23d92cc4c5013c7241dff1a7f90355542f6c382b590bed
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -503,14 +521,21 @@ __metadata:
   resolution: "@minids/common@workspace:common"
   dependencies:
     "@fortawesome/vue-fontawesome": ^3.0.3
+    "@kyvg/vue3-notification": ^2.9.1
+    "@types/leaflet": ^1.9.3
+    "@types/tz-lookup": ^6.1.0
     "@vue/cli-plugin-eslint": ^5.0.8
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@wwtelescope/engine-pinia": ^0.2.0
+    date-fns: ^2.30.0
+    date-fns-tz: ^2.0.0
     eslint: ^8.31.0
     eslint-plugin-vue: ^9.8.0
+    leaflet: ^1.9.4
     screenfull: ^6.0.2
     typescript: ^4.9.4
+    tz-lookup: ^6.1.25
     vue: ^3
     vue-template-compiler: ^2.7.14
     vuetify: ^3.3.3
@@ -1234,6 +1259,15 @@ __metadata:
   dependencies:
     "@types/geojson": "*"
   checksum: f3ee2e2fc8bd3480d77667471c8f774a3726ff7694a7d08d2423c05b40e28f00379c7d469b4cbd3b53a1bc96c75970c92f9da7908fc477cbac0eda2a9d17b6ad
+  languageName: node
+  linkType: hard
+
+"@types/leaflet@npm:^1.9.3":
+  version: 1.9.3
+  resolution: "@types/leaflet@npm:1.9.3"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: d12042edc3a043d074b4fd3b4c4800f479dfb01db3980d8c1151edbc70b23ca9e84ab7da72ce0d1c36c040f89ba1421bd36d9d9796ec3704a0d3c942985a87ae
   languageName: node
   linkType: hard
 
@@ -4064,6 +4098,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"date-fns@npm:^2.30.0":
+  version: 2.30.0
+  resolution: "date-fns@npm:2.30.0"
+  dependencies:
+    "@babel/runtime": ^7.21.0
+  checksum: f7be01523282e9bb06c0cd2693d34f245247a29098527d4420628966a2d9aad154bd0e90a6b1cf66d37adcb769cd108cf8a7bd49d76db0fb119af5cdd13644f4
+  languageName: node
+  linkType: hard
+
 "de-indent@npm:^1.0.2":
   version: 1.0.2
   resolution: "de-indent@npm:1.0.2"
@@ -6753,6 +6796,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"leaflet@npm:^1.9.4":
+  version: 1.9.4
+  resolution: "leaflet@npm:1.9.4"
+  checksum: bfc79f17a247b37b92d84b3c78702501603392d6589fde606de4a825d11f1609d90225388834f2e0709dac327e52dcd4b4b9cc9fd3d590060c5b1e53b84fa6c6
+  languageName: node
+  linkType: hard
+
 "less-loader@npm:^11.1.0":
   version: 11.1.0
   resolution: "less-loader@npm:11.1.0"
@@ -9123,6 +9173,13 @@ __metadata:
   dependencies:
     picomatch: ^2.2.1
   checksum: 1ced032e6e45670b6d7352d71d21ce7edf7b9b928494dcaba6f11fba63180d9da6cd7061ebc34175ffda6ff529f481818c962952004d273178acd70f7059b320
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.13.11":
+  version: 0.13.11
+  resolution: "regenerator-runtime@npm:0.13.11"
+  checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
   languageName: node
   linkType: hard
 
