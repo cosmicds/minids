@@ -59,13 +59,21 @@
         </icon-button>
       </div>
       <div id="center-buttons">
+        <location-selector
+          :activator-color="accentColor"
+        >
+        </location-selector>    
+    
       </div>
       <div id="right-buttons">
       </div>
     </div>
 
+
     <div class="bottom-content">
     </div>
+
+    <!-- This contains the video that is displayed when the video icon is clicked. -->
 
     <v-dialog
       id="video-container"
@@ -91,6 +99,8 @@
         </video>
       </div>
     </v-dialog>
+
+    <!-- This contains the informational content that is displayed when the book icon is clicked. -->
 
     <v-dialog
       :style="cssVars"

@@ -1,6 +1,7 @@
 import Vue, { createApp } from "vue";
 
 import { IconButton } from "@minids/common";
+import { LocationSelector } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 
 import vuetify from "../plugins/vuetify";
@@ -52,6 +53,7 @@ createApp(AnnularEclipse2023, {
   .component("WorldWideTelescope", WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
+  .component('location-selector', LocationSelector)
 
   // Mount
   .mount("#app");
