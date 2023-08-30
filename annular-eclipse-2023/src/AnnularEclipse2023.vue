@@ -212,15 +212,50 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+// import { distance } from "@wwtelescope/astro";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
+// import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
+// import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, GetName } from "@wwtelescope/engine";
+import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
+
+import { getTimezoneOffset } from "date-fns-tz";
+
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
 
 type SheetType = "text" | "video" | null;
+
+const D2R = Math.PI / 180;
+const R2D = 180 / Math.PI;
+
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
+
+type LocationRad = {
+  longitudeRad: number;
+  latitudeRad: number;
+};
+
+type EquatorialRad = {
+  raRad: number;
+  decRad: number;
+};
+
+type HorizontalRad = {
+  altRad: number;
+  azRad: number;
+};
+
+
 
 export default defineComponent({
   extends: MiniDSBase,
   
   props: {
+    // wtml: {
+    //   type: Object,
+    //   required: true
+    // },
     wwtNamespace: {
       type: String,
       required: true
@@ -233,16 +268,58 @@ export default defineComponent({
           decRad: 0,
           zoomDeg: 60
         };
-      }
-    }
+      },
+    },
+    sunPlace: {
+      type: Object as PropType<Place>,
+      default() {
+        return {
+          name: "Sun",
+          classification: "SolarSystem"
+        };
+      },
+    },
+    // initialSunParams: {
+    //   type: Object as PropType<GotoTargetOptions>,
+    //   default() {
+    //     return {
+    //       place: 'name="Sun" Classification="SolarSystem"',
+    //       instant: true
+    //     };
+    //   },
+    // },
   },
   data() {
+    const now = new Date();
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
       positionSet: false,
+      imagesetFolder: null as Folder | null,
+
+      showMapTooltip: false,
+      showTextTooltip: false,
+      showVideoTooltip: false,
+      showPlayPauseTooltip: false,
+      showLocationSelector: false,
+      showControls: false,   
+
+      // Harvard Observatory
+      timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
+      selectedTime: now.setUTCHours(0, 0, 0, 0),
+      selectedTimezone: "America/New_York",
+      location: {
+        latitudeRad: D2R * 42.3814,
+        longitudeRad: D2R * -71.1281
+      } as LocationRad,
+      locationErrorMessage: "",
+
+      showAltAzGrid: true,
+      showConstellations: false,
+      showHorizon: true,
+      showEcliptic: true,      
       
       accentColor: "#ef7e3d",
 
@@ -255,10 +332,65 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
+      // this.imagesetFolder = await this.loadImageCollection({
+      //   url: this.wtml.eclipse,
+      //   loadChildFolders: false
+      // });
+      // const children = this.imagesetFolder.get_children() ?? [];
+      // const layerPromises: Promise<Layer>[] = [];
+      // children.forEach((item) => {
+      //   if (!(item instanceof Place)) { return; }
+      //   const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+      //   if (imageset == null) { return; }
+      //   const name = imageset.get_name();
+      //   layerPromises.push(this.addImageSetLayer({
+      //     url: imageset.get_url(),
+      //     mode: "autodetect",
+      //     name: name,
+      //     goto: false
+      //   }).then((layer) => {
+      //     // this.imagesetLayers[name] = layer;
+      //     // applyImageSetLayerSetting(layer, ["opacity", 0]);
+      //     return layer;
+      //   }));
+      // });  
+
       this.gotoRADecZoom({
         ...this.initialCameraParams,
         instant: true
       }).then(() => this.positionSet = true);
+
+      this.setTime(this.dateTime);
+
+      this.wwtSettings.set_localHorizonMode(true);
+      this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
+      this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
+      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
+      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
+      this.wwtSettings.set_showEcliptic(this.showEcliptic);
+      this.wwtSettings.set_showEclipticOverviewText(this.showEcliptic);
+
+      // This is kinda horrible, but it works!
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl._drawSkyOverlays = drawSkyOverlays;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Constellations.initializeConstellationNames = initializeConstellationNames;
+      Grids._makeAltAzGridText = makeAltAzGridText;
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      LayerManager._draw = layerManagerDraw;      
+
+      // this.gotoTarget({
+      //   place: this.sunPlace,
+      //   noZoom: true,
+      //   instant: true,
+      //   trackObject: true
+      // });
+      // console.log(this.sunPlace);
 
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -267,11 +399,24 @@ export default defineComponent({
   },
 
   computed: {
+
+    dateTime() {
+      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
+      return new Date(this.selectedDate.getTime() + todMs);
+    },    
+
+    selectedTimezoneOffset() {
+      return getTimezoneOffset(this.selectedTimezone);
+    },
+
     ready(): boolean {
       return this.layersLoaded && this.positionSet;
     },
     isLoading(): boolean {
       return !this.ready;
+    },
+    selectedDate(): Date {
+      return new Date(this.selectedTime);
     },
     smallSize(): boolean {
       return this.$vuetify.display.smAndDown;
@@ -284,6 +429,25 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
+    },
+    wwtControl(): WWTControl {
+      return WWTControl.singleton;
+    },
+
+    wwtSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+    dontSetTime(): boolean {
+      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
+    },
+    dayFrac(): number {
+      const dateForTOD = new Date();
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
+      const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
@@ -321,8 +485,192 @@ export default defineComponent({
       } else {
         this.sheet = name;
       }
-    }
-  }
+    },
+
+    // WWT does have all of this functionality built in
+    // but it doesn't seem to be exposed
+    // We should do that, but for now we just copy the web engine code
+    // https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/wwtlib/Coordinates.cs
+    altAzToHADec(altRad: number, azRad: number, latRad: number): { ra: number; dec: number; } {
+      azRad = Math.PI - azRad;
+      if (azRad < 0) {
+        azRad += 2 * Math.PI;
+      }
+      let ra = Math.atan2(Math.sin(azRad), Math.cos(azRad) * Math.sin(latRad) + Math.tan(altRad) * Math.cos(latRad));
+      if (ra < 0) {
+        ra += 2 * Math.PI;
+      }
+      const dec = Math.asin(Math.sin(latRad) * Math.sin(altRad) - Math.cos(latRad) * Math.cos(altRad) * Math.cos(azRad));
+      return { ra, dec };
+    },
+
+    getJulian(utc: Date): number {
+      let year = utc.getUTCFullYear();
+      let month = utc.getUTCMonth()+1;
+      const day = utc.getUTCDate();
+      const hour = utc.getUTCHours();
+      const minute = utc.getUTCMinutes();
+      const second = utc.getUTCSeconds() + utc.getUTCMilliseconds() / 1000.0;
+
+      if (month == 1 || month == 2)
+      {
+        year -= 1;
+        month += 12;
+      }
+
+      const a = Math.floor(year / 100);
+      const b = 2 - a + Math.floor(a / 4.0);
+      const c = Math.floor(365.25 * year);
+      const d = Math.floor(30.6001 * (month + 1));
+
+      // gives julian date: number of days since Jan 1, 4713 BC
+      const jd = b + c + d + 1720994.5 + day + (hour + minute / 60.00 + second / 3600.00) / 24.00;
+      return jd;
+
+    },
+    
+    mstFromUTC2(utc: Date, longRad: number): number {
+      const lng = longRad * R2D;
+
+      const modifiedJD = this.getJulian(utc)  - 2451545;
+
+      const julianCenturies = modifiedJD / 36525.0;
+      // this form wants julianDays - 2451545
+      let mst = 280.46061837 + 360.98564736629 * modifiedJD + 0.000387933 * julianCenturies * julianCenturies - julianCenturies * julianCenturies * julianCenturies / 38710000 + lng;
+
+      if (mst > 0.0) {
+        while (mst > 360.0) {
+          mst = mst - 360.0;
+        }
+      } else {
+        while (mst < 0.0) {
+          mst = mst + 360.0;
+        }
+      }
+
+      return mst;
+    },
+
+    horizontalToEquatorial(altRad: number, azRad: number, latRad: number, longRad: number, utc: Date): EquatorialRad {
+      const st = this.mstFromUTC2(utc, longRad); // siderial time 
+  
+      const haDec = this.altAzToHADec(altRad, azRad, latRad); // get Hour Angle and Declination
+      
+      const ha = haDec.ra * R2D;
+
+      let ra = st + ha;
+      if (ra < 0) {
+        ra += 360;
+      }
+      if (ra > 360) {
+        ra -= 360;
+      }
+      // ra -= 180;
+      // console.log(`Alt: ${(altRad*R2D).toFixed(2)} Az: ${(azRad*R2D).toFixed(2)} Ra: ${ra.toFixed(2)} Dec: ${(haDec.dec*R2D).toFixed(2)}`)
+
+      return { raRad: D2R * ra, decRad: haDec.dec };
+    },
+
+    equatorialToHorizontal(raRad: number, decRad: number, latRad: number, longRad: number, utc: Date): HorizontalRad {
+      let hourAngle = this.mstFromUTC2(utc, longRad) - R2D * raRad;
+      if (hourAngle < 0) {
+        hourAngle += 360;
+      }
+
+      const ha = D2R * hourAngle;
+      const dec = decRad;
+      const lat = latRad;
+      
+      const sinAlt = Math.sin(dec) * Math.sin(lat) + Math.cos(dec) * Math.cos(lat) * Math.cos(ha);
+      const altitude = Math.asin(sinAlt);
+      const cosAz = (Math.sin(dec) - Math.sin(altitude) * Math.sin(lat)) / (Math.cos(altitude) * Math.cos(lat));
+      let azimuth = Math.acos(cosAz);
+
+      azimuth = azimuth + (Math.PI * 80) % (Math.PI * 2);
+
+      if (Math.sin(ha) > 0) {
+        azimuth = 2 * Math.PI - azimuth;
+      }
+      return { altRad: altitude, azRad: azimuth };
+
+    },
+
+    createHorizon(when: Date | null = null) {
+      this.removeHorizon();
+
+      const color = '#01362C';
+      const date = when || this.dateTime || new Date();
+
+      // The initial coordinates are given in Alt/Az, then converted to RA/Dec
+      // Use N annotations to cover below the horizon
+      const n = 6;
+      const delta = 2 * Math.PI / n;
+      for (let i = 0; i < n; i++) {
+        let points: [number, number][] = [
+          [0, i * delta],
+          [-Math.PI / 2, i * delta],
+          [0, (i + 1) * delta]
+        ];
+        points = points.map((point) => {
+          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
+          return [R2D * raDec.raRad, R2D * raDec.decRad];
+        });
+        const poly = new Poly();
+        points.forEach(point => poly.addPoint(...point));
+        poly.set_lineColor(color);
+        poly.set_fill(true);
+        poly.set_fillColor(color);
+        this.addAnnotation(poly);
+      }
+
+    },
+
+    removeHorizon() {
+      this.clearAnnotations();
+    },    
+
+    updateForDateTime() {
+      if (!this.dontSetTime) { this.setTime(this.dateTime); }
+      this.updateHorizon(this.dateTime); 
+      // this.showImageForDateTime(this.dateTime);
+      // this.updateViewForDate(options);
+      // this.updateLayersForDate();
+    },
+
+    updateHorizon(when: Date | null = null) {
+      if (this.showHorizon) {
+        this.createHorizon(when);
+      } else {
+        this.removeHorizon();
+      }
+    },
+
+  },
+
+  watch: {
+    showAltAzGrid(show: boolean) {
+      this.wwtSettings.set_showAltAzGrid(show);
+      this.wwtSettings.set_showAltAzGridText(show);
+    },
+    showConstellations(show: boolean) {
+      this.wwtSettings.set_showConstellationLabels(show);
+      this.wwtSettings.set_showConstellationFigures(show);
+    },
+    showEcliptic(show: boolean) {
+      this.wwtSettings.set_showEcliptic(show);
+      this.wwtSettings.set_showEclipticOverviewText(show);
+    },
+    showHorizon(_show: boolean) {
+      this.updateHorizon();
+    },
+    timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+      this.updateForDateTime();
+    },
+    selectedDate() {
+      this.updateForDateTime();
+    },
+  },
+
 });
 </script>
 
