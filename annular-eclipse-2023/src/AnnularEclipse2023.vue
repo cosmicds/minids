@@ -71,6 +71,124 @@
 
 
     <div class="bottom-content">
+      <div
+        id="controls"
+        class="control-icon-wrapper"
+      >
+        <div id="controls-top-row">
+          <font-awesome-icon
+            size="lg"
+            class="ma-1"
+            :color="accentColor"
+            :icon="showControls ? `chevron-down` : `gear`"
+            @click="showControls = !showControls"
+            @keyup.enter="showControls = !showControls"
+            tabindex="0"
+          /> 
+        </div>
+        <transition-expand>
+          <div v-if="showControls" class="controls-content">
+            <v-checkbox
+              :color="accentColor"
+              v-model="showAltAzGrid"
+              @keyup.enter="showAltAzGrid = !showAltAzGrid"
+              label="Grid"
+              hide-details
+            />
+            <v-checkbox
+              :color="accentColor"
+              v-model="showConstellations"
+              @keyup.enter="showConstellations = !showConstellations"
+              label="Constellations"
+              hide-details
+            />
+            <v-checkbox
+              :color="accentColor"
+              v-model="showHorizon"
+              @keyup.enter="showHorizon = !showHorizon"
+              label="Horizon"
+              hide-details
+            />
+            <div
+              style="color:white;"
+              class="mt-3"
+            >
+              Selected location's time:
+            </div>
+            <date-picker
+              dark
+              time-picker
+              enable-seconds
+              :is-24="false"
+              v-model="timeOfDay"
+              :clearable="false"
+              close-on-scroll
+              class="mb-4 mt-1"
+            >
+              <template #input-icon>
+                <font-awesome-icon
+                  icon="clock"
+                  class="mx-2"
+                  :color="accentColor"
+                ></font-awesome-icon>
+              </template>
+            </date-picker>
+            <!-- <v-btn
+              block
+              :color="accentColor"
+              @click="() => {
+                playing = false;
+                playingCometPath = !playingCometPath;
+              }"
+            >
+              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
+            </v-btn> -->
+            <!--
+            <v-btn
+              block
+              :color="accentColor"
+              @click="setToFirstCometImage"
+            >
+              Best view for comet images
+            </v-btn> -->
+          </div>
+        </transition-expand>
+      </div>
+      <div id="credits" class="ui-text">
+        <div id="icons-container">
+          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
+            ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
+          /></a>
+          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
+            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
+          /></a>
+          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
+          /></a>
+          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
+          /></a>
+          <!-- <ShareNetwork
+            v-for="network in networks"
+            :key="network.name"
+            :network="network.name"
+            :class="`${network.name}-button`"
+            :style="{ backgroundColor: network.color, width: 'fit-content' }"
+            :description="description"
+            :url="url"
+            :title="title"
+            :hashtags="hashtagString"
+            :quote="description"
+            twitter-user="WWTelescope"
+          >
+            <font-awesome-icon
+              :class="`${network.name}-icon`"
+              :icon="['fab', network.name]"
+              size="lg"
+            ></font-awesome-icon>
+          </ShareNetwork> -->
+        </div>
+      </div>
     </div>
 
     <!-- This contains the video that is displayed when the video icon is clicked. -->
@@ -302,9 +420,7 @@ export default defineComponent({
       showMapTooltip: false,
       showTextTooltip: false,
       showVideoTooltip: false,
-      showPlayPauseTooltip: false,
-      showLocationSelector: false,
-      showControls: false,   
+      showControls: true,   
 
       // Harvard Observatory
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
@@ -825,6 +941,10 @@ body {
 
 }
 
+.icon-wrapper {
+  padding: 8px 16px;
+}
+
 .top-content {
   position: absolute;
   top: 1rem;
@@ -846,6 +966,96 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+#controls {
+  background: black;
+  padding: 10px;
+  border-radius: 10px;
+  border: solid 1px var(--comet-color);
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  pointer-events: auto;
+
+  .v-label {
+    color: var(--comet-color);
+    opacity: 1;
+  }
+
+  .controls-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    .v-btn {
+      align-self: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      border: solid 1px #899499;
+
+      &:focus {
+        border: 2px solid white;
+      }
+    }
+
+    .v-btn__content {
+      color: black;
+      font-weight: 900;
+      font-size: 0.75em;
+      white-space: break-spaces;
+      width: 150px;
+    }
+  }
+  #controls-top-row {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+#show-controls {
+  color: var(--accent-color);
+}
+
+#credits {
+  color: #ddd;
+  font-size: calc(0.7em + 0.2vw);
+  justify-self: flex-end;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
+
+  a {
+    text-decoration: none;
+    color: #fff;
+    pointer-events: auto;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &[class^="share-network"]:hover {
+      text-decoration: none;
+      filter: brightness(75%);
+    }
+  }
+
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
+  }
 }
 
 #left-buttons, #right-buttons {
