@@ -598,6 +598,15 @@ export default defineComponent({
   },
 
   methods: {
+
+    moveOneDayForward() {
+      this.selectedTime += MILLISECONDS_PER_DAY;
+    },
+
+    moveOneDayBackward() {
+      this.selectedTime -= MILLISECONDS_PER_DAY;
+    },
+    
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
@@ -854,8 +863,20 @@ export default defineComponent({
     selectedDate() {
       this.updateForDateTime();
     },
+    selectedTimezone(newTz: string, oldTz: string) {
+      const newOffset = getTimezoneOffset(newTz);
+      const oldOffset = getTimezoneOffset(oldTz);
+      let newHours = this.timeOfDay.hours + ((newOffset - oldOffset) / (1000*60*60));
+      if (newHours >= 24) {
+        newHours -= 24;
+        this.moveOneDayForward();
+      } else if (newHours < 0) {
+        newHours += 24;
+        this.moveOneDayBackward();
+      }
+      this.timeOfDay.hours = newHours;
+    },
   },
-
 });
 </script>
 
