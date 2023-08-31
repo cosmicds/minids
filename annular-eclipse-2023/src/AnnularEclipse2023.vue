@@ -606,7 +606,7 @@ export default defineComponent({
     moveOneDayBackward() {
       this.selectedTime -= MILLISECONDS_PER_DAY;
     },
-    
+
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
@@ -619,6 +619,9 @@ export default defineComponent({
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
       this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
+      if(this.showHorizon) {
+        this.updateHorizon();
+      }
     },
 
     logLocation() {
