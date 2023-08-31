@@ -770,6 +770,41 @@ export default defineComponent({
         poly.set_fillColor(color);
         this.addAnnotation(poly);
       }
+    },
+
+    createSky(when: Date | null = null) {
+      // this removes all annotations, so it erases horizon if you create that first.
+      // this.removeHorizon(); 
+
+      const color = '#87CEEB';
+      // const opacity = 0.5;
+      const date = when || this.dateTime || new Date();
+
+      // The initial coordinates are given in Alt/Az, then converted to RA/Dec
+      // Use N annotations to cover below the horizon
+      const n = 6;
+      const delta = 2 * Math.PI / n;
+      // const delta = 360/n;
+      for (let i = 0; i < n; i++) {
+        let points: [number, number][] = [
+          [0, i * delta],
+          [0, (i + 1) * delta],
+          [Math.PI / 2, i * delta] // In addition to using +pi/2 instead of -pi/2, I had to switch the order of the 2nd & 3rd points relative to the horizon set. I don't know why, but before I switched them, the polygons didn't render.
+        ];
+        points = points.map((point) => {
+          const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
+          return [R2D * raDec.raRad, R2D * raDec.decRad];
+        });
+        const poly = new Poly();
+        points.forEach(point => poly.addPoint(...point));
+        poly.set_lineColor(color);
+        poly.set_fill(true);
+        poly.set_fillColor(color);
+        // Need to fix error: 
+        // Property 'set_fillColorWithOpacity' does not exist on type 'Poly'.
+        // poly.set_fillColorWithOpacity(color).opacity;
+        this.addAnnotation(poly);
+      }
 
     },
 
@@ -788,6 +823,8 @@ export default defineComponent({
     updateHorizon(when: Date | null = null) {
       if (this.showHorizon) {
         this.createHorizon(when);
+        // uncomment next line when we sort out opacity of sky annotation
+        // this.createSky(when);
       } else {
         this.removeHorizon();
       }
