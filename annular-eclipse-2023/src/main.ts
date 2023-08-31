@@ -3,6 +3,12 @@ import Vue, { createApp } from "vue";
 import { IconButton } from "@minids/common";
 import { LocationSelector } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
+import TransitionExpand from "./TransitionExpand.vue";
+
+import "./polyfills";
+
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 import vuetify from "../plugins/vuetify";
 
@@ -15,18 +21,27 @@ import {
   faBookOpen,
   faTimes,
   faVideo,
+  faGear,
+  faChevronDown,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
 library.add(faTimes);
 library.add(faVideo);
+library.add(faGear);
+library.add(faChevronDown);
+library.add(faClock);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 createApp(AnnularEclipse2023, {
-  wwtNamespace: "wwt-minids-annular-eclipse-2023"
+  wwtNamespace: "wwt-minids-annular-eclipse-2023",
+  // wtml: { // use this just as a test for the sun
+  //   eclipse: "https://raw.githubusercontent.com/patudom/star-life-cycle/master/content/BUACStellarLifeCycles.wtml",
+  // },
 })
  
   // Plugins
@@ -54,6 +69,8 @@ createApp(AnnularEclipse2023, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
   .component('location-selector', LocationSelector)
+  .component('transition-expand', TransitionExpand)
+  .component('date-picker', Datepicker)
 
   // Mount
   .mount("#app");
