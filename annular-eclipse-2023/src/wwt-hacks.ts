@@ -27,6 +27,13 @@ export function drawSkyOverlays() {
       Grids.drawAltAzGridText(this.renderContext, 1, altAzColor);
     }
   }
+  if (Settings.get_active().get_showEcliptic()) {
+    const eclipticColor = Color.fromArgb(1, 255, 165, 0);
+    Grids.drawEcliptic(this.renderContext, 1, eclipticColor);
+    if (Settings.get_active().get_showEclipticOverviewText()) {
+      Grids.drawEclipticText(this.renderContext, 1, eclipticColor);
+    }
+  }
 }
 
 export function initializeConstellationNames() {

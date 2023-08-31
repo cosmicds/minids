@@ -90,6 +90,13 @@
           <div v-if="showControls" class="controls-content">
             <v-checkbox
               :color="accentColor"
+              v-model="showEcliptic"
+              @keyup.enter="showEcliptic = !showEcliptic"
+              label="Ecliptic"
+              hide-details
+            />
+            <v-checkbox
+              :color="accentColor"
               v-model="showAltAzGrid"
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Grid"
@@ -338,6 +345,7 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
+// import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
 
@@ -500,6 +508,8 @@ export default defineComponent({
       // @ts-ignore
       LayerManager._draw = layerManagerDraw;      
 
+      this.updateWWTLocation();
+
       // this.gotoTarget({
       //   place: this.sunPlace,
       //   noZoom: true,
@@ -588,9 +598,31 @@ export default defineComponent({
   },
 
   methods: {
+    toDateString(date: Date) {
+      // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+    },
+
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },
+
+    updateWWTLocation() {
+      this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
+    },
+
+    logLocation() {
+      console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
+    },
+    
+    logPosition() {
+      console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
+    },
+
+    printUTCDate(date: Date) {
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+    },    
 
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
