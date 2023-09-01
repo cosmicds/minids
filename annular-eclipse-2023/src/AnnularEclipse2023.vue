@@ -394,8 +394,8 @@ const R2D = 180 / Math.PI;
 
 // number of milliseconds since January 1, 1970, 00:00:00 UTC
 // month is indexed from 0..?!
-const minTime = Date.UTC(2023, 9, 14, 16, 10);
-const maxTime = Date.UTC(2023, 9, 14, 17, 10);
+const minTime = Date.UTC(2023, 9, 14, 15, 0); // eclipse starts at 9:13am MT in Albuquerque
+const maxTime = Date.UTC(2023, 9, 14, 18, 30); // eclipse ends at 12:09pm MT in Albuquerque
 
 const secondsInterval = 10;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
