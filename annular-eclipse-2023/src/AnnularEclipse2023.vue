@@ -161,6 +161,36 @@
           </div>
         </transition-expand>
       </div>
+      <div id="tools">
+        <span class="tool-container">
+          <icon-button
+            id="play-pause-icon"
+            :fa-icon="!(playing) ? 'play' : 'pause'"
+            @activate="() => {
+              playing = !(playing);
+              playing = false;
+            }"
+            :color="accentColor"
+            tooltip-text="Play/Pause"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <vue-slider
+            id="slider"
+            adsorb
+            included
+            :order="false"
+            v-model="selectedTime"
+            @change="onTimeSliderChange"
+            :data="times"
+            tooltip="always"
+            :tooltip-formatter="(v: number) => 
+              toTimeString(new Date(v))
+            "
+            >
+          </vue-slider>
+        </span>      
+      </div>
       <div id="credits" class="ui-text">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -330,7 +360,6 @@
         </v-window>
       </v-card>
     </v-dialog>
-
   </div>
 </v-app>
 </template>
@@ -349,13 +378,38 @@ import { getTimezoneOffset } from "date-fns-tz";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
 
+// interface MoveOptions {
+//   instant?: boolean;
+//   zoomDeg?: number;
+//   rollRad?: number;
+// }
+
 type SheetType = "text" | "video" | null;
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
 
-const SECONDS_PER_DAY = 60 * 60 * 24;
-const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
+// const startTime = new Date("2023-10-14T10:10"); 
+// const finishTime = new Date("2023-10-14T11:10");
+
+// number of milliseconds since January 1, 1970, 00:00:00 UTC
+// month is indexed from 0..?!
+const minTime = Date.UTC(2023, 9, 14, 16, 10);
+const maxTime = Date.UTC(2023, 9, 14, 17, 10);
+
+const secondsInterval = 10;
+const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
+
+const times: number[] = [];
+
+let t = minTime;
+while (t <= maxTime) {
+  times.push(t);
+  times.push(t + MILLISECONDS_PER_INTERVAL);
+  t += MILLISECONDS_PER_INTERVAL;
+}
+
+// const options = { timeout: 10000, enableHighAccuracy: true };
 
 type LocationRad = {
   longitudeRad: number;
@@ -372,8 +426,6 @@ type HorizontalRad = {
   azRad: number;
 };
 
-
-
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -386,13 +438,15 @@ export default defineComponent({
       type: String,
       required: true
     },
+    
     initialCameraParams: {
       type: Object as PropType<Omit<GotoRADecZoomParams, 'instant'>>,
       default() {
         return {
-          raRad: 0,
-          decRad: 0,
-          zoomDeg: 60
+          // RA/Dec of Sun in Albuquerque close to max annularity
+          raRad: 3.481,
+          decRad: -0.145,
+          zoomDeg: 1
         };
       },
     },
@@ -405,18 +459,15 @@ export default defineComponent({
         };
       },
     },
-    // initialSunParams: {
-    //   type: Object as PropType<GotoTargetOptions>,
-    //   default() {
-    //     return {
-    //       place: 'name="Sun" Classification="SolarSystem"',
-    //       instant: true
-    //     };
-    //   },
-    // },
   },
   data() {
-    const now = new Date();
+    const now = new Date("2023-10-14T10:48");
+    console.log("min/max time UTC", minTime, maxTime);
+    const minutc = new Date(minTime);
+    const maxutc = new Date(maxTime);
+    console.log("Date(min/maxTime):", minutc, maxutc);
+    console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
+    console.log("date:", now);
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -430,20 +481,31 @@ export default defineComponent({
       showVideoTooltip: false,
       showControls: true,   
 
-      // Harvard Observatory
+      selectionProximity: 4,
+      pointerMoveThreshold: 6,
+      isPointerMoving: false,
+      pointerStartPosition: null as { x: number; y: number } | null,      
+
+      // Albuquerque, NM
       timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
-      selectedTime: now.setUTCHours(0, 0, 0, 0),
-      selectedTimezone: "America/New_York",
+      selectedTime: minTime,
+      selectedTimezone: "America/Denver",
       location: {
-        latitudeRad: D2R * 42.3814,
-        longitudeRad: D2R * -71.1281
+        latitudeRad: D2R * 35.106766,
+        longitudeRad: D2R * -106.629181
       } as LocationRad,
       locationErrorMessage: "",
+
+      playing: false,
+      playingIntervalId: null as ReturnType<typeof setInterval> | null,
+      playingWaitCount: 0,
 
       showAltAzGrid: true,
       showConstellations: false,
       showHorizon: true,
-      showEcliptic: true,      
+      showEcliptic: true,    
+      
+      times: times, 
       
       accentColor: "#ef7e3d",
 
@@ -479,10 +541,7 @@ export default defineComponent({
       //   }));
       // });  
 
-      this.gotoRADecZoom({
-        ...this.initialCameraParams,
-        instant: true
-      }).then(() => this.positionSet = true);
+      console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
       this.setTime(this.dateTime);
 
@@ -510,6 +569,14 @@ export default defineComponent({
 
       this.updateWWTLocation();
 
+      this.gotoRADecZoom({
+        // These are RA/Dec of Sun in Albuquerque close to max annularity. Since I don't know how to keep focus on the Sun in the web engine, I tried to set this up so the view would start here, but it isn't.
+        raRad: 3.481,
+        decRad: -0.145,
+        zoomDeg: 1,
+        instant: true
+      }).then(() => this.positionSet = true);
+
       // this.gotoTarget({
       //   place: this.sunPlace,
       //   noZoom: true,
@@ -521,14 +588,17 @@ export default defineComponent({
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
 
+      console.log("selected time", this.selectedTime);
+
     });
   },
 
   computed: {
 
     dateTime() {
-      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
-      return new Date(this.selectedDate.getTime() + todMs);
+      return new Date();
+      // const todMs = this.dayFrac * MILLISECONDS_PER_INTERVAL;
+      // return new Date(this.selectedDate.getTime() + todMs);
     },    
 
     selectedTimezoneOffset() {
@@ -565,15 +635,15 @@ export default defineComponent({
       // @ts-ignore
       return Settings.get_active();
     },
-    dontSetTime(): boolean {
-      return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
-    },
+    // dontSetTime(): boolean {
+    //   return this.selectedTime %MILLISECONDS_PER_INTERVAL !== 0;
+    // },
     dayFrac(): number {
       const dateForTOD = new Date();
       const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
-      return todMs / MILLISECONDS_PER_DAY;
+      return todMs / MILLISECONDS_PER_INTERVAL;
     },
     showTextSheet: {
       get(): boolean {
@@ -599,17 +669,30 @@ export default defineComponent({
 
   methods: {
 
-    moveOneDayForward() {
-      this.selectedTime += MILLISECONDS_PER_DAY;
+    clearPlayingInterval() {
+      if (this.playingIntervalId !== null) {
+        clearInterval(this.playingIntervalId);
+        this.playingIntervalId = null;
+      }
     },
 
-    moveOneDayBackward() {
-      this.selectedTime -= MILLISECONDS_PER_DAY;
+    moveOneIntervalForward() {
+      console.log("selected time", this.selectedTime);
+      this.selectedTime += MILLISECONDS_PER_INTERVAL;
+    },
+
+    moveOneIntervalBackward() {
+      this.selectedTime -= MILLISECONDS_PER_INTERVAL;
     },
 
     toDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+    },
+
+    toTimeString(date: Date) {
+      date = new Date(date.getTime() + this.selectedTimezoneOffset); // ignore timezone
+      return `${date.getUTCHours()}:${date.getUTCMinutes()}`;
     },
 
     closeSplashScreen() {
@@ -622,6 +705,12 @@ export default defineComponent({
       if(this.showHorizon) {
         this.updateHorizon();
       }
+    },
+
+    onTimeSliderChange() {
+      this.$nextTick(() => {
+        this.updateHorizon(this.dateTime);
+      });
     },
 
     logLocation() {
@@ -824,8 +913,28 @@ export default defineComponent({
       this.clearAnnotations();
     },    
 
+    onPointerMove(event: PointerEvent) {
+      if (!this.isPointerMoving && this.pointerStartPosition !== null) {
+        const dist = Math.sqrt((event.pageX - this.pointerStartPosition.x) ** 2 + (event.pageY - this.pointerStartPosition.y) ** 2);
+        if (dist > this.pointerMoveThreshold) {
+          this.isPointerMoving = true;
+        }
+      }
+    },
+
+    onPointerDown(event: PointerEvent) {
+      this.isPointerMoving = false;
+      this.pointerStartPosition = { x: event.pageX, y: event.pageY };
+    },
+
+    onPointerUp() {
+      this.pointerStartPosition = null;
+      this.isPointerMoving = false;
+    },
+
+
     updateForDateTime() {
-      if (!this.dontSetTime) { this.setTime(this.dateTime); }
+      // if (!this.dontSetTime) { this.setTime(this.dateTime); }
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
@@ -863,22 +972,39 @@ export default defineComponent({
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
     },
-    selectedDate() {
-      this.updateForDateTime();
-    },
+    // selectedDate() {
+    //   this.updateForDateTime();
+    // },
     selectedTimezone(newTz: string, oldTz: string) {
       const newOffset = getTimezoneOffset(newTz);
       const oldOffset = getTimezoneOffset(oldTz);
       let newHours = this.timeOfDay.hours + ((newOffset - oldOffset) / (1000*60*60));
       if (newHours >= 24) {
         newHours -= 24;
-        this.moveOneDayForward();
+        this.moveOneIntervalForward();
       } else if (newHours < 0) {
         newHours += 24;
-        this.moveOneDayBackward();
+        this.moveOneIntervalBackward();
       }
       this.timeOfDay.hours = newHours;
     },
+
+    playing(play: boolean) {
+      this.clearPlayingInterval();
+      if (play) {
+        this.playingIntervalId = setInterval(() => {
+          if (this.selectedTime < maxTime) {
+            this.moveOneIntervalForward();
+          } else {
+            this.selectedTime = minTime;
+          }
+          this.$nextTick(() => {
+            // this.updateViewForDate();
+          });
+        }, 350);
+      }
+    },
+
   },
 });
 </script>
@@ -1059,6 +1185,34 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+#tools {
+  z-index: 10;
+  color: #fff;
+  width: 100%;
+
+  .opacity-range {
+    width: 50vw;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  select {
+    background: white;
+    color: black;
+    border-radius: 3px;
+  }
+}
+
+.tool-container {
+  display: flex;
+  width: 99%;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  pointer-events: auto;
 }
 
 #controls {
@@ -1281,4 +1435,46 @@ video {
 .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
   display: none;
 }
+
+// Styling the slider
+
+#sliderlabel {
+  padding: 5px 10px;
+  margin:0 5px;
+  color:#fff !important;
+  background-color: var(--accent-color);
+  overflow: visible;
+}
+
+#slider {
+  width: 100% !important;
+  margin: 5px 30px;
+}
+
+.vue-slider-process {
+  background-color: pink !important;
+}
+
+.vue-slider-dot-tooltip-inner {
+  cursor: grab;
+  padding: 4px 10px !important;
+  color: pink !important;
+  background-color: var(--accent-color) !important;
+  border: 1px solid var(--accent-color) !important;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.vue-slider-dot-handle {
+  cursor: grab;
+  background-color: var(--accent-color) !important;
+  border: 1px solid black !important;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 </style>

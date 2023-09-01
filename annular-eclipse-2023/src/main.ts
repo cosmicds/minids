@@ -7,6 +7,9 @@ import TransitionExpand from "./TransitionExpand.vue";
 
 import "./polyfills";
 
+import VueSlider from "vue-slider-component";
+import 'vue-slider-component/theme/default.css';
+
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -24,6 +27,8 @@ import {
   faGear,
   faChevronDown,
   faClock,
+  faPlay,
+  faPause,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -32,6 +37,8 @@ library.add(faVideo);
 library.add(faGear);
 library.add(faChevronDown);
 library.add(faClock);
+library.add(faPlay);
+library.add(faPause);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -69,6 +76,7 @@ createApp(AnnularEclipse2023, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
   .component('location-selector', LocationSelector)
+  .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
 
