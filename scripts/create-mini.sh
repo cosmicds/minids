@@ -46,6 +46,7 @@ mv MainComponent.vue ${pascal_case_name}.vue
 
 cd ../public
 sed -i.bak "s/minids-template/$name/g" index.html
+sed -i.bak "s/MiniDS data story template/$pascal_case_name/g" index.html
 rm -f index.html.bak
 
 cd ..
