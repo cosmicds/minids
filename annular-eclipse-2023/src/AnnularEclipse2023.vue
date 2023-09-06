@@ -898,12 +898,10 @@ export default defineComponent({
         });
         const poly = new Poly();
         points.forEach(point => poly.addPoint(...point));
-        poly.set_lineColor(color);
         poly.set_fill(true);
         poly.set_fillColor(color);
-        // Need to fix error: 
-        // Property 'set_fillColorWithOpacity' does not exist on type 'Poly'.
-        // poly.set_fillColorWithOpacity(color).opacity;
+        poly.set_opacity(0.6);
+        poly.set_lineWidth(0); // This removes the seam that appears between the polygons when opacity < 1
         this.addAnnotation(poly);
       }
 
@@ -945,7 +943,7 @@ export default defineComponent({
       if (this.showHorizon) {
         this.createHorizon(when);
         // uncomment next line when we sort out opacity of sky annotation
-        // this.createSky(when);
+        this.createSky(when);
       } else {
         this.removeHorizon();
       }
