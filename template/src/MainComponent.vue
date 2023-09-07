@@ -10,6 +10,9 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
 
+
+    <!-- This contains the splash screen content -->
+
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -39,6 +42,9 @@
       </div>
     </transition>
 
+
+    <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
+
     <div class="top-content">
       <div id="left-buttons">
         <icon-button
@@ -64,8 +70,30 @@
       </div>
     </div>
 
+
+    <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
+
     <div class="bottom-content">
+      <div id="project-credits">
+        <div id="icons-container">
+          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
+          ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
+          /></a>
+          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
+            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
+          /></a>
+          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
+          /></a>
+          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
+            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
+          /></a>
+        </div>
+      </div>
     </div>
+
+
+    <!-- This dialog contains the video that is displayed when the video icon is clicked -->
 
     <v-dialog
       id="video-container"
@@ -91,6 +119,9 @@
         </video>
       </div>
     </v-dialog>
+
+
+    <!-- This dialog contains the informational content that is displayed when the book icon is clicked -->
 
     <v-dialog
       :style="cssVars"
@@ -257,24 +288,45 @@ export default defineComponent({
   },
 
   computed: {
+
+    /**
+    These properties relate to the state of the mini.
+    `isLoading` is a bit redundant here, but it could potentially have
+    independent logic.
+    */
     ready(): boolean {
       return this.layersLoaded && this.positionSet;
     },
     isLoading(): boolean {
       return !this.ready;
     },
+
+    /**
+    Properties related to device/screen characteristics
+    */
     smallSize(): boolean {
       return this.$vuetify.display.smAndDown;
     },
     mobile(): boolean {
       return this.smallSize && this.touchscreen;
     },
+
+    /**
+    This lets us inject component data into element CSS
+    */
     cssVars() {
       return {
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
+
+    /**
+    Computed flags that control whether the relevant dialogs display.
+    The `sheet` data member stores which sheet is open, so these are just
+    computed wrappers around modifying/querying that which can be used as
+    dialog v-model values
+    */
     showTextSheet: {
       get(): boolean {
         return this.sheet === 'text';
@@ -322,6 +374,8 @@ export default defineComponent({
   src: url("../../assets/HighwayGothicNarrow.ttf");
 }
 
+
+/* Overall page styling */
 html {
   height: 100%;
   margin: 0;
@@ -349,6 +403,11 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+
+/*
+  The main content of the mini.
+  The --app-content-height allows the app to shrink when the text is open
+ */
 #main-content {
   position: fixed;
   width: 100%;
@@ -386,6 +445,8 @@ body {
   opacity: 0;
 }
 
+
+/* The modal loading window */
 .modal {
   position: absolute;
   top: 0px;
@@ -454,19 +515,8 @@ body {
   }
 }
 
-.pointer {
-  cursor: pointer;
-}
 
-.control-icon {
-  pointer-events: auto;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-}
-
+/* Top and bottom content */
 .top-content {
   position: absolute;
   top: 1rem;
@@ -496,6 +546,7 @@ body {
   gap: 10px;
 }
 
+/* Splash screen */
 #splash-overlay {
   position: fixed;
   align-items: center;
@@ -517,6 +568,55 @@ body {
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
 }
 
+#project-credits {
+  color: #ddd;
+  font-size: calc(0.7em + 0.2vw);
+  justify-self: flex-end;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
+
+  a {
+    text-decoration: none;
+    color: #fff;
+    pointer-events: auto;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &[class^="share-network"]:hover {
+      text-decoration: none;
+      filter: brightness(75%);
+    }
+  }
+
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
+  }
+
+  @media only screen and (max-width: 600px) {
+  img {
+    height: 24px;
+  }
+}
+
+  svg {
+    vertical-align: middle;
+    height: 24px;
+  }
+}
+
+/* Video and text dialogs */
 .video-wrapper {
   height: 100%;
   background: black;
@@ -567,6 +667,8 @@ video {
   }
 }
 
+
+/* Miscellaneous class styling */
 .close-icon {
   position: absolute;
   top: 10px;
@@ -583,6 +685,19 @@ video {
   }
 }
 
+.pointer {
+  cursor: pointer;
+}
+
+.control-icon {
+  pointer-events: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+}
+
 .scrollable {
   overflow-y: auto;
 }
@@ -592,6 +707,12 @@ video {
   border-bottom-right-radius: 0px !important;
 }
 
+
+/*
+  These last few blocks contain some hackery related to the text tabs.
+  The close icon isn't part of the standard v-tabs setup, so we need to
+  create some space for that ourselves.
+ */
 #tab-items {
   // padding-bottom: 2px !important;
 

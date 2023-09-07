@@ -8,6 +8,10 @@ function to_pascal_case {
     echo $1 | perl -pe 's/(^|(_|-))./uc($&)/ge;s/_|-//g'
 }
 
+function space_split_pascal {
+    echo $1 | perl -pe 's/(?<!^)([A-Z]+)/ $1/g'
+}
+
 if [[ $# -lt 1 ]]; then
     echo "Mini name is missing!"
     exit 2
@@ -37,6 +41,7 @@ yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/cli-
      @vue/cli-service @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
 node ../scripts/update-name.js "@minids/${name}"
 pascal_case_name=$(to_pascal_case $name)
+title=$(space_split_pascal ${pascal_case_name})
 
 cd src
 sed -i.bak "s/MainComponent/${pascal_case_name}/g" main.ts
@@ -46,6 +51,8 @@ mv MainComponent.vue ${pascal_case_name}.vue
 
 cd ../public
 sed -i.bak "s/minids-template/$name/g" index.html
+sed -i.bak "s/MiniDS data story template/$pascal_case_name/g" index.html
+sed -i.bak "s/MiniDS Template/$title/g" index.html
 rm -f index.html.bak
 
 cd ..
