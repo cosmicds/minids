@@ -68,7 +68,19 @@
       <div id="right-buttons">
       </div>
     </div>
-
+    
+    <div id="eclipse-location-selector">
+      <v-select
+        :items="eclipsePathLocations"
+        item-title="name"
+        :return-object="true"
+        label="Select eclipse viewing location"
+        :color="accentColor"
+        :dense="true"
+        @update:model-value="updateLocation"
+      >
+      </v-select>
+    </div>
 
     <div class="bottom-content">
       <div
@@ -374,7 +386,7 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
-// import tzlookup from "tz-lookup";
+import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
 
@@ -496,6 +508,63 @@ export default defineComponent({
       } as LocationRad,
       locationErrorMessage: "",
 
+      eclipsePathLocations: [
+        {
+          name: "Albuquerque, NM",
+          latitudeRad: D2R * 35.106766,
+          longitudeRad: D2R * -106.629181,
+          eclipseFracion: 0.97
+        },
+        {
+          name: "Eugene, OR",
+          latitudeRad: D2R * 44.052069,
+          longitudeRad: D2R * -123.086754,
+          eclipseFracion: .95
+        },
+        {
+          name: "Las Vegas, NV",
+          latitudeRad: D2R * 36.169941,
+          longitudeRad: D2R * -115.139830,
+          eclipseFracion: .87
+        },
+        {
+          name: "Denver, CO",
+          latitudeRad: D2R * 39.739235,
+          longitudeRad: D2R * -104.990250,
+          eclipseFracion: .85
+        },
+        {
+          name: "Los Angeles, CA",
+          latitudeRad: D2R * 34.05,
+          longitudeRad: D2R * -118.24,
+          eclipseFracion: .78
+        },
+        {
+          name: "Omaha, NE",
+          latitudeRad: D2R * 41.256538,
+          longitudeRad: D2R * -95.934502,
+          eclipseFracion: .68
+        },
+        {
+          name: "Chicago, IL",
+          latitudeRad: D2R * 41.878113,
+          longitudeRad: D2R * -87.629799,
+          eclipseFracion: .54
+        },
+        {
+          name: "New York, NY",
+          latitudeRad: D2R * 40.712776,
+          longitudeRad: D2R * -74.005974,
+          eclipseFracion: .35
+        },
+        {
+          name: "Boston, MA",
+          latitudeRad: D2R * 42.360081,
+          longitudeRad: D2R * -71.058884,
+          eclipseFracion: .29
+        },
+      ],
+      
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
@@ -705,6 +774,22 @@ export default defineComponent({
       if(this.showHorizon) {
         this.updateHorizon();
       }
+    },
+
+    //eslint-disable-next-line
+    updateLocation(location: LocationRad | null) {
+      if (location == null) {
+        return;
+      }
+      
+      this.location = {
+        latitudeRad: location.latitudeRad,
+        longitudeRad: location.longitudeRad
+      };
+
+      console.log("location", this.location);
+      this.updateWWTLocation();
+      this.updateHorizon();
     },
 
     onTimeSliderChange() {
@@ -987,6 +1072,22 @@ export default defineComponent({
       this.timeOfDay.hours = newHours;
     },
 
+    location(loc: LocationRad, oldLoc: LocationRad) {
+      const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
+      
+      if (oldLoc.latitudeRad * loc.latitudeRad < 0) {
+        Grids._altAzTextBatch = null;
+      }
+
+      this.selectedTimezone = tzlookup(...locationDeg);
+      this.updateWWTLocation();
+
+      // We need to let the location update before we redraw the horizon
+      this.$nextTick(() => {
+        this.updateHorizon();
+      });
+    },
+    
     playing(play: boolean) {
       this.clearPlayingInterval();
       if (play) {
@@ -1473,6 +1574,14 @@ video {
   &:active {
     cursor: grabbing;
   }
+}
+
+#eclipse-location-selector {
+  position: absolute;
+  top: 25%;
+  left: 1em;
+  width: 300px;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 </style>
