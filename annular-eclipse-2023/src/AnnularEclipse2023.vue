@@ -637,6 +637,8 @@ export default defineComponent({
       console.log("selected time", this.selectedTime);
 
     });
+
+    this.timeOfDay = { ...this.timeOfDay }; // force times to sync after everything is mounted
   },
 
   computed: {
