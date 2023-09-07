@@ -37,7 +37,7 @@ node scripts/add-workspace.js $name
 # Do some setup in the new directory
 cd $name
 yarn add vue vuetify webpack-plugin-vuetify @fortawesome/fontawesome-svg-core @fortawesome/vue-fontawesome @fortawesome/free-solid-svg-icons
-yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/cli-plugin-eslint @vue/cli-plugin-typescript \
+yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser @typescript-eslint/typescript-estree @vue/cli-plugin-eslint @vue/cli-plugin-typescript \
      @vue/cli-service @vue/compiler-sfc @vue/eslint-config-typescript eslint eslint-plugin-vue less less-loader typescript webpack
 node ../scripts/update-name.js "@minids/${name}"
 pascal_case_name=$(to_pascal_case $name)
