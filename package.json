@@ -1,27 +1,29 @@
 {
-    "name": "minids-monorepo",
-    "private": true,
-    "workspaces": [
-        "carina",
-        "common",
-        "green-comet",
-        "pinwheel-supernova",
-        "tests"
-    ],
-    "scripts": {
-        "build": "yarn workspaces foreach -vt run build",
-        "clean": "yarn workspaces foreach -vt run clean",
-        "lint": "yarn workspaces foreach -vt run lint"
-    },
-    "dependencies": {
-        "@mdi/font": "^7.1.96",
-        "@minids/carina": "workspace:*",
-        "@minids/common": "workspace:*",
-        "@minids/tests": "workspace:*"
-    },
-    "packageManager": "yarn@3.3.0",
-    "devDependencies": {
-        "@types/chai": "^4.3.4",
-        "rimraf": "^4.1.0"
-    }
+  "name": "minids-monorepo",
+  "private": true,
+  "workspaces": [
+    "carina",
+    "common",
+    "green-comet",
+    "pinwheel-supernova",
+    "tests"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach -vt run build",
+    "clean": "yarn workspaces foreach -vt run clean",
+    "lint": "yarn workspaces foreach -vt run lint",
+    "create-mini": "scripts/create-mini.sh"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.1.96",
+    "@minids/carina": "workspace:*",
+    "@minids/common": "workspace:*",
+    "@minids/tests": "workspace:*"
+  },
+  "packageManager": "yarn@3.3.0",
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "rimraf": "^4.1.0",
+    "tslib": "^2.6.2"
+  }
 }
