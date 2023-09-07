@@ -1033,6 +1033,14 @@ export default defineComponent({
       this.updateHorizon();
     },
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+      const date = this.selectedDate;
+      const offset = this.selectedTimezoneOffset / (1000*60*60);
+      date.setUTCHours(this.timeOfDay.hours - offset, this.timeOfDay.minutes, this.timeOfDay.seconds);
+      this.selectedTime = date.getTime();
+    },
+    
+    dateTime(_date: Date) {
+      console.log('watch dateTime');
       this.updateForDateTime();
     },
 
