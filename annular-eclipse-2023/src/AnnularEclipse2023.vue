@@ -68,7 +68,47 @@
       <div id="right-buttons">
       </div>
     </div>
-
+    
+    <div id="track-time">
+        <table class="show-time">
+          <tr>
+            <td class="ui-text"> selectedTimezone: </td>
+            <td class="ui-text"> {{ selectedTimezone }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> selectedTimezoneOffset: </td>
+            <td class="ui-text"> {{ selectedTimezoneOffset / (1000 * 60 * 60) }} hr </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> selectedTime (raw): </td>
+            <td class="ui-text"> {{ selectedTime }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> selectedTime: </td>
+            <td class="ui-text"> {{ new Date(selectedTime).toUTCString() }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> selectedDate: </td>
+            <td class="ui-text"> {{ selectedDate.toUTCString() }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> wwtCurrentTime: </td>
+            <td class="ui-text"> {{ wwtCurrentTime.toUTCString() }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> timeOfDay (from date-picker): </td>
+            <td class="ui-text"> {{ timeOfDay }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> dayFrac: </td>
+            <td class="ui-text"> {{ dayFrac  }} </td>
+          </tr>
+          <tr>
+            <td class="ui-text"> dateTime: </td>
+            <td class="ui-text"> {{ dateTime.toUTCString() }} </td>
+          </tr>
+        </table>
+      </div>
 
     <div class="bottom-content">
       <div
@@ -1474,5 +1514,20 @@ video {
     cursor: grabbing;
   }
 }
+
+#track-time {
+  position: absolute;
+  top: 15%;
+  margin: 0 30px;
+  color: white;
+  font-size: 0.8em;
+  
+}
+
+table.show-time tr>td:first-child {
+  font-weight: bold;
+  padding-right: 1em;
+}
+
 
 </style>
