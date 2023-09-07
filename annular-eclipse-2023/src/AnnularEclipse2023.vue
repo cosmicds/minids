@@ -729,14 +729,30 @@ export default defineComponent({
       this.selectedTime -= MILLISECONDS_PER_INTERVAL;
     },
 
-    toDateString(date: Date) {
+    toUTCDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
+    toUTCTimeString(date: Date) {
+      const minutes = date.getUTCMinutes();
+      const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      // get am pm
+      const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
+      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+    },
+
+    toLocaleTimeString(date: Date) {
+      date = new Date(date.getTime() + this.selectedTimezoneOffset);
+      const minutes = date.getUTCMinutes();
+      const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      // get am pm
+      const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
+      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+    },
+
     toTimeString(date: Date) {
-      date = new Date(date.getTime() + this.selectedTimezoneOffset); // ignore timezone
-      return `${date.getUTCHours()}:${date.getUTCMinutes()}`;
+      return this.toLocaleTimeString(date);
     },
 
     closeSplashScreen() {
