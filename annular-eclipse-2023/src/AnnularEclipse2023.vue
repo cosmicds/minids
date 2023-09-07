@@ -640,6 +640,9 @@ export default defineComponent({
 
     dateTime() {
       const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
+      let time = this.selectedDate.getTime();
+      time -= time % MILLISECONDS_PER_DAY;
+      return new Date(time + todMs);
     },    
 
     selectedTimezoneOffset() {
