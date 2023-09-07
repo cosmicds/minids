@@ -1,4 +1,5 @@
 {
+  "draft": true,
   "version": "0.0.0",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
+    "@typescript-eslint/typescript-estree": "7.0.0-alpha.0",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
@@ -27,7 +29,7 @@
     "eslint-plugin-vue": "^9.17.0",
     "less": "^4.2.0",
     "less-loader": "^11.1.3",
-    "typescript": "^5.2.2",
+    "typescript": "latest",
     "webpack": "^5.88.2"
   },
   "name": "@minids/annular-eclipse-2023"

@@ -49,9 +49,8 @@ import tzlookup from "tz-lookup";
 import { getTimezoneOffset } from "date-fns-tz";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
-// eslint-disable-next-line
-import Notifications from "@kyvg/vue3-notification";
-import { defineComponent } from "vue";
+import _Notifications from "@kyvg/vue3-notification";
+import { defineComponent, PropType } from "vue";
 import IconButton from "./IconButton.vue";
 
 library.add(faLocationPin);
@@ -74,6 +73,15 @@ export default defineComponent({
     activatorColor: {
       type: String,
       default: "#ffffff"
+    },
+    initialLocation: {
+      type: Object as PropType<LocationDeg>,
+      default() {
+        return {
+          latitudeDeg: 42.3814,
+          longitudeDeg: -71.1281
+        };
+      }
     }
   },
 
@@ -85,11 +93,8 @@ export default defineComponent({
     return {
       circle: null as L.Circle | null,
       map: null as Map | null,
-      location: {
-        latitudeDeg: 42.3814,
-        longitudeDeg: -71.1281
-      } as LocationDeg,
-      timezone: "America/New_York",
+      location: this.initialLocation,
+      timezone: tzlookup(this.initialLocation.latitudeDeg, this.initialLocation.longitudeDeg),
       locationErrorMessage: "",
       show: false
     };
