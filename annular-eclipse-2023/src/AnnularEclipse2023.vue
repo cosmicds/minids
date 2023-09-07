@@ -538,6 +538,9 @@ export default defineComponent({
         longitudeRad: D2R * -106.629181
       } as LocationRad,
       locationErrorMessage: "",
+      
+      syncDateTimeWithWWTCurrentTime: true,
+      syncDateTimewithSelectedTime: true,
 
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -992,7 +995,7 @@ export default defineComponent({
 
 
     updateForDateTime() {
-      // if (!this.dontSetTime) { this.setTime(this.dateTime); }
+      this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
