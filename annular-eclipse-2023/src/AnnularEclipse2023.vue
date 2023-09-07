@@ -642,10 +642,12 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
-      let time = this.selectedDate.getTime();
-      time -= time % MILLISECONDS_PER_DAY;
-      return new Date(time + todMs);
+      const hours = this.timeOfDay.hours - this.selectedTimezoneOffset / (1000 * 60 * 60);
+      const minutes = this.timeOfDay.minutes;
+      const seconds = this.timeOfDay.seconds;
+      const time = this.selectedDate;
+      time.setUTCHours(hours, minutes, seconds);
+      return new Date(time);
     },    
 
     selectedTimezoneOffset() {
