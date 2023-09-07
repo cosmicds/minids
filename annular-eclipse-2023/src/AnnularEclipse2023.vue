@@ -1035,9 +1035,18 @@ export default defineComponent({
     timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
       this.updateForDateTime();
     },
-    // selectedDate() {
-    //   this.updateForDateTime();
-    // },
+
+    selectedTime(_time: number) {
+      const date = new Date(this.selectedTime);
+      const hms = {
+        // need the local time here, not UTC, so add the offset
+        hours: date.getUTCHours() + this.selectedTimezoneOffset / (1000*60*60),
+        minutes: date.getUTCMinutes(),
+        seconds: date.getUTCSeconds()
+      };
+      this.timeOfDay = hms;
+    },
+
     selectedTimezone(newTz: string, oldTz: string) {
       const newOffset = getTimezoneOffset(newTz);
       const oldOffset = getTimezoneOffset(oldTz);
