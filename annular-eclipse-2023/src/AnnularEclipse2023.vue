@@ -437,6 +437,9 @@ const R2D = 180 / Math.PI;
 const minTime = Date.UTC(2023, 9, 14, 15, 0); // eclipse starts at 9:13am MT in Albuquerque
 const maxTime = Date.UTC(2023, 9, 14, 18, 30); // eclipse ends at 12:09pm MT in Albuquerque
 
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
+
 const secondsInterval = 10;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
 
@@ -636,9 +639,7 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      return new Date();
-      // const todMs = this.dayFrac * MILLISECONDS_PER_INTERVAL;
-      // return new Date(this.selectedDate.getTime() + todMs);
+      const todMs = this.dayFrac * MILLISECONDS_PER_DAY;
     },    
 
     selectedTimezoneOffset() {
@@ -676,14 +677,14 @@ export default defineComponent({
       return Settings.get_active();
     },
     // dontSetTime(): boolean {
-    //   return this.selectedTime %MILLISECONDS_PER_INTERVAL !== 0;
+    //   return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
     // },
     dayFrac(): number {
       const dateForTOD = new Date();
       const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
-      return todMs / MILLISECONDS_PER_INTERVAL;
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
