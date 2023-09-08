@@ -591,7 +591,7 @@ export default defineComponent({
       LayerManager._draw = layerManagerDraw;      
 
       this.updateWWTLocation();
-      this.setClockSync(true); // set to false to pause
+      this.setClockSync(false); // set to false to pause
       this.setClockRate(1); //
 
       this.gotoRADecZoom({
