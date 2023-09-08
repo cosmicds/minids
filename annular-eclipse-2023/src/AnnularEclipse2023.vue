@@ -156,13 +156,13 @@
               label="Horizon"
               hide-details
             />
-            <div
+            <!-- <div
               style="color:white;"
               class="mt-3"
             >
               Selected location's time:
-            </div>
-            <date-picker
+            </div> -->
+            <!-- <date-picker
               dark
               time-picker
               enable-seconds
@@ -179,7 +179,7 @@
                   :color="accentColor"
                 ></font-awesome-icon>
               </template>
-            </date-picker>
+            </date-picker> -->
             <!-- <v-btn
               block
               :color="accentColor"
@@ -505,6 +505,7 @@ export default defineComponent({
   },
   data() {
     const totalEclipseTimeNMTZ = new Date("2023-10-14T10:48");
+    const _totalEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
     console.log("min/max time UTC", minTime, maxTime);
     const minutc = new Date(minTime);
     const maxutc = new Date(maxTime);
@@ -531,7 +532,7 @@ export default defineComponent({
 
       // Albuquerque, NM
       timeOfDay: { hours: totalEclipseTimeNMTZ.getHours(), minutes: totalEclipseTimeNMTZ.getMinutes(), seconds: totalEclipseTimeNMTZ.getSeconds() },
-      selectedTime: minTime,
+      selectedTime: _totalEclipseTimeUTC.getTime(), //1697302060000,
       selectedTimezone: "America/Denver",
       location: {
         latitudeRad: D2R * 35.106766,
@@ -640,18 +641,25 @@ export default defineComponent({
 
     });
 
-    this.timeOfDay = { ...this.timeOfDay }; // force times to sync after everything is mounted
+    // this.timeOfDay = { ...this.timeOfDay }; // force times to sync after everything is mounted
+    // force times to sync after everything is mounted
+    // setInterval(() => {
+    //   console.log("sync clocks");
+    //   console.log(this.selectedTime);
+    //   console.log(this.wwtCurrentTime.getTime());
+    //   // this.selectedTime = this.wwtCurrentTime.getTime();
+    // }, 1000);
   },
 
   computed: {
 
     dateTime() {
-      const hours = this.timeOfDay.hours - this.selectedTimezoneOffset / (1000 * 60 * 60);
-      const minutes = this.timeOfDay.minutes;
-      const seconds = this.timeOfDay.seconds;
-      const time = this.selectedDate;
-      time.setUTCHours(hours, minutes, seconds);
-      return new Date(time);
+      // const hours = this.timeOfDay.hours - this.selectedTimezoneOffset / (1000 * 60 * 60);
+      // const minutes = this.timeOfDay.minutes;
+      // const seconds = this.timeOfDay.seconds;
+      // const time = this.selectedDate;
+      // time.setUTCHours(hours, minutes, seconds);
+      return new Date(this.selectedTime);
     },    
 
     selectedTimezoneOffset() {
@@ -1036,12 +1044,12 @@ export default defineComponent({
     showHorizon(_show: boolean) {
       this.updateHorizon();
     },
-    timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
-      const date = this.selectedDate;
-      const offset = this.selectedTimezoneOffset / (1000*60*60);
-      date.setUTCHours(this.timeOfDay.hours - offset, this.timeOfDay.minutes, this.timeOfDay.seconds);
-      this.selectedTime = date.getTime();
-    },
+    // timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+    //   const date = this.selectedDate;
+    //   const offset = this.selectedTimezoneOffset / (1000*60*60);
+    //   date.setUTCHours(this.timeOfDay.hours - offset, this.timeOfDay.minutes, this.timeOfDay.seconds);
+    //   this.selectedTime = date.getTime();
+    // },
     
     dateTime(_date: Date) {
       console.log('watch dateTime');
@@ -1049,20 +1057,19 @@ export default defineComponent({
     },
 
     selectedTime(_time: number) {
-      const date = new Date(this.selectedTime);
-      const hms = {
-        // need the local time here, not UTC, so add the offset
-        hours: date.getUTCHours() + this.selectedTimezoneOffset / (1000*60*60),
-        minutes: date.getUTCMinutes(),
-        seconds: date.getUTCSeconds()
-      };
-      this.timeOfDay = hms;
+      return;
+      // const date = new Date(this.selectedTime);
+      // const hms = {
+      //   // need the local time here, not UTC, so add the offset
+      //   hours: date.getUTCHours() + this.selectedTimezoneOffset / (1000*60*60),
+      //   minutes: date.getUTCMinutes(),
+      //   seconds: date.getUTCSeconds()
+      // };
+      // this.timeOfDay = hms;
     },
 
-    wwtCurrentTime(time: Date) {
-      if (this.syncDateTimeWithWWTCurrentTime) {
-        this.selectedTime = time.getTime();
-      }
+    wwtCurrentTime(_time: Date) {
+      // this.selectedTime = _time.getTime();
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
