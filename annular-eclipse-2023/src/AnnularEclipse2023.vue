@@ -63,7 +63,14 @@
           :activator-color="accentColor"
         >
         </location-selector>    
-    
+        <icon-button
+          fa-icon="sun"
+          :color="accentColor"
+          tooltip-text="Center view on Sun"
+          tooltip-location='top'
+          @activate="() => trackSun()"
+        >
+        </icon-button>
       </div>
       <div id="right-buttons">
       </div>
@@ -462,7 +469,7 @@ export default defineComponent({
     sunPlace.set_names(["Sun"]);
     sunPlace.set_classification(Classification.solarSystem);   
     sunPlace.set_target(SolarSystemObjects.sun);
-    sunPlace.set_zoomLevel(10);
+    sunPlace.set_zoomLevel(20);
 
     return {
       showSplashScreen: true,
@@ -551,9 +558,6 @@ export default defineComponent({
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
-
-        console.log(this);
-        console.log(this.sunPlace);
       }, 100);
 
       // If there are layers to set up, do that here!
@@ -1149,6 +1153,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  #center-buttons {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 .bottom-content {
