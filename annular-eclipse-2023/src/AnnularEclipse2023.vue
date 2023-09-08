@@ -614,6 +614,8 @@ export default defineComponent({
       LayerManager._draw = layerManagerDraw;      
 
       this.updateWWTLocation();
+      this.setClockSync(true);
+      this.setClockRate(1);
 
       this.gotoRADecZoom({
         // These are RA/Dec of Sun in Albuquerque close to max annularity. Since I don't know how to keep focus on the Sun in the web engine, I tried to set this up so the view would start here, but it isn't.
