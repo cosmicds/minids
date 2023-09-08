@@ -83,6 +83,8 @@ const tests: GreenCometTests = {
       "@selectedLocationTimeLabel", "@selectedLocationTimeInput",
       "@timeIcon", "@centerOnNowButton", "@playCometImagesButton"
     ]);
+
+    controls.click("@openCloseButton");
   },
 
   'Open video': function() {
@@ -165,7 +167,6 @@ const tests: GreenCometTests = {
   'Control Panel': function() {
     const controls = this.sections.controls;
 
-    controls.click("@openCloseButton");
     controls.expect.element("@openCloseButton").to.have.attribute("data-icon", "gear");
     expectAllNotPresent(controls, [
       "@gridInput", "@constellationsInput", "@horizonInput",
