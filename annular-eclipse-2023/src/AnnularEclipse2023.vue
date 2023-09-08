@@ -480,14 +480,14 @@ export default defineComponent({
     },
   },
   data() {
-    const totalEclipseTimeNMTZ = new Date("2023-10-14T10:48");
-    const _totalEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
+    const annularEclipseTimeNMTZ = new Date("2023-10-14T10:48");
+    const _annularEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
     console.log("min/max time UTC", minTime, maxTime);
     const minutc = new Date(minTime);
     const maxutc = new Date(maxTime);
     console.log("Date(min/maxTime):", minutc, maxutc);
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
-    console.log("date:", totalEclipseTimeNMTZ);
+    console.log("date:", annularEclipseTimeNMTZ);
     return {
       showSplashScreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -507,8 +507,8 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,      
 
       // Albuquerque, NM
-      timeOfDay: { hours: totalEclipseTimeNMTZ.getHours(), minutes: totalEclipseTimeNMTZ.getMinutes(), seconds: totalEclipseTimeNMTZ.getSeconds() },
-      selectedTime: _totalEclipseTimeUTC.getTime(), //1697302060000,
+      timeOfDay: { hours: annularEclipseTimeNMTZ.getHours(), minutes: annularEclipseTimeNMTZ.getMinutes(), seconds: annularEclipseTimeNMTZ.getSeconds() },
+      selectedTime: _annularEclipseTimeUTC.getTime(), //1697302060000,
       selectedTimezone: "America/Denver",
       location: {
         latitudeRad: D2R * 35.106766,
