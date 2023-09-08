@@ -1059,6 +1059,12 @@ export default defineComponent({
       this.timeOfDay = hms;
     },
 
+    wwtCurrentTime(time: Date) {
+      if (this.syncDateTimeWithWWTCurrentTime) {
+        this.selectedTime = time.getTime();
+      }
+    },
+
     selectedTimezone(newTz: string, oldTz: string) {
       const newOffset = getTimezoneOffset(newTz);
       const oldOffset = getTimezoneOffset(oldTz);
