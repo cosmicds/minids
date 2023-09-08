@@ -513,7 +513,7 @@ export default defineComponent({
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
     console.log("date:", totalEclipseTimeNMTZ);
     return {
-      showSplashScreen: true,
+      showSplashScreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -615,7 +615,7 @@ export default defineComponent({
       LayerManager._draw = layerManagerDraw;      
 
       this.updateWWTLocation();
-      this.setClockSync(false); // set to false to pause
+      this.setClockSync(true); // set to false to pause
       this.setClockRate(1); //
 
       this.gotoRADecZoom({
@@ -1070,6 +1070,7 @@ export default defineComponent({
 
     wwtCurrentTime(_time: Date) {
       // this.selectedTime = _time.getTime();
+      this.updateHorizon(_time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
