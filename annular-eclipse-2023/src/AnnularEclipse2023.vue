@@ -366,11 +366,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-// import { distance } from "@wwtelescope/astro";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
+import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
-// import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
-// import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, GetName } from "@wwtelescope/engine";
+import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
@@ -515,37 +514,14 @@ export default defineComponent({
 
   mounted() {
     this.waitForReady().then(async () => {
-      
-      this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      // this.imagesetFolder = await this.loadImageCollection({
-      //   url: this.wtml.eclipse,
-      //   loadChildFolders: false
-      // });
-      // const children = this.imagesetFolder.get_children() ?? [];
-      // const layerPromises: Promise<Layer>[] = [];
-      // children.forEach((item) => {
-      //   if (!(item instanceof Place)) { return; }
-      //   const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-      //   if (imageset == null) { return; }
-      //   const name = imageset.get_name();
-      //   layerPromises.push(this.addImageSetLayer({
-      //     url: imageset.get_url(),
-      //     mode: "autodetect",
-      //     name: name,
-      //     goto: false
-      //   }).then((layer) => {
-      //     // this.imagesetLayers[name] = layer;
-      //     // applyImageSetLayerSetting(layer, ["opacity", 0]);
-      //     return layer;
-      //   }));
-      // });  
+      this.backgroundImagesets = [...skyBackgroundImagesets];
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
       this.setTime(this.dateTime);
 
-      this.wwtSettings.set_localHorizonMode(true);
+      //this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
@@ -569,21 +545,25 @@ export default defineComponent({
 
       this.updateWWTLocation();
 
-      this.gotoRADecZoom({
-        // These are RA/Dec of Sun in Albuquerque close to max annularity. Since I don't know how to keep focus on the Sun in the web engine, I tried to set this up so the view would start here, but it isn't.
-        raRad: 3.481,
-        decRad: -0.145,
-        zoomDeg: 1,
-        instant: true
-      }).then(() => this.positionSet = true);
+      setTimeout(() => {
+        const sunPlace = new Place();
+        sunPlace.set_names(["Sun"]);
+        sunPlace.set_classification(Classification.solarSystem);   
+        sunPlace.set_target(SolarSystemObjects.sun);
+        sunPlace.set_zoomLevel(10);
+        this.wwtControl.renderContext.set_solarSystemTrack(0);
+        const options: GotoTargetOptions = {
+          place: sunPlace,
+          instant: true,
+          noZoom: false,
+          trackObject: true 
+        };
+        this.gotoTarget(options).then(() => this.positionSet = true);
 
-      // this.gotoTarget({
-      //   place: this.sunPlace,
-      //   noZoom: true,
-      //   instant: true,
-      //   trackObject: true
-      // });
-      // console.log(this.sunPlace);
+        this.setClockRate(100);
+        console.log(this);
+        console.log(sunPlace);
+      }, 100);
 
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
