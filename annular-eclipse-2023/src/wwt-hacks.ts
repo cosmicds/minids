@@ -199,3 +199,43 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
   renderContext.set_world(matOld);
   renderContext.set_worldBaseNonRotating(matOldNonRotating);
 };
+
+// This function is being overwritten to get around the bug(?) described in https://github.com/WorldWideTelescope/wwt-webgl-engine/issues/268
+// Since we were patching anyway, I've stripped out some if-else paths that won't ever be visited in this story
+export function updateViewParameters() {
+  if (this.renderContext.space && this._tracking && this._trackingObject != null) {
+     var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(this._trackingObject.get_RA(), this._trackingObject.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
+     this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
+     this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
+   }
+   else if (!this.get_solarSystemMode()) {
+     this._tracking = false;
+     this._trackingObject = null;
+   }
+   var oneMinusDragCoefficient = 1 - 0.8;
+   var dc = 0.8;
+   if (!this._tracking) {
+     var minDelta = (this.renderContext.viewCamera.zoom / 4000);
+     if (this.renderContext.viewCamera.zoom > 360) {
+       minDelta = (360 / 40000);
+     }
+     if ((((Math.abs(this.renderContext.targetAlt - this.renderContext.alt) >= minDelta) | (Math.abs(this.renderContext.targetAz - this.renderContext.az) >= minDelta)) === 1)) {
+       this.renderContext.alt += (this.renderContext.targetAlt - this.renderContext.alt) / 10;
+       if (Math.abs(this.renderContext.targetAz - this.renderContext.az) > 170) {
+         if (this.renderContext.targetAz > this.renderContext.az) {
+           this.renderContext.az += (this.renderContext.targetAz - (360 + this.renderContext.az)) / 10;
+         }
+         else {
+           this.renderContext.az += ((360 + this.renderContext.targetAz) - this.renderContext.az) / 10;
+         }
+       }
+       else {
+         this.renderContext.az += (this.renderContext.targetAz - this.renderContext.az) / 10;
+       }
+       this.renderContext.az = ((this.renderContext.az + 720) % 360);
+     }
+   }
+   this.renderContext.viewCamera.zoom = dc * this.renderContext.viewCamera.zoom + oneMinusDragCoefficient * this.renderContext.targetCamera.zoom;
+   this.renderContext.viewCamera.rotation = dc * this.renderContext.viewCamera.rotation + oneMinusDragCoefficient * this.renderContext.targetCamera.rotation;
+   this.renderContext.viewCamera.angle = dc * this.renderContext.viewCamera.angle + oneMinusDragCoefficient * this.renderContext.targetCamera.angle;
+}

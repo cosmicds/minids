@@ -367,7 +367,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
-import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
@@ -375,7 +374,7 @@ import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl,
 import { getTimezoneOffset } from "date-fns-tz";
 // import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -449,15 +448,6 @@ export default defineComponent({
         };
       },
     },
-    sunPlace: {
-      type: Object as PropType<Place>,
-      default() {
-        return {
-          name: "Sun",
-          classification: "SolarSystem"
-        };
-      },
-    },
   },
   data() {
     const now = new Date("2023-10-14T10:48");
@@ -467,6 +457,13 @@ export default defineComponent({
     console.log("Date(min/maxTime):", minutc, maxutc);
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
     console.log("date:", now);
+
+    const sunPlace = new Place();
+    sunPlace.set_names(["Sun"]);
+    sunPlace.set_classification(Classification.solarSystem);   
+    sunPlace.set_target(SolarSystemObjects.sun);
+    sunPlace.set_zoomLevel(10);
+
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -508,7 +505,9 @@ export default defineComponent({
       
       accentColor: "#ef7e3d",
 
-      tab: 0
+      tab: 0,
+
+      sunPlace
     };
   },
 
@@ -519,9 +518,10 @@ export default defineComponent({
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
+      console.log(this.dateTime);
       this.setTime(this.dateTime);
 
-      //this.wwtSettings.set_localHorizonMode(true);
+      this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
       this.wwtSettings.set_showConstellationLabels(this.showConstellations);
@@ -543,26 +543,17 @@ export default defineComponent({
       // @ts-ignore
       LayerManager._draw = layerManagerDraw;      
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
+
       this.updateWWTLocation();
 
       setTimeout(() => {
-        const sunPlace = new Place();
-        sunPlace.set_names(["Sun"]);
-        sunPlace.set_classification(Classification.solarSystem);   
-        sunPlace.set_target(SolarSystemObjects.sun);
-        sunPlace.set_zoomLevel(10);
-        this.wwtControl.renderContext.set_solarSystemTrack(0);
-        const options: GotoTargetOptions = {
-          place: sunPlace,
-          instant: true,
-          noZoom: false,
-          trackObject: true 
-        };
-        this.gotoTarget(options).then(() => this.positionSet = true);
+        this.trackSun().then(() => this.positionSet = true);
 
-        this.setClockRate(100);
         console.log(this);
-        console.log(sunPlace);
+        console.log(this.sunPlace);
       }, 100);
 
       // If there are layers to set up, do that here!
@@ -576,9 +567,7 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      return new Date();
-      // const todMs = this.dayFrac * MILLISECONDS_PER_INTERVAL;
-      // return new Date(this.selectedDate.getTime() + todMs);
+      return new Date(this.selectedTime);
     },    
 
     selectedTimezoneOffset() {
@@ -648,6 +637,15 @@ export default defineComponent({
   },
 
   methods: {
+
+    async trackSun(): Promise<void> {
+      return this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
+    },
 
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
