@@ -156,30 +156,6 @@
               label="Horizon"
               hide-details
             />
-            <!-- <div
-              style="color:white;"
-              class="mt-3"
-            >
-              Selected location's time:
-            </div> -->
-            <!-- <date-picker
-              dark
-              time-picker
-              enable-seconds
-              :is-24="false"
-              v-model="timeOfDay"
-              :clearable="false"
-              close-on-scroll
-              class="mb-4 mt-1"
-            >
-              <template #input-icon>
-                <font-awesome-icon
-                  icon="clock"
-                  class="mx-2"
-                  :color="accentColor"
-                ></font-awesome-icon>
-              </template>
-            </date-picker> -->
             <!-- <v-btn
               block
               :color="accentColor"
@@ -641,24 +617,11 @@ export default defineComponent({
 
     });
 
-    // this.timeOfDay = { ...this.timeOfDay }; // force times to sync after everything is mounted
-    // force times to sync after everything is mounted
-    // setInterval(() => {
-    //   console.log("sync clocks");
-    //   console.log(this.selectedTime);
-    //   console.log(this.wwtCurrentTime.getTime());
-    //   // this.selectedTime = this.wwtCurrentTime.getTime();
-    // }, 1000);
   },
 
   computed: {
 
     dateTime() {
-      // const hours = this.timeOfDay.hours - this.selectedTimezoneOffset / (1000 * 60 * 60);
-      // const minutes = this.timeOfDay.minutes;
-      // const seconds = this.timeOfDay.seconds;
-      // const time = this.selectedDate;
-      // time.setUTCHours(hours, minutes, seconds);
       return new Date(this.selectedTime);
     },    
 
@@ -1044,12 +1007,7 @@ export default defineComponent({
     showHorizon(_show: boolean) {
       this.updateHorizon();
     },
-    // timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
-    //   const date = this.selectedDate;
-    //   const offset = this.selectedTimezoneOffset / (1000*60*60);
-    //   date.setUTCHours(this.timeOfDay.hours - offset, this.timeOfDay.minutes, this.timeOfDay.seconds);
-    //   this.selectedTime = date.getTime();
-    // },
+
     
     dateTime(_date: Date) {
       console.log('watch dateTime');
@@ -1058,14 +1016,6 @@ export default defineComponent({
 
     selectedTime(_time: number) {
       return;
-      // const date = new Date(this.selectedTime);
-      // const hms = {
-      //   // need the local time here, not UTC, so add the offset
-      //   hours: date.getUTCHours() + this.selectedTimezoneOffset / (1000*60*60),
-      //   minutes: date.getUTCMinutes(),
-      //   seconds: date.getUTCSeconds()
-      // };
-      // this.timeOfDay = hms;
     },
 
     wwtCurrentTime(_time: Date) {
