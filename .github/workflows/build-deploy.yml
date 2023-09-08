@@ -74,7 +74,7 @@ jobs:
           workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            draft=$(cat package.json | jq -r '.draft // false | @sh')
+            draft=$(cat ${ws}/package.json | jq -r '.draft // false | @sh')
             if [[ $draft != 'true' && $ws != 'common' && $ws != 'tests' ]]
             then
               mv ${ws}/dist dist/${ws}
