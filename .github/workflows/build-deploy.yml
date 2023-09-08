@@ -83,7 +83,7 @@ jobs:
             fi
             cd ..
           done
-          echo "${deployments[@]}"
+          echo "${deployments[@]}" >> $GITHUB_OUTPUT
         
       - name: Rearrange for Pages
         run: |
