@@ -68,29 +68,14 @@ jobs:
         uses: browserstack/github-actions/setup-local@master
         with:
           local-testing: stop
-
-      - name: Determine workspaces to deploy
-        id: deployments
-        run: |
-          workspaces=(${{ steps.workspaces.outputs.value }})
-          deployments=()
-          for ws in "${workspaces[@]}"
-          do
-            cd $ws
-            draft=$(cat package.json | jq -r '.draft // false | @sh')
-            if [[ $draft != 'true' ]]; then
-              deployments+=($ws)
-            fi
-            cd ..
-          done
-          echo "${deployments[@]}"
         
       - name: Rearrange for Pages
         run: |
-          workspaces=(${{ steps.deployments.outputs.value }})
+          workspaces=(${{ steps.workspaces.outputs.value }})
           for ws in "${workspaces[@]}"
           do
-            if [[ $ws != 'common' && $ws != 'tests' ]]
+            draft=$(cat ${ws}/package.json | jq -r '.draft // false | @sh')
+            if [[ $draft != 'true' && $ws != 'common' && $ws != 'tests' ]]
             then
               mv ${ws}/dist dist/${ws}
             fi
