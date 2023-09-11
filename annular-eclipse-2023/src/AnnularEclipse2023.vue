@@ -493,7 +493,7 @@ export default defineComponent({
     sunPlace.set_zoomLevel(20);
 
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -504,7 +504,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showControls: true,   
-      showLocationSelector: true,
+      showLocationSelector: false,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
