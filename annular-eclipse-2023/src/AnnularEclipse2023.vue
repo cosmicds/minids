@@ -59,8 +59,11 @@
         </icon-button>
       </div>
       <div id="center-buttons">
+        <!-- read https://github.com/cosmicds/minids/pull/141 for component description -->
         <location-selector
           :activator-color="accentColor"
+          @update:modelValue="updateLocationFromMap"
+          :model-value="locationDeg"
         >
         </location-selector>    
         <icon-button
@@ -73,9 +76,32 @@
         </icon-button>
       </div>
       <div id="right-buttons">
+        <v-dialog
+          v-model="showLocationSelector"
+          >
+          <template v-slot:activator>
+            <icon-button
+              v-model="showLocationSelector"
+              fa-icon="map-location-dot"
+              :color="accentColor"
+              tooltip-text="Select location"
+              tooltip-location="end"
+              ></icon-button>
+          </template>
+            <div id="eclipse-location-selector">
+              <v-select
+                :model-value="selectedLocation"
+                :items="Object.keys(eclipsePathLocations)"
+                label="Select eclipse viewing location"
+                :color="accentColor"
+                @update:model-value="updateLocation"
+              >
+              </v-select>
+            </div>
+        </v-dialog>
       </div>
     </div>
-
+    
 
     <div class="bottom-content">
       <div
@@ -355,7 +381,7 @@ import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
-// import tzlookup from "tz-lookup";
+import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
 
@@ -399,6 +425,17 @@ type LocationRad = {
   longitudeRad: number;
   latitudeRad: number;
 };
+
+interface EclipseLocation extends LocationRad {
+  name: string;
+  eclipseFracion: number | null;
+}
+
+type LocationDeg = {
+  longitudeDeg: number;
+  latitudeDeg: number;
+};
+
 
 type EquatorialRad = {
   raRad: number;
@@ -463,6 +500,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showControls: true,   
+      showLocationSelector: false,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -477,11 +515,74 @@ export default defineComponent({
         latitudeRad: D2R * 35.106766,
         longitudeRad: D2R * -106.629181
       } as LocationRad,
+      selectedLocation: "Albuquerque, NM",
       locationErrorMessage: "",
       
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
+      eclipsePathLocations: {
+        "Albuquerque, NM": {
+          name: "Albuquerque, NM",
+          latitudeRad: D2R * 35.106766,
+          longitudeRad: D2R * -106.629181,
+          eclipseFracion: 0.97
+        },
+        "Eugene, OR": {
+          name: "Eugene, OR",
+          latitudeRad: D2R * 44.052069,
+          longitudeRad: D2R * -123.086754,
+          eclipseFracion: .95
+        },
+        "Las Vegas, NV": {
+          name: "Las Vegas, NV",
+          latitudeRad: D2R * 36.169941,
+          longitudeRad: D2R * -115.139830,
+          eclipseFracion: .87
+        },
+        "Denver, CO": {
+          name: "Denver, CO",
+          latitudeRad: D2R * 39.739235,
+          longitudeRad: D2R * -104.990250,
+          eclipseFracion: .85
+        },
+        "Los Angeles, CA": {
+          name: "Los Angeles, CA",
+          latitudeRad: D2R * 34.05,
+          longitudeRad: D2R * -118.24,
+          eclipseFracion: .78
+        },
+        "Omaha, NE": {
+          name: "Omaha, NE",
+          latitudeRad: D2R * 41.256538,
+          longitudeRad: D2R * -95.934502,
+          eclipseFracion: .68
+        },
+        "Chicago, IL": {
+          name: "Chicago, IL",
+          latitudeRad: D2R * 41.878113,
+          longitudeRad: D2R * -87.629799,
+          eclipseFracion: .54
+        },
+        "New York, NY": {
+          name: "New York, NY",
+          latitudeRad: D2R * 40.712776,
+          longitudeRad: D2R * -74.005974,
+          eclipseFracion: .35
+        },
+        "Boston, MA": {
+          name: "Boston, MA",
+          latitudeRad: D2R * 42.360081,
+          longitudeRad: D2R * -71.058884,
+          eclipseFracion: .29
+        },
+        "User Selected": { // by default, user selected is Albaquerque
+          name: "User Selected",
+          latitudeRad: D2R * 35.106766,
+          longitudeRad: D2R * -106.629181,
+          eclipseFracion: 0.97
+        }
+      } as Record<string, EclipseLocation>,
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
@@ -557,7 +658,7 @@ export default defineComponent({
 
     dateTime() {
       return new Date(this.selectedTime);
-    },    
+    },
 
     selectedTimezoneOffset() {
       return getTimezoneOffset(this.selectedTimezone);
@@ -598,7 +699,7 @@ export default defineComponent({
     // },
     dayFrac(): number {
       const dateForTOD = new Date();
-      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60 * 60 * 1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
@@ -621,6 +722,21 @@ export default defineComponent({
           const video = document.querySelector("#info-video") as HTMLVideoElement;
           video.pause();
         }
+      }
+    },
+
+    locationDeg: {
+      get(): LocationDeg {
+        return {
+          latitudeDeg: R2D * this.location.latitudeRad,
+          longitudeDeg: R2D * this.location.longitudeRad
+        };
+      },
+      set(value: LocationDeg) {
+        this.location = {
+          latitudeRad: D2R * value.latitudeDeg,
+          longitudeRad: D2R * value.longitudeDeg
+        };
       }
     }
   },
@@ -688,6 +804,38 @@ export default defineComponent({
       if(this.showHorizon) {
         this.updateHorizon();
       }
+    },
+
+
+
+    updateLocation(location: string) {
+      if (location == null) {
+        return;
+      }
+      console.log("updateLocation", location);
+      this.selectedLocation = location;
+      this.location = {
+        latitudeRad: this.eclipsePathLocations[location].latitudeRad,
+        longitudeRad: this.eclipsePathLocations[location].longitudeRad
+      };
+
+    },
+
+    updateLocationFromMap(location: LocationDeg) {
+      if (location == null) {
+        return;
+      }
+      console.log("updateLocationFromMap", location);
+      this.selectedLocation = 'User Selected';
+      this.locationDeg = location;
+
+      this.eclipsePathLocations['User Selected'] = {
+        name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
+        latitudeRad: D2R * location.latitudeDeg,
+        longitudeRad: D2R * location.longitudeDeg,
+        eclipseFracion: null
+      };
+
     },
 
     onTimeSliderChange() {
@@ -980,6 +1128,30 @@ export default defineComponent({
       this.timeOfDay.hours = newHours;
     },
 
+    location(loc: LocationRad, oldLoc: LocationRad) {
+      const locationDeg: [number, number] = [R2D * loc.latitudeRad, R2D * loc.longitudeRad];
+      
+      if (oldLoc.latitudeRad * loc.latitudeRad < 0) {
+        Grids._altAzTextBatch = null;
+      }
+
+      this.selectedTimezone = tzlookup(...locationDeg);
+      this.updateWWTLocation();
+
+      // We need to let the location update before we redraw the horizon
+      this.$nextTick(() => {
+        this.updateHorizon();
+      });
+    },
+
+    selectedLocation(locname: string) {
+      if (!(locname in this.eclipsePathLocations)) {
+        console.log(`location ${locname} not found in eclipsePathLocations`);
+        return;
+      }
+      console.log("selected location", locname);
+    },
+    
     playing(play: boolean) {
       this.clearPlayingInterval();
       if (play) {
@@ -1471,6 +1643,16 @@ video {
   &:active {
     cursor: grabbing;
   }
+}
+
+#eclipse-location-selector {
+  position: fixed;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 400px;
+  max-width: 90%;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 </style>
