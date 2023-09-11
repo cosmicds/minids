@@ -62,8 +62,8 @@
         <!-- read https://github.com/cosmicds/minids/pull/141 for component description -->
         <location-selector
           :activator-color="accentColor"
-          @location-change="updateLocationFromMap"
-          :initialLocation="locationDeg"
+          @update:modelValue="updateLocationFromMap"
+          :model-value="locationDeg"
         >
         </location-selector>    
         <icon-button
@@ -436,10 +436,6 @@ type LocationDeg = {
   latitudeDeg: number;
 };
 
-type LocationDegTZ = {
-  location: LocationDeg;
-  timezone: string;
-};
 
 type EquatorialRad = {
   raRad: number;
@@ -662,7 +658,7 @@ export default defineComponent({
 
     dateTime() {
       return new Date(this.selectedTime);
-    },    
+    },
 
     selectedTimezoneOffset() {
       return getTimezoneOffset(this.selectedTimezone);
@@ -703,7 +699,7 @@ export default defineComponent({
     // },
     dayFrac(): number {
       const dateForTOD = new Date();
-      const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
+      const timezoneOffsetHours = this.selectedTimezoneOffset / (60 * 60 * 1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
@@ -729,12 +725,20 @@ export default defineComponent({
       }
     },
 
-    locationDeg(): LocationDeg {
-      return {
-        latitudeDeg: R2D * this.location.latitudeRad,
-        longitudeDeg: R2D * this.location.longitudeRad
-      };
-    },
+    locationDeg: {
+      get(): LocationDeg {
+        return {
+          latitudeDeg: R2D * this.location.latitudeRad,
+          longitudeDeg: R2D * this.location.longitudeRad
+        };
+      },
+      set(value: LocationDeg) {
+        this.location = {
+          latitudeRad: D2R * value.latitudeDeg,
+          longitudeRad: D2R * value.longitudeDeg
+        };
+      }
+    }
   },
 
   methods: {
@@ -817,20 +821,20 @@ export default defineComponent({
 
     },
 
-    updateLocationFromMap(location: LocationDegTZ) {
+    updateLocationFromMap(location: LocationDeg) {
       if (location == null) {
         return;
       }
       console.log("updateLocationFromMap", location);
       this.selectedLocation = 'User Selected';
       this.location = {
-        latitudeRad: D2R * location.location.latitudeDeg,
-        longitudeRad: D2R * location.location.longitudeDeg
+        latitudeRad: D2R * location.latitudeDeg,
+        longitudeRad: D2R * location.longitudeDeg
       };
       this.eclipsePathLocations['User Selected'] = {
-        name: `User Selected: ${location.location.latitudeDeg.toFixed(2)}, ${location.location.longitudeDeg.toFixed(2)}`,
-        latitudeRad: D2R * location.location.latitudeDeg,
-        longitudeRad: D2R * location.location.longitudeDeg,
+        name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
+        latitudeRad: D2R * location.latitudeDeg,
+        longitudeRad: D2R * location.longitudeDeg,
         eclipseFracion: null
       };
 
