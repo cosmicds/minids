@@ -63,7 +63,14 @@
           :activator-color="accentColor"
         >
         </location-selector>    
-    
+        <icon-button
+          fa-icon="sun"
+          :color="accentColor"
+          tooltip-text="Center view on Sun"
+          tooltip-location='top'
+          @activate="() => trackSun()"
+        >
+        </icon-button>
       </div>
       <div id="right-buttons">
       </div>
@@ -366,17 +373,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-// import { distance } from "@wwtelescope/astro";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
-// import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
-// import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, GetName } from "@wwtelescope/engine";
+import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
 // import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -450,15 +455,6 @@ export default defineComponent({
         };
       },
     },
-    sunPlace: {
-      type: Object as PropType<Place>,
-      default() {
-        return {
-          name: "Sun",
-          classification: "SolarSystem"
-        };
-      },
-    },
   },
   data() {
     const now = new Date("2023-10-14T10:48");
@@ -468,6 +464,13 @@ export default defineComponent({
     console.log("Date(min/maxTime):", minutc, maxutc);
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
     console.log("date:", now);
+
+    const sunPlace = new Place();
+    sunPlace.set_names(["Sun"]);
+    sunPlace.set_classification(Classification.solarSystem);   
+    sunPlace.set_target(SolarSystemObjects.sun);
+    sunPlace.set_zoomLevel(20);
+
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -509,40 +512,20 @@ export default defineComponent({
       
       accentColor: "#ef7e3d",
 
-      tab: 0
+      tab: 0,
+
+      sunPlace
     };
   },
 
   mounted() {
     this.waitForReady().then(async () => {
-      
-      this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      // this.imagesetFolder = await this.loadImageCollection({
-      //   url: this.wtml.eclipse,
-      //   loadChildFolders: false
-      // });
-      // const children = this.imagesetFolder.get_children() ?? [];
-      // const layerPromises: Promise<Layer>[] = [];
-      // children.forEach((item) => {
-      //   if (!(item instanceof Place)) { return; }
-      //   const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-      //   if (imageset == null) { return; }
-      //   const name = imageset.get_name();
-      //   layerPromises.push(this.addImageSetLayer({
-      //     url: imageset.get_url(),
-      //     mode: "autodetect",
-      //     name: name,
-      //     goto: false
-      //   }).then((layer) => {
-      //     // this.imagesetLayers[name] = layer;
-      //     // applyImageSetLayerSetting(layer, ["opacity", 0]);
-      //     return layer;
-      //   }));
-      // });  
+      this.backgroundImagesets = [...skyBackgroundImagesets];
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
+      console.log(this.dateTime);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -567,23 +550,15 @@ export default defineComponent({
       // @ts-ignore
       LayerManager._draw = layerManagerDraw;      
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
+
       this.updateWWTLocation();
 
-      this.gotoRADecZoom({
-        // These are RA/Dec of Sun in Albuquerque close to max annularity. Since I don't know how to keep focus on the Sun in the web engine, I tried to set this up so the view would start here, but it isn't.
-        raRad: 3.481,
-        decRad: -0.145,
-        zoomDeg: 1,
-        instant: true
-      }).then(() => this.positionSet = true);
-
-      // this.gotoTarget({
-      //   place: this.sunPlace,
-      //   noZoom: true,
-      //   instant: true,
-      //   trackObject: true
-      // });
-      // console.log(this.sunPlace);
+      setTimeout(() => {
+        this.trackSun().then(() => this.positionSet = true);
+      }, 100);
 
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -596,9 +571,7 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      return new Date();
-      // const todMs = this.dayFrac * MILLISECONDS_PER_INTERVAL;
-      // return new Date(this.selectedDate.getTime() + todMs);
+      return new Date(this.selectedTime);
     },    
 
     selectedTimezoneOffset() {
@@ -668,6 +641,15 @@ export default defineComponent({
   },
 
   methods: {
+
+    async trackSun(): Promise<void> {
+      return this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
+    },
 
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
@@ -1171,6 +1153,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  #center-buttons {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 .bottom-content {
