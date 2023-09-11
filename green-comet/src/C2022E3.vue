@@ -2036,6 +2036,7 @@ body {
   margin-right: 1rem;
   margin-bottom: 1rem;
   pointer-events: auto;
+  width: fit-content;
 
   .v-label {
     color: var(--comet-color);
