@@ -75,7 +75,7 @@
       <div id="right-buttons">
       </div>
     </div>
-    
+
 
     <div class="bottom-content">
       <div
@@ -452,7 +452,7 @@ export default defineComponent({
     sunPlace.set_zoomLevel(20);
 
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -551,7 +551,6 @@ export default defineComponent({
       console.log("selected time", this.selectedTime);
 
     });
-
   },
 
   computed: {
