@@ -29,7 +29,8 @@ import {
   faClock,
   faPlay,
   faPause,
-  faMapLocationDot
+  faMapLocationDot,
+  faSun
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -41,6 +42,7 @@ library.add(faClock);
 library.add(faPlay);
 library.add(faPause);
 library.add(faMapLocationDot);
+library.add(faSun);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice

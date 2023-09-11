@@ -66,7 +66,14 @@
           :initialLocation="locationDeg"
         >
         </location-selector>    
-    
+        <icon-button
+          fa-icon="sun"
+          :color="accentColor"
+          tooltip-text="Center view on Sun"
+          tooltip-location='top'
+          @activate="() => trackSun()"
+        >
+        </icon-button>
       </div>
       <div id="right-buttons">
         <v-dialog
@@ -142,30 +149,6 @@
               label="Horizon"
               hide-details
             />
-            <div
-              style="color:white;"
-              class="mt-3"
-            >
-              Selected location's time:
-            </div>
-            <date-picker
-              dark
-              time-picker
-              enable-seconds
-              :is-24="false"
-              v-model="timeOfDay"
-              :clearable="false"
-              close-on-scroll
-              class="mb-4 mt-1"
-            >
-              <template #input-icon>
-                <font-awesome-icon
-                  icon="clock"
-                  class="mx-2"
-                  :color="accentColor"
-                ></font-awesome-icon>
-              </template>
-            </date-picker>
             <!-- <v-btn
               block
               :color="accentColor"
@@ -392,17 +375,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-// import { distance } from "@wwtelescope/astro";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
-// import { GotoTargetOptions } from "@wwtelescope/engine-helpers";
-// import { Color, Constellations, Folder, Grids, Layer, LayerManager, Poly, RenderContext, Settings, SpreadSheetLayer, WWTControl, GetName } from "@wwtelescope/engine";
+import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -422,6 +403,9 @@ const R2D = 180 / Math.PI;
 // month is indexed from 0..?!
 const minTime = Date.UTC(2023, 9, 14, 15, 0); // eclipse starts at 9:13am MT in Albuquerque
 const maxTime = Date.UTC(2023, 9, 14, 18, 30); // eclipse ends at 12:09pm MT in Albuquerque
+
+const SECONDS_PER_DAY = 60 * 60 * 24;
+const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
 const secondsInterval = 10;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
@@ -491,24 +475,23 @@ export default defineComponent({
         };
       },
     },
-    sunPlace: {
-      type: Object as PropType<Place>,
-      default() {
-        return {
-          name: "Sun",
-          classification: "SolarSystem"
-        };
-      },
-    },
   },
   data() {
-    const now = new Date("2023-10-14T10:48");
+    const annularEclipseTimeNMTZ = new Date("2023-10-14T10:48");
+    const _annularEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
     console.log("min/max time UTC", minTime, maxTime);
     const minutc = new Date(minTime);
     const maxutc = new Date(maxTime);
     console.log("Date(min/maxTime):", minutc, maxutc);
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
-    console.log("date:", now);
+    console.log("date:", annularEclipseTimeNMTZ);
+
+    const sunPlace = new Place();
+    sunPlace.set_names(["Sun"]);
+    sunPlace.set_classification(Classification.solarSystem);   
+    sunPlace.set_target(SolarSystemObjects.sun);
+    sunPlace.set_zoomLevel(20);
+
     return {
       showSplashScreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -529,8 +512,8 @@ export default defineComponent({
       pointerStartPosition: null as { x: number; y: number } | null,      
 
       // Albuquerque, NM
-      timeOfDay: { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
-      selectedTime: minTime,
+      timeOfDay: { hours: annularEclipseTimeNMTZ.getHours(), minutes: annularEclipseTimeNMTZ.getMinutes(), seconds: annularEclipseTimeNMTZ.getSeconds() },
+      selectedTime: _annularEclipseTimeUTC.getTime(), //1697302060000,
       selectedTimezone: "America/Denver",
       location: {
         latitudeRad: D2R * 35.106766,
@@ -538,6 +521,9 @@ export default defineComponent({
       } as LocationRad,
       selectedLocation: "Albuquerque, NM",
       locationErrorMessage: "",
+      
+      syncDateTimeWithWWTCurrentTime: true,
+      syncDateTimewithSelectedTime: true,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
@@ -614,40 +600,20 @@ export default defineComponent({
       
       accentColor: "#ef7e3d",
 
-      tab: 0
+      tab: 0,
+
+      sunPlace
     };
   },
 
   mounted() {
     this.waitForReady().then(async () => {
-      
-      this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      // this.imagesetFolder = await this.loadImageCollection({
-      //   url: this.wtml.eclipse,
-      //   loadChildFolders: false
-      // });
-      // const children = this.imagesetFolder.get_children() ?? [];
-      // const layerPromises: Promise<Layer>[] = [];
-      // children.forEach((item) => {
-      //   if (!(item instanceof Place)) { return; }
-      //   const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
-      //   if (imageset == null) { return; }
-      //   const name = imageset.get_name();
-      //   layerPromises.push(this.addImageSetLayer({
-      //     url: imageset.get_url(),
-      //     mode: "autodetect",
-      //     name: name,
-      //     goto: false
-      //   }).then((layer) => {
-      //     // this.imagesetLayers[name] = layer;
-      //     // applyImageSetLayerSetting(layer, ["opacity", 0]);
-      //     return layer;
-      //   }));
-      // });  
+      this.backgroundImagesets = [...skyBackgroundImagesets];
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
+      console.log(this.dateTime);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -672,23 +638,17 @@ export default defineComponent({
       // @ts-ignore
       LayerManager._draw = layerManagerDraw;      
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
+
       this.updateWWTLocation();
+      this.setClockSync(false); // set to false to pause
+      this.setClockRate(1); //
 
-      this.gotoRADecZoom({
-        // These are RA/Dec of Sun in Albuquerque close to max annularity. Since I don't know how to keep focus on the Sun in the web engine, I tried to set this up so the view would start here, but it isn't.
-        raRad: 3.481,
-        decRad: -0.145,
-        zoomDeg: 1,
-        instant: true
-      }).then(() => this.positionSet = true);
-
-      // this.gotoTarget({
-      //   place: this.sunPlace,
-      //   noZoom: true,
-      //   instant: true,
-      //   trackObject: true
-      // });
-      // console.log(this.sunPlace);
+      setTimeout(() => {
+        this.trackSun().then(() => this.positionSet = true);
+      }, 100);
 
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -701,9 +661,7 @@ export default defineComponent({
   computed: {
 
     dateTime() {
-      return new Date();
-      // const todMs = this.dayFrac * MILLISECONDS_PER_INTERVAL;
-      // return new Date(this.selectedDate.getTime() + todMs);
+      return new Date(this.selectedTime);
     },    
 
     selectedTimezoneOffset() {
@@ -741,14 +699,14 @@ export default defineComponent({
       return Settings.get_active();
     },
     // dontSetTime(): boolean {
-    //   return this.selectedTime %MILLISECONDS_PER_INTERVAL !== 0;
+    //   return this.selectedTime %MILLISECONDS_PER_DAY !== 0;
     // },
     dayFrac(): number {
       const dateForTOD = new Date();
       const timezoneOffsetHours = this.selectedTimezoneOffset / (60*60*1000);
       dateForTOD.setUTCHours(this.timeOfDay.hours - timezoneOffsetHours, this.timeOfDay.minutes, this.timeOfDay.seconds);
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
-      return todMs / MILLISECONDS_PER_INTERVAL;
+      return todMs / MILLISECONDS_PER_DAY;
     },
     showTextSheet: {
       get(): boolean {
@@ -781,6 +739,15 @@ export default defineComponent({
 
   methods: {
 
+    async trackSun(): Promise<void> {
+      return this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
+    },
+
     clearPlayingInterval() {
       if (this.playingIntervalId !== null) {
         clearInterval(this.playingIntervalId);
@@ -797,14 +764,30 @@ export default defineComponent({
       this.selectedTime -= MILLISECONDS_PER_INTERVAL;
     },
 
-    toDateString(date: Date) {
+    toUTCDateString(date: Date) {
       // date = new Date(date.getTime() + this.selectedTimezoneOffset) // ignore timezone
       return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
+    toUTCTimeString(date: Date) {
+      const minutes = date.getUTCMinutes();
+      const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      // get am pm
+      const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
+      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+    },
+
+    toLocaleTimeString(date: Date) {
+      date = new Date(date.getTime() + this.selectedTimezoneOffset);
+      const minutes = date.getUTCMinutes();
+      const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      // get am pm
+      const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
+      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+    },
+
     toTimeString(date: Date) {
-      date = new Date(date.getTime() + this.selectedTimezoneOffset); // ignore timezone
-      return `${date.getUTCHours()}:${date.getUTCMinutes()}`;
+      return this.toLocaleTimeString(date);
     },
 
     closeSplashScreen() {
@@ -1078,7 +1061,7 @@ export default defineComponent({
 
 
     updateForDateTime() {
-      // if (!this.dontSetTime) { this.setTime(this.dateTime); }
+      this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
       this.updateHorizon(this.dateTime); 
       // this.showImageForDateTime(this.dateTime);
       // this.updateViewForDate(options);
@@ -1113,12 +1096,22 @@ export default defineComponent({
     showHorizon(_show: boolean) {
       this.updateHorizon();
     },
-    timeOfDay(_time: { hours: number; minutes: number; seconds: number }) {
+
+    
+    dateTime(_date: Date) {
+      console.log('watch dateTime');
       this.updateForDateTime();
     },
-    // selectedDate() {
-    //   this.updateForDateTime();
-    // },
+
+    selectedTime(_time: number) {
+      return;
+    },
+
+    wwtCurrentTime(_time: Date) {
+      // this.selectedTime = _time.getTime();
+      this.updateHorizon(_time);
+    },
+
     selectedTimezone(newTz: string, oldTz: string) {
       const newOffset = getTimezoneOffset(newTz);
       const oldOffset = getTimezoneOffset(oldTz);
@@ -1341,6 +1334,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  #center-buttons {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 .bottom-content {
