@@ -1473,11 +1473,4 @@ video {
   }
 }
 
-
-table.show-time tr>td:first-child {
-  font-weight: bold;
-  padding-right: 1em;
-}
-
-
 </style>
