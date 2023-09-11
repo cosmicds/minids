@@ -81,9 +81,8 @@
           </template>
             <div id="eclipse-location-selector">
               <v-select
-                :items="eclipsePathLocations"
-                item-title="name"
-                :return-object="true"
+                :model-value="selectedLocation"
+                :items="Object.keys(eclipsePathLocations)"
                 label="Select eclipse viewing location"
                 :color="accentColor"
                 @update:model-value="updateLocation"
@@ -441,6 +440,11 @@ type LocationRad = {
   latitudeRad: number;
 };
 
+interface EclipseLocation extends LocationRad {
+  name: string;
+  eclipseFracion: number | null;
+}
+
 type EquatorialRad = {
   raRad: number;
   decRad: number;
@@ -520,65 +524,71 @@ export default defineComponent({
         latitudeRad: D2R * 35.106766,
         longitudeRad: D2R * -106.629181
       } as LocationRad,
+      selectedLocation: "Albuquerque, NM",
       locationErrorMessage: "",
 
-      eclipsePathLocations: [
-        {
+      eclipsePathLocations: {
+        "Albuquerque, NM": {
           name: "Albuquerque, NM",
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
           eclipseFracion: 0.97
         },
-        {
+        "Eugene, OR": {
           name: "Eugene, OR",
           latitudeRad: D2R * 44.052069,
           longitudeRad: D2R * -123.086754,
           eclipseFracion: .95
         },
-        {
+        "Las Vegas, NV": {
           name: "Las Vegas, NV",
           latitudeRad: D2R * 36.169941,
           longitudeRad: D2R * -115.139830,
           eclipseFracion: .87
         },
-        {
+        "Denver, CO": {
           name: "Denver, CO",
           latitudeRad: D2R * 39.739235,
           longitudeRad: D2R * -104.990250,
           eclipseFracion: .85
         },
-        {
+        "Los Angeles, CA": {
           name: "Los Angeles, CA",
           latitudeRad: D2R * 34.05,
           longitudeRad: D2R * -118.24,
           eclipseFracion: .78
         },
-        {
+        "Omaha, NE": {
           name: "Omaha, NE",
           latitudeRad: D2R * 41.256538,
           longitudeRad: D2R * -95.934502,
           eclipseFracion: .68
         },
-        {
+        "Chicago, IL": {
           name: "Chicago, IL",
           latitudeRad: D2R * 41.878113,
           longitudeRad: D2R * -87.629799,
           eclipseFracion: .54
         },
-        {
+        "New York, NY": {
           name: "New York, NY",
           latitudeRad: D2R * 40.712776,
           longitudeRad: D2R * -74.005974,
           eclipseFracion: .35
         },
-        {
+        "Boston, MA": {
           name: "Boston, MA",
           latitudeRad: D2R * 42.360081,
           longitudeRad: D2R * -71.058884,
           eclipseFracion: .29
         },
-      ],
-      
+        "User Selected": { // by default, user selected is Albaquerque
+          name: "User Selected",
+          latitudeRad: D2R * 35.106766,
+          longitudeRad: D2R * -106.629181,
+          eclipseFracion: 0.97
+        }
+      } as Record<string, EclipseLocation>,
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
@@ -790,12 +800,20 @@ export default defineComponent({
       }
     },
 
-    //eslint-disable-next-line
-    updateLocation(location: LocationRad | null) {
+
+
+    updateLocation(location: string) {
       if (location == null) {
         return;
       }
-      
+      console.log("updateLocation", location);
+      this.selectedLocation = location;
+      this.location = {
+        latitudeRad: this.eclipsePathLocations[location].latitudeRad,
+        longitudeRad: this.eclipsePathLocations[location].longitudeRad
+      };
+
+    },
       this.location = {
         latitudeRad: location.latitudeRad,
         longitudeRad: location.longitudeRad
@@ -1100,6 +1118,14 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateHorizon();
       });
+    },
+
+    selectedLocation(locname: string) {
+      if (!(locname in this.eclipsePathLocations)) {
+        console.log(`location ${locname} not found in eclipsePathLocations`);
+        return;
+      }
+      console.log("selected location", locname);
     },
     
     playing(play: boolean) {
@@ -1592,7 +1618,7 @@ video {
 
 #eclipse-location-selector {
   position: fixed;
-  top: 25%;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
   width: 400px;
