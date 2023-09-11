@@ -66,21 +66,34 @@
     
       </div>
       <div id="right-buttons">
+        <v-dialog
+          v-model="showLocationSelector"
+          fullscreen
+          >
+          <template v-slot:activator>
+            <icon-button
+              v-model="showLocationSelector"
+              fa-icon="map-location-dot"
+              :color="accentColor"
+              tooltip-text="Select location"
+              tooltip-location="end"
+              ></icon-button>
+          </template>
+            <div id="eclipse-location-selector">
+              <v-select
+                :items="eclipsePathLocations"
+                item-title="name"
+                :return-object="true"
+                label="Select eclipse viewing location"
+                :color="accentColor"
+                @update:model-value="updateLocation"
+              >
+              </v-select>
+            </div>
+        </v-dialog>
       </div>
     </div>
     
-    <div id="eclipse-location-selector">
-      <v-select
-        :items="eclipsePathLocations"
-        item-title="name"
-        :return-object="true"
-        label="Select eclipse viewing location"
-        :color="accentColor"
-        :dense="true"
-        @update:model-value="updateLocation"
-      >
-      </v-select>
-    </div>
 
     <div class="bottom-content">
       <div
@@ -481,7 +494,7 @@ export default defineComponent({
     console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
     console.log("date:", now);
     return {
-      showSplashScreen: true,
+      showSplashScreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -492,6 +505,7 @@ export default defineComponent({
       showTextTooltip: false,
       showVideoTooltip: false,
       showControls: true,   
+      showLocationSelector: true,
 
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -1577,10 +1591,12 @@ video {
 }
 
 #eclipse-location-selector {
-  position: absolute;
+  position: fixed;
   top: 25%;
-  left: 1em;
-  width: 300px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 400px;
+  max-width: 90%;
   background-color: rgba(0, 0, 0, 0.7);
 }
 
