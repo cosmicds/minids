@@ -45,8 +45,6 @@ import { VCard } from "vuetify/components/VCard";
 import { VBtn } from "vuetify/components/VBtn";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
-import tzlookup from "tz-lookup";
-import { getTimezoneOffset } from "date-fns-tz";
 import L, { LeafletMouseEvent, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import _Notifications from "@kyvg/vue3-notification";
@@ -74,7 +72,7 @@ export default defineComponent({
       type: String,
       default: "#ffffff"
     },
-    initialLocation: {
+    modelValue: {
       type: Object as PropType<LocationDeg>,
       default() {
         return {
@@ -93,8 +91,6 @@ export default defineComponent({
     return {
       circle: null as L.Circle | null,
       map: null as Map | null,
-      location: this.initialLocation,
-      timezone: tzlookup(this.initialLocation.latitudeDeg, this.initialLocation.longitudeDeg),
       locationErrorMessage: "",
       show: false
     };
@@ -111,10 +107,10 @@ export default defineComponent({
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          this.location = {
+          this.updateValue({
             longitudeDeg: position.coords.longitude,
             latitudeDeg: position.coords.latitude
-          };
+          });
 
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], this.map.getZoom());
@@ -150,14 +146,14 @@ export default defineComponent({
       let longitudeDeg = event.latlng.lng + 180;
       longitudeDeg = ((longitudeDeg % 360) + 360) % 360;  // We want modulo, but JS % operator is remainder
       longitudeDeg -= 180;
-      this.location = {
+      this.updateValue({
         latitudeDeg: event.latlng.lat,
         longitudeDeg
-      };
+      });
     },
 
     setup() {
-      const map = L.map("map-container").setView([this.location.latitudeDeg, this.location.longitudeDeg], 4);
+      const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
       L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
@@ -166,31 +162,29 @@ export default defineComponent({
         className: 'map-tiles'
       }).addTo(map);
 
-      this.circle = this.circleForLocation(this.location).addTo(map);
+      this.circle = this.circleForLocation(this.modelValue).addTo(map);
 
       map.doubleClickZoom.disable();
       map.on('dblclick', this.onMapSelect);
       this.map = map;
     },
 
-  },
+    updateValue(value: LocationDeg) {
+      this.$emit('update:modelValue', value);
+    },
 
-  computed: {
-    selectedTimezoneOffset() {
-      return getTimezoneOffset(this.timezone);
+    updateCircle() {
+      if (this.map) {
+        this.circle?.remove();
+        this.circle = this.circleForLocation(this.modelValue).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+      }
     }
+
   },
 
   watch: {
-    location(location: LocationDeg) {
-      if (this.map) {
-        this.circle?.remove();
-        this.circle = this.circleForLocation(location).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
-      }
-
-      this.timezone = tzlookup(location.latitudeDeg, location.longitudeDeg);
-
-      this.$emit('locationChange', { location, timezone: this.timezone });
+    modelValue() {
+      this.updateCircle();
     },
 
     show(show: boolean) {
@@ -201,6 +195,7 @@ export default defineComponent({
         });
       } else {
         this.map?.remove();
+        this.map = null;
         this.circle = null;
       }
     }

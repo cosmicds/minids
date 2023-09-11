@@ -568,19 +568,15 @@ __metadata:
     "@fortawesome/vue-fontawesome": ^3.0.3
     "@kyvg/vue3-notification": ^2.9.1
     "@types/leaflet": ^1.9.3
-    "@types/tz-lookup": ^6.1.0
     "@vue/cli-plugin-eslint": ^5.0.8
     "@vue/cli-plugin-typescript": ^5.0.8
     "@vue/cli-service": ^5.0.8
     "@wwtelescope/engine-pinia": ^0.2.0
-    date-fns: ^2.30.0
-    date-fns-tz: ^2.0.0
     eslint: ^8.31.0
     eslint-plugin-vue: ^9.8.0
     leaflet: ^1.9.4
     screenfull: ^6.0.2
     typescript: ^4.9.4
-    tz-lookup: ^6.1.25
     vue: ^3
     vue-template-compiler: ^2.7.14
     vuetify: ^3.3.3
@@ -4311,7 +4307,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.29.3, date-fns@npm:^2.30.0":
+"date-fns@npm:^2.29.3":
   version: 2.30.0
   resolution: "date-fns@npm:2.30.0"
   dependencies:
