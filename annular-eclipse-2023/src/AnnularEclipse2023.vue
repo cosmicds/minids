@@ -827,10 +827,8 @@ export default defineComponent({
       }
       console.log("updateLocationFromMap", location);
       this.selectedLocation = 'User Selected';
-      this.location = {
-        latitudeRad: D2R * location.latitudeDeg,
-        longitudeRad: D2R * location.longitudeDeg
-      };
+      this.locationDeg = location;
+
       this.eclipsePathLocations['User Selected'] = {
         name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
         latitudeRad: D2R * location.latitudeDeg,
