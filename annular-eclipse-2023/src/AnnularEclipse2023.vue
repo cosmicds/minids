@@ -59,8 +59,11 @@
         </icon-button>
       </div>
       <div id="center-buttons">
+        <!-- read https://github.com/cosmicds/minids/pull/141 for component description -->
         <location-selector
           :activator-color="accentColor"
+          @location-change="updateLocationFromMap"
+          :initialLocation="locationDeg"
         >
         </location-selector>    
     
@@ -68,7 +71,6 @@
       <div id="right-buttons">
         <v-dialog
           v-model="showLocationSelector"
-          fullscreen
           >
           <template v-slot:activator>
             <icon-button
@@ -445,6 +447,16 @@ interface EclipseLocation extends LocationRad {
   eclipseFracion: number | null;
 }
 
+type LocationDeg = {
+  longitudeDeg: number;
+  latitudeDeg: number;
+};
+
+type LocationDegTZ = {
+  location: LocationDeg;
+  timezone: string;
+};
+
 type EquatorialRad = {
   raRad: number;
   decRad: number;
@@ -757,7 +769,14 @@ export default defineComponent({
           video.pause();
         }
       }
-    }
+    },
+
+    locationDeg(): LocationDeg {
+      return {
+        latitudeDeg: R2D * this.location.latitudeRad,
+        longitudeDeg: R2D * this.location.longitudeRad
+      };
+    },
   },
 
   methods: {
@@ -814,14 +833,24 @@ export default defineComponent({
       };
 
     },
+
+    updateLocationFromMap(location: LocationDegTZ) {
+      if (location == null) {
+        return;
+      }
+      console.log("updateLocationFromMap", location);
+      this.selectedLocation = 'User Selected';
       this.location = {
-        latitudeRad: location.latitudeRad,
-        longitudeRad: location.longitudeRad
+        latitudeRad: D2R * location.location.latitudeDeg,
+        longitudeRad: D2R * location.location.longitudeDeg
+      };
+      this.eclipsePathLocations['User Selected'] = {
+        name: `User Selected: ${location.location.latitudeDeg.toFixed(2)}, ${location.location.longitudeDeg.toFixed(2)}`,
+        latitudeRad: D2R * location.location.latitudeDeg,
+        longitudeRad: D2R * location.location.longitudeDeg,
+        eclipseFracion: null
       };
 
-      console.log("location", this.location);
-      this.updateWWTLocation();
-      this.updateHorizon();
     },
 
     onTimeSliderChange() {
