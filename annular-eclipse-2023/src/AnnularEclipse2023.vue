@@ -609,7 +609,7 @@ export default defineComponent({
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
-      console.log(this.dateTime);
+      console.log(this);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -644,6 +644,8 @@ export default defineComponent({
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
+        this.setForegroundImageByName("DSS (Digitized Sky Survey");
+        this.setBackgroundImageByName("Black Sky Background");
       }, 100);
 
       // If there are layers to set up, do that here!
