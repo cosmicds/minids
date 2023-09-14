@@ -25,4 +25,15 @@ declare module "@wwtelescope/engine" {
     static getPushPinTexture(pinId: number): Texture;
   }
 
+  export class Tile {
+    static tilesInView: number;
+    static tilesTouched: number;
+    static deepestLevel: number;
+  }
+
+  export class TileCache {
+    static getTile(): Tile;
+  }
+
+  export class RenderTriangle {}
 }

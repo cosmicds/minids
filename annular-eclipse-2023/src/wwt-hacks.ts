@@ -3,10 +3,12 @@
 
 /* eslint-disable */
 
+
+
 import {
-  Color, Colors, Constellations, Coordinates, Grids,
-  LayerManager, LayerMap, PushPin, Settings, SpaceTimeController,
-  SpreadSheetLayer, Text3d, Text3dBatch, URLHelpers,
+  Annotation, Color, Colors, Constellations, Coordinates, Grids,
+  LayerManager, Planets, PushPin, RenderTriangle, Settings, SpaceTimeController,
+  SpreadSheetLayer, Text3d, Text3dBatch, Tile, TileCache, TourPlayer, URLHelpers,
   Vector3d, WWTControl
 } from "@wwtelescope/engine";
 
@@ -174,10 +176,8 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
     }
     renderContext.set_nominalRadius(thisMap.frame.meanRadius);
   }
-  //console.log("========");
   for (const layer of LayerManager.get_allMaps()[referenceFrame].layers) {
     if (layer.enabled) {
-      //console.log(layer);
       var layerStart = SpaceTimeController.utcToJulian(layer.get_startTime());
       var layerEnd = SpaceTimeController.utcToJulian(layer.get_endTime());
       var fadeIn = SpaceTimeController.utcToJulian(layer.get_startTime()) - ((layer.get_fadeType() === 1 || layer.get_fadeType() === 3) ? (layer.get_fadeSpan() / 864000000) : 0);
@@ -276,16 +276,16 @@ export function renderOneFrame() {
     SpaceTimeController.set_now(this.get__mover().get_currentDateTime());
     Planets.updatePlanetLocations(this.get_solarSystemMode());
     if (this.get__mover() != null) {
-      var newCam = this.get__mover().get_currentPosition();
+      const newCam = this.get__mover().get_currentPosition();
       this.renderContext.targetCamera = newCam.copy();
       this.renderContext.viewCamera = newCam.copy();
       if (this.renderContext.space && Settings.get_active().get_galacticMode()) {
-        var gPoint = Coordinates.j2000toGalactic(newCam.get_RA() * 15, newCam.get_dec());
+        const gPoint = Coordinates.j2000toGalactic(newCam.get_RA() * 15, newCam.get_dec());
         this.renderContext.targetAlt = this.renderContext.alt = gPoint[1];
         this.renderContext.targetAz = this.renderContext.az = gPoint[0];
       }
       else if (this.renderContext.space && Settings.get_active().get_localHorizonMode()) {
-        var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(newCam.get_RA(), newCam.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
+        const currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(newCam.get_RA(), newCam.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
         this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
         this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
       }
@@ -342,9 +342,9 @@ export function renderOneFrame() {
     Planets.drawPlanets(this.renderContext, 1);
   }
 
-  var worldSave = this.renderContext.get_world();
-  var viewSave = this.renderContext.get_view();
-  var projSave = this.renderContext.get_projection();
+  const worldSave = this.renderContext.get_world();
+  const viewSave = this.renderContext.get_view();
+  const projSave = this.renderContext.get_projection();
   if (Settings.get_current().get_showCrosshairs()) {
     this._drawCrosshairs(this.renderContext);
   }
@@ -352,9 +352,9 @@ export function renderOneFrame() {
     this.uiController.render(this.renderContext);
   }
   else {
-    var index = 0;
+    const index = 0;
     Annotation.prepBatch(this.renderContext);
-    for (const item in this._annotations) {
+    for (const item of this._annotations) {
       item.draw(this.renderContext);
       index++;
     }
@@ -368,7 +368,7 @@ export function renderOneFrame() {
       this._drawHoverText(this.renderContext);
     }
   }
-  var tilesAllLoaded = !TileCache.get_queueCount();
+  const tilesAllLoaded = !TileCache.get_queueCount();
   this.renderContext.setupMatricesOverlays();
   this._fadeFrame();
   this._frameCount++;
@@ -381,8 +381,8 @@ export function renderOneFrame() {
   this.renderContext.set_world(worldSave);
   this.renderContext.set_view(viewSave);
   this.renderContext.set_projection(projSave);
-  var now = Date.now();
-  var ms = now - this._lastUpdate;
+  const now = Date.now();
+  const ms = now - this._lastUpdate;
   if (ms > 1000) {
     this._lastUpdate = now;
     this._frameCount = 0;

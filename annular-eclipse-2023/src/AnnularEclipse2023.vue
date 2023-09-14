@@ -378,12 +378,12 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place  } from "@wwtelescope/engine";
+import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -637,6 +637,10 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
 
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
