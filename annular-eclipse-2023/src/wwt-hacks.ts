@@ -312,8 +312,8 @@ export function renderOneFrame() {
     else {
       if (this.renderContext.viewCamera.opacity !== 100 && this.renderContext.gl == null) {
         if (this._foregroundCanvas.width !== this.renderContext.width || this._foregroundCanvas.height !== this.renderContext.height) {
-          this._foregroundCanvas.width = ss.truncate(this.renderContext.width);
-          this._foregroundCanvas.height = ss.truncate(this.renderContext.height);
+          this._foregroundCanvas.width = this.renderContext.width;
+          this._foregroundCanvas.height = this.renderContext.height;
         }
         var saveDevice = this.renderContext.device;
         this._fgDevice.clearRect(0, 0, this.renderContext.width, this.renderContext.height);
@@ -331,9 +331,7 @@ export function renderOneFrame() {
     }
   }
 
-  var $enum1 = ss.enumerate(this.renderContext.get_catalogHipsImagesets());
-  while ($enum1.moveNext()) {
-    var imageset = $enum1.current;
+  for (const imageset in this.renderContext.get_catalogHipsImagesets()) {
     if (imageset.get_hipsProperties().get_catalogSpreadSheetLayer().enabled && imageset.get_hipsProperties().get_catalogSpreadSheetLayer().lastVersion === imageset.get_hipsProperties().get_catalogSpreadSheetLayer().get_version()) {
       this.renderContext.drawImageSet(imageset, 100);
     }
@@ -356,9 +354,7 @@ export function renderOneFrame() {
   else {
     var index = 0;
     Annotation.prepBatch(this.renderContext);
-    var $enum2 = ss.enumerate(this._annotations);
-    while ($enum2.moveNext()) {
-      var item = $enum2.current;
+    for (const item in this._annotations) {
       item.draw(this.renderContext);
       index++;
     }
@@ -368,7 +364,7 @@ export function renderOneFrame() {
       this._annotationHover(raDecDown.x, raDecDown.y, this._hoverTextPoint.x, this._hoverTextPoint.y);
       this._lastMouseMove = new Date(2100, 1, 1);
     }
-    if (!ss.emptyString(this._hoverText)) {
+    if (this._hoverText) {
       this._drawHoverText(this.renderContext);
     }
   }
@@ -385,7 +381,7 @@ export function renderOneFrame() {
   this.renderContext.set_world(worldSave);
   this.renderContext.set_view(viewSave);
   this.renderContext.set_projection(projSave);
-  var now = ss.now();
+  var now = Date.now();
   var ms = now - this._lastUpdate;
   if (ms > 1000) {
     this._lastUpdate = now;
