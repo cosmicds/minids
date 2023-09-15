@@ -3,7 +3,7 @@
 
 /* eslint-disable */
 
-import { Annotation2, Poly2 } from "./Annotation2";
+import { Annotation2 } from "./Annotation2";
 
 import {
   Annotation, Color, Colors, Constellations, Coordinates, Grids,

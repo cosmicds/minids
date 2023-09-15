@@ -5,15 +5,12 @@ if ! test -f ${filepath}; then
     filepath="../${filepath}"
 fi
 
-line_number=$(sed -n "/TileCache: /=" ${filepath})
-if [[ ! -z ${line_number} ]]
+reexport_line=$(sed -n "/ ss: () => (\/\* reexport/=" $filepath)
+reexport_line=$((${reexport_line} - 1))
+if [[ ! -z ${reexport_line} ]]
 then
-    line=$(head -n ${line_number} ${filepath} | tail -1 | xargs)
-    insert_number=$(sed -n "/ScaleTypes: ScaleTypes/=" ${filepath})
-    if [[ $(($line_number < $insert_number)) ]]
-    then
-        sed -i.bak "${insert_number}a      TileCache: [ TileCache, TileCache$, null ]," ${filepath}
-        sed -i.bak "${line_number}d" ${filepath}
-        rm ${filepath}.bak
-    fi
+    sed -i.bak "${reexport_line}a TileCache: () => (_tile_cache_js__WEBPACK_IMPORTED_MODULE_X__.TileCache)," ${filepath}
+    import_line=$((reexport_line + 5))
+    sed -i.bak "${import_line}a var _tile_cache_js__WEBPACK_IMPORTED_MODULE_X__ = __webpack_require__('./esm/tile_cache.js');" ${filepath}
+    rm ${filepath}.bak
 fi
