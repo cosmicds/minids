@@ -379,6 +379,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
+import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import tzlookup from "tz-lookup";
@@ -1001,12 +1002,17 @@ export default defineComponent({
           const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
           return [R2D * raDec.raRad, R2D * raDec.decRad];
         });
-        const poly = new Poly();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const poly = new Poly2();
         points.forEach(point => poly.addPoint(...point));
         poly.set_lineColor(color);
         poly.set_fill(true);
         poly.set_fillColor(color);
-        this.addAnnotation(poly);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        Annotation2.annotations.push(poly);
       }
     },
 

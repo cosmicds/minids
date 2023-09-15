@@ -330,31 +330,6 @@ export function renderOneFrame() {
       }
     }
   }
-
-  Annotation2.prepBatch(this.renderContext);
-  for (const item of Annotation2.annotations) {
-    item.draw(this.renderContext);
-    index++;
-  }
-  Annotation2.drawBatch(this.renderContext);
-
-  for (const imageset in this.renderContext.get_catalogHipsImagesets()) {
-    if (imageset.get_hipsProperties().get_catalogSpreadSheetLayer().enabled && imageset.get_hipsProperties().get_catalogSpreadSheetLayer().lastVersion === imageset.get_hipsProperties().get_catalogSpreadSheetLayer().get_version()) {
-      this.renderContext.drawImageSet(imageset, 100);
-    }
-  }
-  if (Settings.get_active().get_showSolarSystem()) {
-    this.constellation = Constellations.containment.findConstellationForPoint(this.renderContext.viewCamera.get_RA(), this.renderContext.viewCamera.get_dec());
-    this._drawSkyOverlays();
-    Planets.drawPlanets(this.renderContext, 1);
-  }
-
-  const worldSave = this.renderContext.get_world();
-  const viewSave = this.renderContext.get_view();
-  const projSave = this.renderContext.get_projection();
-  if (Settings.get_current().get_showCrosshairs()) {
-    this._drawCrosshairs(this.renderContext);
-  }
   if (this.uiController != null) {
     this.uiController.render(this.renderContext);
   }
@@ -375,6 +350,31 @@ export function renderOneFrame() {
       this._drawHoverText(this.renderContext);
     }
   }
+
+  for (const imageset in this.renderContext.get_catalogHipsImagesets()) {
+    if (imageset.get_hipsProperties().get_catalogSpreadSheetLayer().enabled && imageset.get_hipsProperties().get_catalogSpreadSheetLayer().lastVersion === imageset.get_hipsProperties().get_catalogSpreadSheetLayer().get_version()) {
+      this.renderContext.drawImageSet(imageset, 100);
+    }
+  }
+  if (Settings.get_active().get_showSolarSystem()) {
+    this.constellation = Constellations.containment.findConstellationForPoint(this.renderContext.viewCamera.get_RA(), this.renderContext.viewCamera.get_dec());
+    this._drawSkyOverlays();
+    Planets.drawPlanets(this.renderContext, 1);
+  }
+
+  Annotation2.prepBatch(this.renderContext);
+  for (const item of Annotation2.annotations) {
+    item.draw(this.renderContext);
+  }
+  Annotation2.drawBatch(this.renderContext);
+
+  const worldSave = this.renderContext.get_world();
+  const viewSave = this.renderContext.get_view();
+  const projSave = this.renderContext.get_projection();
+  if (Settings.get_current().get_showCrosshairs()) {
+    this._drawCrosshairs(this.renderContext);
+  }
+
   const tilesAllLoaded = !TileCache.get_queueCount();
   this.renderContext.setupMatricesOverlays();
   this._fadeFrame();
