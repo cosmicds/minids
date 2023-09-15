@@ -3,7 +3,7 @@
 
 /* eslint-disable */
 
-
+import { Annotation2, Poly2 } from "./Annotation2";
 
 import {
   Annotation, Color, Colors, Constellations, Coordinates, Grids,
@@ -330,6 +330,13 @@ export function renderOneFrame() {
       }
     }
   }
+
+  Annotation2.prepBatch(this.renderContext);
+  for (const item of Annotation2.annotations) {
+    item.draw(this.renderContext);
+    index++;
+  }
+  Annotation2.drawBatch(this.renderContext);
 
   for (const imageset in this.renderContext.get_catalogHipsImagesets()) {
     if (imageset.get_hipsProperties().get_catalogSpreadSheetLayer().enabled && imageset.get_hipsProperties().get_catalogSpreadSheetLayer().lastVersion === imageset.get_hipsProperties().get_catalogSpreadSheetLayer().get_version()) {

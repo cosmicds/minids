@@ -1,3 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable */
+
 import { Color, Colors, Coordinates, PointList, LineList, TriangleFanList, TriangleList, Tessellator } from "@wwtelescope/engine";
 
 export function Annotation2() {
@@ -6,6 +10,8 @@ export function Annotation2() {
     this._opacity = 1;
     this._showHoverLabel = false;
 }
+
+Annotation2.annotations = [];
 
 Annotation2.pointList = null;
 Annotation2.lineList = null;
