@@ -813,8 +813,6 @@ export default defineComponent({
       }
     },
 
-
-
     updateLocation(location: string) {
       if (location == null) {
         return;
@@ -983,7 +981,6 @@ export default defineComponent({
     },
 
     createHorizon(when: Date | null = null) {
-      this.removeHorizon();
 
       const color = '#01362C';
       const date = when || this.dateTime || new Date();
@@ -1017,9 +1014,6 @@ export default defineComponent({
     },
 
     createSky(when: Date | null = null) {
-      // this removes all annotations, so it erases horizon if you create that first.
-      // this.removeHorizon(); 
-
       const color = '#87CEEB';
       // const opacity = 0.5;
       const date = when || this.dateTime || new Date();
@@ -1050,7 +1044,8 @@ export default defineComponent({
 
     },
 
-    removeHorizon() {
+    removeAnnotations() {
+      Annotation2.annotations = [];
       this.clearAnnotations();
     },    
 
@@ -1077,18 +1072,13 @@ export default defineComponent({
     updateForDateTime() {
       this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
       this.updateHorizon(this.dateTime); 
-      // this.showImageForDateTime(this.dateTime);
-      // this.updateViewForDate(options);
-      // this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
+      this.removeAnnotations();
       if (this.showHorizon) {
         this.createHorizon(when);
-        // uncomment next line when we sort out opacity of sky annotation
         this.createSky(when);
-      } else {
-        this.removeHorizon();
       }
     },
 
