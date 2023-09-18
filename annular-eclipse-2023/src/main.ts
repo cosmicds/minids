@@ -89,7 +89,6 @@ createApp(AnnularEclipse2023, {
   .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
-  .component('guided-content', GuidedContent)
 
   // Mount
   .mount("#app");
