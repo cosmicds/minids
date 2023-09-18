@@ -63,10 +63,10 @@ export function makeAltAzGridText() {
     const up = Vector3d.create(0, sign, 0);
     const directions = [
       [[0, alt, -1], "N"],
-      [[sign * -1, alt, 0], "E"],
+      [[-sign, alt, 0], "E"],
       [[0, alt, 1], "S"],
-      [[sign * 1, alt,  -0.0095], "V"],
-      [[sign * 1, alt,  0.0095], "V"]
+      [[sign, alt,  -0.0095], "V"],
+      [[sign, alt,  0.0095], "V"]
     ]
     directions.forEach(([v, text]) => {
       Grids._altAzTextBatch.add(new Text3d(Vector3d.create(...v), up, text, 75, 0.00018));
