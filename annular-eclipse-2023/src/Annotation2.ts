@@ -127,6 +127,16 @@ export class Annotation2 {
       this.center = value;
       return value;
   }
+
+  static addAnnotation(ann) {
+    Annotation2.annotations.push(ann);
+    Annotation2.batchDirty = true;
+  }
+
+  static clearAll() {
+    Annotation2.annotations = [];
+    Annotation2.batchDirty = true;
+  }
 }
 
 export class Poly2 extends Annotation2 {
@@ -244,4 +254,5 @@ export class Poly2 extends Annotation2 {
           ctx.restore();
       }
   }
+
 };

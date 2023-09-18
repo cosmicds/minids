@@ -1009,7 +1009,7 @@ export default defineComponent({
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        Annotation2.annotations.push(poly);
+        Annotation2.addAnnotation(poly);
       }
     },
 
@@ -1045,7 +1045,9 @@ export default defineComponent({
     },
 
     removeAnnotations() {
-      Annotation2.annotations = [];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Annotation2.clearAll();
       this.clearAnnotations();
     },    
 
