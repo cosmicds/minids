@@ -378,12 +378,13 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Constellations, Folder, Grids, LayerManager, Poly,Settings, WWTControl, Place  } from "@wwtelescope/engine";
+import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
+import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters } from "./wwt-hacks";
+import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -609,7 +610,7 @@ export default defineComponent({
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
-      console.log(this.dateTime);
+      console.log(this);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -638,12 +639,18 @@ export default defineComponent({
       // @ts-ignore
       this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
+
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
       this.setClockRate(1); //
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
+        this.setForegroundImageByName("DSS (Digitized Sky Survey");
+        this.setBackgroundImageByName("Black Sky Background");
       }, 100);
 
       // If there are layers to set up, do that here!
@@ -805,8 +812,6 @@ export default defineComponent({
         this.updateHorizon();
       }
     },
-
-
 
     updateLocation(location: string) {
       if (location == null) {
@@ -976,7 +981,6 @@ export default defineComponent({
     },
 
     createHorizon(when: Date | null = null) {
-      this.removeHorizon();
 
       const color = '#01362C';
       const date = when || this.dateTime || new Date();
@@ -995,19 +999,21 @@ export default defineComponent({
           const raDec = this.horizontalToEquatorial(...point, this.location.latitudeRad, this.location.longitudeRad, date);
           return [R2D * raDec.raRad, R2D * raDec.decRad];
         });
-        const poly = new Poly();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const poly = new Poly2();
         points.forEach(point => poly.addPoint(...point));
         poly.set_lineColor(color);
         poly.set_fill(true);
         poly.set_fillColor(color);
-        this.addAnnotation(poly);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        Annotation2.addAnnotation(poly);
       }
     },
 
     createSky(when: Date | null = null) {
-      // this removes all annotations, so it erases horizon if you create that first.
-      // this.removeHorizon(); 
-
       const color = '#87CEEB';
       // const opacity = 0.5;
       const date = when || this.dateTime || new Date();
@@ -1038,7 +1044,10 @@ export default defineComponent({
 
     },
 
-    removeHorizon() {
+    removeAnnotations() {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Annotation2.clearAll();
       this.clearAnnotations();
     },    
 
@@ -1065,18 +1074,13 @@ export default defineComponent({
     updateForDateTime() {
       this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
       this.updateHorizon(this.dateTime); 
-      // this.showImageForDateTime(this.dateTime);
-      // this.updateViewForDate(options);
-      // this.updateLayersForDate();
     },
 
     updateHorizon(when: Date | null = null) {
+      this.removeAnnotations();
       if (this.showHorizon) {
         this.createHorizon(when);
-        // uncomment next line when we sort out opacity of sky annotation
         this.createSky(when);
-      } else {
-        this.removeHorizon();
       }
     },
 
