@@ -1461,7 +1461,7 @@ body {
 }
 
 .top-content {
-  position: relative;
+  position: absolute;
   top: 1rem;
   left: 1rem;
   width: calc(100% - 2rem);
