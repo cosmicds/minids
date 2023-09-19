@@ -693,6 +693,8 @@ export default defineComponent({
       times: times, 
       
       accentColor: "#ef7e3d",
+      guidedContentHeight: "300px",
+      showGuidedContent: true,
 
       tab: 0,
 
@@ -756,6 +758,11 @@ export default defineComponent({
       console.log("selected time", this.selectedTime);
 
     });
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
+    });
   },
 
   computed: {
@@ -791,6 +798,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
+        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
       };
     },
     wwtControl(): WWTControl {
@@ -1189,6 +1197,23 @@ export default defineComponent({
         this.createSky(when);
       }
     },
+
+    updateGuidedContentHeight() {
+      const guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+      if (guidedContentContainer) {
+        const height = guidedContentContainer.clientHeight;
+        console.log("height", height);
+        this.guidedContentHeight = `${height}px`;
+        
+      }
+    },
+    
+    onResize() {
+      // get height of #guided-content-container
+      this.$nextTick(() => {
+        this.updateGuidedContentHeight();
+      });
+    }
 
   },
 
