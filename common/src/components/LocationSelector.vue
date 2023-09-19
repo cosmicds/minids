@@ -1,51 +1,40 @@
 <template>
-  <v-card class="location-selector">
-    <div class="text-center">
-      Move around the map and double-click to change location
-    </div>
-    <v-btn
-      @click="getLocation"
-      @keyup.enter="getLocation"
-    >
-      Use My Location
-    </v-btn>
-    <div class="text-center red--text">{{ locationErrorMessage }}</div>
-    <div id="map-container"></div>
-  </v-card>
+  <div id="map-container"></div>
 </template>
 
 <script lang="ts">
-import { VCard } from "vuetify/components/VCard";
-import { VBtn } from "vuetify/components/VBtn";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
 import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import _Notifications from "@kyvg/vue3-notification";
 import { defineComponent, PropType } from "vue";
 
-library.add(faLocationPin);
-
-export type LocationDeg = {
+export interface LocationDeg {
   longitudeDeg: number;
   latitudeDeg: number;
-};
+}
 
 interface MapOptions extends TileLayerOptions {
   templateUrl: string;
 }
 
-export default defineComponent({
+interface Place extends LocationDeg { 
+  color?: Color;
+  fillColor?: Color;
+  fillOpacity?: number;
+  radius?: number;
+  name?: string;
+}
 
-  components: {
-    'v-btn': VBtn,
-    'v-card': VCard,
-  },
+export default defineComponent({
 
   props: {
     activatorColor: {
       type: String,
       default: "#ffffff"
+    },
+    detectLocation: {
+      type: Boolean,
+      default: true
     },
     modelValue: {
       type: Object as PropType<LocationDeg>,
@@ -67,19 +56,49 @@ export default defineComponent({
           className: 'map-tiles'
         };
       }
+    },
+    places: {
+      type: Array as PropType<Place[]>,
+      default() {
+        return [];
+      }
+    },
+    placeCircleOptions: {
+      type: Object as Record<string, any>,
+      default() {
+        return {
+          color: "#0000FF",
+          fillColor: "#3333FF",
+          fillOpacity: 0.5,
+          radius: 150 
+        };
+      }
+    },
+    selectedCircleOptions: {
+      type: Object as Record<string,any>,
+      default() {
+        return {
+          color: "#FF0000",
+          fillColor: "#FF0033",
+          fillOpacity: 0.5,
+          radius: 200
+        };
+      }
     }
   },
 
   mounted() {
-    this.getLocation(true);
+    if (this.detectLocation) {
+      this.getLocation(true);
+    }
     this.setup();
   },
 
   data() {
     return {
-      circle: null as L.Circle | null,
+      placeCircles: [] as L.Circle[],
+      selectedCircle: null as L.Circle | null,
       map: null as Map | null,
-      locationErrorMessage: ""
     };
   },
 
@@ -109,20 +128,23 @@ export default defineComponent({
               duration: 4500
             });
           } else {
-            this.locationErrorMessage = msg;
+            this.$emit("error", msg);
           }
         },
         options
       );
     },
 
-    circleForLocation(location: LocationDeg): L.Circle {
-      return L.circle([location.latitudeDeg, location.longitudeDeg], {
-        color: "#FF0000",
-        fillColor: "#FF0033",
-        fillOpacity: 0.5,
-        radius: 200
-      });
+    circleForLocation(location: LocationDeg, circleOptions: Record<string,any>): L.Circle {
+      return L.circle([location.latitudeDeg, location.longitudeDeg], circleOptions);
+    },
+
+    circleForSelection() : L.Circle {
+      return this.circleForLocation(this.modelValue, this.selectedCircleOptions);
+    },
+
+    circleForPlace(place): L.Circle {
+      return this.circleForLocation(place, this.placeCircleOptions);
     },
 
     onMapSelect(event: LeafletMouseEvent) {
@@ -140,7 +162,17 @@ export default defineComponent({
       
       const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
       L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
-      this.circle = this.circleForLocation(this.modelValue).addTo(map);
+      this.selectedCircle = this.circleForSelection();
+      this.placeCircles = this.places.map(place => this.circleForPlace(place));
+      this.placeCircles.forEach((circle, index) => {
+        circle.on('hover', () => {
+          circle.openTooltip(this.places[index]);
+        });
+        if (this.places[index].name) {
+          circle.bindTooltip(name);
+        }
+        circle.addTo(map);
+      });
 
       map.doubleClickZoom.disable();
       map.on('dblclick', this.onMapSelect);
@@ -153,8 +185,8 @@ export default defineComponent({
 
     updateCircle() {
       if (this.map) {
-        this.circle?.remove();
-        this.circle = this.circleForLocation(this.modelValue).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        this.selectedCircle?.remove();
+        this.selectedCircle = this.circleForLocation(this.modelValue).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
       }
     }
 
@@ -165,7 +197,7 @@ export default defineComponent({
       this.updateCircle();
     },
   }
-
+  
 });
 </script>
 
