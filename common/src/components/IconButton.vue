@@ -24,9 +24,15 @@
           <font-awesome-icon
             v-if="faIcon"
             :icon="faIcon"
-            size="lg"
+            :size="faSize"
             :class="['fa-icon', faIcon]"
           ></font-awesome-icon>
+          <v-icon
+            v-if="mdIcon"
+            :size="mdSize"
+            :class="['md-icon', mdIcon]"
+          >{{ `mdi-${mdIcon}` }}
+        </v-icon>
         </slot>
       </div>
     </template>
@@ -37,18 +43,24 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { VTooltip } from "vuetify/components/VTooltip";
+import { VIcon } from "vuetify/components/VIcon";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import type { FontAwesomeIconProps } from "@fortawesome/vue-fontawesome/";
+
+type SizeType = Extract<FontAwesomeIconProps, 'size'>;
 
 export default defineComponent({
 
   components: {
     'v-tooltip': VTooltip,
+    'v-icon': VIcon,
     'font-awesome-icon': FontAwesomeIcon
   },
 
   props: {
     modelValue: { type: Boolean, required: false },
-    faIcon: { type: String, required: false },
+    faIcon: { type: String, required: false, default: null},
+    mdIcon: { type: String, required: false, default: null},
     color: { type: String, default: "#ffffff" },
     focusColor: { type: String, default: "#ffffff" },
     backgroundColor: { type: String, default: "#040404" },
@@ -60,7 +72,9 @@ export default defineComponent({
     tooltipOnFocus: { type: Boolean, default: false },
     tooltipOnHover: { type: Boolean, default: true },
     tooltipOffset: { type: [String, Number], default: 0 },
-    showTooltip: { type: Boolean, default: true }
+    showTooltip: { type: Boolean, default: true },
+    faSize: { type: String as SizeType, default: 'lg' }, // fa: lg, md: 20px
+    mdSize: { type: String, default: '1.25em' } // fa: lg, md: 20px
   },
 
   methods: {
@@ -125,6 +139,7 @@ export default defineComponent({
   border: 1px solid var(--color);
   display: flex;
   align-items: center;
+  justify-content: center;
   pointer-events: auto;
   border-radius: 20px;
 
