@@ -72,6 +72,7 @@ export default defineComponent({
 
   mounted() {
     this.getLocation(true);
+    this.setup();
   },
 
   data() {
@@ -137,7 +138,8 @@ export default defineComponent({
     setup() {
       const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
-      L.tileLayer(this.mapOptions.templateUrl, this.mapOptions).addTo(map);
+      const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
+      L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
       this.circle = this.circleForLocation(this.modelValue).addTo(map);
 
       map.doubleClickZoom.disable();
