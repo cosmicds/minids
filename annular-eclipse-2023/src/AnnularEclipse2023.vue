@@ -3,9 +3,122 @@
   id="app"
   :style="cssVars"
 >
+  
+    <div id="guided-content-container">
+      
+      <div id="top-guided-content" class="guided-content">
+        <icon-button
+          v-model="showGuidedContent"
+          :fa-icon="showGuidedContent ? 'chevron-up' : 'chevron-down'"
+          :color="accentColor"
+          background-color="transparent"
+          :box-shadow="false"
+          tooltip-location="start"
+          @activate="() => { onResize() }"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Discover'"
+          fa-icon="rocket"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Discover'}"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Answer'"
+          fa-icon="puzzle-piece"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Answer'}"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Explore'"
+          fa-icon="location-dot"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Explore'}"
+        ></icon-button>
+        <icon-button
+          v-model="showTextSheet"
+          fa-icon="book-open"
+          :color="accentColor"
+          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+          tooltip-location="start"
+        ></icon-button>
+        
+        <icon-button
+          v-model="showVideoSheet"
+          fa-icon="video"
+          :color="accentColor"
+          tooltip-text="Watch video"
+          tooltip-location="start"
+        >
+        </icon-button>
+        <icon-button
+          fa-icon="sun"
+          :color="accentColor"
+          tooltip-text="Center view on Sun"
+          tooltip-location='top'
+          @activate="() => trackSun()"
+        >
+        </icon-button>
+      </div>
+        
+      <div v-if="showGuidedContent" id="bottom-guided-content">
+        <div id="map-holder">
+          <span id="title">What will the eclipse look like here?</span>
+          <div id="map-container-map">
+            <span v-if="learnerPath=='Discover'">
+              Show a map with a pre-selected locations
+            </span>
+            <span v-if="learnerPath=='Answer'">
+              Show a map with a possible eclipse paths
+            </span>
+            <span v-if="learnerPath=='Explore'">
+              Show a map with a user selected location
+            </span>
+          </div>
+        </div>
+        
+        <div id="bottom-center-content">
+          
+          <!-- Learn Path -->
+          <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
+            <span id="description">
+              <p>Click a highlighted city to view the eclipse from that location.</p>
+              <p>Explore until you can identify which locations will see an annular eclipse</p>
+            </span>
+          </div>
+          
+          <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
+            <span id="description">
+              <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
+              <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
+            </span>
+          </div>
+          
+          <!-- Explore Path -->
+          <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
+            <span id="description">Click a location on the map to select any place you like.</span>
+          </div>
+          
+          <div id="location-time-display">
+            <div id="location-display" class="ltd-container">
+              <p class="ltd-label">View for:</p>
+              <p class="ltd-value">{{ selectedLocation }}</p>
+            </div>
+            <div id="time-display" class="ltd-container">
+              <p class="ltd-label">Time:</p>
+              <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
+            </div>
+          </div>
+          
+        </div>
+        <!-- <div id="main-guided-contols" class="controls"></div> -->
+      </div>
+        
+    </div>
+
   <div
     id="main-content"
   >
+  
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
@@ -39,106 +152,7 @@
       </div>
     </transition>
   
-  <div id="guided-content-container">
-    <div id="top-guided-content" class="guided-content">
-      <icon-button
-        :v-model="learnerPath == 'Discover'"
-        fa-icon="rocket"
-        :color="accentColor"
-        @activate="() => { learnerPath = 'Discover'}"
-      ></icon-button>
-      <icon-button
-        :v-model="learnerPath == 'Answer'"
-        fa-icon="puzzle-piece"
-        :color="accentColor"
-        @activate="() => { learnerPath = 'Answer'}"
-      ></icon-button>
-      <icon-button
-        :v-model="learnerPath == 'Explore'"
-        fa-icon="location-dot"
-        :color="accentColor"
-        @activate="() => { learnerPath = 'Explore'}"
-      ></icon-button>
-      <icon-button
-        v-model="showTextSheet"
-        fa-icon="book-open"
-        :color="accentColor"
-        :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-        tooltip-location="start"
-      >
-      </icon-button>
-      <icon-button
-        v-model="showVideoSheet"
-        fa-icon="video"
-        :color="accentColor"
-        tooltip-text="Watch video"
-        tooltip-location="start"
-      >
-      </icon-button>
-      <icon-button
-        fa-icon="sun"
-        :color="accentColor"
-        tooltip-text="Center view on Sun"
-        tooltip-location='top'
-        @activate="() => trackSun()"
-      >
-      </icon-button>
-    </div>
-      
-    <div id="bottom-guided-content">
-      <div id="map-holder">
-        <span id="title">What will the eclipse look like here?</span>
-        <div id="map-container-map">
-          <span v-if="learnerPath=='Discover'">
-            Show a map with a pre-selected locations
-          </span>
-          <span v-if="learnerPath=='Answer'">
-            Show a map with a possible eclipse paths
-          </span>
-          <span v-if="learnerPath=='Explore'">
-            Show a map with a user selected location
-          </span>
-        </div>
-      </div>
-      
-      <div id="bottom-center-content">
-        
-        <!-- Learn Path -->
-        <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
-          <span id="description">
-            <p>Click a highlighted city to view the eclipse from that location.</p>
-            <p>Explore until you can identify which locations will see an annular eclipse</p>
-          </span>
-        </div>
-        
-        <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
-          <span id="description">
-            <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
-            <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
-          </span>
-        </div>
-        
-        <!-- Explore Path -->
-        <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
-          <span id="description">Click a location on the map to select any place you like.</span>
-        </div>
-        
-        <div id="location-time-display">
-          <div id="location-display" class="ltd-container">
-            <p class="ltd-label">View for:</p>
-            <p class="ltd-value">{{ selectedLocation }}</p>
-          </div>
-          <div id="time-display" class="ltd-container">
-            <p class="ltd-label">Time:</p>
-            <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
-          </div>
-        </div>
-        
-      </div>
-      <div id="main-guided-contols" class="controls"></div>
-    </div>
-      
-  </div>
+  
 
     <div class="top-content">
       <div id="left-buttons">
