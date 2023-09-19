@@ -18,8 +18,8 @@ interface MapOptions extends TileLayerOptions {
 }
 
 interface Place extends LocationDeg { 
-  color?: Color;
-  fillColor?: Color;
+  color?: string;
+  fillColor?: string;
   fillOpacity?: number;
   radius?: number;
   name?: string;
@@ -64,7 +64,7 @@ export default defineComponent({
       }
     },
     placeCircleOptions: {
-      type: Object as Record<string, any>,
+      type: Object as PropType<Record<string, any>>,
       default() {
         return {
           color: "#0000FF",
@@ -75,7 +75,7 @@ export default defineComponent({
       }
     },
     selectedCircleOptions: {
-      type: Object as Record<string,any>,
+      type: Object as PropType<Record<string,any>>,
       default() {
         return {
           color: "#FF0000",
@@ -143,7 +143,7 @@ export default defineComponent({
       return this.circleForLocation(this.modelValue, this.selectedCircleOptions);
     },
 
-    circleForPlace(place): L.Circle {
+    circleForPlace(place: Place): L.Circle {
       return this.circleForLocation(place, this.placeCircleOptions);
     },
 
@@ -166,9 +166,12 @@ export default defineComponent({
       this.placeCircles = this.places.map(place => this.circleForPlace(place));
       this.placeCircles.forEach((circle, index) => {
         circle.on('hover', () => {
-          circle.openTooltip(this.places[index]);
+          const place = this.places[index];
+          circle.openTooltip([place.latitudeDeg, place.longitudeDeg]);
         });
-        if (this.places[index].name) {
+
+        const name = this.places[index].name;
+        if (name) {
           circle.bindTooltip(name);
         }
         circle.addTo(map);
@@ -186,7 +189,7 @@ export default defineComponent({
     updateCircle() {
       if (this.map) {
         this.selectedCircle?.remove();
-        this.selectedCircle = this.circleForLocation(this.modelValue).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        this.selectedCircle = this.circleForSelection().addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
       }
     }
 
