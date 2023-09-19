@@ -27,6 +27,8 @@ interface Place extends LocationDeg {
 
 export default defineComponent({
 
+  emits: ["place", "update:modelValue", "error"],
+
   props: {
     activatorColor: {
       type: String,
@@ -97,6 +99,7 @@ export default defineComponent({
   data() {
     return {
       placeCircles: [] as L.Circle[],
+      hoveredPlace: null as Place | null,
       selectedCircle: null as L.Circle | null,
       map: null as Map | null,
     };
@@ -140,11 +143,19 @@ export default defineComponent({
     },
 
     circleForSelection() : L.Circle {
-      return this.circleForLocation(this.modelValue, this.selectedCircleOptions);
+      return this.circleForLocation(this.modelValue, { ...this.selectedCircleOptions, interactive: false });
     },
 
     circleForPlace(place: Place): L.Circle {
       return this.circleForLocation(place, this.placeCircleOptions);
+    },
+
+    onPlaceSelect(place: Place) {
+      this.updateValue({
+        longitudeDeg: place.longitudeDeg,
+        latitudeDeg: place.latitudeDeg
+      });
+      this.$emit('place', place);
     },
 
     onMapSelect(event: LeafletMouseEvent) {
@@ -165,9 +176,18 @@ export default defineComponent({
       this.selectedCircle = this.circleForSelection();
       this.placeCircles = this.places.map(place => this.circleForPlace(place));
       this.placeCircles.forEach((circle, index) => {
-        circle.on('hover', () => {
+        circle.on('mouseover', () => {
           const place = this.places[index];
+          this.hoveredPlace = place;
           circle.openTooltip([place.latitudeDeg, place.longitudeDeg]);
+        });
+
+        circle.on('click', () => {
+          this.onPlaceSelect(this.places[index]);
+        });
+
+        circle.on('mouseout', () => {
+          this.hoveredPlace = null;
         });
 
         const name = this.places[index].name;
