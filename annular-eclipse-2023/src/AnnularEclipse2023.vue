@@ -1316,9 +1316,10 @@ body {
 }
 
 #main-content {
-  position: fixed;
+  position: relative;
+  // top: var(--top-content-height);
   width: 100%;
-  height: var(--app-content-height);
+  height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
 
   transition: height 0.1s ease-in-out;
@@ -1332,8 +1333,8 @@ body {
   font-size: 11pt;
 
   .wwtelescope-component {
-    position: absolute;
-    top: 0;
+    position: relative;
+    // top: 0;
     width: 100%;
     height: 100%;
     border-style: none;
