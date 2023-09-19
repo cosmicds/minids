@@ -52,6 +52,7 @@ export default defineComponent({
     color: { type: String, default: "#ffffff" },
     focusColor: { type: String, default: "#ffffff" },
     backgroundColor: { type: String, default: "#040404" },
+    boxShadow: { type: Boolean, default: true },
     border: { type: Boolean, default: true },
     longPressTimeMs: { type: Number, default: 500 },
     tooltipText: { type: String, required: false },
@@ -103,7 +104,9 @@ export default defineComponent({
       return {
         "--color": this.color,
         "--background-color": this.backgroundColor,
-        "--focus-color": this.focusColor
+        "--focus-color": this.focusColor,
+        "--active-shadow": this.boxShadow ? this.color : 'transparent',
+        "--focus-shadow": this.boxShadow ? this.focusColor : 'transparent',
       };
     },
 
@@ -138,10 +141,10 @@ export default defineComponent({
   }
 
   &.active {
-    box-shadow: 0px 0px 10px 3px var(--color);
+    box-shadow: 0px 0px 10px 3px var(--active-shadow);
 
     &:focus {
-      box-shadow: 0px 0px 10px 3px var(--focus-color);
+      box-shadow: 0px 0px 10px 3px var(--focus-shadow);
     }
   }
 }
