@@ -45,7 +45,7 @@ import { VCard } from "vuetify/components/VCard";
 import { VBtn } from "vuetify/components/VBtn";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
-import L, { LeafletMouseEvent, Map } from "leaflet";
+import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import _Notifications from "@kyvg/vue3-notification";
 import { defineComponent, PropType } from "vue";
@@ -57,6 +57,10 @@ export type LocationDeg = {
   longitudeDeg: number;
   latitudeDeg: number;
 };
+
+interface MapOptions extends TileLayerOptions {
+  templateUrl: string;
+}
 
 export default defineComponent({
 
@@ -78,6 +82,18 @@ export default defineComponent({
         return {
           latitudeDeg: 42.3814,
           longitudeDeg: -71.1281
+        };
+      }
+    },
+    mapOptions: {
+      type: Object as PropType<MapOptions>,
+      default() {
+        return {
+          templateUrl: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+          maxZoom: 20,
+          subdomains:['mt0','mt1','mt2','mt3'],
+          attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+          className: 'map-tiles'
         };
       }
     }
@@ -155,13 +171,7 @@ export default defineComponent({
     setup() {
       const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
-      L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3'],
-        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
-        className: 'map-tiles'
-      }).addTo(map);
-
+      L.tileLayer(this.mapOptions.templateUrl, this.mapOptions).addTo(map);
       this.circle = this.circleForLocation(this.modelValue).addTo(map);
 
       map.doubleClickZoom.disable();
