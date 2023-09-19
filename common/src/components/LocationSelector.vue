@@ -1,46 +1,20 @@
 <template>
-  <v-dialog
-    v-model="show"
-    class="location-selector-dialog"
-  >
-    <!-- TODO: What should the real types here be?
-              We don't need them so it doesn't matter,
-              but would be good to know.
-    -->
-    <template v-slot:activator>
-      <slot
-        name="activator"
-        :open="open"
-      >
-        <icon-button
-          v-model="show"
-          :color="activatorColor"
-          fa-icon="location-pin"
-          class="map-icon"
-          tooltip-text="Select location"
-          tooltip-location="bottom"
-          tooltip-offset="5px"
-        ></icon-button>
-      </slot>
-    </template>
-    <v-card class="location-selector">
-      <div class="text-center">
-        Move around the map and double-click to change location
-      </div>
-      <v-btn
-        @click="getLocation"
-        @keyup.enter="getLocation"
-      >
-        Use My Location
-      </v-btn>
-      <div class="text-center red--text">{{ locationErrorMessage }}</div>
-      <div id="map-container"></div>
-    </v-card>
-  </v-dialog>
+  <v-card class="location-selector">
+    <div class="text-center">
+      Move around the map and double-click to change location
+    </div>
+    <v-btn
+      @click="getLocation"
+      @keyup.enter="getLocation"
+    >
+      Use My Location
+    </v-btn>
+    <div class="text-center red--text">{{ locationErrorMessage }}</div>
+    <div id="map-container"></div>
+  </v-card>
 </template>
 
 <script lang="ts">
-import { VDialog } from "vuetify/components/VDialog";
 import { VCard } from "vuetify/components/VCard";
 import { VBtn } from "vuetify/components/VBtn";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -49,7 +23,6 @@ import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import _Notifications from "@kyvg/vue3-notification";
 import { defineComponent, PropType } from "vue";
-import IconButton from "./IconButton.vue";
 
 library.add(faLocationPin);
 
@@ -67,8 +40,6 @@ export default defineComponent({
   components: {
     'v-btn': VBtn,
     'v-card': VCard,
-    'v-dialog': VDialog,
-    'icon-button': IconButton
   },
 
   props: {
@@ -107,16 +78,11 @@ export default defineComponent({
     return {
       circle: null as L.Circle | null,
       map: null as Map | null,
-      locationErrorMessage: "",
-      show: false
+      locationErrorMessage: ""
     };
   },
 
   methods: {
-
-    open() {
-      this.show = true;
-    },
 
     getLocation(startup=false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
@@ -196,45 +162,24 @@ export default defineComponent({
     modelValue() {
       this.updateCircle();
     },
-
-    show(show: boolean) {
-      if (show) {
-        this.locationErrorMessage = "";
-        this.$nextTick(() => {
-          this.setup();
-        });
-      } else {
-        this.map?.remove();
-        this.map = null;
-        this.circle = null;
-      }
-    }
   }
 
 });
 </script>
 
 <style lang="less">
-.location-selector-dialog {
-  
-  .v-overlay__content {
-    width: fit-content !important;
-  }
+.location-selector {
+  align-items: center;
+  margin: auto;
+  width: 70vw;
+  height: fit-content;
+}
 
-  .location-selector {
-    align-items: center;
-    margin: auto;
-    width: 70vw;
-    height: fit-content;
-  }
-
-  #map-container {
-    width: 60vw;
-    height: 70vh;
-    margin: auto;
-    padding: 5px 0px;
-    border-radius: 5px;
-  }
-
+#map-container {
+  width: 60vw;
+  height: 70vh;
+  margin: auto;
+  padding: 5px 0px;
+  border-radius: 5px;
 }
 </style>
