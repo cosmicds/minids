@@ -118,7 +118,6 @@
   <div
     id="main-content"
   >
-  
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
@@ -151,8 +150,6 @@
         </div>
       </div>
     </transition>
-  
-  
 
     <div class="top-content">
       <div id="left-buttons">
@@ -583,7 +580,7 @@ export default defineComponent({
     sunPlace.set_zoomLevel(20);
 
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
