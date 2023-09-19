@@ -1928,6 +1928,20 @@ video {
     flex-direction: row;
     justify-content: space-between;
     width: 90%;
+    
+    
+    div.icon-wrapper {
+      background-color: rgba(209, 209, 209, .2);
+      // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
+      border: none;
+      border-radius: 5px;
+      padding-inline: 10px;
+      padding-block: 3px;
+      width: 100%;
+      margin-inline: 10px;
+      justify-content: center;
+    }
+    
   }
   
   #bottom-guided-content {
