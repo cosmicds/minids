@@ -1792,25 +1792,31 @@ video {
 }
 
 #guided-content-container {
-  --margin: 10px;
+  --margin: 0px;
   position: relative;
-  top: 0;
+  top: 0; 
   left: 0;
   width: calc(100% - 2*var(--margin));
-  height: fit-content; // 2*var(--margin) if going to bottom
-  min-height: calc(25vh - var(--margin));
+  height: fit-content; 
   margin: var(--margin);
-  padding: var(--margin);
+  padding-block: 0.5rem;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  border: 1px solid var(--accent-color);
-  background-color: #000000f0;
-  // z-index: 100;
+  gap: 0.5rem;
+  // border-bottom: 1px solid var(--accent-color);
+  background-color: #272727;
+  
+  transition: height 0.5s ease-in-out;
+  
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
   
   #top-guided-content {
+    // buttons
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -1818,9 +1824,12 @@ video {
   }
   
   #bottom-guided-content {
+    // map stuff
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
+    
   
     #map-holder {
       // width: 90%;
@@ -1831,15 +1840,14 @@ video {
       #title {
         color: var(--accent-color);
         font-weight: bold;
-        font-size: 1em
-        
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
       }
       
       #map-container-map {
         width: 100%;
         aspect-ratio: 2 / 1;
         background-color: cornsilk;
-        border: 5px solid grey;
         
         span {
           font-weight: bold;
@@ -1853,25 +1861,34 @@ video {
     }
     
     #bottom-center-content {
+      // text guidelines
+
       .bottom-center-content-text {
         color: white;
         font-size: 1em;
-        text-align: left;
+        text-align: center;
         margin: 1em;
         padding: 0;
+        
       }
       
       #location-time-display {
         margin: 1em;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 0.5rem;
+        
       
         .ltd-container {
-          display: block;
+          // display: block;
           padding-inline: 0.5em;
           margin-bottom: 0.5em;
           text-align: left;
           background-color: aliceblue;
           color: blue;
           border-radius: 0.5em;
+          flex-grow: 1;
         }
         
         .ltd-label {
