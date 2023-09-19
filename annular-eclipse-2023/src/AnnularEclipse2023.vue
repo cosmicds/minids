@@ -3,6 +3,118 @@
   id="app"
   :style="cssVars"
 >
+  
+    <div id="guided-content-container">
+      
+      <div id="top-guided-content" class="guided-content">
+        <icon-button
+          v-model="showGuidedContent"
+          :fa-icon="showGuidedContent ? 'chevron-up' : 'chevron-down'"
+          :color="accentColor"
+          background-color="transparent"
+          :box-shadow="false"
+          tooltip-location="start"
+          @activate="() => { onResize() }"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Discover'"
+          fa-icon="rocket"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Discover'}"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Answer'"
+          fa-icon="puzzle-piece"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Answer'}"
+        ></icon-button>
+        <icon-button
+          :v-model="learnerPath == 'Explore'"
+          fa-icon="location-dot"
+          :color="accentColor"
+          @activate="() => { learnerPath = 'Explore'}"
+        ></icon-button>
+        <icon-button
+          v-model="showTextSheet"
+          fa-icon="book-open"
+          :color="accentColor"
+          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+          tooltip-location="start"
+        ></icon-button>
+        
+        <icon-button
+          v-model="showVideoSheet"
+          fa-icon="video"
+          :color="accentColor"
+          tooltip-text="Watch video"
+          tooltip-location="start"
+        >
+        </icon-button>
+        <icon-button
+          fa-icon="sun"
+          :color="accentColor"
+          tooltip-text="Center view on Sun"
+          tooltip-location='top'
+          @activate="() => trackSun()"
+        >
+        </icon-button>
+      </div>
+        
+      <div v-if="showGuidedContent" id="bottom-guided-content">
+        <div id="map-holder">
+          <span id="title">What will the eclipse look like here?</span>
+          <div id="map-container-map">
+            <span v-if="learnerPath=='Discover'">
+              Show a map with a pre-selected locations
+            </span>
+            <span v-if="learnerPath=='Answer'">
+              Show a map with a possible eclipse paths
+            </span>
+            <span v-if="learnerPath=='Explore'">
+              Show a map with a user selected location
+            </span>
+          </div>
+        </div>
+        
+        <div id="bottom-center-content">
+          
+          <!-- Learn Path -->
+          <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
+            <span id="description">
+              <p>Click a highlighted city to view the eclipse from that location.</p>
+              <p>Explore until you can identify which locations will see an annular eclipse</p>
+            </span>
+          </div>
+          
+          <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
+            <span id="description">
+              <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
+              <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
+            </span>
+          </div>
+          
+          <!-- Explore Path -->
+          <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
+            <span id="description">Click a location on the map to select any place you like.</span>
+          </div>
+          
+          <div id="location-time-display">
+            <div id="location-display" class="ltd-container">
+              <p class="ltd-label">View for:</p>
+              <p class="ltd-value">{{ selectedLocation }}</p>
+            </div>
+            <div id="time-display" class="ltd-container">
+              <p class="ltd-label">Time:</p>
+              <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
+            </div>
+          </div>
+          
+        </div>
+        <!-- <div id="main-guided-contols" class="controls"></div> -->
+      </div>
+        
+    </div>
+
   <div
     id="main-content"
   >
@@ -41,22 +153,7 @@
 
     <div class="top-content">
       <div id="left-buttons">
-        <icon-button
-          v-model="showTextSheet"
-          fa-icon="book-open"
-          :color="accentColor"
-          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-          tooltip-location="start"
-        >
-        </icon-button>
-        <icon-button
-          v-model="showVideoSheet"
-          fa-icon="video"
-          :color="accentColor"
-          tooltip-text="Watch video"
-          tooltip-location="start"
-        >
-        </icon-button>
+        
       </div>
       <div id="center-buttons">
         <!-- read https://github.com/cosmicds/minids/pull/141 for component description -->
@@ -66,14 +163,7 @@
           :model-value="locationDeg"
         >
         </location-selector>    
-        <icon-button
-          fa-icon="sun"
-          :color="accentColor"
-          tooltip-text="Center view on Sun"
-          tooltip-location='top'
-          @activate="() => trackSun()"
-        >
-        </icon-button>
+        
       </div>
       <div id="right-buttons">
         <v-dialog
@@ -381,7 +471,7 @@ import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
 
-import { getTimezoneOffset } from "date-fns-tz";
+import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
@@ -584,6 +674,10 @@ export default defineComponent({
           eclipseFracion: 0.97
         }
       } as Record<string, EclipseLocation>,
+
+      learnerPath: "Explore", // Explore or Learn
+
+      
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
@@ -596,6 +690,8 @@ export default defineComponent({
       times: times, 
       
       accentColor: "#ef7e3d",
+      guidedContentHeight: "300px",
+      showGuidedContent: true,
 
       tab: 0,
 
@@ -659,6 +755,11 @@ export default defineComponent({
       console.log("selected time", this.selectedTime);
 
     });
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
+    });
   },
 
   computed: {
@@ -669,6 +770,10 @@ export default defineComponent({
 
     selectedTimezoneOffset() {
       return getTimezoneOffset(this.selectedTimezone);
+    },
+
+    selectedLocaledTimeDateString() {
+      return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
     },
 
     ready(): boolean {
@@ -690,6 +795,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
+        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
       };
     },
     wwtControl(): WWTControl {
@@ -786,6 +892,11 @@ export default defineComponent({
       // get am pm
       const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
       return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+    },
+
+    toLocaleDateString(date: Date) {
+      date = new Date(date.getTime() + this.selectedTimezoneOffset);
+      return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`;
     },
 
     toLocaleTimeString(date: Date) {
@@ -1084,6 +1195,23 @@ export default defineComponent({
       }
     },
 
+    updateGuidedContentHeight() {
+      const guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+      if (guidedContentContainer) {
+        const height = guidedContentContainer.clientHeight;
+        console.log("height", height);
+        this.guidedContentHeight = `${height}px`;
+        
+      }
+    },
+    
+    onResize() {
+      // get height of #guided-content-container
+      this.$nextTick(() => {
+        this.updateGuidedContentHeight();
+      });
+    }
+
   },
 
   watch: {
@@ -1210,9 +1338,10 @@ body {
 }
 
 #main-content {
-  position: fixed;
+  position: relative;
+  // top: var(--top-content-height);
   width: 100%;
-  height: var(--app-content-height);
+  height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
 
   transition: height 0.1s ease-in-out;
@@ -1226,8 +1355,8 @@ body {
   font-size: 11pt;
 
   .wwtelescope-component {
-    position: absolute;
-    top: 0;
+    position: relative;
+    // top: 0;
     width: 100%;
     height: 100%;
     border-style: none;
@@ -1658,5 +1787,115 @@ video {
   max-width: 90%;
   background-color: rgba(0, 0, 0, 0.7);
 }
+
+#guided-content-container {
+  --margin: 0px;
+  position: relative;
+  top: 0; 
+  left: 0;
+  width: calc(100% - 2*var(--margin));
+  height: fit-content; 
+  margin: var(--margin);
+  padding-block: 0.5rem;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  // border-bottom: 1px solid var(--accent-color);
+  background-color: #272727;
+  
+  transition: height 0.5s ease-in-out;
+  
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
+  
+  #top-guided-content {
+    // buttons
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+  }
+  
+  #bottom-guided-content {
+    // map stuff
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+  
+    #map-holder {
+      // width: 90%;
+      height: fit-content;
+      pointer-events: auto;
+      margin-inline: auto;
+      
+      #title {
+        color: var(--accent-color);
+        font-weight: bold;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+      }
+      
+      #map-container-map {
+        width: 100%;
+        aspect-ratio: 2 / 1;
+        background-color: cornsilk;
+        
+        span {
+          font-weight: bold;
+          color: black;
+          // wrap text
+          white-space: break-spaces;
+        }
+        
+      }
+      
+    }
+    
+    #bottom-center-content {
+      // text guidelines
+
+      .bottom-center-content-text {
+        color: white;
+        font-size: 1em;
+        text-align: center;
+        margin: 1em;
+        padding: 0;
+        
+      }
+      
+      #location-time-display {
+        margin: 1em;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 0.5rem;
+        
+      
+        .ltd-container {
+          // display: block;
+          padding-inline: 0.5em;
+          margin-bottom: 0.5em;
+          text-align: left;
+          background-color: aliceblue;
+          color: blue;
+          border-radius: 0.5em;
+          flex-grow: 1;
+        }
+        
+        .ltd-label {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+
 
 </style>
