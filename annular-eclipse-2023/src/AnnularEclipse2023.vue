@@ -17,6 +17,12 @@
           @activate="() => { onResize() }"
         ></icon-button>
         <icon-button
+          fa-icon="question"
+          :color="accentColor"
+          tooltip-location="start"
+          @activate="() => { inIntro=true; introSlide = 2 }"
+        ></icon-button>
+        <icon-button
           :v-model="learnerPath == 'Discover'"
           fa-icon="rocket"
           :color="accentColor"
@@ -782,6 +788,7 @@ export default defineComponent({
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
+      showGuidedContent: false,
       inIntro: false,
 
       tab: 0,
@@ -887,7 +894,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
-        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
+        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
     },
     wwtControl(): WWTControl {
@@ -1391,6 +1398,17 @@ export default defineComponent({
         }, 350);
       }
     },
+
+    showSplashScreen(_val) {
+      if (!_val) {
+        this.inIntro = true;
+      }
+    },
+    
+    introSlide(_val) {
+      this.inIntro = _val < 4;
+      return;
+    }
 
   },
 });
