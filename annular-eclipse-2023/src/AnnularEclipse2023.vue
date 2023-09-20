@@ -244,6 +244,23 @@
 
     <div class="top-content" >
       <div id="left-buttons">
+        <v-switch
+          inset
+          :ripple="false"
+          v-model="viewerMode"
+          :color="accentColor"
+          false-value="SunScope"
+          false-icon="mdi-telescope"
+          true-value="Horizon"
+          true-icon="mdi-image-filter-hdr"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-telescope</v-icon>
+          </template>
+          <template v-slot:append>
+            <font-awesome-icon icon="mountain-sun"></font-awesome-icon>
+          </template>
+        </v-switch>
         
       </div>
       <div id="center-buttons">
@@ -788,6 +805,8 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
+      viewerMode: null as unknown as 'Horizon' | 'SunScope' ,
+
       sunPlace
     };
   },
@@ -1303,7 +1322,30 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
-    }
+    },
+
+
+    startHorizonMode() {
+      // turn on local horizon mode
+      // turn on horizon
+      // turn on sky (sky only visible when sun is up)
+      // zoom to full 60deg
+      // go to sun, but don't track
+      console.log('=== startHorizonMode ===');
+      return;
+    },
+
+    startSolarScopeMode() {
+      // turn off local horizon mode
+      // display horizon with reduced opacity
+      // display black/darkened sky to simulate eclipse glasses
+      // give moon transparent black overlay
+      // zoom in
+      // track sun
+      console.log('=== startSolarScopeMode ===');
+      return;
+    },
+  
 
   },
 
@@ -1402,8 +1444,16 @@ export default defineComponent({
     introSlide(_val) {
       this.inIntro = _val < 4;
       return;
-    }
+    },
 
+    viewerMode(mode) {
+      if (mode === 'Horizon') {
+        this.startHorizonMode();
+      } else if (mode === 'SunScope') {
+        this.startSolarScopeMode();
+      }
+    },
+    
   },
 });
 </script>
@@ -1714,6 +1764,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  pointer-events: auto;
 }
 
 #splash-overlay {
