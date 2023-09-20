@@ -378,6 +378,23 @@
             "
             >
           </vue-slider>
+          <icon-button
+            id="set-time-now-button"
+            @activate="() => {
+              selectedTime = times.reduce((a, b) => {
+                return Math.abs(b - Date.now()) < Math.abs(a - Date.now()) ? b : a;
+              });
+              playing = !(playing);
+            }"
+            :color="accentColor"
+            tooltip-text="Go to current time"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          >
+            <template v-slot:button>
+              Now
+            </template>
+          </icon-button>
         </span>      
       </div>
       <div id="credits" class="ui-text">
