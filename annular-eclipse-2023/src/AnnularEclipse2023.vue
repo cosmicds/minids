@@ -807,6 +807,7 @@ export default defineComponent({
 
       viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
 
+      showSky: true,
       skyColorNight: "#1F1F1F",
       skyColorLight: "#87CEEB",
 
@@ -1393,7 +1394,9 @@ export default defineComponent({
     showHorizon(_show: boolean) {
       this.updateHorizon();
     },
-
+    showSky(_show: boolean) {
+      this.updateHorizon();
+    },
     
     dateTime(_date: Date) {
       console.log('watch dateTime');
