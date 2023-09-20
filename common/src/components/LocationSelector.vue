@@ -6,7 +6,7 @@
 import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { notify } from "@kyvg/vue3-notification";
-import { defineComponent, toRaw, PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export interface LocationDeg {
   longitudeDeg: number;
@@ -188,6 +188,7 @@ export default defineComponent({
       const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
       L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
       this.selectedCircle = this.circleForSelection();
+      this.selectedCircle?.addTo(map);
       this.placeCircles = this.places.map(place => this.circleForPlace(place));
       this.placeCircles.forEach((circle, index) => {
         circle.on('mouseover', () => {
@@ -220,6 +221,7 @@ export default defineComponent({
       if (this.map) {
         this.selectedCircle?.remove();
         this.selectedCircle = this.circleForSelection();
+        console.log(this.selectedCircle);
         if (this.selectedCircle) {
           this.selectedCircle.addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
         }
