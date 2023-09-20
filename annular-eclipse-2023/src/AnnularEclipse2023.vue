@@ -1327,21 +1327,34 @@ export default defineComponent({
 
     startHorizonMode() {
       // turn on local horizon mode
+      this.wwtSettings.set_localHorizonMode(true);
       // turn on horizon
+      this.showHorizon = true;
       // turn on sky (sky only visible when sun is up)
+      // // this.showSky = true;
       // zoom to full 60deg
+      this.sunPlace.set_zoomLevel(60 * 6);
       // go to sun, but don't track
+      this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
       console.log('=== startHorizonMode ===');
       return;
     },
 
     startSolarScopeMode() {
       // turn off local horizon mode
+      this.wwtSettings.set_localHorizonMode(false);
       // display horizon with reduced opacity
       // display black/darkened sky to simulate eclipse glasses
       // give moon transparent black overlay
       // zoom in
+      this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
+      this.trackSun();
       console.log('=== startSolarScopeMode ===');
       return;
     },
