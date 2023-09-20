@@ -1907,7 +1907,7 @@ video {
   height: fit-content; 
   margin: var(--margin);
   padding-block: 0.5rem;
-  pointer-events: none;
+  // pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1915,6 +1915,8 @@ video {
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
+  user-select: none;
+  
   
   transition: height 0.5s ease-in-out;
   
