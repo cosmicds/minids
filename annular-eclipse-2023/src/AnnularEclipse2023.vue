@@ -17,6 +17,12 @@
           @activate="() => { onResize() }"
         ></icon-button>
         <icon-button
+          fa-icon="question"
+          :color="accentColor"
+          tooltip-location="start"
+          @activate="() => { inIntro=true; introSlide = 2 }"
+        ></icon-button>
+        <icon-button
           :v-model="learnerPath == 'Discover'"
           fa-icon="rocket"
           :color="accentColor"
@@ -151,7 +157,92 @@
       </div>
     </transition>
 
-    <div class="top-content">
+    <v-dialog
+      v-model="inIntro"
+      :style="cssVars"
+      :scrim="false"
+      :persistent="false"
+      >
+    <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
+      <v-window v-model="introSlide">
+        <v-window-item :value="1">
+          <div class="intro-text">
+            <p>
+            On October 14, 2023, the U.S. will experience
+            a partial solar eclipse, where the Moon 
+            will appear to travel across the Sun and 
+            block a portion of it.
+            </p>
+          <br />
+            <p>
+            A lucky segment of the U.S. will 
+            experience what is known as an <b>annular eclipse</b>.
+            </p>
+          </div>
+        </v-window-item>
+        
+        <v-window-item :value="2">
+          <div class="intro-text">
+            <p>
+              In this interactive page you can
+            </p>
+            
+            <ul
+            >
+              <v-list-item>
+                <template v-slot:prepend>
+                  <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
+                </template>
+                  Explore what the eclipse will look like from different parts of the country
+              </v-list-item>
+              <v-list-item>
+                <template v-slot:prepend>
+                  <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
+                </template>
+                  Use some detective work to identify the Path of Visibility for the annular eclipse
+              </v-list-item>
+              <v-list-item>
+                <template v-slot:prepend>
+                  <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
+                </template>
+                  Choose any location around the world and see how the eclipse would look from there
+              </v-list-item>
+            </ul>
+          </div>
+        </v-window-item>
+        <v-window-item :value="3">
+          <p>
+            Press <font-awesome-icon icon="question"></font-awesome-icon> to see this introduction again
+          </p>
+        </v-window-item>
+      </v-window>
+
+      <div id="intro-bottom-controls">
+        <v-btn
+          id="intro-next-button"
+          :color="accentColor"
+          @click="introSlide--"
+          @keyup.enter="introSlide--"
+          elevation="0"
+          >
+          Previous
+        </v-btn>
+        
+        <v-btn
+          id="intro-next-button"
+          :color="accentColor"
+          @click="introSlide++"
+          @keyup.enter="introSlide++"
+          elevation="0"
+          >
+          Next
+        </v-btn>
+      </div>
+    </div>
+    </v-dialog>
+    
+
+    <div class="top-content" >
       <div id="left-buttons">
         
       </div>
@@ -691,9 +782,11 @@ export default defineComponent({
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
-      showGuidedContent: true,
+      showGuidedContent: false,
+      inIntro: false,
 
       tab: 0,
+      introSlide: 1,
 
       sunPlace
     };
@@ -795,7 +888,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
-        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
+        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
     },
     wwtControl(): WWTControl {
@@ -1300,6 +1393,17 @@ export default defineComponent({
       }
     },
 
+    showSplashScreen(_val) {
+      if (!_val) {
+        this.inIntro = true;
+      }
+    },
+    
+    introSlide(_val) {
+      this.inIntro = _val < 4;
+      return;
+    }
+
   },
 });
 </script>
@@ -1797,7 +1901,7 @@ video {
   height: fit-content; 
   margin: var(--margin);
   padding-block: 0.5rem;
-  pointer-events: none;
+  // pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1805,6 +1909,8 @@ video {
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
+  user-select: none;
+  
   
   transition: height 0.5s ease-in-out;
   
@@ -1818,6 +1924,20 @@ video {
     flex-direction: row;
     justify-content: space-between;
     width: 90%;
+    
+    
+    div.icon-wrapper {
+      background-color: rgba(209, 209, 209, .2);
+      // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
+      border: none;
+      border-radius: 5px;
+      padding-inline: 10px;
+      padding-block: 3px;
+      width: 100%;
+      margin-inline: 10px;
+      justify-content: center;
+    }
+    
   }
   
   #bottom-guided-content {
@@ -1892,6 +2012,52 @@ video {
           font-weight: bold;
         }
       }
+    }
+  }
+}
+
+
+
+#introduction-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 75%;
+  height: fit-content;
+  // outline: 5px solid var(--accent-color);
+  border-radius: 2em;
+  padding: 2em;
+  font-size: 1em;
+  // rotated translucent background gradient
+  background: linear-gradient(45deg,
+                            rgb(15, 32, 39), 
+                            rgb(32, 58, 67), 
+                            rgba(44, 83, 100));
+
+  .v-list-item__prepend {
+    margin-right: 0.75em;
+  }
+  
+  .intro-text {
+    color: var(--accent-color);
+  }
+  
+  div#intro-bottom-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    margin-top:1em;
+  
+    #intro-reminder {
+      outline: 1px solid red;
+    }
+    
+    #intro-next-button {
+      background-color: rgba(18, 18, 18,.5);
     }
   }
 }
