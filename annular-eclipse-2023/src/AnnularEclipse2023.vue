@@ -378,7 +378,7 @@
             "
             >
           </vue-slider>
-          <icon-button
+          <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
               selectedTime = times.reduce((a, b) => {
@@ -394,7 +394,7 @@
             <template v-slot:button>
               Now
             </template>
-          </icon-button>
+          </icon-button> -->
         </span>      
       </div>
       <div id="credits" class="ui-text">
