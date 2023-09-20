@@ -1405,7 +1405,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, MILLISECONDS_PER_INTERVAL / 10);
+        }, MILLISECONDS_PER_INTERVAL / 600);
       }
     },
 
