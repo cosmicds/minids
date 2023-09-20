@@ -1366,6 +1366,8 @@ export default defineComponent({
     startHorizonMode() {
       // turn on local horizon mode
       this.wwtSettings.set_localHorizonMode(true);
+      // alt ax grid
+      this.showAltAzGrid = true;
       // turn on horizon
       this.showHorizon = true;
       // turn on sky (sky only visible when sun is up)
@@ -1386,6 +1388,7 @@ export default defineComponent({
     startSolarScopeMode() {
       // turn off local horizon mode
       this.wwtSettings.set_localHorizonMode(false);
+      this.showAltAzGrid = false;
       // display horizon with reduced opacity
       // display black/darkened sky to simulate eclipse glasses
       // sky color changes based on viewerMode and updates horizon via watcher
