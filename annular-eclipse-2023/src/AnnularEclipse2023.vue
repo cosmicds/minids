@@ -807,6 +807,8 @@ export default defineComponent({
 
       viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
 
+      skyColorNight: "#1F1F1F",
+      skyColorLight: "#87CEEB",
 
       sunPlace
     };
@@ -964,6 +966,14 @@ export default defineComponent({
           latitudeRad: D2R * value.latitudeDeg,
           longitudeRad: D2R * value.longitudeDeg
         };
+      }
+    },
+
+    skyColor(): string {
+      if (this.viewerMode == 'SunScope') {
+        return this.skyColorNight;
+      } else {
+        return this.skyColorLight;
       }
     }
   },
@@ -1239,7 +1249,7 @@ export default defineComponent({
     },
 
     createSky(when: Date | null = null) {
-      const color = '#87CEEB';
+      const color = this.skyColor || '#87CEEB';
       // const opacity = 0.5;
       const date = when || this.dateTime || new Date();
 
@@ -1305,7 +1315,9 @@ export default defineComponent({
       this.removeAnnotations();
       if (this.showHorizon) {
         this.createHorizon(when);
-        this.createSky(when);
+        if (this.showSky) {
+          this.createSky(when);
+        }
       }
     },
 
@@ -1333,7 +1345,7 @@ export default defineComponent({
       // turn on horizon
       this.showHorizon = true;
       // turn on sky (sky only visible when sun is up)
-      // // this.showSky = true;
+      // sky color changes based on viewerMode and updates horizon via watcher
       // zoom to full 60deg
       this.sunPlace.set_zoomLevel(60 * 6);
       // go to sun, but don't track
@@ -1352,6 +1364,7 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(false);
       // display horizon with reduced opacity
       // display black/darkened sky to simulate eclipse glasses
+      // sky color changes based on viewerMode and updates horizon via watcher
       // give moon transparent black overlay
       // zoom in
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1468,6 +1481,10 @@ export default defineComponent({
         this.startSolarScopeMode();
       }
     },
+
+    skyColor(_color) {
+      this.updateHorizon();
+    }
     
   },
 });
