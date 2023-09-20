@@ -805,7 +805,8 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
-      viewerMode: null as unknown as 'Horizon' | 'SunScope' ,
+      viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
+
 
       sunPlace
     };
@@ -864,6 +865,7 @@ export default defineComponent({
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
 
+      this.startHorizonMode();
       console.log("selected time", this.selectedTime);
 
     });
