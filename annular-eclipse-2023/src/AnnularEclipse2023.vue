@@ -1510,6 +1510,18 @@ export default defineComponent({
 
     skyColor(_color) {
       this.updateHorizon();
+    },
+
+    sunAboveHorizon(isAbove) {
+      console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
+      // this.showSky = isAbove; // just turn it off
+      this.skyOpacity = isAbove ? 0.6 : 0;
+    },
+
+    sunPosition(_pos) {
+      // sunAlt = pos.altRad;
+      // this.skyOpacity = // some function
+      return;
     }
     
   },
