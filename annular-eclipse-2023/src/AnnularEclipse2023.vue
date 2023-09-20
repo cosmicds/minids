@@ -978,7 +978,27 @@ export default defineComponent({
       } else {
         return this.skyColorLight;
       }
-    }
+    },
+
+    sunPosition() {
+      const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
+        this.sunPlace.get_dec() * D2R,
+        this.location.latitudeRad,
+        this.location.longitudeRad,
+        this.dateTime);
+
+      return {
+        'raRad': this.sunPlace.get_RA() * 15 * D2R,
+        'decRad': this.sunPlace.get_dec() * D2R,
+        'altRad': sunAltAz.altRad,
+        'azRad': sunAltAz.azRad
+      };
+    },
+
+    sunAboveHorizon(): boolean {
+      return this.sunPosition.altRad > 0;
+    },
+
   },
 
   methods: {
