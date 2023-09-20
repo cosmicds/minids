@@ -5,8 +5,8 @@
 <script lang="ts">
 import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import _Notifications from "@kyvg/vue3-notification";
-import { defineComponent, PropType } from "vue";
+import { notify } from "@kyvg/vue3-notification";
+import { defineComponent, toRaw, PropType } from "vue";
 
 export interface LocationDeg {
   longitudeDeg: number;
@@ -90,6 +90,7 @@ export default defineComponent({
   },
 
   mounted() {
+    console.log(this);
     if (this.detectLocation) {
       this.getLocation(true);
     }
@@ -101,6 +102,8 @@ export default defineComponent({
       placeCircles: [] as L.Circle[],
       hoveredPlace: null as Place | null,
       selectedCircle: null as L.Circle | null,
+      selectedPlace: null as Place | null,
+      selectedPlaceCircle: null as L.Circle | null,
       map: null as Map | null,
     };
   },
@@ -124,7 +127,7 @@ export default defineComponent({
         (_error) => {
           const msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can\nuse the location selector to manually input a location.";
           if (startup) {
-            this.$notify({
+            notify({
               group: "startup-location",
               type: "error",
               text: msg,
@@ -142,12 +145,20 @@ export default defineComponent({
       return L.circle([location.latitudeDeg, location.longitudeDeg], circleOptions);
     },
 
-    circleForSelection() : L.Circle {
+    circleForSelection() : L.Circle | null {
+      if (this.selectedPlace) {
+        return null;
+      }
       return this.circleForLocation(this.modelValue, { ...this.selectedCircleOptions, interactive: false });
     },
 
     circleForPlace(place: Place): L.Circle {
-      return this.circleForLocation(place, this.placeCircleOptions);
+      const options = (place === this.selectedPlace) ? this.selectedCircleOptions : this.placeCircleOptions;
+      const circle = this.circleForLocation(place, options);
+      if (place.name) {
+        circle.bindTooltip(place.name);
+      }
+      return circle;
     },
 
     onPlaceSelect(place: Place) {
@@ -156,12 +167,14 @@ export default defineComponent({
         latitudeDeg: place.latitudeDeg
       });
       this.$emit('place', place);
+      this.selectedPlace = place;
     },
 
     onMapSelect(event: LeafletMouseEvent) {
       let longitudeDeg = event.latlng.lng + 180;
       longitudeDeg = ((longitudeDeg % 360) + 360) % 360;  // We want modulo, but JS % operator is remainder
       longitudeDeg -= 180;
+      this.selectedPlace = null;
       this.updateValue({
         latitudeDeg: event.latlng.lat,
         longitudeDeg
@@ -169,6 +182,7 @@ export default defineComponent({
     },
 
     setup() {
+      console.log("setup");
       const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
       const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
@@ -190,10 +204,6 @@ export default defineComponent({
           this.hoveredPlace = null;
         });
 
-        const name = this.places[index].name;
-        if (name) {
-          circle.bindTooltip(name);
-        }
         circle.addTo(map);
       });
 
@@ -209,7 +219,10 @@ export default defineComponent({
     updateCircle() {
       if (this.map) {
         this.selectedCircle?.remove();
-        this.selectedCircle = this.circleForSelection().addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        this.selectedCircle = this.circleForSelection();
+        if (this.selectedCircle) {
+          this.selectedCircle.addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        }
       }
     }
 
@@ -219,6 +232,18 @@ export default defineComponent({
     modelValue() {
       this.updateCircle();
     },
+    places() {
+      this.map?.remove();
+      this.setup();
+    },
+    selectedPlace(newPlace) {
+      const index = this.places.indexOf(newPlace);
+      const oldSelectedCircle = this.selectedPlaceCircle;
+      this.selectedPlaceCircle = this.placeCircles[index];
+
+      oldSelectedCircle?.setStyle(this.placeCircleOptions);
+      this.selectedPlaceCircle?.setStyle(this.selectedCircleOptions);
+    }
   }
   
 });
