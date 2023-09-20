@@ -193,25 +193,19 @@
                 <template v-slot:prepend>
                   <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
                 </template>
-                <v-list-item-content>
                   Explore what the eclipse will look like from different parts of the country
-                </v-list-item-content>
               </v-list-item>
               <v-list-item>
                 <template v-slot:prepend>
                   <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
                 </template>
-                <v-list-item-content>
                   Use some detective work to identify the Path of Visibility for the annular eclipse
-                </v-list-item-content>
               </v-list-item>
               <v-list-item>
                 <template v-slot:prepend>
                   <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
                 </template>
-                <v-list-item-content>
                   Choose any location around the world and see how the eclipse would look from there
-                </v-list-item-content>
               </v-list-item>
             </ul>
           </div>
