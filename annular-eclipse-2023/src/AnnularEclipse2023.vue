@@ -810,6 +810,8 @@ export default defineComponent({
       showSky: true,
       skyColorNight: "#1F1F1F",
       skyColorLight: "#87CEEB",
+      skyOpacity: 0.6,
+      horizonOpacity: 1,
 
       sunPlace
     };
@@ -1242,6 +1244,7 @@ export default defineComponent({
         poly.set_lineColor(color);
         poly.set_fill(true);
         poly.set_fillColor(color);
+        poly.set_opacity(this.horizonOpacity);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -1273,7 +1276,7 @@ export default defineComponent({
         points.forEach(point => poly.addPoint(...point));
         poly.set_fill(true);
         poly.set_fillColor(color);
-        poly.set_opacity(0.6);
+        poly.set_opacity(this.skyOpacity);
         poly.set_lineWidth(0); // This removes the seam that appears between the polygons when opacity < 1
         this.addAnnotation(poly);
       }
