@@ -23,19 +23,19 @@
           @activate="() => { inIntro=true; introSlide = 2 }"
         ></icon-button>
         <icon-button
-          :v-model="learnerPath == 'Discover'"
+          :model-value="learnerPath == 'Discover'"
           fa-icon="rocket"
           :color="accentColor"
           @activate="() => { learnerPath = 'Discover'}"
         ></icon-button>
         <icon-button
-          :v-model="learnerPath == 'Answer'"
+          :model-value="learnerPath == 'Answer'"
           fa-icon="puzzle-piece"
           :color="accentColor"
           @activate="() => { learnerPath = 'Answer'}"
         ></icon-button>
         <icon-button
-          :v-model="learnerPath == 'Explore'"
+          :model-value="learnerPath == 'Explore'"
           fa-icon="location-dot"
           :color="accentColor"
           @activate="() => { learnerPath = 'Explore'}"
@@ -71,7 +71,15 @@
           <span id="title">What will the eclipse look like here?</span>
           <div id="map-container-map">
             <span v-if="learnerPath=='Discover'">
-              Show a map with a pre-selected locations
+            <location-selector
+              :model-value="locationDeg"
+              @update:modelValue="updateLocationFromMap"
+              @place="(place: typeof places[number]) => updateLocation(place.name)"
+              :map-options="mapOptions"
+              :places="places"
+              :place-circle-options="placeCircleOptions"
+              :selected-circle-options="selectedCircleOptions"
+            ></location-selector>
             </span>
             <span v-if="learnerPath=='Answer'">
               Show a map with a possible eclipse paths
@@ -247,14 +255,6 @@
         
       </div>
       <div id="center-buttons">
-        <!-- read https://github.com/cosmicds/minids/pull/141 for component description -->
-        <location-selector
-          :activator-color="accentColor"
-          @update:modelValue="updateLocationFromMap"
-          :model-value="locationDeg"
-        >
-        </location-selector>    
-        
       </div>
       <div id="right-buttons">
         <v-dialog
@@ -681,7 +681,8 @@ export default defineComponent({
       showMapTooltip: false,
       showTextTooltip: false,
       showVideoTooltip: false,
-      showControls: true,   
+      showControls: true, 
+      showMapSelector: false,
       showLocationSelector: false,
 
       selectionProximity: 4,
@@ -702,6 +703,14 @@ export default defineComponent({
       
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
+
+      mapOptions: {
+        templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
+        minZoom: 1,
+        maxZoom: 16,
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        ext: 'jpg'
+      },
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
@@ -766,8 +775,23 @@ export default defineComponent({
         }
       } as Record<string, EclipseLocation>,
 
-      learnerPath: "Explore", // Explore or Learn
+      places: [] as (LocationRad & { name: string })[],
+        
+      placeCircleOptions: {
+        color: "#0000FF",
+        fillColor: "#0000FF",
+        fillOpacity: 0.7,
+        radius: 50000
+      },
 
+      selectedCircleOptions: {
+        color: "#FF0000",
+        fillColor: "#FF0000",
+        fillOpacity: 0.7,
+        radius: 50000
+      },
+
+      learnerPath: "Explore", // Explore or Learn
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -790,6 +814,16 @@ export default defineComponent({
 
       sunPlace
     };
+  },
+
+  created() {
+    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== "User Selected").map(([_, pl]) => {
+      return {
+        ...pl,
+        latitudeDeg: R2D * pl.latitudeRad,
+        longitudeDeg: R2D * pl.longitudeRad
+      };
+    });
   },
 
   mounted() {
