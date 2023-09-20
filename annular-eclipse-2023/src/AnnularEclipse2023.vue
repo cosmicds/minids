@@ -358,7 +358,6 @@
             :fa-icon="!(playing) ? 'play' : 'pause'"
             @activate="() => {
               playing = !(playing);
-              playing = false;
             }"
             :color="accentColor"
             tooltip-text="Play/Pause"
@@ -1389,7 +1388,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, 350);
+        }, MILLISECONDS_PER_INTERVAL);
       }
     },
 
