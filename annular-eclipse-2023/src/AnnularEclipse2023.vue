@@ -979,6 +979,18 @@ export default defineComponent({
           longitudeRad: D2R * value.longitudeDeg
         };
       }
+    },
+
+    selectedLocationText(): string {
+      if (this.selectedLocation !== 'User Selected') {
+        return this.selectedLocation;
+      } else {
+        const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
+        const ew = this.locationDeg.longitudeDeg >= 0 ? 'E' : 'W';
+        const lat = Math.abs(this.locationDeg.latitudeDeg).toFixed(3);
+        const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
+        return `${lat}° ${ns}, ${lon}° ${ew}`;
+      }
     }
   },
 
@@ -1079,6 +1091,18 @@ export default defineComponent({
         longitudeRad: D2R * location.longitudeDeg,
         eclipseFracion: null
       };
+
+      const citySelector = this.$refs.citySelector;
+      // There's got to be a way to export the component data/method definitions
+      // but that's a problem for another day
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      citySelector?.onMapSelect({
+        latlng: {
+          lat: location.latitudeDeg,
+          lng: location.latitudeDeg
+        }
+      });
 
     },
 
