@@ -70,8 +70,8 @@
         <div id="map-holder">
           <span id="title">What will the eclipse look like here?</span>
           <div id="map-container-map">
-            <span v-if="learnerPath=='Discover'">
             <location-selector
+              v-if="learnerPath == 'Discover'"
               @place="(place: typeof places[number]) => updateLocation(place.name)"
               :map-options="mapOptions"
               :places="places"
@@ -80,17 +80,15 @@
               :selected-circle-options="selectedCircleOptions"
               :selectable="false"
             ></location-selector>
-            </span>
             <span v-if="learnerPath=='Answer'">
               Show a map with a possible eclipse paths
             </span>
-            <span v-if="learnerPath=='Explore'">
-              <location-selector
-                :model-value="locationDeg"
-                @update:modelValue="updateLocationFromMap"
-                :selected-circle-options="selectedCircleOptions"
-              ></location-selector>
-            </span>
+            <location-selector
+              v-if="learnerPath == 'Explore'"
+              :model-value="locationDeg"
+              @update:modelValue="updateLocationFromMap"
+              :selected-circle-options="selectedCircleOptions"
+            ></location-selector>
           </div>
         </div>
         
@@ -2000,7 +1998,8 @@ video {
       }
       
       #map-container-map {
-        width: 100%;
+        height: 300px;
+        width: 450px;
         aspect-ratio: 2 / 1;
         background-color: cornsilk;
         

@@ -24,7 +24,6 @@ interface Place extends LocationDeg {
   radius?: number;
   name?: string;
 }
-
 export default defineComponent({
 
   emits: ["place", "update:modelValue", "error"],
@@ -196,7 +195,6 @@ export default defineComponent({
     },
 
     setup() {
-      console.log("setup");
       const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
       const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
@@ -269,16 +267,9 @@ export default defineComponent({
 </script>
 
 <style lang="less">
-.location-selector {
-  align-items: center;
-  margin: auto;
-  width: 70vw;
-  height: fit-content;
-}
-
 #map-container {
-  width: 60vw;
-  height: 70vh;
+  height: 100%;
+  width: 100%;
   margin: auto;
   padding: 5px 0px;
   border-radius: 5px;
