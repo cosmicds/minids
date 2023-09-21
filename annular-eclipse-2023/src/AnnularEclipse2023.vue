@@ -71,13 +71,13 @@
           <span id="title">What will the eclipse look like here?</span>
           <div id="map-container-map">
             <span v-if="learnerPath=='Discover'">
-              Show a map with a pre-selected locations
+              <img alt="CosmicDS Logo" src="../../assets/EclipseMapChoose.png"/>
             </span>
             <span v-if="learnerPath=='Answer'">
-              Show a map with a possible eclipse paths
+              <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
             </span>
             <span v-if="learnerPath=='Explore'">
-              Show a map with a user selected location
+              <img alt="CosmicDS Logo" src="../../assets/EclipseMapExplore.png"/>
             </span>
           </div>
         </div>
@@ -1899,10 +1899,14 @@ video {
   
   transition: height 0.5s ease-in-out;
   
-  @media (max-width: 600px) {
+  @media (max-width: 600px) { // styles in here will apply to screens smaller than 600px wide
     font-size: 0.75rem;
   }
   
+  @media (min-size:750px) { // styles in here will apply to screens larger than 750px wide
+
+  }
+
   #top-guided-content {
     // buttons
     display: flex;
@@ -1957,6 +1961,10 @@ video {
           // wrap text
           white-space: break-spaces;
         }
+
+      img {
+        height: 170px;
+      }
         
       }
       
