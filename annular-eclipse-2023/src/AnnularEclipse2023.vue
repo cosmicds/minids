@@ -375,7 +375,6 @@
             :fa-icon="!(playing) ? 'play' : 'pause'"
             @activate="() => {
               playing = !(playing);
-              playing = false;
             }"
             :color="accentColor"
             tooltip-text="Play/Pause"
@@ -396,6 +395,23 @@
             "
             >
           </vue-slider>
+          <!-- <icon-button
+            id="set-time-now-button"
+            @activate="() => {
+              selectedTime = times.reduce((a, b) => {
+                return Math.abs(b - Date.now()) < Math.abs(a - Date.now()) ? b : a;
+              });
+              playing = !(playing);
+            }"
+            :color="accentColor"
+            tooltip-text="Go to current time"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          >
+            <template v-slot:button>
+              Now
+            </template>
+          </icon-button> -->
         </span>      
       </div>
       <div id="credits" class="ui-text">
@@ -600,13 +616,19 @@ const R2D = 180 / Math.PI;
 
 // number of milliseconds since January 1, 1970, 00:00:00 UTC
 // month is indexed from 0..?!
-const minTime = Date.UTC(2023, 9, 14, 8, 0); // eclipse starts at 9:13am MT in Albuquerque
-const maxTime = Date.UTC(2023, 9, 14, 25, 30); // eclipse ends at 12:09pm MT in Albuquerque
+// https://www.timeanddate.com/eclipse/solar/2023-october-14#eclipse-table
+const eclipseStartTime = Date.UTC(2023, 9, 14, 15, 3); // partial eclipse starts at 15:03 UTC
+const eclipseFinishTime = Date.UTC(2023, 9, 14, 20, 55); // partial eclipse ends at  20:55 UTC
+const extraTime = 1000 * 60 * 60; // add 2 hours to the end time to make sure we get the full eclipse
+// const minTime = Date.UTC(2023, 9, 14, 8, 0); // eclipse starts at 9:13am MT in Albuquerque
+// const maxTime = Date.UTC(2023, 9, 14, 25, 30); // eclipse ends at 12:09pm MT in Albuquerque
+const minTime = eclipseStartTime - extraTime;
+const maxTime = eclipseFinishTime + extraTime;
 
 const SECONDS_PER_DAY = 60 * 60 * 24;
 const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
-const secondsInterval = 10;
+const secondsInterval = 20;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
 
 const times: number[] = [];
@@ -1490,7 +1512,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, 350);
+        }, MILLISECONDS_PER_INTERVAL / 300);
       }
     },
 
