@@ -254,12 +254,6 @@
           true-value="Horizon"
           true-icon="mdi-image-filter-hdr"
         >
-          <template v-slot:prepend>
-            <v-icon>mdi-telescope</v-icon>
-          </template>
-          <template v-slot:append>
-            <font-awesome-icon icon="mountain-sun"></font-awesome-icon>
-          </template>
         </v-switch>
         
       </div>
