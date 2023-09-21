@@ -91,11 +91,12 @@
             <div id="map-container-map">
               <location-selector
                 v-if="learnerPath == 'Discover'"
+                :model-value="locationDeg"
                 @place="(place: typeof places[number]) => updateLocation(place.name)"
                 :detect-location="false"
                 :map-options="mapOptions"
                 :places="places"
-                :initial-place="places.find(p => p.name === 'Albuquerque, NM')"
+                :initial-place="places.find(p => p.name === 'selectedLocation')"
                 :place-circle-options="placeCircleOptions"
                 :selected-circle-options="selectedCircleOptions"
                 :selectable="false"
@@ -107,6 +108,7 @@
                 v-if="learnerPath == 'Explore'"
                 :model-value="locationDeg"
                 @update:modelValue="updateLocationFromMap"
+                :detect-location="false"
                 :selected-circle-options="selectedCircleOptions"
               ></location-selector>
             </div>
@@ -137,7 +139,7 @@
             <div id="location-time-display">
               <div id="location-display" class="ltd-container">
                 <p class="ltd-label">View for:</p>
-                <p class="ltd-value">{{ selectedLocation }}</p>
+                <p class="ltd-value">{{ selectedLocationText }}</p>
               </div>
               <div id="time-display" class="ltd-container">
                 <p class="ltd-label">Time:</p>
