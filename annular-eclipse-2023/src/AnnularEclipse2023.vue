@@ -870,7 +870,12 @@ export default defineComponent({
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
 
-      this.startHorizonMode();
+      if (this.viewerMode == 'SunScope') {
+        this.startSolarScopeMode();
+      } else {
+        this.startHorizonMode();
+      }
+      
       console.log("selected time", this.selectedTime);
 
     });
