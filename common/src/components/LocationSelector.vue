@@ -59,6 +59,10 @@ export default defineComponent({
         };
       }
     },
+    initialPlace: {
+      type: Object as PropType<Place>,
+      default: null
+    },
     places: {
       type: Array as PropType<Place[]>,
       default() {
@@ -98,7 +102,9 @@ export default defineComponent({
   },
 
   mounted() {
-    console.log(this);
+    if (this.initialPlace) {
+      this.selectedPlace = this.initialPlace;
+    }
     if (this.detectLocation) {
       this.getLocation(true);
     }
@@ -233,7 +239,6 @@ export default defineComponent({
       if (this.map) {
         this.selectedCircle?.remove();
         this.selectedCircle = this.circleForSelection();
-        console.log(this.selectedCircle);
         if (this.selectedCircle) {
           this.selectedCircle.addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
         }

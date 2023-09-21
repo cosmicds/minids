@@ -75,6 +75,7 @@
               @place="(place: typeof places[number]) => updateLocation(place.name)"
               :map-options="mapOptions"
               :places="places"
+              :initial-place="places.find(p => p.name === 'Albuquerque, NM')"
               :place-circle-options="placeCircleOptions"
               :selected-circle-options="selectedCircleOptions"
               :selectable="false"
@@ -87,6 +88,7 @@
               <location-selector
                 :model-value="locationDeg"
                 @update:modelValue="updateLocationFromMap"
+                :selected-circle-options="selectedCircleOptions"
               ></location-selector>
             </span>
           </div>
