@@ -611,7 +611,7 @@ const maxTime = eclipseFinishTime + extraTime;
 const SECONDS_PER_DAY = 60 * 60 * 24;
 const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
-const secondsInterval = 10;
+const secondsInterval = 20;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
 
 const times: number[] = [];
@@ -1411,7 +1411,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, MILLISECONDS_PER_INTERVAL / 600);
+        }, MILLISECONDS_PER_INTERVAL / 300);
       }
     },
 
