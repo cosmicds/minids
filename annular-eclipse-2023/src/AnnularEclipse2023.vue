@@ -880,7 +880,7 @@ export default defineComponent({
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("Digital Sky Survey (Color)");
+        this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
       }, 100);
 
@@ -1382,17 +1382,12 @@ export default defineComponent({
     startHorizonMode() {
       // turn on local horizon mode
       this.wwtSettings.set_localHorizonMode(true);
-      // alt ax grid
       this.showAltAzGrid = true;
-      // turn on horizon
       this.skyColor = this.skyColorLight;
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
       this.horizonOpacity = 1;
-      // turn on sky (sky only visible when sun is up)
-      // sky color changes based on viewerMode and updates horizon via watcher
-      // zoom to full 60deg
+      this.setForegroundImageByName("Digitized Sky Survey (Color)");
       this.sunPlace.set_zoomLevel(60 * 6);
-      // go to sun, but don't track
       this.gotoTarget({
         place: this.sunPlace,
         instant: true,
@@ -1404,17 +1399,12 @@ export default defineComponent({
     },
 
     startSolarScopeMode() {
-      // turn off local horizon mode
       this.wwtSettings.set_localHorizonMode(false);
       this.showAltAzGrid = false;
-      // display horizon with reduced opacity
-      // display black/darkened sky to simulate eclipse glasses
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      // sky color changes based on viewerMode and updates horizon via watcher
-      // give moon transparent black overlay
-      // zoom in
+      this.setForegroundImageByName("Black Sky Background");
       this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
       this.trackSun();
@@ -1602,14 +1592,17 @@ export default defineComponent({
     sunAboveHorizon(isAbove) {
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
-      this.skyOpacity = isAbove ? 0.6 : 0;
-      this.setForegroundImageByName((isAbove && this.viewerMode == 'Horizon') ? "Black Sky Background" : "Digitized Sky Survey (Color)");
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
-    sunPosition(_pos) {
-      // sunAlt = pos.altRad;
-      // this.skyOpacity = // some function
+    sunPosition(pos) {
+
+      const _civilTwilight = -6 * D2R;
+      const _nauticalTwilight = 2 * _civilTwilight;
+      const astronomicalTwilight = 3 * _civilTwilight;
+      
+      const sunAlt = pos.altRad;
+      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
       return;
     }
     
