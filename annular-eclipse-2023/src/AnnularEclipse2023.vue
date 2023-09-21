@@ -898,6 +898,8 @@ export default defineComponent({
       } else {
         this.startHorizonMode();
       }
+
+      this.setTimeforSunAlt(10); // 10 degrees above horizon
       
       console.log("selected time", this.selectedTime);
 
@@ -1426,6 +1428,69 @@ export default defineComponent({
       return;
     },
   
+    getSunAltitudeAtTime(time: Date): { altRad: number; azRad: number; } {
+      const sunAltAz = this.equatorialToHorizontal(this.sunPosition.raRad, this.sunPosition.decRad, this.location.latitudeRad, this.location.longitudeRad, time);
+      return sunAltAz;
+    },
+
+    // function that finds at what time the sun will reach a given altitude during the current day to within 15 minutes
+    getTimeforSunAlt(altDeg: number): { rising: number | null; setting: number | null; } {
+      // takes about 45ms to run
+      // search for time when sun is at given altitude
+      // start at 12:00am and search every MINUTES_PER_INTERVAL
+      const minTime = this.selectedTime - (this.selectedTime % MILLISECONDS_PER_DAY) - this.selectedTimezoneOffset;
+      const maxTime = minTime + MILLISECONDS_PER_DAY;
+      // const ehr = this.eclipticHorizonAngle(this.location.latitudeRad, this.dateTime);
+      let time = minTime;
+      let sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad; // negative
+      // find the two times it crosses the given altitude
+      while ((sunAlt < altDeg * D2R) && (time < maxTime)) {
+        time += MILLISECONDS_PER_INTERVAL;
+        sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad;
+      }
+      const rising = time == maxTime ? null : time;
+      while ((sunAlt > altDeg * D2R) && (time < maxTime)) {
+        time += MILLISECONDS_PER_INTERVAL;
+        sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad;
+      }
+      const setting = time == maxTime ? null : time;
+      
+      return {
+        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : (rising !== null ? rising : null),
+        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : (setting !== null ? setting : null)
+      };
+    },
+    
+    
+    setTimeforSunAlt(altDeg: number) {
+      const out = this.getTimeforSunAlt(altDeg);
+      console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
+      console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
+      if (out.rising == null && out.setting == null) {
+        return;
+      }
+
+      function matchTime(time: number | null, times: number[]) {
+        if (time === null) {
+          return -1;
+        }
+        const dt = time - times[0];
+        return times[0] + dt - (dt % MILLISECONDS_PER_INTERVAL);
+      }
+
+      if (this.times.includes(matchTime(out.rising, this.times))) {
+        this.selectedTime = matchTime(out.rising, this.times);
+      } else if (this.times.includes(matchTime(out.setting, this.times))) {
+        this.selectedTime = matchTime(out.setting, this.times);
+      } else {
+        console.log("time not in times array");
+        // best to leave it alone so it doesn't jump around
+        // this.selectedTime = Math.max(minTime, Math.min(newTime, maxTime));
+      }
+      
+
+    },
+  
 
   },
 
@@ -1545,7 +1610,7 @@ export default defineComponent({
       // this.showSky = isAbove; // just turn it off
       this.skyOpacity = isAbove ? 0.6 : 0;
       this.setForegroundImageByName(isAbove ? "Black Sky Background" : "Digitized Sky Survey (Color)");
-      console.log('setting Foreground to ', isAbove ? "Black Sky Background" : "Digitized Sky Survey (Color)");
+      this.horizonOpacity = isAbove && this.viewerMode !== 'SunScope' ? 1 : 0.6;
       console.log(this.wwtForegroundOpacity);
     },
 
