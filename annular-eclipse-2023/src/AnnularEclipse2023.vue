@@ -145,7 +145,18 @@
             </div>
             
           </div>
-          <!-- <div id="main-guided-contols" class="controls"></div> -->
+
+          <div v-if="selectedLocation === 'User Selected'">
+            <icon-button
+              id="share"
+              fa-icon="share-nodes"
+              :color="accentColor"
+              background-color="transparent"
+              :box-shadow="false"
+              @activate="copyShareURL"
+            ></icon-button>
+          </div>
+          
         </div>
       </v-col>
     </v-row>
@@ -548,6 +559,8 @@
         </v-window>
       </v-card>
     </v-dialog>
+
+  <notifications group="copy-url" position="top right" />
   </div>
 </v-app>
 </template>
@@ -1369,6 +1382,26 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
+    },
+
+    copyShareURL() {
+      const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      navigator.clipboard
+        .writeText(url)
+        .then(() =>
+          this.$notify({
+            group: "copy-url",
+            type: "success",
+            text: "URL successfully copied"
+          })
+        )
+        .catch((_err) =>
+          this.$notify({
+            group: "copy-url",
+            type: "error",
+            text: "Failed to copy URL"
+          })
+        );
     }
 
   },
@@ -2131,6 +2164,8 @@ video {
   }
 }
 
-
-
+#share-button {
+  margin: auto;
+  width: 2em;
+}
 </style>
