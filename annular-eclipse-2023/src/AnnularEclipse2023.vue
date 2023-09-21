@@ -810,6 +810,7 @@ export default defineComponent({
       showSky: true,
       skyColorNight: "#1F1F1F",
       skyColorLight: "#87CEEB",
+      skyColor: "#87CEEB",
       skyOpacity: 0.6,
       horizonOpacity: 1,
 
@@ -974,14 +975,6 @@ export default defineComponent({
           latitudeRad: D2R * value.latitudeDeg,
           longitudeRad: D2R * value.longitudeDeg
         };
-      }
-    },
-
-    skyColor(): string {
-      if (this.viewerMode == 'SunScope') {
-        return this.skyColorNight;
-      } else {
-        return this.skyColorLight;
       }
     },
 
@@ -1374,6 +1367,7 @@ export default defineComponent({
       // alt ax grid
       this.showAltAzGrid = true;
       // turn on horizon
+      this.skyColor = this.skyColorLight;
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
       // turn on sky (sky only visible when sun is up)
       // sky color changes based on viewerMode and updates horizon via watcher
@@ -1396,6 +1390,7 @@ export default defineComponent({
       this.showAltAzGrid = false;
       // display horizon with reduced opacity
       // display black/darkened sky to simulate eclipse glasses
+      this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
       // sky color changes based on viewerMode and updates horizon via watcher
