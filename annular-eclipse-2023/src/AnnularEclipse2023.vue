@@ -72,20 +72,22 @@
           <div id="map-container-map">
             <span v-if="learnerPath=='Discover'">
             <location-selector
-              :model-value="locationDeg"
-              @update:modelValue="updateLocationFromMap"
               @place="(place: typeof places[number]) => updateLocation(place.name)"
               :map-options="mapOptions"
               :places="places"
               :place-circle-options="placeCircleOptions"
               :selected-circle-options="selectedCircleOptions"
+              :selectable="false"
             ></location-selector>
             </span>
             <span v-if="learnerPath=='Answer'">
               Show a map with a possible eclipse paths
             </span>
             <span v-if="learnerPath=='Explore'">
-              Show a map with a user selected location
+              <location-selector
+                :model-value="locationDeg"
+                @update:modelValue="updateLocationFromMap"
+              ></location-selector>
             </span>
           </div>
         </div>

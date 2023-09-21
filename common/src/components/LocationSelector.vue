@@ -76,6 +76,14 @@ export default defineComponent({
         };
       }
     },
+    placeSelectable: {
+      type: Boolean,
+      default: true
+    },
+    selectable: {
+      type: Boolean,
+      default: true
+    },
     selectedCircleOptions: {
       type: Object as PropType<Record<string,any>>,
       default() {
@@ -197,9 +205,11 @@ export default defineComponent({
           circle.openTooltip([place.latitudeDeg, place.longitudeDeg]);
         });
 
-        circle.on('click', () => {
-          this.onPlaceSelect(this.places[index]);
-        });
+        if (this.placeSelectable) {
+          circle.on('click', () => {
+            this.onPlaceSelect(this.places[index]);
+          });
+        }
 
         circle.on('mouseout', () => {
           this.hoveredPlace = null;
@@ -209,7 +219,9 @@ export default defineComponent({
       });
 
       map.doubleClickZoom.disable();
-      map.on('dblclick', this.onMapSelect);
+      if (this.selectable) {
+        map.on('dblclick', this.onMapSelect);
+      }
       this.map = map;
     },
 
