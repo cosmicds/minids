@@ -204,40 +204,75 @@ export function layerManagerDraw(renderContext, opacity, astronomical, reference
 // Since we were patching anyway, I've stripped out some if-else paths that won't ever be visited in this story
 export function updateViewParameters() {
   if (this.renderContext.space && this._tracking && this._trackingObject != null) {
-     var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(this._trackingObject.get_RA(), this._trackingObject.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
-     this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
-     this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
-   }
-   else if (!this.get_solarSystemMode()) {
-     this._tracking = false;
-     this._trackingObject = null;
-   }
-   var oneMinusDragCoefficient = 1 - 0.8;
-   var dc = 0.8;
-   if (!this._tracking) {
-     var minDelta = (this.renderContext.viewCamera.zoom / 4000);
-     if (this.renderContext.viewCamera.zoom > 360) {
-       minDelta = (360 / 40000);
-     }
-     if ((((Math.abs(this.renderContext.targetAlt - this.renderContext.alt) >= minDelta) | (Math.abs(this.renderContext.targetAz - this.renderContext.az) >= minDelta)) === 1)) {
-       this.renderContext.alt += (this.renderContext.targetAlt - this.renderContext.alt) / 10;
-       if (Math.abs(this.renderContext.targetAz - this.renderContext.az) > 170) {
-         if (this.renderContext.targetAz > this.renderContext.az) {
-           this.renderContext.az += (this.renderContext.targetAz - (360 + this.renderContext.az)) / 10;
-         }
-         else {
-           this.renderContext.az += ((360 + this.renderContext.targetAz) - this.renderContext.az) / 10;
-         }
-       }
-       else {
-         this.renderContext.az += (this.renderContext.targetAz - this.renderContext.az) / 10;
-       }
-       this.renderContext.az = ((this.renderContext.az + 720) % 360);
-     }
-   }
-   this.renderContext.viewCamera.zoom = dc * this.renderContext.viewCamera.zoom + oneMinusDragCoefficient * this.renderContext.targetCamera.zoom;
-   this.renderContext.viewCamera.rotation = dc * this.renderContext.viewCamera.rotation + oneMinusDragCoefficient * this.renderContext.targetCamera.rotation;
-   this.renderContext.viewCamera.angle = dc * this.renderContext.viewCamera.angle + oneMinusDragCoefficient * this.renderContext.targetCamera.angle;
+    if (Settings.get_active().get_galacticMode() && this.renderContext.space) {
+       var gPoint = Coordinates.j2000toGalactic(this._trackingObject.get_RA() * 15, this._trackingObject.get_dec());
+       this.renderContext.targetAlt = this.renderContext.alt = gPoint[1];
+       this.renderContext.targetAz = this.renderContext.az = gPoint[0];
+    }
+    else if (this.renderContext.space && Settings.get_active().get_localHorizonMode()) {
+       var currentAltAz = Coordinates.equitorialToHorizon(Coordinates.fromRaDec(this._trackingObject.get_RA(), this._trackingObject.get_dec()), SpaceTimeController.get_location(), SpaceTimeController.get_now());
+       this.renderContext.targetAlt = this.renderContext.alt = currentAltAz.get_alt();
+       this.renderContext.targetAz = this.renderContext.az = currentAltAz.get_az();
+    }
+    else {
+         this.renderContext.viewCamera.lng = this.renderContext.targetCamera.lng = this.rAtoViewLng(this._trackingObject.get_RA());
+         this.renderContext.viewCamera.lat = this.renderContext.targetCamera.lat = this._trackingObject.get_dec();
+    }
+  } else if (!this.get_solarSystemMode()) {
+   this._tracking = false;
+   this._trackingObject = null;
+  }
+  var oneMinusDragCoefficient = 1 - 0.8;
+  var dc = 0.8;
+  if (!this._tracking) {
+    var minDelta = (this.renderContext.viewCamera.zoom / 4000);
+    if (this.renderContext.viewCamera.zoom > 360) {
+      minDelta = (360 / 40000);
+    }
+        if (this.renderContext.space && (Settings.get_active().get_localHorizonMode() || Settings.get_active().get_galacticMode())) {
+            if ((((Math.abs(this.renderContext.targetAlt - this.renderContext.alt) >= minDelta) | (Math.abs(this.renderContext.targetAz - this.renderContext.az) >= minDelta)) === 1)) {
+                this.renderContext.alt += (this.renderContext.targetAlt - this.renderContext.alt) / 10;
+                if (Math.abs(this.renderContext.targetAz - this.renderContext.az) > 170) {
+                    if (this.renderContext.targetAz > this.renderContext.az) {
+                        this.renderContext.az += (this.renderContext.targetAz - (360 + this.renderContext.az)) / 10;
+                    }
+                    else {
+                        this.renderContext.az += ((360 + this.renderContext.targetAz) - this.renderContext.az) / 10;
+                    }
+                }
+                else {
+                    this.renderContext.az += (this.renderContext.targetAz - this.renderContext.az) / 10;
+                }
+                this.renderContext.az = ((this.renderContext.az + 720) % 360);
+            }
+        }
+        else {
+            if ((((Math.abs(this.renderContext.targetCamera.lat - this.renderContext.viewCamera.lat) >= minDelta) | (Math.abs(this.renderContext.targetCamera.lng - this.renderContext.viewCamera.lng) >= minDelta)) === 1)) {
+                this.renderContext.viewCamera.lat += (this.renderContext.targetCamera.lat - this.renderContext.viewCamera.lat) / 10;
+                if (Math.abs(this.renderContext.targetCamera.lng - this.renderContext.viewCamera.lng) > 170) {
+                    if (this.renderContext.targetCamera.lng > this.renderContext.viewCamera.lng) {
+                        this.renderContext.viewCamera.lng += (this.renderContext.targetCamera.lng - (360 + this.renderContext.viewCamera.lng)) / 10;
+                    }
+                    else {
+                        this.renderContext.viewCamera.lng += ((360 + this.renderContext.targetCamera.lng) - this.renderContext.viewCamera.lng) / 10;
+                    }
+                }
+                else {
+                    this.renderContext.viewCamera.lng += (this.renderContext.targetCamera.lng - this.renderContext.viewCamera.lng) / 10;
+                }
+                this.renderContext.viewCamera.lng = ((this.renderContext.viewCamera.lng + 720) % 360);
+            }
+            else {
+                if (this.renderContext.viewCamera.lat !== this.renderContext.targetCamera.lat || this.renderContext.viewCamera.lng !== this.renderContext.targetCamera.lng) {
+                    this.renderContext.viewCamera.lat = this.renderContext.targetCamera.lat;
+                    this.renderContext.viewCamera.lng = this.renderContext.targetCamera.lng;
+                }
+            }
+        }
+    }
+  this.renderContext.viewCamera.zoom = dc * this.renderContext.viewCamera.zoom + oneMinusDragCoefficient * this.renderContext.targetCamera.zoom;
+  this.renderContext.viewCamera.rotation = dc * this.renderContext.viewCamera.rotation + oneMinusDragCoefficient * this.renderContext.targetCamera.rotation;
+  this.renderContext.viewCamera.angle = dc * this.renderContext.viewCamera.angle + oneMinusDragCoefficient * this.renderContext.targetCamera.angle;
 }
 
 export function renderOneFrame() {
