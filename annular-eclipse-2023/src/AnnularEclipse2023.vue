@@ -73,6 +73,7 @@
             <location-selector
               v-if="learnerPath == 'Discover'"
               @place="(place: typeof places[number]) => updateLocation(place.name)"
+              :detect-location="false"
               :map-options="mapOptions"
               :places="places"
               :initial-place="places.find(p => p.name === 'Albuquerque, NM')"
