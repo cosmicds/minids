@@ -1,76 +1,41 @@
 <template>
-  <v-dialog
-    v-model="show"
-    class="location-selector-dialog"
-  >
-    <!-- TODO: What should the real types here be?
-              We don't need them so it doesn't matter,
-              but would be good to know.
-    -->
-    <template v-slot:activator>
-      <slot
-        name="activator"
-        :open="open"
-      >
-        <icon-button
-          v-model="show"
-          :color="activatorColor"
-          fa-icon="location-pin"
-          class="map-icon"
-          tooltip-text="Select location"
-          tooltip-location="bottom"
-          tooltip-offset="5px"
-        ></icon-button>
-      </slot>
-    </template>
-    <v-card class="location-selector">
-      <div class="text-center">
-        Move around the map and double-click to change location
-      </div>
-      <v-btn
-        @click="getLocation"
-        @keyup.enter="getLocation"
-      >
-        Use My Location
-      </v-btn>
-      <div class="text-center red--text">{{ locationErrorMessage }}</div>
-      <div id="map-container"></div>
-    </v-card>
-  </v-dialog>
+  <div id="map-container"></div>
 </template>
 
 <script lang="ts">
-import { VDialog } from "vuetify/components/VDialog";
-import { VCard } from "vuetify/components/VCard";
-import { VBtn } from "vuetify/components/VBtn";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
-import L, { LeafletMouseEvent, Map } from "leaflet";
+import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import _Notifications from "@kyvg/vue3-notification";
+import { notify } from "@kyvg/vue3-notification";
 import { defineComponent, PropType } from "vue";
-import IconButton from "./IconButton.vue";
 
-library.add(faLocationPin);
-
-export type LocationDeg = {
+export interface LocationDeg {
   longitudeDeg: number;
   latitudeDeg: number;
-};
+}
 
+interface MapOptions extends TileLayerOptions {
+  templateUrl: string;
+}
+
+interface Place extends LocationDeg { 
+  color?: string;
+  fillColor?: string;
+  fillOpacity?: number;
+  radius?: number;
+  name?: string;
+}
 export default defineComponent({
 
-  components: {
-    'v-btn': VBtn,
-    'v-card': VCard,
-    'v-dialog': VDialog,
-    'icon-button': IconButton
-  },
+  emits: ["place", "update:modelValue", "error"],
 
   props: {
     activatorColor: {
       type: String,
       default: "#ffffff"
+    },
+    detectLocation: {
+      type: Boolean,
+      default: true
     },
     modelValue: {
       type: Object as PropType<LocationDeg>,
@@ -80,27 +45,83 @@ export default defineComponent({
           longitudeDeg: -71.1281
         };
       }
+    },
+    mapOptions: {
+      type: Object as PropType<MapOptions>,
+      default() {
+        return {
+          templateUrl: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+          maxZoom: 20,
+          subdomains:['mt0','mt1','mt2','mt3'],
+          attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+          className: 'map-tiles'
+        };
+      }
+    },
+    initialPlace: {
+      type: Object as PropType<Place>,
+      default: null
+    },
+    places: {
+      type: Array as PropType<Place[]>,
+      default() {
+        return [];
+      }
+    },
+    placeCircleOptions: {
+      type: Object as PropType<Record<string, any>>,
+      default() {
+        return {
+          color: "#0000FF",
+          fillColor: "#3333FF",
+          fillOpacity: 0.5,
+          radius: 150 
+        };
+      }
+    },
+    placeSelectable: {
+      type: Boolean,
+      default: true
+    },
+    selectable: {
+      type: Boolean,
+      default: true
+    },
+    selectedCircleOptions: {
+      type: Object as PropType<Record<string,any>>,
+      default() {
+        return {
+          color: "#FF0000",
+          fillColor: "#FF0033",
+          fillOpacity: 0.5,
+          radius: 200
+        };
+      }
     }
   },
 
   mounted() {
-    this.getLocation(true);
+    if (this.initialPlace) {
+      this.selectedPlace = this.initialPlace;
+    }
+    if (this.detectLocation) {
+      this.getLocation(true);
+    }
+    this.setup();
   },
 
   data() {
     return {
-      circle: null as L.Circle | null,
+      placeCircles: [] as L.Circle[],
+      hoveredPlace: null as Place | null,
+      selectedCircle: null as L.Circle | null,
+      selectedPlace: null as Place | null,
+      selectedPlaceCircle: null as L.Circle | null,
       map: null as Map | null,
-      locationErrorMessage: "",
-      show: false
     };
   },
 
   methods: {
-
-    open() {
-      this.show = true;
-    },
 
     getLocation(startup=false) {
       const options = { timeout: 10000, enableHighAccuracy: true };
@@ -119,33 +140,54 @@ export default defineComponent({
         (_error) => {
           const msg = "Unable to autodetect location. Location will default to Cambridge, MA, USA, or you can\nuse the location selector to manually input a location.";
           if (startup) {
-            this.$notify({
+            notify({
               group: "startup-location",
               type: "error",
               text: msg,
               duration: 4500
             });
           } else {
-            this.locationErrorMessage = msg;
+            this.$emit("error", msg);
           }
         },
         options
       );
     },
 
-    circleForLocation(location: LocationDeg): L.Circle {
-      return L.circle([location.latitudeDeg, location.longitudeDeg], {
-        color: "#FF0000",
-        fillColor: "#FF0033",
-        fillOpacity: 0.5,
-        radius: 200
+    circleForLocation(location: LocationDeg, circleOptions: Record<string,any>): L.Circle {
+      return L.circle([location.latitudeDeg, location.longitudeDeg], circleOptions);
+    },
+
+    circleForSelection() : L.Circle | null {
+      if (this.selectedPlace) {
+        return null;
+      }
+      return this.circleForLocation(this.modelValue, { ...this.selectedCircleOptions, interactive: false });
+    },
+
+    circleForPlace(place: Place): L.Circle {
+      const options = (place === this.selectedPlace) ? this.selectedCircleOptions : this.placeCircleOptions;
+      const circle = this.circleForLocation(place, options);
+      if (place.name) {
+        circle.bindTooltip(place.name);
+      }
+      return circle;
+    },
+
+    onPlaceSelect(place: Place) {
+      this.updateValue({
+        longitudeDeg: place.longitudeDeg,
+        latitudeDeg: place.latitudeDeg
       });
+      this.$emit('place', place);
+      this.selectedPlace = place;
     },
 
     onMapSelect(event: LeafletMouseEvent) {
       let longitudeDeg = event.latlng.lng + 180;
       longitudeDeg = ((longitudeDeg % 360) + 360) % 360;  // We want modulo, but JS % operator is remainder
       longitudeDeg -= 180;
+      this.selectedPlace = null;
       this.updateValue({
         latitudeDeg: event.latlng.lat,
         longitudeDeg
@@ -155,17 +197,35 @@ export default defineComponent({
     setup() {
       const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
-      L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3'],
-        attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
-        className: 'map-tiles'
-      }).addTo(map);
+      const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
+      L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
+      this.selectedCircle = this.circleForSelection();
+      this.selectedCircle?.addTo(map);
+      this.placeCircles = this.places.map(place => this.circleForPlace(place));
+      this.placeCircles.forEach((circle, index) => {
+        circle.on('mouseover', () => {
+          const place = this.places[index];
+          this.hoveredPlace = place;
+          circle.openTooltip([place.latitudeDeg, place.longitudeDeg]);
+        });
 
-      this.circle = this.circleForLocation(this.modelValue).addTo(map);
+        if (this.placeSelectable) {
+          circle.on('click', () => {
+            this.onPlaceSelect(this.places[index]);
+          });
+        }
+
+        circle.on('mouseout', () => {
+          this.hoveredPlace = null;
+        });
+
+        circle.addTo(map);
+      });
 
       map.doubleClickZoom.disable();
-      map.on('dblclick', this.onMapSelect);
+      if (this.selectable) {
+        map.on('dblclick', this.onMapSelect);
+      }
       this.map = map;
     },
 
@@ -175,8 +235,11 @@ export default defineComponent({
 
     updateCircle() {
       if (this.map) {
-        this.circle?.remove();
-        this.circle = this.circleForLocation(this.modelValue).addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        this.selectedCircle?.remove();
+        this.selectedCircle = this.circleForSelection();
+        if (this.selectedCircle) {
+          this.selectedCircle.addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
+        }
       }
     }
 
@@ -186,45 +249,29 @@ export default defineComponent({
     modelValue() {
       this.updateCircle();
     },
+    places() {
+      this.map?.remove();
+      this.setup();
+    },
+    selectedPlace(newPlace) {
+      const index = this.places.indexOf(newPlace);
+      const oldSelectedCircle = this.selectedPlaceCircle;
+      this.selectedPlaceCircle = this.placeCircles[index];
 
-    show(show: boolean) {
-      if (show) {
-        this.locationErrorMessage = "";
-        this.$nextTick(() => {
-          this.setup();
-        });
-      } else {
-        this.map?.remove();
-        this.map = null;
-        this.circle = null;
-      }
+      oldSelectedCircle?.setStyle(this.placeCircleOptions);
+      this.selectedPlaceCircle?.setStyle(this.selectedCircleOptions);
     }
   }
-
+  
 });
 </script>
 
 <style lang="less">
-.location-selector-dialog {
-  
-  .v-overlay__content {
-    width: fit-content !important;
-  }
-
-  .location-selector {
-    align-items: center;
-    margin: auto;
-    width: 70vw;
-    height: fit-content;
-  }
-
-  #map-container {
-    width: 60vw;
-    height: 70vh;
-    margin: auto;
-    padding: 5px 0px;
-    border-radius: 5px;
-  }
-
+#map-container {
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  padding: 5px 0px;
+  border-radius: 5px;
 }
 </style>
