@@ -1,5 +1,5 @@
 <template>
-  <div id="map-container"></div>
+  <div class="map-container"></div>
 </template>
 
 <script lang="ts">
@@ -195,12 +195,12 @@ export default defineComponent({
     },
 
     setup() {
-      const map = L.map("map-container").setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
+      const mapContainer = this.$el as HTMLDivElement;
+      const map = L.map(mapContainer).setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
       
       const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
       L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
-      this.selectedCircle = this.circleForSelection();
-      this.selectedCircle?.addTo(map);
+
       this.placeCircles = this.places.map(place => this.circleForPlace(place));
       this.placeCircles.forEach((circle, index) => {
         circle.on('mouseover', () => {
@@ -221,6 +221,9 @@ export default defineComponent({
 
         circle.addTo(map);
       });
+
+      this.selectedCircle = this.circleForSelection();
+      this.selectedCircle?.addTo(map);
 
       map.doubleClickZoom.disable();
       if (this.selectable) {
@@ -267,7 +270,7 @@ export default defineComponent({
 </script>
 
 <style lang="less">
-#map-container {
+.map-container {
   height: 100%;
   width: 100%;
   margin: auto;

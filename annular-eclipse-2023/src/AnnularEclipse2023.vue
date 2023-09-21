@@ -72,11 +72,12 @@
           <div id="map-container-map">
             <location-selector
               v-if="learnerPath == 'Discover'"
+              ref="citySelector"
               @place="(place: typeof places[number]) => updateLocation(place.name)"
               :detect-location="false"
               :map-options="mapOptions"
               :places="places"
-              :initial-place="places.find(p => p.name === 'Albuquerque, NM')"
+              :initial-place="places.find(p => p.name === selectedLocation)"
               :place-circle-options="placeCircleOptions"
               :selected-circle-options="selectedCircleOptions"
               :selectable="false"
@@ -88,6 +89,7 @@
               v-if="learnerPath == 'Explore'"
               :model-value="locationDeg"
               @update:modelValue="updateLocationFromMap"
+              :detect-location="false"
               :selected-circle-options="selectedCircleOptions"
             ></location-selector>
           </div>
@@ -1081,6 +1083,18 @@ export default defineComponent({
         longitudeRad: D2R * location.longitudeDeg,
         eclipseFracion: null
       };
+
+      const citySelector = this.$refs.citySelector;
+      // There's got to be a way to export the component data/method definitions
+      // but that's a problem for another day
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      citySelector?.onMapSelect({
+        latlng: {
+          lat: location.latitudeDeg,
+          lng: location.latitudeDeg
+        }
+      });
 
     },
 
