@@ -23,7 +23,7 @@ export function drawSkyOverlays() {
     WWTControl.constellationsFigures.draw(this.renderContext, false, 'UMA', false);
   }
   if (Settings.get_active().get_showAltAzGrid()) {
-    const altAzColor = Color.fromArgb(1, 3, 92, 134);
+    const altAzColor = Color.fromArgb(180, 133,201,254);
     Grids.drawAltAzGrid(this.renderContext, 1, altAzColor);
     if (Settings.get_active().get_showAltAzGridText()) {
       Grids.drawAltAzGridText(this.renderContext, 1, altAzColor);

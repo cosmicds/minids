@@ -304,23 +304,16 @@
           <div v-if="showControls" class="controls-content">
             <v-checkbox
               :color="accentColor"
-              v-model="showEcliptic"
-              @keyup.enter="showEcliptic = !showEcliptic"
-              label="Ecliptic"
-              hide-details
-            />
-            <v-checkbox
-              :color="accentColor"
               v-model="showAltAzGrid"
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Grid"
-              hide-details
+              hide-details 
             />
             <v-checkbox
               :color="accentColor"
-              v-model="showConstellations"
-              @keyup.enter="showConstellations = !showConstellations"
-              label="Constellations"
+              v-model="showEcliptic"
+              @keyup.enter="showEcliptic = !showEcliptic"
+              label="Ecliptic"
               hide-details
             />
             <v-checkbox
@@ -559,13 +552,13 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
+import { Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
+import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -774,9 +767,8 @@ export default defineComponent({
       playingWaitCount: 0,
 
       showAltAzGrid: true,
-      showConstellations: false,
       showHorizon: true,
-      showEcliptic: true,    
+      showEcliptic: false,    
       
       times: times, 
       
@@ -805,10 +797,8 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
-      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
-      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
       this.wwtSettings.set_showEcliptic(this.showEcliptic);
-      this.wwtSettings.set_showEclipticOverviewText(this.showEcliptic);
+      this.wwtSettings.set_showEclipticOverviewText(false);
 
       // This is kinda horrible, but it works!
 
@@ -817,7 +807,6 @@ export default defineComponent({
       this.wwtControl._drawSkyOverlays = drawSkyOverlays;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      Constellations.initializeConstellationNames = initializeConstellationNames;
       Grids._makeAltAzGridText = makeAltAzGridText;
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1218,8 +1207,8 @@ export default defineComponent({
     },
 
     createSky(when: Date | null = null) {
-      const color = '#87CEEB';
-      // const opacity = 0.5;
+      const color = '#4190ED';
+      const opacity = 0.9;
       const date = when || this.dateTime || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1241,7 +1230,7 @@ export default defineComponent({
         points.forEach(point => poly.addPoint(...point));
         poly.set_fill(true);
         poly.set_fillColor(color);
-        poly.set_opacity(0.6);
+        poly.set_opacity(opacity);
         poly.set_lineWidth(0); // This removes the seam that appears between the polygons when opacity < 1
         this.addAnnotation(poly);
       }
@@ -1312,13 +1301,9 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
     },
-    showConstellations(show: boolean) {
-      this.wwtSettings.set_showConstellationLabels(show);
-      this.wwtSettings.set_showConstellationFigures(show);
-    },
     showEcliptic(show: boolean) {
       this.wwtSettings.set_showEcliptic(show);
-      this.wwtSettings.set_showEclipticOverviewText(show);
+      this.wwtSettings.set_showEclipticOverviewText(false);
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
@@ -1395,7 +1380,7 @@ export default defineComponent({
 
     showSplashScreen(_val) {
       if (!_val) {
-        this.inIntro = true;
+        this.inIntro = false; //Set to false for now to make coding other things easier.
       }
     },
     
