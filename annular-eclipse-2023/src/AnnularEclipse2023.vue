@@ -2021,8 +2021,8 @@ video {
       }
       
       #map-container-map {
-        height: 200px;
-        width: 300px;
+        height: 230px;
+        width: 350px;
         aspect-ratio: 2 / 1;
         background-color: cornsilk;
         
