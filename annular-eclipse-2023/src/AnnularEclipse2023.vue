@@ -886,7 +886,7 @@ export default defineComponent({
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("DSS (Digitized Sky Survey");
+        this.setForegroundImageByName("Digital Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
       }, 100);
 
@@ -1391,6 +1391,7 @@ export default defineComponent({
       // turn on horizon
       this.skyColor = this.skyColorLight;
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
+      this.horizonOpacity = 1;
       // turn on sky (sky only visible when sun is up)
       // sky color changes based on viewerMode and updates horizon via watcher
       // zoom to full 60deg
@@ -1400,7 +1401,7 @@ export default defineComponent({
         place: this.sunPlace,
         instant: true,
         noZoom: false,
-        trackObject: true
+        trackObject: false
       });
       console.log('=== startHorizonMode ===');
       return;
@@ -1449,7 +1450,6 @@ export default defineComponent({
     },
     
     dateTime(_date: Date) {
-      console.log('watch dateTime');
       this.updateForDateTime();
     },
 
@@ -1544,8 +1544,9 @@ export default defineComponent({
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.skyOpacity = isAbove ? 0.6 : 0;
-      // this.setBackgroundImageByName(isAbove ? "Black Sky Background" : "DSS (Digitized Sky Survey");
-      // this.setForegroundImageByName(isAbove ? "Black Sky Background" : "DSS (Digitized Sky Survey");
+      this.setForegroundImageByName(isAbove ? "Black Sky Background" : "Digitized Sky Survey (Color)");
+      console.log('setting Foreground to ', isAbove ? "Black Sky Background" : "Digitized Sky Survey (Color)");
+      console.log(this.wwtForegroundOpacity);
     },
 
     sunPosition(_pos) {
