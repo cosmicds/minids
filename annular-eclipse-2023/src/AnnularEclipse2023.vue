@@ -1374,7 +1374,7 @@ export default defineComponent({
       // alt ax grid
       this.showAltAzGrid = true;
       // turn on horizon
-      this.showHorizon = true;
+      this.showHorizon = true; // automatically calls it's watcher and updates horizon
       // turn on sky (sky only visible when sun is up)
       // sky color changes based on viewerMode and updates horizon via watcher
       // zoom to full 60deg
@@ -1396,6 +1396,8 @@ export default defineComponent({
       this.showAltAzGrid = false;
       // display horizon with reduced opacity
       // display black/darkened sky to simulate eclipse glasses
+      this.horizonOpacity = 0.6;
+      this.updateHorizon(); // manually update horizon
       // sky color changes based on viewerMode and updates horizon via watcher
       // give moon transparent black overlay
       // zoom in
@@ -1512,6 +1514,7 @@ export default defineComponent({
       if (mode === 'Horizon') {
         this.startHorizonMode();
       } else if (mode === 'SunScope') {
+        this.horizonOpacity = 0.6;
         this.startSolarScopeMode();
       }
     },
@@ -1524,6 +1527,8 @@ export default defineComponent({
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.skyOpacity = isAbove ? 0.6 : 0;
+      // this.setBackgroundImageByName(isAbove ? "Black Sky Background" : "DSS (Digitized Sky Survey");
+      // this.setForegroundImageByName(isAbove ? "Black Sky Background" : "DSS (Digitized Sky Survey");
     },
 
     sunPosition(_pos) {
