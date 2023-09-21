@@ -73,6 +73,7 @@
             <location-selector
               v-if="learnerPath == 'Discover'"
               ref="citySelector"
+              :model-value="locationDeg"
               @place="(place: typeof places[number]) => updateLocation(place.name)"
               :detect-location="false"
               :map-options="mapOptions"
@@ -120,7 +121,7 @@
           <div id="location-time-display">
             <div id="location-display" class="ltd-container">
               <p class="ltd-label">View for:</p>
-              <p class="ltd-value">{{ selectedLocation }}</p>
+              <p class="ltd-value">{{ selectedLocationText }}</p>
             </div>
             <div id="time-display" class="ltd-container">
               <p class="ltd-label">Time:</p>
@@ -982,6 +983,18 @@ export default defineComponent({
           latitudeRad: D2R * value.latitudeDeg,
           longitudeRad: D2R * value.longitudeDeg
         };
+      }
+    },
+
+    selectedLocationText(): string {
+      if (this.selectedLocation !== 'User Selected') {
+        return this.selectedLocation;
+      } else {
+        const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
+        const ew = this.locationDeg.longitudeDeg >= 0 ? 'E' : 'W';
+        const lat = Math.abs(this.locationDeg.latitudeDeg).toFixed(3);
+        const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
+        return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
     }
   },
