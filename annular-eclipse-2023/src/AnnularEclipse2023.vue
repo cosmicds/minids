@@ -1603,6 +1603,7 @@ export default defineComponent({
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.skyOpacity = isAbove ? 0.6 : 0;
+      this.setForegroundImageByName((isAbove && this.viewerMode == 'Horizon') ? "Black Sky Background" : "Digitized Sky Survey (Color)");
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
