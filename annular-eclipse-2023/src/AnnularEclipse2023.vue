@@ -827,6 +827,14 @@ export default defineComponent({
         longitudeDeg: R2D * pl.longitudeRad
       };
     });
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const lat = parseFloat(searchParams.get("lat") ?? "");
+    const lon = parseFloat(searchParams.get("lon") ?? "");
+    if (lat && lon) {
+      this.selectedLocation = "User Selected";
+      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+    }
   },
 
   mounted() {
