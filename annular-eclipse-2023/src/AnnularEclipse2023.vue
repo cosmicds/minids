@@ -176,19 +176,35 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-    <div id="viewer-mode-switch">
-      <v-switch
-        inset
-        :ripple="false"
-        v-model="viewerMode"
+    <v-tooltip
+        location="right"
         :color="accentColor"
-        false-value="SunScope"
-        false-icon="mdi-telescope"
-        true-value="Horizon"
-        true-icon="mdi-image-filter-hdr"
+        :style="cssVars"
       >
-      </v-switch>
-    </div>
+      <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="viewer-mode-switch"
+            >
+            
+            <v-switch
+              inset
+              hide-details
+              :ripple="false"
+              v-model="viewerMode"
+              :color="accentColor"
+              false-value="SunScope"
+              false-icon="mdi-telescope"
+              true-value="Horizon"
+              true-icon="mdi-image-filter-hdr"
+            >
+            </v-switch>
+          
+          </div>
+        </template>
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+      </v-tooltip>
+    
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -1908,6 +1924,8 @@ body {
   position: absolute;
   top: 1rem;
   left: 1rem;
+  outline: 1px solid red;
+  
 }
 
 .top-content {
