@@ -868,8 +868,8 @@ export default defineComponent({
 
       showSky: true,
       skyColorNight: "#1F1F1F",
-      skyColorLight: "#87CEEB",
-      skyColor: "#87CEEB",
+      skyColorLight: "#4190ED",
+      skyColor: "#4190ED",
       skyOpacity: 0.6,
       horizonOpacity: 1,
 
