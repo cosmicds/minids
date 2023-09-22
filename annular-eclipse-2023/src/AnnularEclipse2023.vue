@@ -18,12 +18,12 @@
             :icon="showGuidedContent ? `chevron-down` : `chevron-up`"
             @click="() => {
               console.log('showGuidedContent = ', showGuidedContent);
-              showGuidedContent = !showGuidedContent
+              showGuidedContent = !showGuidedContent;
+              onResize();
             }"
             @keyup.enter="showGuidedContent = !showGuidedContent"
             tabindex="0"
             tooltip-location="start"
-            @activate="() => { onResize() }"
           /> 
         </div>
       </v-col>
@@ -1775,7 +1775,7 @@ body {
   height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
 
-  transition: height 0.1s ease-in-out;
+  // transition: height 0.1s ease-in-out;
 }
 
 #app {
