@@ -48,10 +48,7 @@
             @activate="() => { learnerPath = 'Answer'}"
           ></icon-button>   
           <icon-button
-            :v-model="() => {
-              learnerPath == 'Explore'; 
-              showLocationSelector;
-            }"
+            :v-model="learnerPath == 'Explore'" 
             fa-icon="location-dot"
             :color="accentColor"
             @activate="() => { learnerPath = 'Explore'}"
