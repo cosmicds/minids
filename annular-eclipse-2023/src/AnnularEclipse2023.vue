@@ -628,7 +628,7 @@ const maxTime = eclipseFinishTime + extraTime;
 const SECONDS_PER_DAY = 60 * 60 * 24;
 const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
-const secondsInterval = 20;
+const secondsInterval = 40;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
 
 const times: number[] = [];
@@ -860,6 +860,8 @@ export default defineComponent({
       skyOpacity: 0.6,
       horizonOpacity: 1,
 
+      realTimeRate: 1,
+
       sunPlace
     };
   },
@@ -926,6 +928,8 @@ export default defineComponent({
         
       }, 100);
 
+      this.realTimeRate = this.setRealTimeRate('8 minutes per second'); // 500;
+      
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
 
@@ -1038,6 +1042,10 @@ export default defineComponent({
       }
     },
 
+    tickDurationMS(): number {
+      return MILLISECONDS_PER_INTERVAL / (this.realTimeRate);
+    },
+    
     sunPosition() {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
         this.sunPlace.get_dec() * D2R,
@@ -1542,6 +1550,37 @@ export default defineComponent({
       
 
     },
+
+    setRealTimeRate(rate: string) {
+      console.log('setRealTimeRate', rate);
+      // parse a string that looks like "x [time] per y [time]"
+      // e.g. "1 second per 1 minute"
+      // returns a number that is the ratio of the two times converted to seconds/seconds
+      // e.g. 1/60
+      // if the string is not parseable, returns 1
+      function unitToSec(unitString: string): number {
+        if (unitString[0] == 'h') {
+          return 3600;
+        } else if (unitString[0] == 'm') {
+          return 60;
+        } else if (unitString[0] == 's') {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+      
+      // parse string
+      const parsedString = rate.match(/(\d+(\.(\d+)?)?)\s(\w+)\sper\s(\d+(\.(\d+)?)?)?\s?(\w+)/);
+      console.log(parsedString);
+      if (parsedString === null) {
+        return 1;
+      }
+      const num1 = parseInt(parsedString[1]) * unitToSec(parsedString[4]);
+      const num2 = (parseInt(parsedString[5]?? 1) ) * unitToSec(parsedString[8]);
+      console.log(num1, num2);
+      return num1 / num2;
+    },
   
 
   },
@@ -1629,7 +1668,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, MILLISECONDS_PER_INTERVAL / 300);
+        }, this.tickDurationMS);
       }
     },
 
