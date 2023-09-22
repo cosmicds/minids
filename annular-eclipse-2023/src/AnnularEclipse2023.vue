@@ -18,12 +18,12 @@
             :icon="showGuidedContent ? `chevron-down` : `chevron-up`"
             @click="() => {
               console.log('showGuidedContent = ', showGuidedContent);
-              showGuidedContent = !showGuidedContent
+              showGuidedContent = !showGuidedContent;
+              onResize();
             }"
             @keyup.enter="showGuidedContent = !showGuidedContent"
             tabindex="0"
             tooltip-location="start"
-            @activate="() => { onResize() }"
           /> 
         </div>
       </v-col>
@@ -176,7 +176,35 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-
+    <v-tooltip
+        location="right"
+        :color="accentColor"
+        :style="cssVars"
+      >
+      <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="viewer-mode-switch"
+            >
+            
+            <v-switch
+              inset
+              hide-details
+              :ripple="false"
+              v-model="viewerMode"
+              :color="accentColor"
+              false-value="SunScope"
+              false-icon="mdi-telescope"
+              true-value="Horizon"
+              true-icon="mdi-image-filter-hdr"
+            >
+            </v-switch>
+          
+          </div>
+        </template>
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+      </v-tooltip>
+    
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -605,7 +633,7 @@ const R2D = 180 / Math.PI;
 // https://www.timeanddate.com/eclipse/solar/2023-october-14#eclipse-table
 const eclipseStartTime = Date.UTC(2023, 9, 14, 15, 3); // partial eclipse starts at 15:03 UTC
 const eclipseFinishTime = Date.UTC(2023, 9, 14, 20, 55); // partial eclipse ends at  20:55 UTC
-const extraTime = 1000 * 60 * 60; // add 2 hours to the end time to make sure we get the full eclipse
+const extraTime = 1000 * 60 * 60 * 5; // add 2 hours to the end time to make sure we get the full eclipse
 // const minTime = Date.UTC(2023, 9, 14, 8, 0); // eclipse starts at 9:13am MT in Albuquerque
 // const maxTime = Date.UTC(2023, 9, 14, 25, 30); // eclipse ends at 12:09pm MT in Albuquerque
 const minTime = eclipseStartTime - extraTime;
@@ -614,7 +642,7 @@ const maxTime = eclipseFinishTime + extraTime;
 const SECONDS_PER_DAY = 60 * 60 * 24;
 const MILLISECONDS_PER_DAY = 1000 * SECONDS_PER_DAY;
 
-const secondsInterval = 20;
+const secondsInterval = 40;
 const MILLISECONDS_PER_INTERVAL = 1000 * secondsInterval;
 
 const times: number[] = [];
@@ -836,6 +864,18 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
+      viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
+
+      showSky: true,
+      skyColorNight: "#1F1F1F",
+      skyColorLight: "#4190ED",
+      skyColor: "#4190ED",
+      skyOpacity: 0.6,
+      horizonOpacity: 1,
+
+      playbackRate: 1,
+      oldPlayBackRate: 1,
+
       sunPlace
     };
   },
@@ -901,13 +941,25 @@ export default defineComponent({
 
       setTimeout(() => {
         this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("DSS (Digitized Sky Survey");
+        this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
+        this.setForegroundOpacity(100);
+        
       }, 100);
 
+      this.playbackRate = 1;  //this.setplaybackRate('8 minutes per second'); // 500;
+      
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
 
+      if (this.viewerMode == 'SunScope') {
+        this.startSolarScopeMode();
+      } else {
+        this.startHorizonMode();
+      }
+
+      this.setTimeforSunAlt(10); // 10 degrees above horizon
+      
       console.log("selected time", this.selectedTime);
 
     });
@@ -1009,6 +1061,30 @@ export default defineComponent({
       }
     },
 
+    tickDurationMS(): number {
+      return MILLISECONDS_PER_INTERVAL / (this.playbackRate);
+    },
+    
+    sunPosition() {
+      const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
+        this.sunPlace.get_dec() * D2R,
+        this.location.latitudeRad,
+        this.location.longitudeRad,
+        this.dateTime);
+
+      return {
+        'raRad': this.sunPlace.get_RA() * 15 * D2R,
+        'decRad': this.sunPlace.get_dec() * D2R,
+        'altRad': sunAltAz.altRad,
+        'azRad': sunAltAz.azRad
+      };
+    },
+
+    sunAboveHorizon(): boolean {
+      return this.sunPosition.altRad > 0;
+    },
+
+
     selectedLocationText(): string {
       if (this.selectedLocation !== 'User Selected') {
         return this.selectedLocation;
@@ -1020,6 +1096,7 @@ export default defineComponent({
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
     }
+
   },
 
   methods: {
@@ -1041,7 +1118,6 @@ export default defineComponent({
     },
 
     moveOneIntervalForward() {
-      console.log("selected time", this.selectedTime);
       this.selectedTime += MILLISECONDS_PER_INTERVAL;
     },
 
@@ -1297,6 +1373,7 @@ export default defineComponent({
         poly.set_lineColor(color);
         poly.set_fill(true);
         poly.set_fillColor(color);
+        poly.set_opacity(this.horizonOpacity);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -1305,8 +1382,8 @@ export default defineComponent({
     },
 
     createSky(when: Date | null = null) {
-      const color = '#4190ED';
-      const opacity = 0.9;
+      const color = this.skyColor || '#4190ED';
+      // const opacity = 0.5;
       const date = when || this.dateTime || new Date();
 
       // The initial coordinates are given in Alt/Az, then converted to RA/Dec
@@ -1328,7 +1405,7 @@ export default defineComponent({
         points.forEach(point => poly.addPoint(...point));
         poly.set_fill(true);
         poly.set_fillColor(color);
-        poly.set_opacity(opacity);
+        poly.set_opacity(this.skyOpacity);
         poly.set_lineWidth(0); // This removes the seam that appears between the polygons when opacity < 1
         this.addAnnotation(poly);
       }
@@ -1371,7 +1448,9 @@ export default defineComponent({
       this.removeAnnotations();
       if (this.showHorizon) {
         this.createHorizon(when);
-        this.createSky(when);
+        if (this.showSky) {
+          this.createSky(when);
+        }
       }
     },
 
@@ -1392,6 +1471,136 @@ export default defineComponent({
       });
     },
 
+    startHorizonMode() {
+      // turn on local horizon mode
+      this.wwtSettings.set_localHorizonMode(true);
+      this.showAltAzGrid = true;
+      this.skyColor = this.skyColorLight;
+      this.showHorizon = true; // automatically calls it's watcher and updates horizon
+      this.horizonOpacity = 1;
+      // this.setForegroundImageByName("Digitized Sky Survey (Color)");
+      this.sunPlace.set_zoomLevel(60 * 6);
+      this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: false
+      });
+      this.playbackRate = this.getplaybackRate('2 hours per 15 seconds');
+      console.log('=== startHorizonMode ===');
+      return;
+    },
+
+    startSolarScopeMode() {
+      this.wwtSettings.set_localHorizonMode(false);
+      this.showAltAzGrid = false;
+      this.skyColor = this.skyColorNight;
+      this.horizonOpacity = 0.6;
+      this.updateHorizon(); // manually update horizon
+      this.playbackRate = this.getplaybackRate('2 hours per 30 seconds');
+      // this.setForegroundImageByName("Black Sky Background");
+      // this.setForegroundOpacity(100);
+      this.sunPlace.set_zoomLevel(20); // the original default value
+      // track sun
+      this.trackSun();
+      console.log('=== startSolarScopeMode ===');
+      return;
+    },
+  
+    getSunAltitudeAtTime(time: Date): { altRad: number; azRad: number; } {
+      const sunAltAz = this.equatorialToHorizontal(this.sunPosition.raRad, this.sunPosition.decRad, this.location.latitudeRad, this.location.longitudeRad, time);
+      return sunAltAz;
+    },
+
+    // function that finds at what time the sun will reach a given altitude during the current day to within 15 minutes
+    getTimeforSunAlt(altDeg: number): { rising: number | null; setting: number | null; } {
+      // takes about 45ms to run
+      // search for time when sun is at given altitude
+      // start at 12:00am and search every MINUTES_PER_INTERVAL
+      const minTime = this.selectedTime - (this.selectedTime % MILLISECONDS_PER_DAY) - this.selectedTimezoneOffset;
+      const maxTime = minTime + MILLISECONDS_PER_DAY;
+      // const ehr = this.eclipticHorizonAngle(this.location.latitudeRad, this.dateTime);
+      let time = minTime;
+      let sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad; // negative
+      // find the two times it crosses the given altitude
+      while ((sunAlt < altDeg * D2R) && (time < maxTime)) {
+        time += MILLISECONDS_PER_INTERVAL;
+        sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad;
+      }
+      const rising = time == maxTime ? null : time;
+      while ((sunAlt > altDeg * D2R) && (time < maxTime)) {
+        time += MILLISECONDS_PER_INTERVAL;
+        sunAlt = this.getSunAltitudeAtTime(new Date(time)).altRad;
+      }
+      const setting = time == maxTime ? null : time;
+      
+      return {
+        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : (rising !== null ? rising : null),
+        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : (setting !== null ? setting : null)
+      };
+    },
+    
+    
+    setTimeforSunAlt(altDeg: number) {
+      const out = this.getTimeforSunAlt(altDeg);
+      console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
+      console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
+      if (out.rising == null && out.setting == null) {
+        return;
+      }
+
+      function matchTime(time: number | null, times: number[]) {
+        if (time === null) {
+          return -1;
+        }
+        const dt = time - times[0];
+        return times[0] + dt - (dt % MILLISECONDS_PER_INTERVAL);
+      }
+
+      if (this.times.includes(matchTime(out.rising, this.times))) {
+        this.selectedTime = matchTime(out.rising, this.times);
+      } else if (this.times.includes(matchTime(out.setting, this.times))) {
+        this.selectedTime = matchTime(out.setting, this.times);
+      } else {
+        console.log("time not in times array");
+        // best to leave it alone so it doesn't jump around
+        // this.selectedTime = Math.max(minTime, Math.min(newTime, maxTime));
+      }
+      
+
+    },
+
+    getplaybackRate(rate: string) {
+      console.log('setplaybackRate', rate);
+      // parse a string that looks like "x [time] per y [time]"
+      // e.g. "1 second per 1 minute"
+      // returns a number that is the ratio of the two times converted to seconds/seconds
+      // e.g. 1/60
+      // if the string is not parseable, returns 1
+      function unitToSec(unitString: string): number {
+        if (unitString[0] == 'h') {
+          return 3600;
+        } else if (unitString[0] == 'm') {
+          return 60;
+        } else if (unitString[0] == 's') {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+      
+      // parse string
+      const parsedString = rate.match(/(\d+(\.(\d+)?)?)\s(\w+)\sper\s(\d+(\.(\d+)?)?)?\s?(\w+)/);
+
+      if (parsedString === null) {
+        return 1;
+      }
+      const num1 = parseInt(parsedString[1]) * unitToSec(parsedString[4]);
+      const num2 = (parseInt(parsedString[5]?? 1) ) * unitToSec(parsedString[8]);
+      
+      return num1 / num2;
+    },
+  
     copyShareURL() {
       const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
       navigator.clipboard
@@ -1426,10 +1635,11 @@ export default defineComponent({
     showHorizon(_show: boolean) {
       this.updateHorizon();
     },
-
+    showSky(_show: boolean) {
+      this.updateHorizon();
+    },
     
     dateTime(_date: Date) {
-      console.log('watch dateTime');
       this.updateForDateTime();
     },
 
@@ -1481,6 +1691,7 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
+      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
       this.clearPlayingInterval();
       if (play) {
         this.playingIntervalId = setInterval(() => {
@@ -1492,7 +1703,7 @@ export default defineComponent({
           this.$nextTick(() => {
             // this.updateViewForDate();
           });
-        }, MILLISECONDS_PER_INTERVAL / 300);
+        }, this.tickDurationMS);
       }
     },
 
@@ -1505,8 +1716,48 @@ export default defineComponent({
     introSlide(_val) {
       this.inIntro = _val < 4;
       return;
-    }
+    },
 
+    viewerMode(mode) {
+      if (mode === 'Horizon') {
+        this.startHorizonMode();
+      } else if (mode === 'SunScope') {
+        this.horizonOpacity = 0.6;
+        this.startSolarScopeMode();
+      }
+    },
+
+    skyColor(_color) {
+      this.updateHorizon();
+    },
+
+    sunAboveHorizon(isAbove) {
+      console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
+      // this.showSky = isAbove; // just turn it off
+      this.horizonOpacity = isAbove ? 1 : 0.85;
+    },
+
+    sunPosition(pos) {
+
+      const _civilTwilight = -6 * D2R;
+      const _nauticalTwilight = 2 * _civilTwilight;
+      const astronomicalTwilight = 3 * _civilTwilight;
+      
+      const sunAlt = pos.altRad;
+      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+
+      function dssOpacity(alt: number) {
+        if (alt > 0) {
+          return 0;
+        } else {
+          return 1 - (1 + Math.atan(Math.PI * alt / (-astronomicalTwilight))) / 2;
+        }
+      }
+      
+      this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
+      return;
+    }
+    
   },
 });
 </script>
@@ -1553,7 +1804,7 @@ body {
   height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
 
-  transition: height 0.1s ease-in-out;
+  // transition: height 0.1s ease-in-out;
 }
 
 #app {
@@ -1667,6 +1918,17 @@ body {
 
 .icon-wrapper {
   padding: 8px 16px;
+}
+
+#viewer-mode-switch {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+
+  .v-switch__thumb {
+    color: var(--accent-color);
+    background-color: black; 
+  }
 }
 
 .top-content {
@@ -1819,6 +2081,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  pointer-events: auto;
 }
 
 #splash-overlay {
