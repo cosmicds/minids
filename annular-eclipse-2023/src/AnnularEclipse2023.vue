@@ -3,137 +3,172 @@
   id="app"
   :style="cssVars"
 >
+
+  <!-- Top content box with map, location, time, and option icons -->
   
-    <div id="guided-content-container">
-      
-      <div id="top-guided-content" class="guided-content">
-        <icon-button
-          v-model="showGuidedContent"
-          :fa-icon="showGuidedContent ? 'chevron-up' : 'chevron-down'"
-          :color="accentColor"
-          background-color="transparent"
-          :box-shadow="false"
-          tooltip-location="start"
-          @activate="() => { onResize() }"
-        ></icon-button>
-        <icon-button
-          fa-icon="question"
-          :color="accentColor"
-          tooltip-location="start"
-          @activate="() => { inIntro=true; introSlide = 2 }"
-        ></icon-button>
-        <icon-button
-          :model-value="learnerPath == 'Discover'"
-          fa-icon="rocket"
-          :color="accentColor"
-          @activate="() => { learnerPath = 'Discover'}"
-        ></icon-button>
-        <icon-button
-          :model-value="learnerPath == 'Answer'"
-          fa-icon="puzzle-piece"
-          :color="accentColor"
-          @activate="() => { learnerPath = 'Answer'}"
-        ></icon-button>
-        <icon-button
-          :model-value="learnerPath == 'Explore'"
-          fa-icon="location-dot"
-          :color="accentColor"
-          @activate="() => { learnerPath = 'Explore'}"
-        ></icon-button>
-        <icon-button
-          v-model="showTextSheet"
-          fa-icon="book-open"
-          :color="accentColor"
-          :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-          tooltip-location="start"
-        ></icon-button>
-        
-        <icon-button
-          v-model="showVideoSheet"
-          fa-icon="video"
-          :color="accentColor"
-          tooltip-text="Watch video"
-          tooltip-location="start"
-        >
-        </icon-button>
-        <icon-button
-          fa-icon="sun"
-          :color="accentColor"
-          tooltip-text="Center view on Sun"
-          tooltip-location='top'
-          @activate="() => trackSun()"
-        >
-        </icon-button>
-      </div>
-        
-      <div v-if="showGuidedContent" id="bottom-guided-content">
-        <div id="map-holder">
-          <span id="title">What will the eclipse look like here?</span>
-          <div id="map-container-map">
-            <location-selector
-              v-if="learnerPath == 'Discover'"
-              ref="citySelector"
-              :model-value="locationDeg"
-              @place="(place: typeof places[number]) => updateLocation(place.name)"
-              :detect-location="false"
-              :map-options="mapOptions"
-              :places="places"
-              :initial-place="places.find(p => p.name === selectedLocation)"
-              :place-circle-options="placeCircleOptions"
-              :selected-circle-options="selectedCircleOptions"
-              :selectable="false"
-            ></location-selector>
-            <span v-if="learnerPath=='Answer'">
-              Show a map with a possible eclipse paths
-            </span>
-            <location-selector
-              v-if="learnerPath == 'Explore'"
-              :model-value="locationDeg"
-              @update:modelValue="updateLocationFromMap"
-              :detect-location="false"
-              :selected-circle-options="selectedCircleOptions"
-            ></location-selector>
-          </div>
+  <v-card id="guided-content-container">
+    <v-row id="top-row">
+      <v-col cols="1">
+        <div>
+          <font-awesome-icon
+            v-model="showGuidedContent"
+            size="lg"
+            class="ma-1"
+            :color="accentColor"
+            :icon="showGuidedContent ? `chevron-down` : `chevron-up`"
+            @click="() => {
+              console.log('showGuidedContent = ', showGuidedContent);
+              showGuidedContent = !showGuidedContent
+            }"
+            @keyup.enter="showGuidedContent = !showGuidedContent"
+            tabindex="0"
+            tooltip-location="start"
+            @activate="() => { onResize() }"
+          /> 
         </div>
-        
-        <div id="bottom-center-content">
+      </v-col>
+      <v-col>
+        <div id="top-guided-content" class="guided-content">
+          <icon-button
+            fa-icon="question"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-location="start"
+            @activate="() => { inIntro=true; introSlide = 2 }"
+          ></icon-button>
+          <icon-button
+            :model-value="learnerPath == 'Discover'"
+            fa-icon="rocket"
+            :color="accentColor"
+            :focus-color="accentColor"
+            @activate="() => { learnerPath = 'Discover'}"
+          ></icon-button>
+          <icon-button
+            :model-value="learnerPath == 'Answer'"
+            fa-icon="puzzle-piece"
+            :color="accentColor"
+            :focus-color="accentColor"
+            @activate="() => { learnerPath = 'Answer'}"
+          ></icon-button>   
+          <icon-button
+            :model-value="learnerPath == 'Explore'" 
+            fa-icon="location-dot"
+            :color="accentColor"
+            :focus-color="accentColor"
+            @activate="() => { learnerPath = 'Explore'}"
+          ></icon-button>
+          <icon-button
+            v-model="showTextSheet"
+            fa-icon="book-open"
+            :color="accentColor"
+            :focus-color="accentColor"
+            :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+            tooltip-location="start"
+          ></icon-button>
           
-          <!-- Learn Path -->
-          <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
-            <span id="description">
-              <p>Click a highlighted city to view the eclipse from that location.</p>
-              <p>Explore until you can identify which locations will see an annular eclipse</p>
-            </span>
-          </div>
-          
-          <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
-            <span id="description">
-              <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
-              <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
-            </span>
-          </div>
-          
-          <!-- Explore Path -->
-          <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
-            <span id="description">Click a location on the map to select any place you like.</span>
-          </div>
-          
-          <div id="location-time-display">
-            <div id="location-display" class="ltd-container">
-              <p class="ltd-label">View for:</p>
-              <p class="ltd-value">{{ selectedLocationText }}</p>
-            </div>
-            <div id="time-display" class="ltd-container">
-              <p class="ltd-label">Time:</p>
-              <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
+          <icon-button
+            v-model="showVideoSheet"
+            fa-icon="video"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="Watch video"
+            tooltip-location="start"
+          >
+          </icon-button>
+          <icon-button
+            fa-icon="sun"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="Center view on Sun"
+            tooltip-location='top'
+            @activate="() => trackSun()"
+          >
+          </icon-button>
+        </div>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <div v-if="showGuidedContent" id="bottom-guided-content">
+          <div id="map-holder">
+            <span id="title">What will the eclipse look like here?</span>
+            <div id="map-container-map">
+              <location-selector
+                v-if="learnerPath == 'Discover'"
+                :model-value="locationDeg"
+                @place="(place: typeof places[number]) => updateLocation(place.name)"
+                :detect-location="false"
+                :map-options="mapOptions"
+                :places="places"
+                :initial-place="places.find(p => p.name === 'selectedLocation')"
+                :place-circle-options="placeCircleOptions"
+                :selected-circle-options="selectedCircleOptions"
+                :selectable="false"
+              ></location-selector>
+              <span v-if="learnerPath=='Answer'">
+                <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+              </span>
+              <location-selector
+                v-if="learnerPath == 'Explore'"
+                :model-value="locationDeg"
+                @update:modelValue="updateLocationFromMap"
+                :detect-location="false"
+                :selected-circle-options="selectedCircleOptions"
+              ></location-selector>
             </div>
           </div>
           
+          <div id="bottom-center-content">
+            
+            <!-- Learn Path -->
+            <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
+              <span id="description">
+                <p>Click a highlighted city to view the eclipse from that location.</p>
+                <p>Explore until you can identify which locations will see an annular eclipse</p>
+              </span>
+            </div>
+            
+            <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
+              <span id="description">
+                <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
+                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
+              </span>
+            </div>
+            
+            <!-- Explore Path -->
+            <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
+              <span id="description">Click a location on the map to select any place you like.</span>
+            </div>
+            
+            <div id="location-time-display">
+              <div id="location-display" class="ltd-container">
+                <p class="ltd-label">View for:</p>
+                <p class="ltd-value">{{ selectedLocationText }}</p>
+              </div>
+              <div id="time-display" class="ltd-container">
+                <p class="ltd-label">Time:</p>
+                <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
+              </div>
+            </div>
+            
+          </div>
+
+          <div v-if="selectedLocation === 'User Selected'">
+            <icon-button
+              id="share"
+              fa-icon="share-nodes"
+              :color="accentColor"
+              :focus-color="accentColor"
+              background-color="transparent"
+              :box-shadow="false"
+              @activate="copyShareURL"
+            ></icon-button>
+          </div>
+          
         </div>
-        <!-- <div id="main-guided-contols" class="controls"></div> -->
-      </div>
-        
-    </div>
+      </v-col>
+    </v-row>
+  </v-card>
 
   <div
     id="main-content"
@@ -171,136 +206,92 @@
       </div>
     </transition>
 
+  <!-- Opening Dialog Sequence -->
+
     <v-dialog
       v-model="inIntro"
       :style="cssVars"
       :scrim="false"
       :persistent="false"
       >
-    <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
-      <v-window v-model="introSlide">
-        <v-window-item :value="1">
-          <div class="intro-text">
+      <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
+        <v-window v-model="introSlide">
+          <v-window-item :value="1">
+            <div class="intro-text">
+              <p>
+              On October 14, 2023, the U.S. will experience
+              a partial solar eclipse, where the Moon 
+              will appear to travel across the Sun and 
+              block a portion of it.
+              </p>
+            <br />
+              <p>
+              A lucky segment of the U.S. will 
+              experience what is known as an <b>annular eclipse</b>.
+              </p>
+            </div>
+          </v-window-item>
+          
+          <v-window-item :value="2">
+            <div class="intro-text">
+              <p>
+                In this interactive page you can
+              </p>
+              
+              <ul
+              >
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
+                  </template>
+                    Explore what the eclipse will look like from different parts of the country
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
+                  </template>
+                    Use some detective work to identify the Path of Visibility for the annular eclipse
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
+                  </template>
+                    Choose any location around the world and see how the eclipse would look from there
+                </v-list-item>
+              </ul>
+            </div>
+          </v-window-item>
+          <v-window-item :value="3">
             <p>
-            On October 14, 2023, the U.S. will experience
-            a partial solar eclipse, where the Moon 
-            will appear to travel across the Sun and 
-            block a portion of it.
+              Press <font-awesome-icon icon="question"></font-awesome-icon> to see this introduction again
             </p>
-          <br />
-            <p>
-            A lucky segment of the U.S. will 
-            experience what is known as an <b>annular eclipse</b>.
-            </p>
-          </div>
-        </v-window-item>
-        
-        <v-window-item :value="2">
-          <div class="intro-text">
-            <p>
-              In this interactive page you can
-            </p>
-            
-            <ul
-            >
-              <v-list-item>
-                <template v-slot:prepend>
-                  <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
-                </template>
-                  Explore what the eclipse will look like from different parts of the country
-              </v-list-item>
-              <v-list-item>
-                <template v-slot:prepend>
-                  <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
-                </template>
-                  Use some detective work to identify the Path of Visibility for the annular eclipse
-              </v-list-item>
-              <v-list-item>
-                <template v-slot:prepend>
-                  <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
-                </template>
-                  Choose any location around the world and see how the eclipse would look from there
-              </v-list-item>
-            </ul>
-          </div>
-        </v-window-item>
-        <v-window-item :value="3">
-          <p>
-            Press <font-awesome-icon icon="question"></font-awesome-icon> to see this introduction again
-          </p>
-        </v-window-item>
-      </v-window>
+          </v-window-item>
+        </v-window>
 
-      <div id="intro-bottom-controls">
-        <v-btn
-          id="intro-next-button"
-          :color="accentColor"
-          @click="introSlide--"
-          @keyup.enter="introSlide--"
-          elevation="0"
-          >
-          Previous
-        </v-btn>
-        
-        <v-btn
-          id="intro-next-button"
-          :color="accentColor"
-          @click="introSlide++"
-          @keyup.enter="introSlide++"
-          elevation="0"
-          >
-          Next
-        </v-btn>
+        <div id="intro-bottom-controls">
+          <v-btn
+            id="intro-next-button"
+            :color="accentColor"
+            @click="introSlide--"
+            @keyup.enter="introSlide--"
+            elevation="0"
+            >
+            Previous
+          </v-btn>
+          
+          <v-btn
+            id="intro-next-button"
+            :color="accentColor"
+            @click="introSlide++"
+            @keyup.enter="introSlide++"
+            elevation="0"
+            >
+            Next
+          </v-btn>
+        </div>
       </div>
-    </div>
     </v-dialog>
     
-
-    <div class="top-content" >
-      <div id="left-buttons">
-        <v-switch
-          inset
-          :ripple="false"
-          v-model="viewerMode"
-          :color="accentColor"
-          false-value="SunScope"
-          false-icon="mdi-telescope"
-          true-value="Horizon"
-          true-icon="mdi-image-filter-hdr"
-        >
-        </v-switch>
-        
-      </div>
-      <div id="center-buttons">
-      </div>
-      <div id="right-buttons">
-        <v-dialog
-          v-model="showLocationSelector"
-          >
-          <template v-slot:activator>
-            <icon-button
-              v-model="showLocationSelector"
-              fa-icon="map-location-dot"
-              :color="accentColor"
-              tooltip-text="Select location"
-              tooltip-location="end"
-              ></icon-button>
-          </template>
-            <div id="eclipse-location-selector">
-              <v-select
-                :model-value="selectedLocation"
-                :items="Object.keys(eclipsePathLocations)"
-                label="Select eclipse viewing location"
-                :color="accentColor"
-                @update:model-value="updateLocation"
-              >
-              </v-select>
-            </div>
-        </v-dialog>
-      </div>
-    </div>
-    
-
     <div class="bottom-content">
       <div
         id="controls"
@@ -321,23 +312,16 @@
           <div v-if="showControls" class="controls-content">
             <v-checkbox
               :color="accentColor"
-              v-model="showEcliptic"
-              @keyup.enter="showEcliptic = !showEcliptic"
-              label="Ecliptic"
-              hide-details
-            />
-            <v-checkbox
-              :color="accentColor"
               v-model="showAltAzGrid"
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Grid"
-              hide-details
+              hide-details 
             />
             <v-checkbox
               :color="accentColor"
-              v-model="showConstellations"
-              @keyup.enter="showConstellations = !showConstellations"
-              label="Constellations"
+              v-model="showEcliptic"
+              @keyup.enter="showEcliptic = !showEcliptic"
+              label="Ecliptic"
               hide-details
             />
             <v-checkbox
@@ -583,6 +567,8 @@
         </v-window>
       </v-card>
     </v-dialog>
+
+  <notifications group="copy-url" position="top right" />
   </div>
 </v-app>
 </template>
@@ -592,13 +578,13 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Constellations, Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
+import { Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
 
-import { drawSkyOverlays, initializeConstellationNames, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
+import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 // interface MoveOptions {
 //   instant?: boolean;
@@ -710,7 +696,7 @@ export default defineComponent({
     sunPlace.set_zoomLevel(20);
 
     return {
-      showSplashScreen: true,
+      showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -837,15 +823,14 @@ export default defineComponent({
       playingWaitCount: 0,
 
       showAltAzGrid: true,
-      showConstellations: false,
       showHorizon: true,
-      showEcliptic: true,    
+      showEcliptic: false,    
       
       times: times, 
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
-      showGuidedContent: false,
+      showGuidedContent: true,
       inIntro: false,
 
       tab: 0,
@@ -874,6 +859,14 @@ export default defineComponent({
         longitudeDeg: R2D * pl.longitudeRad
       };
     });
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const lat = parseFloat(searchParams.get("lat") ?? "");
+    const lon = parseFloat(searchParams.get("lon") ?? "");
+    if (lat && lon) {
+      this.selectedLocation = "User Selected";
+      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+    }
   },
 
   mounted() {
@@ -889,10 +882,8 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
-      this.wwtSettings.set_showConstellationLabels(this.showConstellations);
-      this.wwtSettings.set_showConstellationFigures(this.showConstellations);
       this.wwtSettings.set_showEcliptic(this.showEcliptic);
-      this.wwtSettings.set_showEclipticOverviewText(this.showEcliptic);
+      this.wwtSettings.set_showEclipticOverviewText(false);
 
       // This is kinda horrible, but it works!
 
@@ -901,7 +892,6 @@ export default defineComponent({
       this.wwtControl._drawSkyOverlays = drawSkyOverlays;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      Constellations.initializeConstellationNames = initializeConstellationNames;
       Grids._makeAltAzGridText = makeAltAzGridText;
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1363,7 +1353,7 @@ export default defineComponent({
     },
 
     createSky(when: Date | null = null) {
-      const color = this.skyColor || '#87CEEB';
+      const color = this.skyColor || '#4190ED';
       // const opacity = 0.5;
       const date = when || this.dateTime || new Date();
 
@@ -1451,7 +1441,6 @@ export default defineComponent({
         this.updateGuidedContentHeight();
       });
     },
-
 
     startHorizonMode() {
       // turn on local horizon mode
@@ -1583,6 +1572,25 @@ export default defineComponent({
       return num1 / num2;
     },
   
+    copyShareURL() {
+      const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      navigator.clipboard
+        .writeText(url)
+        .then(() =>
+          this.$notify({
+            group: "copy-url",
+            type: "success",
+            text: "URL successfully copied"
+          })
+        )
+        .catch((_err) =>
+          this.$notify({
+            group: "copy-url",
+            type: "error",
+            text: "Failed to copy URL"
+          })
+        );
+    }
 
   },
 
@@ -1591,13 +1599,9 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
     },
-    showConstellations(show: boolean) {
-      this.wwtSettings.set_showConstellationLabels(show);
-      this.wwtSettings.set_showConstellationFigures(show);
-    },
     showEcliptic(show: boolean) {
       this.wwtSettings.set_showEcliptic(show);
-      this.wwtSettings.set_showEclipticOverviewText(show);
+      this.wwtSettings.set_showEclipticOverviewText(false);
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
@@ -1676,7 +1680,7 @@ export default defineComponent({
 
     showSplashScreen(_val) {
       if (!_val) {
-        this.inIntro = true;
+        this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
       }
     },
     
@@ -1729,6 +1733,8 @@ export default defineComponent({
 });
 </script>
 
+
+<!-------------------------  STYLE ----------------------------->
 <style lang="less">
 @font-face {
   font-family: "Highway Gothic Narrow";
@@ -2204,16 +2210,6 @@ video {
   }
 }
 
-#eclipse-location-selector {
-  position: fixed;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  width: 400px;
-  max-width: 90%;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
 #guided-content-container {
   --margin: 0px;
   position: relative;
@@ -2226,41 +2222,51 @@ video {
   // pointer-events: none;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  // justify-content: center;
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
   user-select: none;
   
-  
   transition: height 0.5s ease-in-out;
   
-  @media (max-width: 600px) {
+  @media (max-width: 600px) { // styles in here will apply to screens smaller than 600px wide
     font-size: 0.75rem;
   }
   
+  @media (min-size:750px) { // styles in here will apply to screens larger than 750px wide
+
+  }
+
+  #top-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+  }
+
   #top-guided-content {
     // buttons
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 90%;
-    
-    
-    div.icon-wrapper {
-      background-color: rgba(209, 209, 209, .2);
-      // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
-      border: none;
-      border-radius: 5px;
-      padding-inline: 10px;
-      padding-block: 3px;
-      width: 100%;
-      margin-inline: 10px;
-      justify-content: center;
-    }
-    
+  }  
+  
+  div.icon-wrapper {
+    background-color: rgba(209, 209, 209, .2);
+    // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
+    border: none;
+    border-radius: 5px;
+    padding-inline: 10px;
+    padding-block: 3px;
+    width: 100%;
+    margin-inline: 10px;
+    justify-content: center;
   }
+    
+}
   
   #bottom-guided-content {
     // map stuff
@@ -2284,8 +2290,8 @@ video {
       }
       
       #map-container-map {
-        height: 300px;
-        width: 450px;
+        height: 230px;
+        width: 350px;
         aspect-ratio: 2 / 1;
         background-color: cornsilk;
         
@@ -2295,6 +2301,10 @@ video {
           // wrap text
           white-space: break-spaces;
         }
+
+      img {
+        height: 170px;
+      }
         
       }
       
@@ -2337,7 +2347,7 @@ video {
       }
     }
   }
-}
+
 
 
 
@@ -2385,6 +2395,8 @@ video {
   }
 }
 
-
-
+#share-button {
+  margin: auto;
+  width: 2em;
+}
 </style>
