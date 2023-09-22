@@ -1924,8 +1924,11 @@ body {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  outline: 1px solid red;
-  
+
+  .v-switch__thumb {
+    color: var(--accent-color);
+    background-color: black; 
+  }
 }
 
 .top-content {
