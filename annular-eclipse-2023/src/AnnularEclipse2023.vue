@@ -176,7 +176,19 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-
+    <div id="viewer-mode-switch">
+      <v-switch
+        inset
+        :ripple="false"
+        v-model="viewerMode"
+        :color="accentColor"
+        false-value="SunScope"
+        false-icon="mdi-telescope"
+        true-value="Horizon"
+        true-icon="mdi-image-filter-hdr"
+      >
+      </v-switch>
+    </div>
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -845,7 +857,8 @@ export default defineComponent({
       skyOpacity: 0.6,
       horizonOpacity: 1,
 
-      realTimeRate: 1,
+      playbackRate: 1,
+      oldPlayBackRate: 1,
 
       sunPlace
     };
@@ -918,7 +931,7 @@ export default defineComponent({
         
       }, 100);
 
-      this.realTimeRate = 1;  //this.setRealTimeRate('8 minutes per second'); // 500;
+      this.playbackRate = 1;  //this.setplaybackRate('8 minutes per second'); // 500;
       
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -1033,7 +1046,7 @@ export default defineComponent({
     },
 
     tickDurationMS(): number {
-      return MILLISECONDS_PER_INTERVAL / (this.realTimeRate);
+      return MILLISECONDS_PER_INTERVAL / (this.playbackRate);
     },
     
     sunPosition() {
@@ -1457,7 +1470,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: false
       });
-      this.realTimeRate = this.setRealTimeRate('2 hours per 15 seconds');
+      this.playbackRate = this.getplaybackRate('2 hours per 15 seconds');
       console.log('=== startHorizonMode ===');
       return;
     },
@@ -1468,7 +1481,7 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      this.realTimeRate = this.setRealTimeRate('2 hours per 30 seconds');
+      this.playbackRate = this.getplaybackRate('2 hours per 30 seconds');
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1541,8 +1554,8 @@ export default defineComponent({
 
     },
 
-    setRealTimeRate(rate: string) {
-      console.log('setRealTimeRate', rate);
+    getplaybackRate(rate: string) {
+      console.log('setplaybackRate', rate);
       // parse a string that looks like "x [time] per y [time]"
       // e.g. "1 second per 1 minute"
       // returns a number that is the ratio of the two times converted to seconds/seconds
@@ -1562,13 +1575,13 @@ export default defineComponent({
       
       // parse string
       const parsedString = rate.match(/(\d+(\.(\d+)?)?)\s(\w+)\sper\s(\d+(\.(\d+)?)?)?\s?(\w+)/);
-      console.log(parsedString);
+
       if (parsedString === null) {
         return 1;
       }
       const num1 = parseInt(parsedString[1]) * unitToSec(parsedString[4]);
       const num2 = (parseInt(parsedString[5]?? 1) ) * unitToSec(parsedString[8]);
-      console.log(num1, num2);
+      
       return num1 / num2;
     },
   
@@ -1662,7 +1675,7 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
-      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.realTimeRate}x real time`);
+      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
       this.clearPlayingInterval();
       if (play) {
         this.playingIntervalId = setInterval(() => {
@@ -1889,6 +1902,12 @@ body {
 
 .icon-wrapper {
   padding: 8px 16px;
+}
+
+#viewer-mode-switch {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
 }
 
 .top-content {
