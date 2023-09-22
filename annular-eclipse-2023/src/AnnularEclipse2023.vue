@@ -928,7 +928,7 @@ export default defineComponent({
         
       }, 100);
 
-      this.realTimeRate = this.setRealTimeRate('8 minutes per second'); // 500;
+      this.realTimeRate = 1;  //this.setRealTimeRate('8 minutes per second'); // 500;
       
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -1099,7 +1099,6 @@ export default defineComponent({
     },
 
     moveOneIntervalForward() {
-      console.log("selected time", this.selectedTime);
       this.selectedTime += MILLISECONDS_PER_INTERVAL;
     },
 
@@ -1469,6 +1468,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: false
       });
+      this.realTimeRate = this.setRealTimeRate('2 hours per 15 seconds');
       console.log('=== startHorizonMode ===');
       return;
     },
@@ -1479,6 +1479,7 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
+      this.realTimeRate = this.setRealTimeRate('2 hours per 30 seconds');
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1657,6 +1658,7 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
+      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.realTimeRate}x real time`);
       this.clearPlayingInterval();
       if (play) {
         this.playingIntervalId = setInterval(() => {
