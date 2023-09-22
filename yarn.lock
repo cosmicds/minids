@@ -490,6 +490,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kyvg/vue3-notification@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@kyvg/vue3-notification@npm:3.0.2"
+  peerDependencies:
+    vue: ^3.0.0
+  checksum: c6dbd3550083d9448006b50624ebeb778b86bbd564d1957e0f501fa9ed77821180b8b7b5aa9d0e7a45b2bc439a242cbd7cff6173301f1a2c8f77d863ebfd1b57
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -511,6 +520,7 @@ __metadata:
     "@fortawesome/fontawesome-svg-core": ^6.4.2
     "@fortawesome/free-solid-svg-icons": ^6.4.2
     "@fortawesome/vue-fontawesome": ^3.0.3
+    "@kyvg/vue3-notification": ^3.0.2
     "@minids/common": "workspace:0.0.0"
     "@typescript-eslint/eslint-plugin": ^6.5.0
     "@typescript-eslint/parser": ^6.5.0

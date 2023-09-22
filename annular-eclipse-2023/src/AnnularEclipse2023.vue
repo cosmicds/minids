@@ -32,31 +32,36 @@
           <icon-button
             fa-icon="question"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-location="start"
             @activate="() => { inIntro=true; introSlide = 2 }"
           ></icon-button>
           <icon-button
-            :v-model="learnerPath == 'Discover'"
+            :model-value="learnerPath == 'Discover'"
             fa-icon="rocket"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Discover'}"
           ></icon-button>
           <icon-button
-            :v-model="learnerPath == 'Answer'"
+            :model-value="learnerPath == 'Answer'"
             fa-icon="puzzle-piece"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Answer'}"
           ></icon-button>   
           <icon-button
-            :v-model="learnerPath == 'Explore'" 
+            :model-value="learnerPath == 'Explore'" 
             fa-icon="location-dot"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Explore'}"
           ></icon-button>
           <icon-button
             v-model="showTextSheet"
             fa-icon="book-open"
             :color="accentColor"
+            :focus-color="accentColor"
             :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
             tooltip-location="start"
           ></icon-button>
@@ -65,6 +70,7 @@
             v-model="showVideoSheet"
             fa-icon="video"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Watch video"
             tooltip-location="start"
           >
@@ -72,6 +78,7 @@
           <icon-button
             fa-icon="sun"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Center view on Sun"
             tooltip-location='top'
             @activate="() => trackSun()"
@@ -145,7 +152,19 @@
             </div>
             
           </div>
-          <!-- <div id="main-guided-contols" class="controls"></div> -->
+
+          <div v-if="selectedLocation === 'User Selected'">
+            <icon-button
+              id="share"
+              fa-icon="share-nodes"
+              :color="accentColor"
+              :focus-color="accentColor"
+              background-color="transparent"
+              :box-shadow="false"
+              @activate="copyShareURL"
+            ></icon-button>
+          </div>
+          
         </div>
       </v-col>
     </v-row>
@@ -548,6 +567,8 @@
         </v-window>
       </v-card>
     </v-dialog>
+
+  <notifications group="copy-url" position="top right" />
   </div>
 </v-app>
 </template>
@@ -827,6 +848,14 @@ export default defineComponent({
         longitudeDeg: R2D * pl.longitudeRad
       };
     });
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const lat = parseFloat(searchParams.get("lat") ?? "");
+    const lon = parseFloat(searchParams.get("lon") ?? "");
+    if (lat && lon) {
+      this.selectedLocation = "User Selected";
+      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+    }
   },
 
   mounted() {
@@ -1361,6 +1390,26 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
+    },
+
+    copyShareURL() {
+      const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      navigator.clipboard
+        .writeText(url)
+        .then(() =>
+          this.$notify({
+            group: "copy-url",
+            type: "success",
+            text: "URL successfully copied"
+          })
+        )
+        .catch((_err) =>
+          this.$notify({
+            group: "copy-url",
+            type: "error",
+            text: "Failed to copy URL"
+          })
+        );
     }
 
   },
@@ -2123,6 +2172,8 @@ video {
   }
 }
 
-
-
+#share-button {
+  margin: auto;
+  width: 2em;
+}
 </style>

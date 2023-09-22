@@ -13,6 +13,8 @@ import 'vue-slider-component/theme/default.css';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
+import Notifications from "@kyvg/vue3-notification";
+
 import vuetify from "../plugins/vuetify";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -35,7 +37,8 @@ import {
   faPuzzlePiece,
   faLocationDot,
   faChevronUp,
-  faQuestion
+  faQuestion,
+  faShareNodes
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -53,6 +56,7 @@ library.add(faPuzzlePiece);
 library.add(faLocationDot);
 library.add(faChevronUp);
 library.add(faQuestion);
+library.add(faShareNodes);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -68,6 +72,7 @@ createApp(AnnularEclipse2023, {
   // Plugins
   .use(wwtPinia)
   .use(vuetify)
+  .use(Notifications)
 
   // Directives
   .directive(
