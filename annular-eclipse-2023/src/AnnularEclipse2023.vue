@@ -922,6 +922,8 @@ export default defineComponent({
         this.trackSun().then(() => this.positionSet = true);
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
+        this.setForegroundOpacity(100);
+        
       }, 100);
 
       // If there are layers to set up, do that here!
@@ -1451,7 +1453,7 @@ export default defineComponent({
       this.skyColor = this.skyColorLight;
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
       this.horizonOpacity = 1;
-      this.setForegroundImageByName("Digitized Sky Survey (Color)");
+      // this.setForegroundImageByName("Digitized Sky Survey (Color)");
       this.sunPlace.set_zoomLevel(60 * 6);
       this.gotoTarget({
         place: this.sunPlace,
@@ -1469,7 +1471,8 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      this.setForegroundImageByName("Black Sky Background");
+      // this.setForegroundImageByName("Black Sky Background");
+      // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
       this.trackSun();
@@ -1668,6 +1671,16 @@ export default defineComponent({
       
       const sunAlt = pos.altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+
+      function dssOpacity(alt: number) {
+        if (alt > 0) {
+          return 0;
+        } else {
+          return 1 - (1 + Math.atan(Math.PI * alt / (-astronomicalTwilight))) / 2;
+        }
+      }
+      
+      this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
       return;
     }
     
