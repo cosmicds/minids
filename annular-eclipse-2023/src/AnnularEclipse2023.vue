@@ -32,31 +32,36 @@
           <icon-button
             fa-icon="question"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-location="start"
             @activate="() => { inIntro=true; introSlide = 2 }"
           ></icon-button>
           <icon-button
-            :v-model="learnerPath == 'Discover'"
+            :model-value="learnerPath == 'Discover'"
             fa-icon="rocket"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Discover'}"
           ></icon-button>
           <icon-button
-            :v-model="learnerPath == 'Answer'"
+            :model-value="learnerPath == 'Answer'"
             fa-icon="puzzle-piece"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Answer'}"
           ></icon-button>   
           <icon-button
-            :v-model="learnerPath == 'Explore'" 
+            :model-value="learnerPath == 'Explore'" 
             fa-icon="location-dot"
             :color="accentColor"
+            :focus-color="accentColor"
             @activate="() => { learnerPath = 'Explore'}"
           ></icon-button>
           <icon-button
             v-model="showTextSheet"
             fa-icon="book-open"
             :color="accentColor"
+            :focus-color="accentColor"
             :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
             tooltip-location="start"
           ></icon-button>
@@ -65,6 +70,7 @@
             v-model="showVideoSheet"
             fa-icon="video"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Watch video"
             tooltip-location="start"
           >
@@ -72,6 +78,7 @@
           <icon-button
             fa-icon="sun"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Center view on Sun"
             tooltip-location='top'
             @activate="() => trackSun()"
@@ -151,6 +158,7 @@
               id="share"
               fa-icon="share-nodes"
               :color="accentColor"
+              :focus-color="accentColor"
               background-color="transparent"
               :box-shadow="false"
               @activate="copyShareURL"
