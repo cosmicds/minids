@@ -5,7 +5,7 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  
+
   <v-card id="guided-content-container">
     <v-row id="top-row">
       <v-col cols="1">
@@ -35,6 +35,7 @@
             :focus-color="accentColor"
             tooltip-location="start"
             @activate="() => { inIntro=true; introSlide = 2 }"
+            class="icon-wrapper top-icons"
           ></icon-button>
           <icon-button
             :model-value="learnerPath == 'Explore'"
@@ -87,10 +88,14 @@
         </div>
       </v-col>
     </v-row>
+    <v-row id="title-row">
+      <v-col>
+        What will the eclipse look like here?
+      </v-col>
+    </v-row>
     <v-row v-if="showGuidedContent" id="bottom-guided-content">
       <v-col :lg="4" :sm="6">
         <div id="map-holder">
-          <span id="title">What will the eclipse look like here?</span>
           <div id="map-container-map">
             <location-selector
               v-if="learnerPath == 'Explore'"
@@ -139,7 +144,7 @@
             
             <!-- Choose Path -->
             <div class="bottom-center-content-text" v-if="learnerPath=='Choose'">
-              <span id="description">Click a location on the map to select any place you like.</span>
+              <p id="description">Click a location on the map to select any place you like.</p>
             </div>
             
             <div id="location-time-display">
@@ -1916,10 +1921,6 @@ body {
 
 }
 
-.icon-wrapper {
-  padding: 8px 16px;
-}
-
 #viewer-mode-switch {
   position: absolute;
   top: 1rem;
@@ -1958,6 +1959,7 @@ body {
   align-items: center;
   gap: 5px;
 }
+
 #tools {
   z-index: 10;
   color: #fff;
@@ -1985,6 +1987,10 @@ body {
   align-items: center;
   gap: 5px;
   pointer-events: auto;
+
+  div.icon-wrapper {
+  padding: 8px 16px;
+  }
 }
 
 #controls {
@@ -2315,27 +2321,42 @@ video {
     flex-direction: row;
     justify-content: space-between;
     width: 90%;
-  }  
   
-  div.icon-wrapper {
-    background-color: rgba(209, 209, 209, .2);
-    border: none;
-    border-radius: 5px;
-    padding-inline: 10px;
-    padding-block: 3px;
-    width: 100%;
-    justify-content: center;
-        
-    @media (max-width: 750px){ //SMALL
-      margin-inline: 4px;
-    }
+    div.icon-wrapper {
+      background-color: rgba(209, 209, 209, .2);
+      border: none;
+      border-radius: 5px;
+      padding-block: 3px;
+      width: 100%;
+      justify-content: center;
+          
+      @media (max-width: 750px){ //SMALL
+        margin-inline: 4px;
+      }
 
-    @media (min-width: 751px){ //LARGE
-      margin-inline: 10px;
+      @media (min-width: 751px){ //LARGE
+        margin-inline: 10px;
+      }  
     }
   }
     
 }
+  #title-row {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-align: left;
+
+    @media (max-width: 750px){ //SMALL
+      width: 95%;
+      font-size: 0.8rem;
+    }
+
+    @media (min-width: 751px){ //LARGE
+      width: 70%;
+      font-size: 1rem;
+    }
+  }
+
   #bottom-guided-content {
     // map stuff
     display: flex;
@@ -2351,19 +2372,13 @@ video {
       width: 70%;
       padding-bottom: 1.5em;
     }
-
   
     #map-holder {
       // width: 90%;
       pointer-events: auto;
       margin-inline: auto;
       
-      #title {
-        color: var(--accent-color);
-        font-weight: bold;
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
-      }
+
       
       #map-container-map {
         aspect-ratio: 5 / 3;
