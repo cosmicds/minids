@@ -5,137 +5,42 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-
-  <v-card id="guided-content-container">
-    <v-row id="top-row">
-      <v-col cols="1">
-        <div>
-          <font-awesome-icon
-            v-model="showGuidedContent"
-            size="lg"
-            class="ma-1"
-            :color="accentColor"
-            :icon="showGuidedContent ? `chevron-down` : `chevron-up`"
-            @click="() => {
-              console.log('showGuidedContent = ', showGuidedContent);
-              showGuidedContent = !showGuidedContent;
-              onResize();
-            }"
-            @keyup.enter="showGuidedContent = !showGuidedContent"
-            tabindex="0"
-            tooltip-location="start"
-          /> 
-        </div>
-      </v-col>
-      <v-col>
-        <div id="top-guided-content" class="guided-content">
-          <icon-button
-            fa-icon="question"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-location="start"
-            @activate="() => { inIntro=true; introSlide = 2 }"
-            class="icon-wrapper top-icons"
-          ></icon-button>
-          <icon-button
-            :model-value="learnerPath == 'Explore'"
-            fa-icon="rocket"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Explore'}"
-          ></icon-button>
-          <icon-button
-            :model-value="learnerPath == 'Answer'"
-            fa-icon="puzzle-piece"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Answer'}"
-          ></icon-button>   
-          <icon-button
-            :model-value="learnerPath == 'Choose'" 
-            fa-icon="location-dot"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Choose'}"
-          ></icon-button>
-          <icon-button
-            v-model="showTextSheet"
-            fa-icon="book-open"
-            :color="accentColor"
-            :focus-color="accentColor"
-            :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-            tooltip-location="start"
-          ></icon-button>
-          
-          <icon-button
-            v-model="showVideoSheet"
-            fa-icon="video"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Watch video"
-            tooltip-location="start"
-          >
-          </icon-button>
-          <icon-button
-            fa-icon="sun"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Center view on Sun"
-            tooltip-location='top'
-            @activate="() => trackSun()"
-          >
-          </icon-button>
-        </div>
-      </v-col>
-    </v-row>
-    <v-row id="title-row">
-      <v-col>
-        What will the eclipse look like here?
-      </v-col>
-    </v-row>
-    <v-row v-if="showGuidedContent" id="bottom-guided-content">
-      <v-col :lg="4" :sm="6">
-        <div id="map-holder">
-          <div id="map-container-map">
-            <location-selector
-              v-if="learnerPath == 'Explore'"
-              :model-value="locationDeg"
-              @place="(place: typeof places[number]) => updateLocation(place.name)"
-              :detect-location="false"
-              :map-options="mapOptions"
-              :places="places"
-              :initial-place="places.find(p => p.name === 'selectedLocation')"
-              :place-circle-options="placeCircleOptions"
-              :selected-circle-options="selectedCircleOptions"
-              :selectable="false"
-            ></location-selector>
-
-            <span v-if="learnerPath=='Answer'">
-              <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
-            </span>
-
-            <location-selector
-              v-if="learnerPath == 'Choose'"
-              :model-value="locationDeg"
-              @update:modelValue="updateLocationFromMap"
-              :detect-location="false"
-              :selected-circle-options="selectedCircleOptions"
-            ></location-selector>
-          </div>
-        </div>
-      </v-col>
-      <v-col lg="4" sm="6">
-          <div id="bottom-center-content">
-            
+  <v-container id="guided-content-container" v-if="showGuidedContent">
+    <div id="close-guided-content-container">
+      <font-awesome-icon
+        v-model="showGuidedContent"
+        size="lg"
+        class="ma-1"
+        :color="accentColor"
+        :icon="`square-xmark`"
+        @click="() => {
+          console.log('showGuidedContent = ', showGuidedContent);
+          showGuidedContent = !showGuidedContent;
+          onResize();
+        }"
+        @keyup.enter="showGuidedContent = !showGuidedContent"
+        tabindex="0"
+        tooltip-location="start"
+      /> 
+    </div>
+    <v-row>
+      <v-col cols="6" id="non-map-container">
+        <v-row>
+          <v-col>
+            <span id="title">What will the eclipse look like here?</span>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col id="top-container-main-text">
             <!-- Learn Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
+            <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span id="description">
                 <p>Click a highlighted city to view the eclipse from that location.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse</p>
               </span>
             </div>
             
-            <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
+            <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span id="description">
                 <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
                 <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
@@ -143,7 +48,7 @@
             </div>
             
             <!-- Choose Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Choose'">
+            <div class="instructions-text" v-if="learnerPath=='Choose'">
               <p id="description">Click a location on the map to select any place you like.</p>
             </div>
             
@@ -157,23 +62,118 @@
                 <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
               </div>
             </div>
-            
-          </div>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <div id="top-container-buttons">
+              <icon-button
+                fa-icon="question"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-location="start"
+                @activate="() => { inIntro=true; introSlide = 2 }"
+              ></icon-button>
+              <icon-button
+                :model-value="learnerPath == 'Explore'"
+                fa-icon="rocket"
+                :color="accentColor"
+                :focus-color="accentColor"
+                @activate="() => { learnerPath = 'Explore'}"
+              ></icon-button>
+              <icon-button
+                :model-value="learnerPath == 'Answer'"
+                fa-icon="puzzle-piece"
+                :color="accentColor"
+                :focus-color="accentColor"
+                @activate="() => { learnerPath = 'Answer'}"
+              ></icon-button>   
+              <icon-button
+                :model-value="learnerPath == 'Choose'" 
+                fa-icon="location-dot"
+                :color="accentColor"
+                :focus-color="accentColor"
+                @activate="() => { learnerPath = 'Choose'}"
+              ></icon-button>
+              <icon-button
+                v-model="showTextSheet"
+                fa-icon="book-open"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                tooltip-location="start"
+              ></icon-button>
+              <icon-button
+                v-model="showVideoSheet"
+                fa-icon="video"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-text="Watch video"
+                tooltip-location="start"
+              >
+              </icon-button>
+              <icon-button
+                fa-icon="sun"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-text="Center view on Sun"
+                tooltip-location='top'
+                @activate="() => trackSun()"
+              >
+              </icon-button>
+            </div>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="6" id="map-column">
+        <div id="map-container" >
+          <location-selector
+            v-if="learnerPath == 'Explore'"
+            :model-value="locationDeg"
+            @place="(place: typeof places[number]) => updateLocation(place.name)"
+            :detect-location="false"
+            :map-options="mapOptions"
+            :places="places"
+            :initial-place="places.find(p => p.name === 'selectedLocation')"
+            :place-circle-options="placeCircleOptions"
+            :selected-circle-options="selectedCircleOptions"
+            :selectable="false"
+            class="leaflet-map"
+          ></location-selector>
 
-          <div v-if="selectedLocation === 'User Selected'">
-            <icon-button
-              id="share"
-              fa-icon="share-nodes"
-              :color="accentColor"
-              :focus-color="accentColor"
-              background-color="transparent"
-              :box-shadow="false"
-              @activate="copyShareURL"
-            ></icon-button>
-          </div>
+          <span v-if="learnerPath=='Answer'">
+            <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+          </span>
+
+          <location-selector
+            v-if="learnerPath == 'Choose'"
+            :model-value="locationDeg"
+            @update:modelValue="updateLocationFromMap"
+            :detect-location="false"
+            :selected-circle-options="selectedCircleOptions"
+            class="leaflet-map"
+          ></location-selector>
+        </div>
       </v-col>
     </v-row>
-  </v-card>
+  </v-container>
+  <div v-if="!showGuidedContent" id="closed-top-container">
+    <font-awesome-icon
+      v-model="showGuidedContent"
+      size="lg"
+      class="ma-1"
+      :color="accentColor"
+      :icon="`gear`"
+      @click="() => {
+        console.log('showGuidedContent = ', showGuidedContent);
+        showGuidedContent = !showGuidedContent;
+        onResize();
+      }"
+      @keyup.enter="showGuidedContent = !showGuidedContent"
+      tabindex="0"
+      tooltip-location="start"
+    /> 
+  </div>
 
   <div
     id="main-content"
@@ -746,7 +746,7 @@ export default defineComponent({
       selectionProximity: 4,
       pointerMoveThreshold: 6,
       isPointerMoving: false,
-      pointerStartPosition: null as { x: number; y: number } | null,      
+      pointerStartPosition: null as { x: number; y: number } | null,  
 
       // Albuquerque, NM
       timeOfDay: { hours: annularEclipseTimeNMTZ.getHours(), minutes: annularEclipseTimeNMTZ.getMinutes(), seconds: annularEclipseTimeNMTZ.getSeconds() },
@@ -1624,7 +1624,8 @@ export default defineComponent({
             text: "Failed to copy URL"
           })
         );
-    }
+    },
+
 
   },
 
@@ -2265,44 +2266,59 @@ video {
 
 }
 
+#closed-top-container{
+  padding-block: 0.25em;
+  margin-left: 0.5em;
+}
+
 #guided-content-container {
-  --margin: 0px;
+  --top-content-max-height: 35%;
+  --map-max-height: 32vh; // Keep this about 3 smaller than above
+
+  max-height: var(--top-content-max-height);
+  --margin: 0.5em;
   position: relative;
-  top: 5px; 
   left: 0;
   width: calc(100% - 2*var(--margin));
-  height: fit-content; 
+  // height: fit-content; 
   margin: var(--margin);
-  padding-block: 0.5rem;
+  padding: 0.5rem;
   // pointer-events: none;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+
   // justify-content: center;
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
   user-select: none;
+  border: solid 1px var(--accent-color);
   
   transition: height 0.5s ease-in-out;
 
   .v-row {
     margin: 0px;
+    padding: 0px;
   }
 
   .v-col {
+    margin: 0px;
     padding: 0px;
   }
 
   .leaflet-control-zoom-in,
   .leaflet-control-zoom-out {
-    width: 5em; 
-    height: 5em; 
-    font-size: 0.4em; 
+
+    @media (max-width: 750px){ //SMALL
+      width: 4em; 
+      // height: 5em; 
+      font-size: 0.4em; 
+    }
+
     background-color: #fff;
     border: 1px solid #ccc; 
     cursor: pointer; /* Change cursor on hover */
-}
+  } 
 
   .leaflet-touch {
     line-height: 5em;
@@ -2315,7 +2331,7 @@ video {
     width: 90%;
   }
 
-  #top-guided-content {
+  #top-container-buttons {
     // buttons
     display: flex;
     flex-direction: row;
@@ -2340,74 +2356,81 @@ video {
     }
   }
     
-}
-  #title-row {
+  #title {
     color: var(--accent-color);
     font-weight: bold;
     text-align: left;
+    padding-left: 1em;
 
     @media (max-width: 750px){ //SMALL
-      width: 95%;
       font-size: 0.8rem;
     }
 
     @media (min-width: 751px){ //LARGE
-      width: 70%;
       font-size: 1rem;
     }
   }
 
-  #bottom-guided-content {
+  #map-column {
     // map stuff
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    align-content: center;
     justify-content: center;
-
-    @media (max-width: 750px){ //SMALL
-      width: 95%;
-    }
-
-    @media (min-width: 751px){ //LARGE
-      width: 70%;
-      padding-bottom: 1.5em;
-    }
+    height: 95%;
+    width: 95%;
   
-    #map-holder {
-      // width: 90%;
+    #map-container {
       pointer-events: auto;
-      margin-inline: auto;
-      
+      height: 100%;
+      width: 100%;
 
+      @media (max-width: 550px){ //SMALL
+        font-size: 0.8rem;
+        aspect-ratio: 3/4; // need to set this to some reasonable value or you just get a tiny horizontal strip
+      }
+
+      @media (min-width: 551px){ //LARGE
+        font-size: 1rem;
+        aspect-ratio: 5/3; // need to set this to some reasonable value or you just get a tiny horizontal strip
+      }
+
+      max-height: var(--map-max-height); // this keeps map from spilling outside the top div for some window aspect ratios
       
-      #map-container-map {
-        aspect-ratio: 5 / 3;
-        background-color: cornsilk;
-        border-radius: 5px;
-        
-        span {
-          font-weight: bold;
-          color: black;
-          // wrap text
-          white-space: break-spaces;
-        }
+      .leaflet-map {
+        height: 100%;
+        width: 100%;
+      }
+      span {
+        color: black;
+        padding: 0;
+        margin: 0;
+      }
 
       img {
-        height: 170px;
+        width: 100%;
       }
-        
-      }
-      
     }
+  }
 
-    #bottom-center-content {
-      // text guidelines
-      .bottom-center-content-text {
-        color: white;
-        text-align: left;
-        line-height: 1.2em;
-        border: 1.5px solid var(--accent-color);
-        border-radius: 5px; 
+  #close-guided-content-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 500;
+  }
+
+  #non-map-container {
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+  }
+
+  #top-container-main-text {
+    // text guidelines
+    .instructions-text {
+      color: white;
+      text-align: left;
+      line-height: 1.2em;
+      border: 1.5px solid var(--accent-color);
+      border-radius: 5px; 
 
       @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
         font-size: 0.7em;
@@ -2423,7 +2446,7 @@ video {
           padding-bottom: 0.4em;
         }
       }
-  
+
       @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
         font-size: 1em;
         margin: 1em;
@@ -2440,45 +2463,43 @@ video {
       }
     }
       
-      #location-time-display {
-        margin: 1em;
-        display: flex;
-        flex-direction: row;
+    #location-time-display {
+      margin: 1em;
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      gap: 0.5rem;
+    
+      .ltd-container {
+        // display: block;
+        text-align: left;
+        background-color: aliceblue;
+        color: blue;
+        border-radius: 0.5em;
         flex-grow: 1;
-        gap: 0.5rem;
-      
-        .ltd-container {
-          // display: block;
+
+        @media (max-width: 750px){ //SMALL
+          padding-left: 0.5em;
+          padding-block: 0.4em;
+          margin-bottom: 0.3em;
+          font-size: 0.6em;
+        }
+
+        @media (min-width: 751px){ //LARGE
+          padding-left: 1em;
+          padding-block: 0.7em;
+          margin-bottom: 0.5em;
           text-align: left;
-          background-color: aliceblue;
-          color: blue;
-          border-radius: 0.5em;
-          flex-grow: 1;
-
-          @media (max-width: 750px){ //SMALL
-            padding-left: 0.5em;
-            padding-block: 0.4em;
-            margin-bottom: 0.3em;
-            font-size: 0.6em;
-          }
-
-          @media (min-width: 751px){ //LARGE
-            padding-left: 1em;
-            padding-block: 0.7em;
-            margin-bottom: 0.5em;
-            text-align: left;
-            font-size: 0.8em;
-          }
+          font-size: 0.8em;
         }
-        
-        .ltd-label {
-          font-weight: bold;
-        }
+      }
+      
+      .ltd-label {
+        font-weight: bold;
       }
     }
   }
-
-
+}
 
 
 #introduction-overlay {
