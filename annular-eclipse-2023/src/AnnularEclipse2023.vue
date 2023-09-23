@@ -68,13 +68,6 @@
           <v-col>
             <div id="top-container-buttons">
               <icon-button
-                fa-icon="question"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-location="start"
-                @activate="() => { inIntro=true; introSlide = 2 }"
-              ></icon-button>
-              <icon-button
                 :model-value="learnerPath == 'Explore'"
                 fa-icon="rocket"
                 :color="accentColor"
@@ -121,6 +114,13 @@
                 @activate="() => trackSun()"
               >
               </icon-button>
+              <icon-button
+                fa-icon="question"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-location="start"
+                @activate="() => { inIntro=true; introSlide = 2 }"
+              ></icon-button>
             </div>
           </v-col>
         </v-row>
@@ -849,7 +849,7 @@ export default defineComponent({
         radius: 50000
       },
 
-      learnerPath: "Choose", // Choose or Learn
+      learnerPath: "Explore", // Choose or Learn
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -2324,19 +2324,12 @@ video {
     line-height: 5em;
   }
 
-  #top-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
-  }
-
   #top-container-buttons {
     // buttons
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 90%;
+    padding-right: 0.4em;
   
     div.icon-wrapper {
       background-color: rgba(209, 209, 209, .2);
@@ -2351,8 +2344,13 @@ video {
       }
 
       @media (min-width: 751px){ //LARGE
-        margin-inline: 10px;
+        margin-inline: 6px;
       }  
+
+      &.active {
+        border: 1.5px solid var(--accent-color);
+      }
+
     }
   }
     
