@@ -37,11 +37,11 @@
             @activate="() => { inIntro=true; introSlide = 2 }"
           ></icon-button>
           <icon-button
-            :model-value="learnerPath == 'Discover'"
+            :model-value="learnerPath == 'Explore'"
             fa-icon="rocket"
             :color="accentColor"
             :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Discover'}"
+            @activate="() => { learnerPath = 'Explore'}"
           ></icon-button>
           <icon-button
             :model-value="learnerPath == 'Answer'"
@@ -51,11 +51,11 @@
             @activate="() => { learnerPath = 'Answer'}"
           ></icon-button>   
           <icon-button
-            :model-value="learnerPath == 'Explore'" 
+            :model-value="learnerPath == 'Choose'" 
             fa-icon="location-dot"
             :color="accentColor"
             :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Explore'}"
+            @activate="() => { learnerPath = 'Choose'}"
           ></icon-button>
           <icon-button
             v-model="showTextSheet"
@@ -87,41 +87,43 @@
         </div>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col>
-        <div v-if="showGuidedContent" id="bottom-guided-content">
-          <div id="map-holder">
-            <span id="title">What will the eclipse look like here?</span>
-            <div id="map-container-map">
-              <location-selector
-                v-if="learnerPath == 'Discover'"
-                :model-value="locationDeg"
-                @place="(place: typeof places[number]) => updateLocation(place.name)"
-                :detect-location="false"
-                :map-options="mapOptions"
-                :places="places"
-                :initial-place="places.find(p => p.name === 'selectedLocation')"
-                :place-circle-options="placeCircleOptions"
-                :selected-circle-options="selectedCircleOptions"
-                :selectable="false"
-              ></location-selector>
-              <span v-if="learnerPath=='Answer'">
-                <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
-              </span>
-              <location-selector
-                v-if="learnerPath == 'Explore'"
-                :model-value="locationDeg"
-                @update:modelValue="updateLocationFromMap"
-                :detect-location="false"
-                :selected-circle-options="selectedCircleOptions"
-              ></location-selector>
-            </div>
+    <v-row v-if="showGuidedContent" id="bottom-guided-content">
+      <v-col :lg="4" :sm="6">
+        <div id="map-holder">
+          <span id="title">What will the eclipse look like here?</span>
+          <div id="map-container-map">
+            <location-selector
+              v-if="learnerPath == 'Explore'"
+              :model-value="locationDeg"
+              @place="(place: typeof places[number]) => updateLocation(place.name)"
+              :detect-location="false"
+              :map-options="mapOptions"
+              :places="places"
+              :initial-place="places.find(p => p.name === 'selectedLocation')"
+              :place-circle-options="placeCircleOptions"
+              :selected-circle-options="selectedCircleOptions"
+              :selectable="false"
+            ></location-selector>
+
+            <span v-if="learnerPath=='Answer'">
+              <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+            </span>
+
+            <location-selector
+              v-if="learnerPath == 'Choose'"
+              :model-value="locationDeg"
+              @update:modelValue="updateLocationFromMap"
+              :detect-location="false"
+              :selected-circle-options="selectedCircleOptions"
+            ></location-selector>
           </div>
-          
+        </div>
+      </v-col>
+      <v-col lg="4" sm="6">
           <div id="bottom-center-content">
             
             <!-- Learn Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
+            <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
               <span id="description">
                 <p>Click a highlighted city to view the eclipse from that location.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse</p>
@@ -135,8 +137,8 @@
               </span>
             </div>
             
-            <!-- Explore Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
+            <!-- Choose Path -->
+            <div class="bottom-center-content-text" v-if="learnerPath=='Choose'">
               <span id="description">Click a location on the map to select any place you like.</span>
             </div>
             
@@ -164,8 +166,6 @@
               @activate="copyShareURL"
             ></icon-button>
           </div>
-          
-        </div>
       </v-col>
     </v-row>
   </v-card>
@@ -844,7 +844,7 @@ export default defineComponent({
         radius: 50000
       },
 
-      learnerPath: "Explore", // Explore or Learn
+      learnerPath: "Choose", // Choose or Learn
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -2250,10 +2250,19 @@ video {
   }
 }
 
+    
+@media (max-width: 750px){ //SMALL
+
+}
+
+@media (min-width: 751px){ //LARGE
+
+}
+
 #guided-content-container {
   --margin: 0px;
   position: relative;
-  top: 0; 
+  top: 5px; 
   left: 0;
   width: calc(100% - 2*var(--margin));
   height: fit-content; 
@@ -2270,13 +2279,27 @@ video {
   user-select: none;
   
   transition: height 0.5s ease-in-out;
-  
-  @media (max-width: 600px) { // styles in here will apply to screens smaller than 600px wide
-    font-size: 0.75rem;
-  }
-  
-  @media (min-size:750px) { // styles in here will apply to screens larger than 750px wide
 
+  .v-row {
+    margin: 0px;
+  }
+
+  .v-col {
+    padding: 0px;
+  }
+
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+    width: 5em; 
+    height: 5em; 
+    font-size: 0.4em; 
+    background-color: #fff;
+    border: 1px solid #ccc; 
+    cursor: pointer; /* Change cursor on hover */
+}
+
+  .leaflet-touch {
+    line-height: 5em;
   }
 
   #top-row {
@@ -2296,29 +2319,42 @@ video {
   
   div.icon-wrapper {
     background-color: rgba(209, 209, 209, .2);
-    // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
     border: none;
     border-radius: 5px;
     padding-inline: 10px;
     padding-block: 3px;
     width: 100%;
-    margin-inline: 10px;
     justify-content: center;
+        
+    @media (max-width: 750px){ //SMALL
+      margin-inline: 4px;
+    }
+
+    @media (min-width: 751px){ //LARGE
+      margin-inline: 10px;
+    }
   }
     
 }
-  
   #bottom-guided-content {
     // map stuff
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    
+
+    @media (max-width: 750px){ //SMALL
+      width: 95%;
+    }
+
+    @media (min-width: 751px){ //LARGE
+      width: 70%;
+      padding-bottom: 1.5em;
+    }
+
   
     #map-holder {
       // width: 90%;
-      height: fit-content;
       pointer-events: auto;
       margin-inline: auto;
       
@@ -2330,10 +2366,9 @@ video {
       }
       
       #map-container-map {
-        height: 230px;
-        width: 350px;
-        aspect-ratio: 2 / 1;
+        aspect-ratio: 5 / 3;
         background-color: cornsilk;
+        border-radius: 5px;
         
         span {
           font-weight: bold;
@@ -2349,18 +2384,46 @@ video {
       }
       
     }
-    
+
     #bottom-center-content {
       // text guidelines
-
       .bottom-center-content-text {
         color: white;
-        font-size: 1em;
-        text-align: center;
-        margin: 1em;
-        padding: 0;
-        
+        text-align: left;
+        line-height: 1.2em;
+        border: 1.5px solid var(--accent-color);
+        border-radius: 5px; 
+
+      @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
+        font-size: 0.7em;
+        margin: 0.7em;
+        padding-inline: 0.7em;
+        padding-top: 0.7em;
+        padding-bottom: 0.3em;
+        line-height: 1.2em;
+        border: 1.5px solid var(--accent-color);
+        border-radius: 5px; 
+
+        p {
+          padding-bottom: 0.4em;
+        }
       }
+  
+      @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
+        font-size: 1em;
+        margin: 1em;
+        padding-inline: 1em;
+        padding-top: 1em;
+        padding-bottom: 0.4em;
+        line-height: 1.2em;
+        border: 1.5px solid var(--accent-color);
+        border-radius: 5px; 
+
+        p {
+          padding-bottom: 0.6em;
+        }
+      }
+    }
       
       #location-time-display {
         margin: 1em;
@@ -2368,17 +2431,29 @@ video {
         flex-direction: row;
         flex-grow: 1;
         gap: 0.5rem;
-        
       
         .ltd-container {
           // display: block;
-          padding-inline: 0.5em;
-          margin-bottom: 0.5em;
           text-align: left;
           background-color: aliceblue;
           color: blue;
           border-radius: 0.5em;
           flex-grow: 1;
+
+          @media (max-width: 750px){ //SMALL
+            padding-left: 0.5em;
+            padding-block: 0.4em;
+            margin-bottom: 0.3em;
+            font-size: 0.6em;
+          }
+
+          @media (min-width: 751px){ //LARGE
+            padding-left: 1em;
+            padding-block: 0.7em;
+            margin-bottom: 0.5em;
+            text-align: left;
+            font-size: 0.8em;
+          }
         }
         
         .ltd-label {
