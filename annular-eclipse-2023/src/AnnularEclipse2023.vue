@@ -72,6 +72,8 @@
                 fa-icon="rocket"
                 :color="accentColor"
                 :focus-color="accentColor"
+                :tooltip-text="'View eclipse from multiple locations'"
+                :tooltip-location="'bottom'"
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
@@ -79,6 +81,8 @@
                 fa-icon="puzzle-piece"
                 :color="accentColor"
                 :focus-color="accentColor"
+                :tooltip-text="'Identify eclipse path'"
+                :tooltip-location="'bottom'"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
               <icon-button
@@ -86,6 +90,8 @@
                 fa-icon="location-dot"
                 :color="accentColor"
                 :focus-color="accentColor"
+                :tooltip-text="'Choose any viewing location'"
+                :tooltip-location="'bottom'"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
@@ -94,7 +100,7 @@
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-                tooltip-location="start"
+                :tooltip-location="'bottom'"
               ></icon-button>
               <icon-button
                 v-model="showVideoSheet"
@@ -102,7 +108,7 @@
                 :color="accentColor"
                 :focus-color="accentColor"
                 tooltip-text="Watch video"
-                tooltip-location="start"
+                :tooltip-location="'bottom'"
               >
               </icon-button>
               <icon-button
@@ -110,7 +116,7 @@
                 :color="accentColor"
                 :focus-color="accentColor"
                 tooltip-text="Center view on Sun"
-                tooltip-location='top'
+                :tooltip-location="'bottom'"
                 @activate="() => trackSun()"
               >
               </icon-button>
@@ -118,7 +124,7 @@
                 fa-icon="question"
                 :color="accentColor"
                 :focus-color="accentColor"
-                tooltip-location="start"
+                :tooltip-location="'bottom'"
                 @activate="() => { inIntro=true; introSlide = 2 }"
               ></icon-button>
             </div>
