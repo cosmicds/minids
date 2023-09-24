@@ -1013,6 +1013,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--sky-color': this.skyColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
@@ -2354,7 +2355,7 @@ video {
       }  
 
       &.active {
-        border: 1.5px solid var(--accent-color);
+        border: 1.5px solid var(--sky-color);
       }
 
     }
@@ -2433,7 +2434,7 @@ video {
       color: white;
       text-align: left;
       line-height: 1.2em;
-      border: 1.5px solid var(--accent-color);
+      border: 1.5px solid var(--sky-color);
       border-radius: 5px; 
 
       @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
@@ -2442,9 +2443,6 @@ video {
         padding-inline: 0.7em;
         padding-top: 0.7em;
         padding-bottom: 0.3em;
-        line-height: 1.2em;
-        border: 1.5px solid var(--accent-color);
-        border-radius: 5px; 
 
         p {
           padding-bottom: 0.4em;
@@ -2457,9 +2455,6 @@ video {
         padding-inline: 1em;
         padding-top: 1em;
         padding-bottom: 0.4em;
-        line-height: 1.2em;
-        border: 1.5px solid var(--accent-color);
-        border-radius: 5px; 
 
         p {
           padding-bottom: 0.6em;
