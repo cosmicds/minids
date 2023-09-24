@@ -29,13 +29,13 @@
           <v-col>
             <div id="title">
               <span v-if="learnerPath=='Explore'"
-                >Watch the eclipse
+                >Watch and Compare
               </span>
               <span v-if="learnerPath=='Answer'"
-                >Identify the eclipse path
+                >Identify Eclipse Path
               </span>
               <span v-if="learnerPath=='Choose'"
-                >Choose any viewing location
+                >Choose Any Location
               </span>
             </div>
           </v-col>
@@ -45,21 +45,21 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click a highlighted city to view the eclipse from this location.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse</p>
+                <p>Click the highlighted cities to view the eclipse from other locations.</p>
+                <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Once you have collected enough data to determine the annular eclipse path, click to select it.</p>
+                <p>Have you determined the eclipse path? Click to select it.</p>
                 <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring.</p>
               </span>
             </div>
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
-              <p class="description">Select any location you like by clicking on the map, and view the eclipse from your chosen spot.</p>
+              <p class="description">Select any location you like by clicking on the map, and view the eclipse from there.</p>
             </div>
           </v-col>
         </v-row>
@@ -77,7 +77,7 @@
               </div>
           </v-col>
         </v-row>
-        <v-row class="non-map-row">
+        <v-row id="button-row" class="non-map-row">
           <v-col>
             <div id="top-container-buttons">
               <icon-button
@@ -2347,101 +2347,7 @@ video {
     margin: 0px;
     padding: 0px;
   }
-
-  .leaflet-control-zoom-in,
-  .leaflet-control-zoom-out {
-
-    @media (max-width: 750px){ //SMALL
-      width: 4em; 
-      // height: 5em; 
-      font-size: 0.4em; 
-    }
-
-    background-color: #fff;
-    border: 1px solid #ccc; 
-    cursor: pointer; /* Change cursor on hover */
-  } 
-
-  .leaflet-touch {
-    line-height: 5em;
-  }
-
-  #top-container-buttons {
-    // buttons
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding-right: 0.4em;
   
-    div.icon-wrapper {
-      background-color: rgba(209, 209, 209, .2);
-      border: none;
-      border-radius: 5px;
-      padding-block: 3px;
-      width: 100%;
-      justify-content: center;
-          
-      @media (max-width: 750px){ //SMALL
-        margin-inline: 4px;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        margin-inline: 6px;
-      }  
-
-      &.active {
-        border: 2px solid var(--sky-color);
-      }
-
-    }
-  }
-  
-  .non-map-row {
-    display: flex;
-    width: 95%;
-    padding-left: 1em;
-  }  
-
-  #map-column {
-    // map stuff
-    align-content: center;
-    justify-content: center;
-    height: 95%;
-    width: 95%;
-  
-    #map-container {
-      pointer-events: auto;
-      height: 100%;
-      width: 100%;
-
-      @media (max-width: 550px){ //SMALL
-        font-size: 0.8rem;
-        aspect-ratio: 3/4; // need to set this to some reasonable value or you just get a tiny horizontal strip
-      }
-
-      @media (min-width: 551px){ //LARGE
-        font-size: 1rem;
-        aspect-ratio: 5/3; // need to set this to some reasonable value or you just get a tiny horizontal strip
-      }
-
-      max-height: var(--map-max-height); // this keeps map from spilling outside the top div for some window aspect ratios
-      
-      .leaflet-map {
-        height: 100%;
-        width: 100%;
-      }
-      span {
-        color: black;
-        padding: 0;
-        margin: 0;
-      }
-
-      img {
-        width: 100%;
-      }
-    }
-  }
-
   #close-guided-content-container {
     position: absolute;
     top: 0;
@@ -2453,6 +2359,12 @@ video {
     padding-left: 0.5em;
     padding-top: 0.5em;
   }
+
+  .non-map-row {
+    display: flex;
+    width: 95%;
+    padding-left: 1em;
+  }  
 
   #title-row {
     color: var(--accent-color);
@@ -2482,13 +2394,13 @@ video {
         text-align: left;
         border: 1.5px solid var(--sky-color);
         border-radius: 5px; 
+        margin-top: 0.5em;
+        padding-inline: 0.7em;
+        padding-top: 0.7em;
 
         @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
           font-size: 0.75rem;
           line-height: 1.2em;
-          margin: 0.75em;
-          padding-inline: 0.7em;
-          padding-top: 0.7em;
           padding-bottom: 0.3em;
 
           p {
@@ -2499,9 +2411,6 @@ video {
         @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
           font-size: 0.9rem;
           line-height: 1.3em;
-          margin-top: 0.5em;
-          padding-inline: 0.7em;
-          padding-top: 0.7em;
           padding-bottom: 0.2em;
 
           p {
@@ -2550,10 +2459,100 @@ video {
       font-weight: bold;
     }
   }
+
+  #button-row {
+    @media (max-width: 750px){ //SMALL
+      margin-left: -0.8em;
+      padding-left: 0em;
+    }
+
+    #top-container-buttons {
+      // buttons
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    
+      div.icon-wrapper {
+        background-color: rgba(209, 209, 209, .2);
+        border: none;
+        border-radius: 5px;
+        padding-block: 4px;
+        width: 100%;
+        justify-content: center;
+            
+        @media (max-width: 750px){ //SMALL
+          margin-inline: 1px;
+        }
+
+        @media (min-width: 751px){ //LARGE
+          margin-inline: 5px;
+        }  
+
+        &.active {
+          border: 2px solid var(--sky-color);
+        }
+
+      }
+    }
+  }
+
+  #map-column {
+    // map stuff
+    align-content: center;
+    justify-content: center;
+    height: 95%;
+    width: 95%;
+  
+    #map-container {
+      pointer-events: auto;
+      height: 100%;
+      width: 100%;
+
+      @media (max-width: 550px){ //SMALL
+        font-size: 0.8rem;
+        aspect-ratio: 3/4; // need to set this to some reasonable value or you just get a tiny horizontal strip
+      }
+
+      @media (min-width: 551px){ //LARGE
+        font-size: 1rem;
+        aspect-ratio: 5/3; // need to set this to some reasonable value or you just get a tiny horizontal strip
+      }
+
+      max-height: var(--map-max-height); // this keeps map from spilling outside the top div for some window aspect ratios
+      
+      .leaflet-map {
+        height: 100%;
+        width: 100%;
+      }
+      span {
+        color: black;
+        padding: 0;
+        margin: 0;
+      }
+
+      img {
+        width: 100%;
+      }
+    }
+
+    .leaflet-control-zoom-in, .leaflet-control-zoom-out {
+
+      @media (max-width: 750px){ //SMALL
+        width: 4em; 
+        // height: 5em; 
+        font-size: 0.4em; 
+      }
+
+      background-color: #fff;
+      border: 1px solid #ccc; 
+      cursor: pointer; /* Change cursor on hover */
+    } 
+
+    .leaflet-touch {
+      line-height: 5em;
+    }
+  }
 }
-
-
-
 
 #introduction-overlay {
   position: absolute;
