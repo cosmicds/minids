@@ -25,46 +25,59 @@
     </div>
     <v-row>
       <v-col cols="6" id="non-map-container">
-        <v-row>
+        <v-row id="title-row" class="non-map-row">
           <v-col>
-            <span id="title">What will the eclipse look like here?</span>
+            <div id="title">
+              <span v-if="learnerPath=='Explore'"
+                >Watch the eclipse
+              </span>
+              <span v-if="learnerPath=='Answer'"
+                >Identify the eclipse path
+              </span>
+              <span v-if="learnerPath=='Choose'"
+                >Choose any viewing location
+              </span>
+            </div>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row id="instructions-row" class="non-map-row">
           <v-col id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
-              <span id="description">
-                <p>Click a highlighted city to view the eclipse from that location.</p>
+              <span class="description">
+                <p>Click a highlighted city to view the eclipse from this location.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
-              <span id="description">
-                <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
+              <span class="description">
+                <p>Once you have collected enough data to determine the annular eclipse path, click to select it.</p>
+                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring.</p>
               </span>
             </div>
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
-              <p id="description">Click a location on the map to select any place you like.</p>
+              <p class="description">Select any location you like by clicking on the map, and view the eclipse from your chosen spot.</p>
             </div>
-            
-            <div id="location-time-display">
+          </v-col>
+        </v-row>
+        <v-row id="location-time-row" class="non-map-row">
+          <v-col :lg="5">
               <div id="location-display" class="ltd-container">
                 <p class="ltd-label">View for:</p>
                 <p class="ltd-value">{{ selectedLocationText }}</p>
               </div>
+          </v-col>
+          <v-col>
               <div id="time-display" class="ltd-container">
                 <p class="ltd-label">Time:</p>
                 <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
               </div>
-            </div>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row class="non-map-row">
           <v-col>
             <div id="top-container-buttons">
               <icon-button
@@ -213,7 +226,7 @@
           
           </div>
         </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
       </v-tooltip>
     
     <v-overlay
@@ -2023,6 +2036,24 @@ body {
     flex-direction: column;
     justify-content: flex-start;
 
+        
+    @media (max-width: 750px){ //SMALL
+      
+      .v-checkbox .v-selection-control {
+      height: 1.5em !important;
+      min-height: 1em !important;
+     }
+
+    }
+
+    @media (min-width: 751px){ //LARGE
+      .v-checkbox .v-selection-control {
+      height: 2em !important;
+      min-height: 1em !important;
+     }
+    }
+
+
     .v-btn {
       align-self: center;
       padding-left: 5px;
@@ -2278,6 +2309,10 @@ video {
   margin-left: 0.5em;
 }
 
+.v-container {
+  max-width: 100%;
+}
+
 #guided-content-container {
   --top-content-max-height: 35%;
   --map-max-height: 32vh; // Keep this about 3 smaller than above
@@ -2355,26 +2390,17 @@ video {
       }  
 
       &.active {
-        border: 1.5px solid var(--sky-color);
+        border: 2px solid var(--sky-color);
       }
 
     }
   }
-    
-  #title {
-    color: var(--accent-color);
-    font-weight: bold;
-    text-align: left;
+  
+  .non-map-row {
+    display: flex;
+    width: 95%;
     padding-left: 1em;
-
-    @media (max-width: 750px){ //SMALL
-      font-size: 0.8rem;
-    }
-
-    @media (min-width: 751px){ //LARGE
-      font-size: 1rem;
-    }
-  }
+  }  
 
   #map-column {
     // map stuff
@@ -2423,82 +2449,110 @@ video {
     z-index: 500;
   }
 
-  #non-map-container {
+  #non-map-container { // Keep content away from the x to close
     padding-left: 0.5em;
     padding-top: 0.5em;
   }
 
-  #top-container-main-text {
-    // text guidelines
-    .instructions-text {
-      color: white;
-      text-align: left;
-      line-height: 1.2em;
-      border: 1.5px solid var(--sky-color);
-      border-radius: 5px; 
+  #title-row {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-align: left;
 
-      @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
-        font-size: 0.7em;
-        margin: 0.7em;
-        padding-inline: 0.7em;
-        padding-top: 0.7em;
-        padding-bottom: 0.3em;
-
-        p {
-          padding-bottom: 0.4em;
-        }
-      }
-
-      @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
-        font-size: 1em;
-        margin: 1em;
-        padding-inline: 1em;
-        padding-top: 1em;
-        padding-bottom: 0.4em;
-
-        p {
-          padding-bottom: 0.6em;
-        }
-      }
+    @media (max-width: 750px){ //SMALL
+      font-size: 0.8rem;
     }
-      
-    #location-time-display {
-      margin: 1em;
+
+    @media (min-width: 751px){ //LARGE
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+  }
+
+  #instructions-row {
+    width: 95%;
+    min-height: 35%;
+    min-width: 95%;
+
+    #top-container-main-text {
       display: flex;
-      flex-direction: row;
-      flex-grow: 1;
-      gap: 0.5rem;
-    
-      .ltd-container {
-        // display: block;
+
+      .instructions-text {
+        color: white;
         text-align: left;
-        background-color: aliceblue;
-        color: blue;
-        border-radius: 0.5em;
-        flex-grow: 1;
+        border: 1.5px solid var(--sky-color);
+        border-radius: 5px; 
 
-        @media (max-width: 750px){ //SMALL
-          padding-left: 0.5em;
-          padding-block: 0.4em;
-          margin-bottom: 0.3em;
-          font-size: 0.6em;
+        @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
+          font-size: 0.75rem;
+          line-height: 1.2em;
+          margin: 0.75em;
+          padding-inline: 0.7em;
+          padding-top: 0.7em;
+          padding-bottom: 0.3em;
+
+          p {
+            padding-bottom: 0.4em;
+          }
         }
 
-        @media (min-width: 751px){ //LARGE
-          padding-left: 1em;
-          padding-block: 0.7em;
-          margin-bottom: 0.5em;
-          text-align: left;
-          font-size: 0.8em;
+        @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
+          font-size: 0.9rem;
+          line-height: 1.3em;
+          margin-top: 0.5em;
+          padding-inline: 0.7em;
+          padding-top: 0.7em;
+          padding-bottom: 0.2em;
+
+          p {
+            padding-bottom: 0.5em;
+          }
+
         }
-      }
-      
-      .ltd-label {
-        font-weight: bold;
       }
     }
   }
+
+  #location-time-row {
+    width: 95%;
+    margin-block: 0.9em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 1;
+    gap: 0.5rem;
+  
+    .ltd-container {
+      // display: block;
+      text-align: left;
+      background-color: white;
+      color: blue;
+      border-radius: 0.5em;
+      flex-grow: 1;
+
+      @media (max-width: 750px){ //SMALL
+        padding-left: 0.5em;
+        padding-block: 0.4em;
+        margin-bottom: 0.3em;
+        font-size: 0.6em;
+      }
+
+      @media (min-width: 751px){ //LARGE
+        padding-left: 1em;
+        padding-block: 0.7em;
+        margin-bottom: 0.5em;
+        text-align: left;
+        font-size: 0.8em;
+      }
+    }
+    
+    .ltd-label {
+      font-weight: bold;
+    }
+  }
 }
+
+
 
 
 #introduction-overlay {
