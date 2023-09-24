@@ -2571,6 +2571,7 @@ video {
   .speed-control-buttons-container {
     position: relative;
     
+    //    BUTTON LAYOUT    //
     .speed-control-button {
       margin-inline: var(--button-gap);
     }
@@ -2582,30 +2583,30 @@ video {
     .speed-control-button:last-child {
       margin-inline-end: 0;
     }
-
-  
+    
+    // create buttons which center their inner content
     .speed-control-button {
       position: relative;
-      display: inline-block;
+      display: inline-block; // 'block' to put in a column
       width: var(--button-width);
-      height:var(--button-width);
-      border-radius: 50%;
-      border: 0.125em solid var(--accent-color);
-      background-color: rgba(0, 0, 0, 0.5);
+      height: var(--button-width);
       
-      // we want to center whatever was inside the button
-      // to do this the parent must have position: relative
-      // and the child must have position: absolute
-      // "> *" selects all direct children of the parent and 
-      // applies the following CSS
       > * {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
       }
+    }
+  
+    //     STYLING     //
+    .speed-control-button {
+      border-radius: 50%;
+      border: 0.125em solid var(--accent-color);
+      background-color: rgba(0, 0, 0, 0.5);
+
       
-      > * {
+      > * { // all direct children (the inner content)
         color: var(--accent-color);
       }
       
