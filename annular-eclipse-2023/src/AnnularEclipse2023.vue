@@ -200,12 +200,13 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-    <v-tooltip
-        location="right"
-        :color="accentColor"
-        :style="cssVars"
-      >
-      <template v-slot:activator="{props}">
+    <div>
+      <v-tooltip
+          location="right"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
           <div 
             v-bind="props"
             id="viewer-mode-switch"
@@ -228,7 +229,19 @@
         </template>
         Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
       </v-tooltip>
-    
+      <div v-if="selectedLocation === 'User Selected'" id="share-button">
+        <icon-button
+          id="share"
+          fa-icon="share-nodes"
+          :color="accentColor"
+          :focus-color="accentColor"
+          background-color="transparent"
+          :box-shadow="false"
+          @activate="copyShareURL"
+        ></icon-button>
+      </div>
+    </div>
+     
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -1951,6 +1964,13 @@ body {
     color: var(--accent-color);
     background-color: black; 
   }
+}
+
+#share-button {
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+
 }
 
 .top-content {
