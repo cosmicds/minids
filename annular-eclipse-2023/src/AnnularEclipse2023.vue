@@ -1026,7 +1026,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
-        '--sky-color': this.skyColor,
+        '--sky-color': this.skyColorLight,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
