@@ -205,6 +205,79 @@
         Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
       </v-tooltip>
     
+      <div id="speed-control">
+        
+        <div class="speed-control-buttons-container">
+          <!-- <div id="time-to-now" class="speed-control-button">
+            <span id="speed-text-now">NOW</span>
+          </div> -->
+          
+          <div 
+            id="speed-up" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex += 1;
+                playbackRate = defaultRate * Math.pow(2, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-up"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-real-time" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = 0;
+                playbackRate = 1;
+              }"
+            >
+            <span id="speed-text-one-x">1&times;</span>
+          </div>
+          
+          <div 
+            id="speed-down" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex -= 1;
+                playbackRate = defaultRate * Math.pow(2, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-down"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-reset" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = 0;
+                playbackRate = viewerMode === 'Horizon' ? horizonRate : scopeRate;
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="arrows-rotate"
+            ></font-awesome-icon>
+          </div>
+          
+        </div>
+        
+        <div class="speed-text">
+          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ Math.round(playbackRate) }}&times;</span></pre>
+          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
+          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
+        </div>
+      </div>
+      
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -874,7 +947,10 @@ export default defineComponent({
       horizonOpacity: 1,
 
       playbackRate: 1,
-      oldPlayBackRate: 1,
+      horizonRate: this.getplaybackRate('2 hours per 15 seconds'),
+      scopeRate: this.getplaybackRate('2 hours per 30 seconds'),
+      speedIndex: 0,
+      tooFast: false,
 
       sunPlace
     };
@@ -1064,6 +1140,12 @@ export default defineComponent({
     tickDurationMS(): number {
       return MILLISECONDS_PER_INTERVAL / (this.playbackRate);
     },
+
+    maxPlaybackRate(): number {
+      const minDuration = 10; //min setInterval on Chrome is ~5ms
+      console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
+      return MILLISECONDS_PER_INTERVAL / minDuration;
+    },
     
     sunPosition() {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
@@ -1095,7 +1177,11 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
-    }
+    },
+
+    defaultRate(): number {
+      return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
+    },
 
   },
 
@@ -1486,7 +1572,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: false
       });
-      this.playbackRate = this.getplaybackRate('2 hours per 15 seconds');
+      this.playbackRate = this.horizonRate;
       console.log('=== startHorizonMode ===');
       return;
     },
@@ -1497,7 +1583,7 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      this.playbackRate = this.getplaybackRate('2 hours per 30 seconds');
+      this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1691,10 +1777,12 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
-      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
+      console.log(`${play ? 'Playing:' : 'Stopping:'} Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
+      let startTime = Date.now();
       this.clearPlayingInterval();
       if (play) {
         this.playingIntervalId = setInterval(() => {
+          startTime = Date.now();
           if (this.selectedTime < maxTime) {
             this.moveOneIntervalForward();
           } else {
@@ -1702,6 +1790,14 @@ export default defineComponent({
           }
           this.$nextTick(() => {
             // this.updateViewForDate();
+          
+            const endTime = Date.now();
+            this.tooFast = endTime - startTime > this.tickDurationMS;
+            if (this.tooFast) {
+              const excess = endTime - startTime - this.tickDurationMS;
+              console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
+              
+            } 
           });
         }, this.tickDurationMS);
       }
@@ -1756,8 +1852,30 @@ export default defineComponent({
       
       this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
       return;
-    }
-    
+    },
+
+    playbackRate(val) {
+      
+      if (val > this.maxPlaybackRate) {
+        console.warn('playbackRate too high, setting to maxPlaybackRate');
+        this.speedIndex -= 1;
+        this.playbackRate = this.maxPlaybackRate;
+      }
+
+      if (val < 1) {
+        console.warn('playbackRate too low, setting to minPlaybackRate');
+        this.speedIndex += 1;
+        this.playbackRate = 1;
+      }
+      
+      this.$nextTick(() => {
+        this.playing = !(this.playing);
+        this.$nextTick(() => {
+          this.playing = !(this.playing);
+        });
+      });
+    },
+
   },
 });
 </script>
@@ -2439,4 +2557,107 @@ video {
   margin: auto;
   width: 2em;
 }
+
+#speed-control {
+  position: absolute;
+  top: calc(1rem + 1rem); // the +1rem aligns it with the switch
+  right: 2rem;
+  font-size: 1rem; // all 'em' values are scaled to this
+  --button-width: 2.5em;
+  --button-gap: 0.125em;
+  width: calc(4 * var(--button-width) + 6 * var(--button-gap));
+  
+  
+  .speed-control-buttons-container {
+    position: relative;
+    
+    .speed-control-button {
+      margin-inline: var(--button-gap);
+    }
+    
+    .speed-control-button:first-child {
+      margin-inline-start: 0;
+    }
+    
+    .speed-control-button:last-child {
+      margin-inline-end: 0;
+    }
+
+  
+    .speed-control-button {
+      position: relative;
+      display: inline-block;
+      width: var(--button-width);
+      height:var(--button-width);
+      border-radius: 50%;
+      border: 0.125em solid var(--accent-color);
+      background-color: rgba(0, 0, 0, 0.5);
+      
+      // we want to center whatever was inside the button
+      // to do this the parent must have position: relative
+      // and the child must have position: absolute
+      // "> *" selects all direct children of the parent and 
+      // applies the following CSS
+      > * {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      
+      > * {
+        color: var(--accent-color);
+      }
+      
+      // text button
+      #speed-text-now {
+        font-size: 0.6em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-one-x {
+        font-size: 1em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-reset {
+        font-size: 2em;
+        font-weight: bold;
+      }
+      
+    }
+    
+    .speed-control-button:active {
+      background-color: #8e3b0b; // hsl sdarker version of accent-color
+    }
+    
+  
+  } 
+
+  .speed-text {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 0.25em;
+    padding-block: 0.15em;
+    border-radius: 0.15em;
+    font-size: 0.9rem;
+  }
+  
+
+  .too-fast {
+    color: red;
+  }
+  
+  .too-fast-warning {
+    padding: 0.25em;
+    display: block;
+    background-color: black;
+    color: rgb(252, 108, 108);
+    font-size: 0.75em;
+  }
+  
+  
+}
+
 </style>
