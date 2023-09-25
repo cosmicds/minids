@@ -200,7 +200,7 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-    <div>
+    <div class="top-content">
       <v-tooltip
           location="right"
           :color="accentColor"
@@ -229,6 +229,47 @@
         </template>
         Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
       </v-tooltip>
+      
+      <v-tooltip
+          location="bottom"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="track-sun-switch"
+            >
+            <v-switch
+              inset
+              hide-details
+              v-model="toggleTrackSun"
+              :ripple="false"
+              :color="accentColor"
+              true-icon="mdi-sun-clock"
+              false-icon="mdi-close"
+            >
+            </v-switch>
+            
+          </div>
+        </template>
+        {{ toggleTrackSun ? 'Tracking Sun' : 'Not Tracking Sun' }}
+      </v-tooltip>
+      <div id="tracking-sun-indicator">
+        <icon-button
+          fa-icon="sun"
+          :color="trackingSun ? accentColor : 'grey'"
+          :focus-color="accentColor"
+          :tooltip-text="toggleTrackSun ? 'Tracking the Sun' : 'Not Tracking the Sun'"
+          :tooltip-location="'bottom'"
+          @activate="() => {toggleTrackSun = !toggleTrackSun}"
+        > 
+        </icon-button>
+        <p 
+          :style="'color: ' + (toggleTrackSun ? 'limegreen' : 'tomato')"
+          >{{ toggleTrackSun ? 'Tracking' : 'Not Tracking' }}
+      </p>
+      </div>
       <div v-if="selectedLocation === 'User Selected'" id="share-button">
         <icon-button
           id="share"
@@ -891,6 +932,8 @@ export default defineComponent({
       showHorizon: true,
       showEcliptic: false,    
       
+      toggleTrackSun: true,
+      
       times: times, 
       
       accentColor: "#ef7e3d",
@@ -1133,6 +1176,18 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
+    },
+
+    trackingSun: {
+      set(value: boolean) {
+        this.toggleTrackSun = value;
+      },
+      
+      get(): boolean {
+        // do something more useful later
+        return this.toggleTrackSun;
+      }
+      
     }
 
   },
@@ -1795,7 +1850,27 @@ export default defineComponent({
       
       this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
       return;
-    }
+    },
+
+    toggleTrackSun(val) {
+      // this turns of sun tracking
+      console.log("toggleTrackSun", val);
+      if (val) {
+        this.trackSun();
+        return;
+      } else {
+        const currentPlace = new Place();
+        currentPlace.set_RA(this.wwtRARad * R2D / 15);
+        currentPlace.set_dec(this.wwtDecRad * R2D);
+        this.gotoTarget({
+          place: currentPlace,
+          instant: true,
+          noZoom: true,
+          trackObject: false
+        });
+        return;
+      }
+    },
     
   },
 });
@@ -1955,15 +2030,40 @@ body {
 
 }
 
+// these are now in #top-content
 #viewer-mode-switch {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
+  // position: absolute;
+  // top: 1rem;
+  // left: 1rem;
 
   .v-switch__thumb {
     color: var(--accent-color);
     background-color: black; 
   }
+}
+
+#track-sun-switch {
+  // position: absolute;
+  // top: 1rem;
+  // left: 6rem;
+  pointer-events: auto;
+  .v-switch__thumb {
+    color: var(--accent-color);
+    background-color: black; 
+  }
+}
+
+#tracking-sun-indicator {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  p {
+    font-size: 0.8em;
+    text-align: center;
+  }
+  
 }
 
 #share-button {
@@ -1980,8 +2080,9 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
 
   #center-buttons {
     display: flex;
