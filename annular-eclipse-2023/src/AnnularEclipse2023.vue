@@ -359,21 +359,23 @@
     
     <div id="location-time-display">
       <v-chip 
-        color="blue-grey"
         prepend-icon="mdi-map-marker-radius"
-        variant="flat"
+        variant="outlined"
         size="small"
-      >
-        <span>{{ selectedLocationText }}</span>
-      </v-chip>
+        elevation="2"
+        :text="selectedLocationText"
+        @click="() => {
+          showGuidedContent = true; 
+          learnerPath = 'Choose'
+          }"
+      > </v-chip>
       <v-chip 
-        color="blue-grey"
         prepend-icon="mdi-clock"
-        variant="flat"
+        variant="outlined"
         size="small"
-      >
-        <span>{{ selectedLocaledTimeDateString }}</span>
-      </v-chip>
+        elevation="2"
+        :text="selectedLocaledTimeDateString"
+      > </v-chip>
     </div>
     
     <div class="bottom-content">
@@ -2651,6 +2653,14 @@ video {
   justify-content: flex-end;
   flex-wrap: wrap-reverse;
   gap:5px;
+  
+  .v-chip {
+    border: none;
+    color: black;
+    background-color: var(--accent-color);
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
   
 }
 </style>
