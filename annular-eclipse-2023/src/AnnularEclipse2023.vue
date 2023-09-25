@@ -59,12 +59,14 @@
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
-              <p class="description">Select any location you like by clicking on the map, and view the eclipse from there.</p>
+              <span class="description">
+                <p>Select any location you like by clicking on the map, and view the eclipse from there.</p>
+              </span>
             </div>
           </v-col>
         </v-row>
         <v-row id="location-time-row" class="non-map-row">
-          <v-col :lg="5">
+          <v-col>
               <div id="location-display" class="ltd-container">
                 <p class="ltd-label">View for:</p>
                 <p class="ltd-value">{{ selectedLocationText }}</p>
@@ -78,7 +80,7 @@
           </v-col>
         </v-row>
         <v-row id="button-row" class="non-map-row">
-          <v-col>
+          <!-- <v-col> -->
             <div id="top-container-buttons">
               <icon-button
                 :model-value="learnerPath == 'Explore'"
@@ -141,7 +143,7 @@
                 @activate="() => { inIntro=true; introSlide = 2 }"
               ></icon-button>
             </div>
-          </v-col>
+          <!-- </v-col> -->
         </v-row>
       </v-col>
       <v-col cols="6" id="map-column">
@@ -2335,20 +2337,15 @@ video {
 
 #guided-content-container {
   --top-content-max-height: 35%;
-  --map-max-height: 32vh; // Keep this about 3 smaller than above
-
-  max-height: var(--top-content-max-height);
-  --margin: 0.5em;
+  --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
+  --margin: 0.5rem;
+  --container-padding: 0.5rem;
   position: relative;
-  left: 0;
-  width: calc(100% - 2*var(--margin));
-  // height: fit-content; 
   margin: var(--margin);
-  padding: 0.5rem;
-  // pointer-events: none;
-  position: relative;
+  padding: var(--container-padding);
 
-  // justify-content: center;
+  width: calc(100% - 2*var(--margin));
+  // max-height: var(--top-content-max-height);
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
@@ -2376,103 +2373,82 @@ video {
   }
 
   #non-map-container { // Keep content away from the x to close
-    padding-left: 0.5em;
-    padding-top: 0.5em;
+    --padding-left: 1rem;
+    
+    @media (max-width: 600px) { //phone-size
+      --padding-left: 0em;
+    }
+    
+    padding-left: var(--padding-left);
+    // padding-right: padding+left + container-padding;
+    padding-right: calc(var(--padding-left) + var(--container-padding));
+  
   }
 
   .non-map-row {
-    display: flex;
-    width: 95%;
-    padding-left: 1em;
-  }  
-
+    margin-bottom: 0.5em;
+  }
+    
+    // .v-row.non-map-row#title-row
   #title-row {
     color: var(--accent-color);
     font-weight: bold;
-    text-align: left;
-
-    @media (max-width: 750px){ //SMALL
-      font-size: 0.8rem;
+    text-align: right;
+    font-size: 1rem;
+    
+    @media (max-width: 600px){ //SMALL
+      padding-left: 1rem;
     }
-
-    @media (min-width: 751px){ //LARGE
-      font-size: 1rem;
-      margin-bottom: 0.2rem;
+    @media (max-width: 390px){ //SMALL
+      font-size: 0.8rem;
+      padding-left: 1rem;
     }
   }
-
-  #instructions-row {
-    width: 95%;
-    min-height: 35%;
-    min-width: 95%;
-
-    #top-container-main-text {
-      display: flex;
-
+    
+    // .v-row.non-map-row#instructions-row
+  #instructions-row { 
+    font-size: 0.9em; // just putting this here explicitly
+    
+    @media (max-width: 750px){ //SMALL
+      font-size: 0.75rem;
+    }
+    
+    // v-col
+    #top-container-main-text { 
+    
+      // div
       .instructions-text {
-        color: white;
-        text-align: left;
         border: 1.5px solid var(--sky-color);
-        border-radius: 5px; 
-        margin-top: 0.5em;
+        border-radius: 5px;
         padding-inline: 0.7em;
-        padding-top: 0.7em;
-
-        @media (max-width: 750px) { // SMALL for screensize smaller than or equal to 750px
-          font-size: 0.75rem;
-          line-height: 1.2em;
-          padding-bottom: 0.3em;
-
+        padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
+        
+        // span
+        .description {
+          line-height: 1.4em;
+          color: white;
+          text-align: left;
+          
           p {
-            padding-bottom: 0.4em;
-          }
-        }
-
-        @media (min-width:751px) {  // LARGE for screensize greater than or equal to 751px
-          font-size: 0.9rem;
-          line-height: 1.3em;
-          padding-bottom: 0.2em;
-
-          p {
-            padding-bottom: 0.5em;
+            margin-block: .3em;
           }
 
         }
       }
     }
   }
-
-  #location-time-row {
-    width: 95%;
-    margin-block: 0.9em;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-grow: 1;
-    gap: 0.5rem;
   
+  // v-row
+  #location-time-row {
+    gap: 0.5em;
+    // div
     .ltd-container {
-      // display: block;
-      text-align: left;
       background-color: white;
       color: blue;
       border-radius: 0.5em;
-      flex-grow: 1;
-
-      @media (max-width: 750px){ //SMALL
-        padding-left: 0.5em;
-        padding-block: 0.4em;
-        margin-bottom: 0.3em;
-        font-size: 0.6em;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        padding-left: 1em;
-        padding-block: 0.7em;
-        margin-bottom: 0.5em;
-        text-align: left;
-        font-size: 0.8em;
-      }
+      height: 100%;
+      font-size: 0.8em;
+      padding: 0.5rem;
     }
     
     .ltd-label {
@@ -2481,32 +2457,33 @@ video {
   }
 
   #button-row {
-    @media (max-width: 750px){ //SMALL
-      margin-left: -0.8em;
-      padding-left: 0em;
+    #top-container-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 1;
+    
+    
+    @media (max-width: 750px) {
+      flex-wrap: wrap;
+      flex-basis: 2.5rem;
+      justify-content: space-around;
     }
 
-    #top-container-buttons {
-      // buttons
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-    
-      div.icon-wrapper {
+      
+      .icon-wrapper {
         background-color: rgba(209, 209, 209, .2);
         border: none;
         border-radius: 5px;
         padding-block: 4px;
         width: 100%;
         justify-content: center;
-            
-        @media (max-width: 750px){ //SMALL
-          margin-inline: 1px;
+        margin-inline: 5px;
+        
+        @media (max-width: 750px) {
+          max-width: 2rem;
+          margin-block: 5px;
         }
-
-        @media (min-width: 751px){ //LARGE
-          margin-inline: 5px;
-        }  
 
         &.active {
           border: 2px solid var(--sky-color);
@@ -2516,60 +2493,42 @@ video {
     }
   }
 
-  #map-column {
-    // map stuff
-    align-content: center;
-    justify-content: center;
-    height: 95%;
-    width: 95%;
+
+}
+
+#map-column { // v-col
+  // background-color: blanchedalmond;
+  position: relative;
+  #map-container {
+    height: 100%;
   
-    #map-container {
-      pointer-events: auto;
-      height: 100%;
+  
+    span {
+      color: red;
+      padding: 0;
+      margin: 0;
+    }
+    
+    img {
       width: 100%;
-
-      @media (max-width: 550px){ //SMALL
-        font-size: 0.8rem;
-        aspect-ratio: 3/4; // need to set this to some reasonable value or you just get a tiny horizontal strip
-      }
-
-      @media (min-width: 551px){ //LARGE
-        font-size: 1rem;
-        aspect-ratio: 5/3; // need to set this to some reasonable value or you just get a tiny horizontal strip
-      }
-
-      max-height: var(--map-max-height); // this keeps map from spilling outside the top div for some window aspect ratios
-      
-      .leaflet-map {
-        height: 100%;
-        width: 100%;
-      }
-      span {
-        color: black;
-        padding: 0;
-        margin: 0;
-      }
-
-      img {
-        width: 100%;
-      }
     }
 
     .leaflet-control-zoom-in, .leaflet-control-zoom-out {
 
-      @media (max-width: 750px){ //SMALL
-        width: 4em; 
-        // height: 5em; 
-        font-size: 0.4em; 
-      }
-
       background-color: #fff;
-      border: 1px solid #ccc; 
       cursor: pointer; /* Change cursor on hover */
+      
+      span {
+        color: black;
+      }
     } 
 
     .leaflet-touch {
-      line-height: 5em;
+      line-height: 1;
+    }
+    
+    .leaflet-control-attribution {
+      font-size: .75em;
     }
   }
 }
