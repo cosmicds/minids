@@ -1235,7 +1235,10 @@ export default defineComponent({
       const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
       // get am pm
       const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
-      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+      // get the 12hr time
+      const hours = date.getUTCHours() % 12;
+      
+      return `${hours != 0 ? hours : 12}:${minuteString} ${ampm}`;
     },
 
     toTimeString(date: Date) {
