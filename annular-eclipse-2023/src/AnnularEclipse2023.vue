@@ -466,20 +466,23 @@
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
-          <vue-slider
+          <v-slider
             id="slider"
-            adsorb
-            included
-            :order="false"
-            v-model="selectedTime"
-            @change="onTimeSliderChange"
-            :data="times"
-            tooltip="always"
-            :tooltip-formatter="(v: number) => 
-              toTimeString(new Date(v))
-            "
+            v-model='selectedTime'
+            :max="maxTime"
+            :min="minTime"
+            :color="accentColor"
+            :ripple="false"
+            hide-details
+            track-size="4px"
+            thumb-size="14px"
+            thumb-label="always"
+            :step="millisecondsPerInterval"
             >
-          </vue-slider>
+            <template v-slot:thumb-label="item">
+              {{ toTimeString(new Date(item.modelValue)) }}
+            </template>
+          </v-slider>
           <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
@@ -928,6 +931,9 @@ export default defineComponent({
       showEcliptic: false,    
       
       times: times, 
+      minTime: minTime,
+      maxTime: maxTime,
+      millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
@@ -2368,6 +2374,46 @@ video {
 
   &:active {
     cursor: grabbing;
+  }
+}
+
+.v-slider {
+  .v-slider-track {
+    --v-slider-track-size: 4px !important;
+
+    .v-slider-track__background {
+      background-color: #CCC !important;
+    }
+
+    .v-slider-track__fill {
+      background-color: rgb(255 193 203)!important;
+      height: var(--v-slider-track-size) !important;
+    }
+
+    .v-slider-track__background--opacity {
+      opacity: 1 !important;
+    }
+  }
+
+  .v-slider-thumb {
+    
+    .v-slider-thumb__surface {
+      border: 1px solid black !important;
+    }
+  }
+  
+
+  .v-slider-thumb__label {
+    min-width: fit-content;
+    white-space: nowrap;
+    color: black;
+    font-size: .9rem;
+    padding: 0.5rem;
+    background-color: var(--accent-color);
+  }
+  
+  .v-slider-thumb__label::before {
+    color: var(--accent-color);
   }
 }
 
