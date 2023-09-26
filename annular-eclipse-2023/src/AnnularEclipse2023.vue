@@ -2486,6 +2486,10 @@ video {
   margin: 5px 30px;
 }
 
+.v-container {
+  max-width: 100%;
+}
+
 #guided-content-container {
   --top-content-max-height: 35%;
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
