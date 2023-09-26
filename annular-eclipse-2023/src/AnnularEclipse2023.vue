@@ -1856,7 +1856,15 @@ export default defineComponent({
       // this turns of sun tracking
       console.log("toggleTrackSun", val);
       if (val) {
-        this.trackSun();
+        const currentPlace = new Place();
+        currentPlace.set_RA(this.sunPlace.get_RA());
+        currentPlace.set_dec(this.sunPlace.get_dec());
+        this.gotoTarget({
+          place: currentPlace,
+          instant: true,
+          noZoom: true,
+          trackObject: true
+        });
         return;
       } else {
         const currentPlace = new Place();
