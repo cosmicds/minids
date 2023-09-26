@@ -406,100 +406,11 @@
               label="Horizon"
               hide-details
             />
-            <!-- <v-btn
-              block
-              :color="accentColor"
-              @click="() => {
-                playing = false;
-                playingCometPath = !playingCometPath;
-              }"
-            >
-              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
-            </v-btn> -->
-            <!--
-            <v-btn
-              block
-              :color="accentColor"
-              @click="setToFirstCometImage"
-            >
-              Best view for comet images
-            </v-btn> -->
           </div>
         </transition-expand>
       </div>
+
       <div id="tools">
-        <div id="speed-control">
-        
-        <div class="speed-control-buttons-container">
-          <!-- <div id="time-to-now" class="speed-control-button">
-            <span id="speed-text-now">NOW</span>
-          </div> -->
-          
-          <div 
-            id="speed-up" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex += 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-up"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-real-time" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = 0;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <span id="speed-text-one-x">1&times;</span>
-          </div>
-          
-          <div 
-            id="speed-down" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex -= 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-down"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-reset" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = Math.round(Math.log10(defaultRate));
-                playbackRate = defaultRate;
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="arrows-rotate"
-            ></font-awesome-icon>
-          </div>
-          
-        </div>
-        
-        <div class="speed-text">
-          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ playbackRate }}&times;</span></pre>
-          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
-          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
-        </div>
-      </div>
         <span class="tool-container">
           <icon-button
             id="play-pause-icon"
@@ -512,6 +423,39 @@
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
+          <icon-button
+            id="speed-down"
+            :fa-icon="'angle-double-down'"
+            @activate="() => {
+                  speedIndex -= 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                }"
+            :color="accentColor"
+            tooltip-text="10x slower"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <icon-button
+            id="speed-up"
+            :fa-icon="'angle-double-up'"
+            @activate="() => {
+                  speedIndex += 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                }"
+            :color="accentColor"
+            tooltip-text="10x faster"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <div id="speed-text">
+            Time rate: 
+            <span v-if="playbackRate===1">
+              Real time
+            </span>
+            <span v-else>
+              {{ playbackRate }}&times;
+            </span>
+          </div>
           <v-slider
             id="slider"
             v-model='selectedTime'
@@ -1002,7 +946,6 @@ export default defineComponent({
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
-      tooFast: false,
 
       sunPlace
     };
@@ -1848,29 +1791,6 @@ export default defineComponent({
     
     playing(play: boolean) {
       console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
-      // let startTime = Date.now();
-      // this.clearPlayingInterval();
-      // if (play) {
-      //   this.playingIntervalId = setInterval(() => {
-      //     startTime = Date.now();
-      //     if (this.selectedTime < maxTime) {
-      //       this.moveOneIntervalForward();
-      //     } else {
-      //       this.selectedTime = minTime;
-      //     }
-      //     this.$nextTick(() => {
-      //       // this.updateViewForDate();
-
-      //       const endTime = Date.now();
-      //       this.tooFast = endTime - startTime > this.tickDurationMS;
-      //       if (this.tooFast) {
-      //         const excess = endTime - startTime - this.tickDurationMS;
-      //         console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
-
-      //       }
-      //     });
-      //   }, this.tickDurationMS);
-      // }
       this.setClockSync(play);
     },
 
@@ -2170,7 +2090,8 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 8px 16px;
+  padding: 5px 5px;
+  min-width: 30px;
   }
 }
 
@@ -2775,29 +2696,20 @@ video {
   
   } 
 
-  .speed-text {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding-inline: 0.25em;
-    padding-block: 0.15em;
-    border-radius: 0.15em;
-    font-size: 0.9rem;
-  }
-  
 
-  .too-fast {
-    color: red;
-  }
-  
-  .too-fast-warning {
-    padding: 0.25em;
-    display: block;
-    background-color: black;
-    color: rgb(252, 108, 108);
-    font-size: 0.75em;
-  }
-  
   
 }
+
+#speed-text {
+    position: absolute;
+    bottom: 0.3rem;
+    left: 0.3rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 0.4em;
+    padding-block: 0.15em;
+    border-radius: 0.3em;
+    font-size: 0.9rem;
+  }  
 
 #top-wwt-content {
   position: absolute;
