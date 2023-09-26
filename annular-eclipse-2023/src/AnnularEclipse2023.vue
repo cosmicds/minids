@@ -723,7 +723,7 @@ type LocationRad = {
 
 interface EclipseLocation extends LocationRad {
   name: string;
-  eclipseFracion: number | null;
+  eclipseFraction: number | null;
 }
 
 type LocationDeg = {
@@ -830,61 +830,79 @@ export default defineComponent({
           name: "Albuquerque, NM",
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
-          eclipseFracion: 0.97
+          eclipseFraction: 0.97
         },
         "Eugene, OR": {
           name: "Eugene, OR",
           latitudeRad: D2R * 44.052069,
           longitudeRad: D2R * -123.086754,
-          eclipseFracion: .95
+          eclipseFraction: .95
         },
-        "Las Vegas, NV": {
-          name: "Las Vegas, NV",
-          latitudeRad: D2R * 36.169941,
-          longitudeRad: D2R * -115.139830,
-          eclipseFracion: .87
+        "San Antonio, TX": {
+          name: "San Antonio, TX",
+          latitudeRad: D2R * 29.434210,
+          longitudeRad: D2R * -98.486798,
+          eclipseFraction: .96
         },
+        // "Las Vegas, NV": {
+        //   name: "Las Vegas, NV",
+        //   latitudeRad: D2R * 36.169941,
+        //   longitudeRad: D2R * -115.139830,
+        //   eclipseFraction: .87
+        // },
         "Denver, CO": {
           name: "Denver, CO",
           latitudeRad: D2R * 39.739235,
           longitudeRad: D2R * -104.990250,
-          eclipseFracion: .85
+          eclipseFraction: .85
+        },
+        "Bismarck, ND": {
+          name: "Bismarck, ND",
+          latitudeRad: D2R * 46.806673,
+          longitudeRad: D2R * -100.797396,
+          eclipseFraction: .64
         },
         "Los Angeles, CA": {
           name: "Los Angeles, CA",
           latitudeRad: D2R * 34.05,
           longitudeRad: D2R * -118.24,
-          eclipseFracion: .78
+          eclipseFraction: .78
         },
-        "Omaha, NE": {
-          name: "Omaha, NE",
-          latitudeRad: D2R * 41.256538,
-          longitudeRad: D2R * -95.934502,
-          eclipseFracion: .68
-        },
+        // "Omaha, NE": {
+        //   name: "Omaha, NE",
+        //   latitudeRad: D2R * 41.256538,
+        //   longitudeRad: D2R * -95.934502,
+        //   eclipseFraction: .68
+        // },
         "Chicago, IL": {
           name: "Chicago, IL",
           latitudeRad: D2R * 41.878113,
           longitudeRad: D2R * -87.629799,
-          eclipseFracion: .54
+          eclipseFraction: .54
         },
-        "New York, NY": {
-          name: "New York, NY",
-          latitudeRad: D2R * 40.712776,
-          longitudeRad: D2R * -74.005974,
-          eclipseFracion: .35
-        },
+        // "New York, NY": {
+        //   name: "New York, NY",
+        //   latitudeRad: D2R * 40.712776,
+        //   longitudeRad: D2R * -74.005974,
+        //   eclipseFraction: .35
+        // },
         "Boston, MA": {
           name: "Boston, MA",
           latitudeRad: D2R * 42.360081,
           longitudeRad: D2R * -71.058884,
-          eclipseFracion: .29
+          eclipseFraction: .29
+        },
+        "Charlotte, NC": {
+          name: "Charlotte, NC",
+          latitudeRad: D2R * 35.227085,
+          longitudeRad: D2R * -80.843124,
+          eclipseFraction: .53
         },
         "User Selected": { // by default, user selected is Albaquerque
           name: "User Selected",
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
-          eclipseFracion: 0.97
+          eclipseFraction: 0.97
         }
       } as Record<string, EclipseLocation>,
 
@@ -1256,7 +1274,7 @@ export default defineComponent({
         name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
         latitudeRad: D2R * location.latitudeDeg,
         longitudeRad: D2R * location.longitudeDeg,
-        eclipseFracion: null
+        eclipseFraction: null
       };
 
       const citySelector = this.$refs.citySelector;
