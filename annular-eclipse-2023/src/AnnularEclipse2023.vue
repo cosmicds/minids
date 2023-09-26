@@ -5,170 +5,196 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  
-  <v-card id="guided-content-container">
-    <v-row id="top-row">
-      <v-col cols="1">
-        <div>
-          <font-awesome-icon
-            v-model="showGuidedContent"
-            size="lg"
-            class="ma-1"
-            :color="accentColor"
-            :icon="showGuidedContent ? `chevron-down` : `chevron-up`"
-            @click="() => {
-              console.log('showGuidedContent = ', showGuidedContent);
-              showGuidedContent = !showGuidedContent;
-              onResize();
-            }"
-            @keyup.enter="showGuidedContent = !showGuidedContent"
-            tabindex="0"
-            tooltip-location="start"
-          /> 
-        </div>
-      </v-col>
-      <v-col>
-        <div id="top-guided-content" class="guided-content">
-          <icon-button
-            fa-icon="question"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-location="start"
-            @activate="() => { inIntro=true; introSlide = 2 }"
-          ></icon-button>
-          <icon-button
-            :model-value="learnerPath == 'Discover'"
-            fa-icon="rocket"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Discover'}"
-          ></icon-button>
-          <icon-button
-            :model-value="learnerPath == 'Answer'"
-            fa-icon="puzzle-piece"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Answer'}"
-          ></icon-button>   
-          <icon-button
-            :model-value="learnerPath == 'Explore'" 
-            fa-icon="location-dot"
-            :color="accentColor"
-            :focus-color="accentColor"
-            @activate="() => { learnerPath = 'Explore'}"
-          ></icon-button>
-          <icon-button
-            v-model="showTextSheet"
-            fa-icon="book-open"
-            :color="accentColor"
-            :focus-color="accentColor"
-            :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-            tooltip-location="start"
-          ></icon-button>
-          
-          <icon-button
-            v-model="showVideoSheet"
-            fa-icon="video"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Watch video"
-            tooltip-location="start"
-          >
-          </icon-button>
-          <icon-button
-            fa-icon="sun"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Center view on Sun"
-            tooltip-location='top'
-            @activate="() => trackSun()"
-          >
-          </icon-button>
-        </div>
-      </v-col>
-    </v-row>
+  <v-container id="guided-content-container" v-if="showGuidedContent">
+    <div id="close-guided-content-container">
+      <font-awesome-icon
+        v-model="showGuidedContent"
+        size="lg"
+        class="ma-1"
+        :color="accentColor"
+        :icon="`square-xmark`"
+        @click="() => {
+          console.log('showGuidedContent = ', showGuidedContent);
+          showGuidedContent = !showGuidedContent;
+          onResize();
+        }"
+        @keyup.enter="showGuidedContent = !showGuidedContent"
+        tabindex="0"
+        tooltip-location="start"
+      /> 
+    </div>
     <v-row>
-      <v-col>
-        <div v-if="showGuidedContent" id="bottom-guided-content">
-          <div id="map-holder">
-            <span id="title">What will the eclipse look like here?</span>
-            <div id="map-container-map">
-              <location-selector
-                v-if="learnerPath == 'Discover'"
-                :model-value="locationDeg"
-                @place="(place: typeof places[number]) => updateLocation(place.name)"
-                :detect-location="false"
-                :map-options="mapOptions"
-                :places="places"
-                :initial-place="places.find(p => p.name === 'selectedLocation')"
-                :place-circle-options="placeCircleOptions"
-                :selected-circle-options="selectedCircleOptions"
-                :selectable="false"
-              ></location-selector>
-              <span v-if="learnerPath=='Answer'">
-                <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+      <v-col cols="6" id="non-map-container">
+        <v-row id="title-row" class="non-map-row">
+          <v-col>
+            <div id="title">
+              <span v-if="learnerPath=='Explore'"
+                >Watch and Compare
               </span>
-              <location-selector
-                v-if="learnerPath == 'Explore'"
-                :model-value="locationDeg"
-                @update:modelValue="updateLocationFromMap"
-                :detect-location="false"
-                :selected-circle-options="selectedCircleOptions"
-              ></location-selector>
+              <span v-if="learnerPath=='Answer'"
+                >Identify Eclipse Path
+              </span>
+              <span v-if="learnerPath=='Choose'"
+                >Choose Any Location
+              </span>
             </div>
-          </div>
-          
-          <div id="bottom-center-content">
-            
+          </v-col>
+        </v-row>
+        <v-row id="instructions-row" class="non-map-row">
+          <v-col id="top-container-main-text">
             <!-- Learn Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Discover'">
-              <span id="description">
-                <p>Click a highlighted city to view the eclipse from that location.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse</p>
+            <div class="instructions-text" v-if="learnerPath=='Explore'">
+              <span class="description">
+                <p>Click the highlighted cities to view the eclipse from other locations.</p>
+                <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
             </div>
             
-            <div class="bottom-center-content-text" v-if="learnerPath=='Answer'">
-              <span id="description">
-                <p>Once you've looked at enough locations, click the path that will expereience an annular eclipse</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring</p>
+            <div class="instructions-text" v-if="learnerPath=='Answer'">
+              <span class="description">
+                <p>Have you determined the eclipse path? Click to select it.</p>
+                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring.</p>
               </span>
             </div>
             
-            <!-- Explore Path -->
-            <div class="bottom-center-content-text" v-if="learnerPath=='Explore'">
-              <span id="description">Click a location on the map to select any place you like.</span>
+            <!-- Choose Path -->
+            <div class="instructions-text" v-if="learnerPath=='Choose'">
+              <span class="description">
+                <p>Select any location you like by clicking on the map, and view the eclipse from there.</p>
+              </span>
             </div>
-            
-            <div id="location-time-display">
+          </v-col>
+        </v-row>
+        <v-row id="location-time-row" class="non-map-row">
+          <v-col>
               <div id="location-display" class="ltd-container">
                 <p class="ltd-label">View for:</p>
                 <p class="ltd-value">{{ selectedLocationText }}</p>
               </div>
+          </v-col>
+          <v-col>
               <div id="time-display" class="ltd-container">
                 <p class="ltd-label">Time:</p>
                 <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
               </div>
+          </v-col>
+        </v-row>
+        <v-row id="button-row" class="non-map-row">
+          <!-- <v-col> -->
+            <div id="top-container-buttons">
+              <icon-button
+                :model-value="learnerPath == 'Explore'"
+                fa-icon="rocket"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'View eclipse from multiple locations'"
+                :tooltip-location="'bottom'"
+                @activate="() => { learnerPath = 'Explore'}"
+              ></icon-button>
+              <icon-button
+                :model-value="learnerPath == 'Answer'"
+                fa-icon="puzzle-piece"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'Identify eclipse path'"
+                :tooltip-location="'bottom'"
+                @activate="() => { learnerPath = 'Answer'}"
+              ></icon-button>   
+              <icon-button
+                :model-value="learnerPath == 'Choose'" 
+                fa-icon="location-dot"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'Choose any viewing location'"
+                :tooltip-location="'bottom'"
+                @activate="() => { learnerPath = 'Choose'}"
+              ></icon-button>
+              <icon-button
+                v-model="showTextSheet"
+                fa-icon="book-open"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                :tooltip-location="'bottom'"
+              ></icon-button>
+              <icon-button
+                v-model="showVideoSheet"
+                fa-icon="video"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-text="Watch video"
+                :tooltip-location="'bottom'"
+              >
+              </icon-button>
+              <icon-button
+                fa-icon="sun"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-text="Center view on Sun"
+                :tooltip-location="'bottom'"
+                @activate="() => trackSun()"
+              >
+              </icon-button>
+              <icon-button
+                fa-icon="question"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-location="'bottom'"
+                @activate="() => { inIntro=true; introSlide = 2 }"
+              ></icon-button>
             </div>
-            
-          </div>
+          <!-- </v-col> -->
+        </v-row>
+      </v-col>
+      <v-col cols="6" id="map-column">
+        <div id="map-container" >
+          <location-selector
+            v-if="learnerPath == 'Explore'"
+            :model-value="locationDeg"
+            @place="(place: typeof places[number]) => updateLocation(place.name)"
+            :detect-location="false"
+            :map-options="mapOptions"
+            :places="places"
+            :initial-place="places.find(p => p.name === 'selectedLocation')"
+            :place-circle-options="placeCircleOptions"
+            :selected-circle-options="selectedCircleOptions"
+            :selectable="false"
+            class="leaflet-map"
+          ></location-selector>
 
-          <div v-if="selectedLocation === 'User Selected'">
-            <icon-button
-              id="share"
-              fa-icon="share-nodes"
-              :color="accentColor"
-              :focus-color="accentColor"
-              background-color="transparent"
-              :box-shadow="false"
-              @activate="copyShareURL"
-            ></icon-button>
-          </div>
-          
+          <span v-if="learnerPath=='Answer'">
+            <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+          </span>
+
+          <location-selector
+            v-if="learnerPath == 'Choose'"
+            :model-value="locationDeg"
+            @update:modelValue="updateLocationFromMap"
+            :detect-location="false"
+            :selected-circle-options="selectedCircleOptions"
+            class="leaflet-map"
+          ></location-selector>
         </div>
       </v-col>
     </v-row>
-  </v-card>
+  </v-container>
+  <div v-if="!showGuidedContent" id="closed-top-container">
+    <font-awesome-icon
+      v-model="showGuidedContent"
+      size="lg"
+      class="ma-1"
+      :color="accentColor"
+      :icon="`gear`"
+      @click="() => {
+        console.log('showGuidedContent = ', showGuidedContent);
+        showGuidedContent = !showGuidedContent;
+        onResize();
+      }"
+      @keyup.enter="showGuidedContent = !showGuidedContent"
+      tabindex="0"
+      tooltip-location="start"
+    /> 
+  </div>
 
   <div
     id="main-content"
@@ -176,12 +202,13 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-    <v-tooltip
-        location="right"
-        :color="accentColor"
-        :style="cssVars"
-      >
-      <template v-slot:activator="{props}">
+    <div>
+      <v-tooltip
+          location="right"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
           <div 
             v-bind="props"
             id="viewer-mode-switch"
@@ -202,10 +229,21 @@
           
           </div>
         </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
       </v-tooltip>
-      
-      
+      <div v-if="selectedLocation === 'User Selected'" id="share-button">
+        <icon-button
+          id="share"
+          fa-icon="share-nodes"
+          :color="accentColor"
+          :focus-color="accentColor"
+          background-color="transparent"
+          :box-shadow="false"
+          @activate="copyShareURL"
+        ></icon-button>
+      </div>
+    </div>
+     
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -682,7 +720,7 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Folder, Grids, LayerManager, Poly, Settings, WWTControl, Place } from "@wwtelescope/engine";
+import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
@@ -817,7 +855,7 @@ export default defineComponent({
       selectionProximity: 4,
       pointerMoveThreshold: 6,
       isPointerMoving: false,
-      pointerStartPosition: null as { x: number; y: number } | null,      
+      pointerStartPosition: null as { x: number; y: number } | null,  
 
       // Albuquerque, NM
       timeOfDay: { hours: annularEclipseTimeNMTZ.getHours(), minutes: annularEclipseTimeNMTZ.getMinutes(), seconds: annularEclipseTimeNMTZ.getSeconds() },
@@ -920,7 +958,7 @@ export default defineComponent({
         radius: 50000
       },
 
-      learnerPath: "Explore", // Explore or Learn
+      learnerPath: "Explore", // Choose or Learn
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -1022,6 +1060,8 @@ export default defineComponent({
       this.setClockRate(1); //
 
       setTimeout(() => {
+        /* eslint-disable @typescript-eslint/no-var-requires */
+        Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
         this.trackSun().then(() => this.positionSet = true);
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
@@ -1084,6 +1124,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--sky-color': this.skyColorLight,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
@@ -1550,7 +1591,13 @@ export default defineComponent({
     },
 
     updateGuidedContentHeight() {
-      const guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+      let guidedContentContainer = null as HTMLElement | null;
+      if (this.showGuidedContent) { 
+        guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+      } else {
+        guidedContentContainer = document.getElementById('closed-top-container') as HTMLElement;
+      }
+      
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
         console.log("height", height);
@@ -1714,7 +1761,8 @@ export default defineComponent({
             text: "Failed to copy URL"
           })
         );
-    }
+    },
+
 
   },
 
@@ -2050,10 +2098,6 @@ body {
 
 }
 
-.icon-wrapper {
-  padding: 8px 16px;
-}
-
 #viewer-mode-switch {
   position: absolute;
   top: 1rem;
@@ -2063,6 +2107,13 @@ body {
     color: var(--accent-color);
     background-color: black; 
   }
+}
+
+#share-button {
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+
 }
 
 .top-content {
@@ -2092,6 +2143,7 @@ body {
   align-items: center;
   gap: 5px;
 }
+
 #tools {
   z-index: 10;
   color: #fff;
@@ -2119,6 +2171,10 @@ body {
   align-items: center;
   gap: 5px;
   pointer-events: auto;
+
+  div.icon-wrapper {
+  padding: 8px 16px;
+  }
 }
 
 #controls {
@@ -2142,6 +2198,24 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+
+        
+    @media (max-width: 750px){ //SMALL
+      
+      .v-checkbox .v-selection-control {
+      height: 1.5em !important;
+      min-height: 1em !important;
+     }
+
+    }
+
+    @media (min-width: 751px){ //LARGE
+      .v-checkbox .v-selection-control {
+      height: 2em !important;
+      min-height: 1em !important;
+     }
+    }
+
 
     .v-btn {
       align-self: center;
@@ -2392,145 +2466,202 @@ video {
 }
 
 #guided-content-container {
-  --margin: 0px;
+  --top-content-max-height: 35%;
+  --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
+  --margin: 0.5rem;
+  --container-padding: 0.5rem;
   position: relative;
-  top: 0; 
-  left: 0;
-  width: calc(100% - 2*var(--margin));
-  height: fit-content; 
   margin: var(--margin);
-  padding-block: 0.5rem;
-  // pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  // justify-content: center;
+  padding: var(--container-padding);
+
+  width: calc(100% - 2*var(--margin));
+  // max-height: var(--top-content-max-height);
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
   user-select: none;
+  border: solid 1px var(--accent-color);
   
   transition: height 0.5s ease-in-out;
-  
-  @media (max-width: 600px) { // styles in here will apply to screens smaller than 600px wide
-    font-size: 0.75rem;
-  }
-  
-  @media (min-size:750px) { // styles in here will apply to screens larger than 750px wide
 
+  .v-row {
+    margin: 0px;
+    padding: 0px;
   }
 
-  #top-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
+  .v-col {
+    margin: 0px;
+    padding: 0px;
+  }
+  
+  #close-guided-content-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 500;
   }
 
-  #top-guided-content {
-    // buttons
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
-  }  
-  
-  div.icon-wrapper {
-    background-color: rgba(209, 209, 209, .2);
-    // box-shadow: 0px 0px 5px rgba(27, 27, 27, 0.7);
-    border: none;
-    border-radius: 5px;
-    padding-inline: 10px;
-    padding-block: 3px;
-    width: 100%;
-    margin-inline: 10px;
-    justify-content: center;
-  }
+  #non-map-container { // Keep content away from the x to close
+    --padding-left: 1rem;
     
-}
-  
-  #bottom-guided-content {
-    // map stuff
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    
-  
-    #map-holder {
-      // width: 90%;
-      height: fit-content;
-      pointer-events: auto;
-      margin-inline: auto;
-      
-      #title {
-        color: var(--accent-color);
-        font-weight: bold;
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
-      }
-      
-      #map-container-map {
-        height: 230px;
-        width: 350px;
-        aspect-ratio: 2 / 1;
-        background-color: cornsilk;
-        
-        span {
-          font-weight: bold;
-          color: black;
-          // wrap text
-          white-space: break-spaces;
-        }
-
-      img {
-        height: 170px;
-      }
-        
-      }
-      
+    @media (max-width: 600px) { //phone-size
+      --padding-left: 0em;
     }
     
-    #bottom-center-content {
-      // text guidelines
+    padding-left: var(--padding-left);
+    // padding-right: padding+left + container-padding;
+    padding-right: calc(var(--padding-left) + var(--container-padding));
+  
+  }
 
-      .bottom-center-content-text {
-        color: white;
-        font-size: 1em;
-        text-align: center;
-        margin: 1em;
-        padding: 0;
+  .non-map-row {
+    margin-bottom: 0.5em;
+  }
+    
+    // .v-row.non-map-row#title-row
+  #title-row {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-align: right;
+    font-size: 1rem;
+    
+    @media (max-width: 600px){ //SMALL
+      padding-left: 1rem;
+    }
+    @media (max-width: 390px){ //SMALL
+      font-size: 0.8rem;
+      padding-left: 1rem;
+    }
+  }
+    
+    // .v-row.non-map-row#instructions-row
+  #instructions-row { 
+    font-size: 0.9em; // just putting this here explicitly
+    
+    @media (max-width: 750px){ //SMALL
+      font-size: 0.75rem;
+    }
+    
+    // v-col
+    #top-container-main-text { 
+    
+      // div
+      .instructions-text {
+        border: 1.5px solid var(--sky-color);
+        border-radius: 5px;
+        padding-inline: 0.7em;
+        padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
         
-      }
-      
-      #location-time-display {
-        margin: 1em;
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-        gap: 0.5rem;
-        
-      
-        .ltd-container {
-          // display: block;
-          padding-inline: 0.5em;
-          margin-bottom: 0.5em;
+        // span
+        .description {
+          line-height: 1.4em;
+          color: white;
           text-align: left;
-          background-color: aliceblue;
-          color: blue;
-          border-radius: 0.5em;
-          flex-grow: 1;
+          
+          p {
+            margin-block: .3em;
+          }
+
         }
+      }
+    }
+  }
+  
+  // v-row
+  #location-time-row {
+    gap: 0.5em;
+    // div
+    .ltd-container {
+      background-color: white;
+      color: blue;
+      border-radius: 0.5em;
+      height: 100%;
+      font-size: 0.8em;
+      padding: 0.5rem;
+    }
+    
+    .ltd-label {
+      font-weight: bold;
+    }
+  }
+
+  #button-row {
+    #top-container-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 1;
+    
+    
+    @media (max-width: 750px) {
+      flex-wrap: wrap;
+      flex-basis: 2.5rem;
+      justify-content: space-around;
+    }
+
+      
+      .icon-wrapper {
+        background-color: rgba(209, 209, 209, .2);
+        border: none;
+        border-radius: 5px;
+        padding-block: 4px;
+        width: 100%;
+        justify-content: center;
+        margin-inline: 5px;
         
-        .ltd-label {
-          font-weight: bold;
+        @media (max-width: 750px) {
+          max-width: 2rem;
+          margin-block: 5px;
         }
+
+        &.active {
+          border: 2px solid var(--sky-color);
+        }
+
       }
     }
   }
 
 
+}
 
+#map-column { // v-col
+  // background-color: blanchedalmond;
+  position: relative;
+  #map-container {
+    height: 100%;
+  
+  
+    span {
+      color: red;
+      padding: 0;
+      margin: 0;
+    }
+    
+    img {
+      width: 100%;
+    }
+
+    .leaflet-control-zoom-in, .leaflet-control-zoom-out {
+
+      background-color: #fff;
+      cursor: pointer; /* Change cursor on hover */
+      
+      span {
+        color: black;
+      }
+    } 
+
+    .leaflet-touch {
+      line-height: 1;
+    }
+    
+    .leaflet-control-attribution {
+      font-size: .75em;
+    }
+  }
+}
 
 #introduction-overlay {
   position: absolute;
