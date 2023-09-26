@@ -871,14 +871,14 @@ export default defineComponent({
         color: "#0000FF",
         fillColor: "#0000FF",
         fillOpacity: 0.7,
-        radius: 50000
+        radius: 5 
       },
 
       selectedCircleOptions: {
         color: "#FF0000",
         fillColor: "#FF0000",
         fillOpacity: 0.7,
-        radius: 50000
+        radius: 5
       },
 
       learnerPath: "Explore", // Choose or Learn
