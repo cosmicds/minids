@@ -189,34 +189,6 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
-            
-            <v-switch
-              inset
-              hide-details
-              :ripple="false"
-              v-model="viewerMode"
-              :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
-            >
-            </v-switch>
-          
-          </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
       <div v-if="selectedLocation === 'User Selected'" id="share-button">
         <icon-button
           id="share"
@@ -344,26 +316,56 @@
         </div>
       </div>
     </v-dialog>
-    
-    <div id="location-time-display">
-      <v-chip 
-        prepend-icon="mdi-map-marker-radius"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocationText"
-        @click="() => {
-          showGuidedContent = true; 
-          learnerPath = 'Choose'
-          }"
-      > </v-chip>
-      <v-chip 
-        prepend-icon="mdi-clock"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocaledTimeDateString"
-      > </v-chip>
+  
+  <div id="top-wwt-content">
+      <div id="location-time-display">
+        <v-chip 
+          prepend-icon="mdi-map-marker-radius"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocationText"
+          @click="() => {
+            showGuidedContent = true; 
+            learnerPath = 'Choose'
+            }"
+        > </v-chip>
+        <v-chip 
+          prepend-icon="mdi-clock"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocaledTimeDateString"
+        > </v-chip>
+      </div>
+      <v-tooltip
+          location="right"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="viewer-mode-switch"
+            >
+            
+            <v-switch
+              inset
+              hide-details
+              :ripple="false"
+              v-model="viewerMode"
+              :color="accentColor"
+              false-value="SunScope"
+              false-icon="mdi-telescope"
+              true-value="Horizon"
+              true-icon="mdi-image-filter-hdr"
+            >
+            </v-switch>
+          
+          </div>
+        </template>
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+      </v-tooltip>
     </div>
     
     <div class="bottom-content">
@@ -382,7 +384,7 @@
           /> 
         </div>
         <transition-expand>
-          <div v-if="showControls" class="controls-content">
+          <div v-if="showControls" id="control-checkboxes">
             <v-checkbox
               :color="accentColor"
               v-model="showAltAzGrid"
@@ -2104,17 +2106,6 @@ body {
 
 }
 
-#viewer-mode-switch {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-
-  .v-switch__thumb {
-    color: var(--accent-color);
-    background-color: black; 
-  }
-}
-
 #share-button {
   position: absolute;
   top: 0.7rem;
@@ -2142,9 +2133,9 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: calc(100% - 2rem);
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
@@ -2192,8 +2183,6 @@ body {
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
   pointer-events: auto;
 
   .v-label {
@@ -2202,12 +2191,11 @@ body {
     opacity: 1;
   }
 
-  .controls-content {
+  #control-checkboxes {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 
-        
     @media (max-width: 750px){ //SMALL
       
       .v-checkbox .v-selection-control {
@@ -2811,24 +2799,46 @@ video {
   
 }
 
-#main-content  > #location-time-display  {
+#top-wwt-content {
   position: absolute;
-  top: 2px;
-  right: 5px;
+  top: 0.5rem;
+  right: 0.5rem;
+
+  #location-time-display  {
   
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap-reverse;
-  gap:5px;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: column;
+    gap:5px;
+
+      .v-chip {
+        border: none;
+        color: blue;
+        background-color: white;
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+    }
   
-  .v-chip {
-    margin-top: 0.5em;
-    border: none;
-    color: blue;
-    background-color: white;
-    font-size: 0.8em;
-    opacity: 0.9;
-  }
-  
+
+  #viewer-mode-switch {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+
+    .v-switch__thumb {
+      color: var(--accent-color);
+      background-color: black; 
+    }
+
+    .v-input--density-default {
+      --v-input-control-height: 0;
+    }
+
+    .v-selection-control--density-default {
+      --v-selection-control-size: auto;
+    } 
+    }
 }
+
 </style>
