@@ -65,20 +65,6 @@
             </div>
           </v-col>
         </v-row>
-        <v-row id="location-time-row" class="non-map-row">
-          <v-col>
-              <div id="location-display" class="ltd-container">
-                <p class="ltd-label">View for:</p>
-                <p class="ltd-value">{{ selectedLocationText }}</p>
-              </div>
-          </v-col>
-          <v-col>
-              <div id="time-display" class="ltd-container">
-                <p class="ltd-label">Time:</p>
-                <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
-              </div>
-          </v-col>
-        </v-row>
         <v-row id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
@@ -388,7 +374,6 @@
         <div id="controls-top-row">
           <font-awesome-icon
             size="lg"
-            class="ma-1"
             :color="accentColor"
             :icon="showControls ? `chevron-down` : `gear`"
             @click="showControls = !showControls"
@@ -2200,17 +2185,19 @@ body {
 
 #controls {
   background: black;
-  padding: 10px;
-  border-radius: 10px;
+  padding-block: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
   border: solid 1px var(--comet-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
   pointer-events: auto;
 
   .v-label {
+    font-size: 0.8em;
     color: var(--comet-color);
     opacity: 1;
   }
@@ -2258,6 +2245,7 @@ body {
     }
   }
   #controls-top-row {
+    padding-left: 0.5em;
     display: flex;
     width: 100%;
     flex-direction: row;
@@ -2592,24 +2580,6 @@ video {
       }
     }
   }
-  
-  // v-row
-  #location-time-row {
-    gap: 0.5em;
-    // div
-    .ltd-container {
-      background-color: white;
-      color: blue;
-      border-radius: 0.5em;
-      height: 100%;
-      font-size: 0.8em;
-      padding: 0.5rem;
-    }
-    
-    .ltd-label {
-      font-weight: bold;
-    }
-  }
 
   #button-row {
     #top-container-buttons{
@@ -2852,6 +2822,7 @@ video {
   gap:5px;
   
   .v-chip {
+    margin-top: 0.5em;
     border: none;
     color: blue;
     background-color: white;
