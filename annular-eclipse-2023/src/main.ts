@@ -38,6 +38,9 @@ import {
   faLocationDot,
   faChevronUp,
   faQuestion,
+  faAngleDoubleDown,
+  faAngleDoubleUp,
+  faArrowsRotate,
   faMountainSun,
   faShareNodes,
   faSquareXmark,
@@ -58,6 +61,9 @@ library.add(faPuzzlePiece);
 library.add(faLocationDot);
 library.add(faChevronUp);
 library.add(faQuestion);
+library.add(faAngleDoubleDown);
+library.add(faAngleDoubleUp);
+library.add(faArrowsRotate);
 library.add(faMountainSun);
 library.add(faShareNodes);
 library.add(faSquareXmark);

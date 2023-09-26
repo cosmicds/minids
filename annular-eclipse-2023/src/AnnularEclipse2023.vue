@@ -441,6 +441,78 @@
         </transition-expand>
       </div>
       <div id="tools">
+        <div id="speed-control">
+        
+        <div class="speed-control-buttons-container">
+          <!-- <div id="time-to-now" class="speed-control-button">
+            <span id="speed-text-now">NOW</span>
+          </div> -->
+          
+          <div 
+            id="speed-up" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex += 1;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-up"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-real-time" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = 0;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <span id="speed-text-one-x">1&times;</span>
+          </div>
+          
+          <div 
+            id="speed-down" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex -= 1;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-down"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-reset" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = Math.round(Math.log10(defaultRate));
+                playbackRate = defaultRate;
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="arrows-rotate"
+            ></font-awesome-icon>
+          </div>
+          
+        </div>
+        
+        <div class="speed-text">
+          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ playbackRate }}&times;</span></pre>
+          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
+          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
+        </div>
+      </div>
         <span class="tool-container">
           <icon-button
             id="play-pause-icon"
@@ -453,20 +525,23 @@
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
-          <vue-slider
+          <v-slider
             id="slider"
-            adsorb
-            included
-            :order="false"
-            v-model="selectedTime"
-            @change="onTimeSliderChange"
-            :data="times"
-            tooltip="active"
-            :tooltip-formatter="(v: number) => 
-              toTimeString(new Date(v))
-            "
+            v-model='selectedTime'
+            :max="maxTime"
+            :min="minTime"
+            :color="accentColor"
+            :ripple="false"
+            hide-details
+            track-size="4px"
+            thumb-size="14px"
+            thumb-label="always"
+            :step="millisecondsPerInterval"
             >
-          </vue-slider>
+            <template v-slot:thumb-label="item">
+              {{ toTimeString(new Date(item.modelValue)) }}
+            </template>
+          </v-slider>
           <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
@@ -915,6 +990,9 @@ export default defineComponent({
       showEcliptic: false,    
       
       times: times, 
+      minTime: minTime,
+      maxTime: maxTime,
+      millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
@@ -934,7 +1012,10 @@ export default defineComponent({
       horizonOpacity: 1,
 
       playbackRate: 1,
-      oldPlayBackRate: 1,
+      horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
+      scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
+      speedIndex: 3,
+      tooFast: false,
 
       sunPlace
     };
@@ -1127,6 +1208,12 @@ export default defineComponent({
     tickDurationMS(): number {
       return MILLISECONDS_PER_INTERVAL / (this.playbackRate);
     },
+
+    maxPlaybackRate(): number {
+      const minDuration = 10; //min setInterval on Chrome is ~5ms
+      console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
+      return MILLISECONDS_PER_INTERVAL / minDuration;
+    },
     
     sunPosition() {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
@@ -1158,7 +1245,11 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
-    }
+    },
+
+    defaultRate(): number {
+      return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
+    },
 
   },
 
@@ -1212,7 +1303,10 @@ export default defineComponent({
       const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
       // get am pm
       const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
-      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+      // get the 12hr time
+      const hours = date.getUTCHours() % 12;
+      
+      return `${hours != 0 ? hours : 12}:${minuteString} ${ampm}`;
     },
 
     toTimeString(date: Date) {
@@ -1555,7 +1649,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: false
       });
-      this.playbackRate = this.getplaybackRate('2 hours per 15 seconds');
+      this.playbackRate = this.horizonRate;
       console.log('=== startHorizonMode ===');
       return;
     },
@@ -1566,7 +1660,7 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      this.playbackRate = this.getplaybackRate('2 hours per 30 seconds');
+      this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1718,7 +1812,12 @@ export default defineComponent({
     },
 
     wwtCurrentTime(_time: Date) {
-      // this.selectedTime = _time.getTime();
+      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+        this.setTime(new Date(this.minTime));
+        return;
+      }
+      
+      this.selectedTime = _time.getTime();
       this.updateHorizon(_time);
     },
 
@@ -1761,20 +1860,31 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
-      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
-      this.clearPlayingInterval();
-      if (play) {
-        this.playingIntervalId = setInterval(() => {
-          if (this.selectedTime < maxTime) {
-            this.moveOneIntervalForward();
-          } else {
-            this.selectedTime = minTime;
-          }
-          this.$nextTick(() => {
-            // this.updateViewForDate();
-          });
-        }, this.tickDurationMS);
-      }
+      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      // let startTime = Date.now();
+      // this.clearPlayingInterval();
+      // if (play) {
+      //   this.playingIntervalId = setInterval(() => {
+      //     startTime = Date.now();
+      //     if (this.selectedTime < maxTime) {
+      //       this.moveOneIntervalForward();
+      //     } else {
+      //       this.selectedTime = minTime;
+      //     }
+      //     this.$nextTick(() => {
+      //       // this.updateViewForDate();
+
+      //       const endTime = Date.now();
+      //       this.tooFast = endTime - startTime > this.tickDurationMS;
+      //       if (this.tooFast) {
+      //         const excess = endTime - startTime - this.tickDurationMS;
+      //         console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
+
+      //       }
+      //     });
+      //   }, this.tickDurationMS);
+      // }
+      this.setClockSync(play);
     },
 
     showSplashScreen(_val) {
@@ -1826,8 +1936,31 @@ export default defineComponent({
       
       this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
       return;
-    }
-    
+    },
+
+    playbackRate(val) {
+      
+      if (val > 11_000) {
+        console.warn('playbackRate too high, setting to maxPlaybackRate');
+        this.speedIndex = 4;
+        this.playbackRate = 10_000;
+      }
+
+      if (val < .1) {
+        console.warn('playbackRate too low, setting to minPlaybackRate');
+        this.speedIndex = -1;
+        this.playbackRate = .1;
+      }
+      
+      this.setClockRate(val);
+      this.$nextTick(() => {
+        this.playing = !(this.playing);
+        this.$nextTick(() => {
+          this.playing = !(this.playing);
+        });
+      });
+    },
+
   },
 });
 </script>
@@ -2307,57 +2440,50 @@ video {
 
 // Styling the slider
 
-#sliderlabel {
-  padding: 5px 10px;
-  margin:0 5px;
-  color:#fff !important;
-  background-color: var(--accent-color);
-  overflow: visible;
+
+.v-slider {
+  .v-slider-track {
+    --v-slider-track-size: 4px !important;
+
+    .v-slider-track__background {
+      background-color: #CCC !important;
+    }
+
+    .v-slider-track__fill {
+      background-color: rgb(255 193 203)!important;
+      height: var(--v-slider-track-size) !important;
+    }
+
+    .v-slider-track__background--opacity {
+      opacity: 1 !important;
+    }
+  }
+
+  .v-slider-thumb {
+    
+    .v-slider-thumb__surface {
+      border: 1px solid black !important;
+    }
+  }
+  
+
+  .v-slider-thumb__label {
+    min-width: fit-content;
+    white-space: nowrap;
+    color: black;
+    font-size: .9rem;
+    padding: 0.5rem;
+    background-color: var(--accent-color);
+  }
+  
+  .v-slider-thumb__label::before {
+    color: var(--accent-color);
+  }
 }
 
 #slider {
   width: 100% !important;
   margin: 5px 30px;
-}
-
-.vue-slider-process {
-  background-color: pink !important;
-}
-
-.vue-slider-dot-tooltip-inner {
-  cursor: grab;
-  padding: 4px 10px !important;
-  color: pink !important;
-  background-color: var(--accent-color) !important;
-  border: 1px solid var(--accent-color) !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-.vue-slider-dot-handle {
-  cursor: grab;
-  background-color: var(--accent-color) !important;
-  border: 1px solid black !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-    
-@media (max-width: 750px){ //SMALL
-
-}
-
-@media (min-width: 751px){ //LARGE
-
-}
-
-#closed-top-container{
-  padding-block: 0.25em;
-  margin-left: 0.5em;
 }
 
 .v-container {
@@ -2609,6 +2735,110 @@ video {
 #share-button {
   margin: auto;
   width: 2em;
+}
+
+#speed-control {
+  position: absolute;
+  bottom: 6.5rem; // the +1rem aligns it with the switch
+  left: 0.25rem;
+  font-size: .9rem; // all 'em' values are scaled to this
+  --button-width: 2.5em;
+  --button-gap: 0.125em;
+  width: calc(4 * var(--button-width) + 6 * var(--button-gap));
+  pointer-events: auto;
+  
+  
+  .speed-control-buttons-container {
+    position: relative;
+    
+    //    BUTTON LAYOUT    //
+    .speed-control-button {
+      margin-inline: var(--button-gap);
+    }
+    
+    .speed-control-button:first-child {
+      margin-inline-start: 0;
+    }
+    
+    .speed-control-button:last-child {
+      margin-inline-end: 0;
+    }
+    
+    // create buttons which center their inner content
+    .speed-control-button {
+      position: relative;
+      display: inline-block; // 'block' to put in a column
+      width: var(--button-width);
+      height: var(--button-width);
+      
+      > * {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  
+    //     STYLING     //
+    .speed-control-button {
+      border-radius: 50%;
+      border: 0.125em solid var(--accent-color);
+      background-color: rgba(0, 0, 0, 0.5);
+
+      
+      > * { // all direct children (the inner content)
+        color: var(--accent-color);
+      }
+      
+      // text button
+      #speed-text-now {
+        font-size: 0.6em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-one-x {
+        font-size: 1em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-reset {
+        font-size: 2em;
+        font-weight: bold;
+      }
+      
+    }
+    
+    .speed-control-button:active {
+      background-color: #8e3b0b; // hsl sdarker version of accent-color
+    }
+    
+  
+  } 
+
+  .speed-text {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 0.25em;
+    padding-block: 0.15em;
+    border-radius: 0.15em;
+    font-size: 0.9rem;
+  }
+  
+
+  .too-fast {
+    color: red;
+  }
+  
+  .too-fast-warning {
+    padding: 0.25em;
+    display: block;
+    background-color: black;
+    color: rgb(252, 108, 108);
+    font-size: 0.75em;
+  }
+  
+  
 }
 
 #main-content  > #location-time-display  {
