@@ -1743,7 +1743,12 @@ export default defineComponent({
     },
 
     wwtCurrentTime(_time: Date) {
-      // this.selectedTime = _time.getTime();
+      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+        this.setTime(new Date(this.minTime));
+        return;
+      }
+      
+      this.selectedTime = _time.getTime();
       this.updateHorizon(_time);
     },
 
@@ -1786,30 +1791,31 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
-      console.log(`${play ? 'Playing:' : 'Stopping:'} Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
-      let startTime = Date.now();
-      this.clearPlayingInterval();
-      if (play) {
-        this.playingIntervalId = setInterval(() => {
-          startTime = Date.now();
-          if (this.selectedTime < maxTime) {
-            this.moveOneIntervalForward();
-          } else {
-            this.selectedTime = minTime;
-          }
-          this.$nextTick(() => {
-            // this.updateViewForDate();
-          
-            const endTime = Date.now();
-            this.tooFast = endTime - startTime > this.tickDurationMS;
-            if (this.tooFast) {
-              const excess = endTime - startTime - this.tickDurationMS;
-              console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
-              
-            } 
-          });
-        }, this.tickDurationMS);
-      }
+      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      // let startTime = Date.now();
+      // this.clearPlayingInterval();
+      // if (play) {
+      //   this.playingIntervalId = setInterval(() => {
+      //     startTime = Date.now();
+      //     if (this.selectedTime < maxTime) {
+      //       this.moveOneIntervalForward();
+      //     } else {
+      //       this.selectedTime = minTime;
+      //     }
+      //     this.$nextTick(() => {
+      //       // this.updateViewForDate();
+
+      //       const endTime = Date.now();
+      //       this.tooFast = endTime - startTime > this.tickDurationMS;
+      //       if (this.tooFast) {
+      //         const excess = endTime - startTime - this.tickDurationMS;
+      //         console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
+
+      //       }
+      //     });
+      //   }, this.tickDurationMS);
+      // }
+      this.setClockSync(play);
     },
 
     showSplashScreen(_val) {
@@ -1865,18 +1871,19 @@ export default defineComponent({
 
     playbackRate(val) {
       
-      if (val > this.maxPlaybackRate) {
+      if (val > 11_000) {
         console.warn('playbackRate too high, setting to maxPlaybackRate');
-        this.speedIndex -= 1;
-        this.playbackRate = this.maxPlaybackRate;
+        this.speedIndex = 4;
+        this.playbackRate = 10_000;
       }
 
-      if (val < 1) {
+      if (val < .1) {
         console.warn('playbackRate too low, setting to minPlaybackRate');
-        this.speedIndex += 1;
-        this.playbackRate = 1;
+        this.speedIndex = -1;
+        this.playbackRate = .1;
       }
       
+      this.setClockRate(val);
       this.$nextTick(() => {
         this.playing = !(this.playing);
         this.$nextTick(() => {
@@ -2611,7 +2618,7 @@ video {
   position: absolute;
   top: calc(1rem + 1rem); // the +1rem aligns it with the switch
   right: 2rem;
-  font-size: 1rem; // all 'em' values are scaled to this
+  font-size: .9rem; // all 'em' values are scaled to this
   --button-width: 2.5em;
   --button-gap: 0.125em;
   width: calc(4 * var(--button-width) + 6 * var(--button-gap));
