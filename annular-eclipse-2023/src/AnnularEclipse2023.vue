@@ -2741,6 +2741,7 @@ video {
   --button-width: 2.5em;
   --button-gap: 0.125em;
   width: calc(4 * var(--button-width) + 6 * var(--button-gap));
+  pointer-events: auto;
   
   
   .speed-control-buttons-container {
