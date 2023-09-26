@@ -359,6 +359,27 @@
       </div>
     </v-dialog>
     
+    <div id="location-time-display">
+      <v-chip 
+        prepend-icon="mdi-map-marker-radius"
+        variant="outlined"
+        size="small"
+        elevation="2"
+        :text="selectedLocationText"
+        @click="() => {
+          showGuidedContent = true; 
+          learnerPath = 'Choose'
+          }"
+      > </v-chip>
+      <v-chip 
+        prepend-icon="mdi-clock"
+        variant="outlined"
+        size="small"
+        elevation="2"
+        :text="selectedLocaledTimeDateString"
+      > </v-chip>
+    </div>
+    
     <div class="bottom-content">
       <div
         id="controls"
@@ -506,16 +527,16 @@
           ></icon-button>
           <v-slider
             id="slider"
-            v-model='selectedTime'
-            :max="maxTime"
-            :min="minTime"
-            :color="accentColor"
-            :ripple="false"
-            hide-details
-            track-size="4px"
-            thumb-size="14px"
-            thumb-label="always"
-            :step="millisecondsPerInterval"
+            adsorb
+            included
+            :order="false"
+            v-model="selectedTime"
+            @change="onTimeSliderChange"
+            :data="times"
+            tooltip="active"
+            :tooltip-formatter="(v: number) => 
+              toTimeString(new Date(v))
+            "
             >
             <template v-slot:thumb-label="item">
               {{ toTimeString(new Date(item.modelValue)) }}
@@ -2815,4 +2836,23 @@ video {
   
 }
 
+#main-content  > #location-time-display  {
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap-reverse;
+  gap:5px;
+  
+  .v-chip {
+    border: none;
+    color: blue;
+    background-color: white;
+    font-size: 0.8em;
+    opacity: 0.9;
+  }
+  
+}
 </style>
