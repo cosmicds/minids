@@ -195,7 +195,17 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
+                <v-row>
+                <v-col cols="6">
+                  Information goes here
+                </v-col>
+                <v-col cols="6">
+                  <figure>
+                    <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img>
+                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                  </figure>
+                </v-col>
+              </v-row>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -2304,7 +2314,7 @@ body {
       .v-checkbox .v-selection-control {
       height: 1.5em !important;
       min-height: 1em !important;
-     }
+      }
 
     }
 
@@ -2312,7 +2322,7 @@ body {
       .v-checkbox .v-selection-control {
       height: 2em !important;
       min-height: 1em !important;
-     }
+      }
     }
 
 
@@ -2504,6 +2514,19 @@ body {
 
 .bottom-sheet {
   
+  figure {
+    position: relative;
+    figcaption{
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-size: 0.5em;
+      background-color: #4a4a4a4a;
+      border-radius: 10px 0 0 0;
+      padding-inline: 10px 5px;
+    }
+  }
+  
   .v-overlay__content {
     align-self: center;
     padding: unset;
@@ -2524,7 +2547,7 @@ body {
   .v-card-text {
     height: 33vh;
     padding-bottom: 25px;
-
+    
     & a {
       text-decoration: none;
     }
