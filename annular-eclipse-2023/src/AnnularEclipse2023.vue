@@ -204,79 +204,7 @@
         </template>
         Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
       </v-tooltip>
-    
-      <div id="speed-control">
-        
-        <div class="speed-control-buttons-container">
-          <!-- <div id="time-to-now" class="speed-control-button">
-            <span id="speed-text-now">NOW</span>
-          </div> -->
-          
-          <div 
-            id="speed-up" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex += 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-up"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-real-time" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = 0;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <span id="speed-text-one-x">1&times;</span>
-          </div>
-          
-          <div 
-            id="speed-down" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex -= 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-down"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-reset" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = Math.round(Math.log10(defaultRate));
-                playbackRate = defaultRate;
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="arrows-rotate"
-            ></font-awesome-icon>
-          </div>
-          
-        </div>
-        
-        <div class="speed-text">
-          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ Math.round(playbackRate) }}&times;</span></pre>
-          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
-          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
-        </div>
-      </div>
+      
       
     <v-overlay
       :model-value="showSplashScreen"
@@ -454,6 +382,78 @@
         </transition-expand>
       </div>
       <div id="tools">
+        <div id="speed-control">
+        
+        <div class="speed-control-buttons-container">
+          <!-- <div id="time-to-now" class="speed-control-button">
+            <span id="speed-text-now">NOW</span>
+          </div> -->
+          
+          <div 
+            id="speed-up" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex += 1;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-up"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-real-time" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = 0;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <span id="speed-text-one-x">1&times;</span>
+          </div>
+          
+          <div 
+            id="speed-down" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex -= 1;
+                playbackRate = Math.pow(10, speedIndex);
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="angle-double-down"
+            ></font-awesome-icon>
+          </div>
+          
+          <div 
+            id="speed-reset" 
+            class="speed-control-button"
+            tabindex="0"
+            @click="() => {
+                speedIndex = Math.round(Math.log10(defaultRate));
+                playbackRate = defaultRate;
+              }"
+            >
+            <font-awesome-icon
+              size="lg"
+              icon="arrows-rotate"
+            ></font-awesome-icon>
+          </div>
+          
+        </div>
+        
+        <div class="speed-text">
+          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ Math.round(playbackRate) }}&times;</span></pre>
+          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
+          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
+        </div>
+      </div>
         <span class="tool-container">
           <icon-button
             id="play-pause-icon"
@@ -2345,44 +2345,6 @@ video {
 
 // Styling the slider
 
-#sliderlabel {
-  padding: 5px 10px;
-  margin:0 5px;
-  color:#fff !important;
-  background-color: var(--accent-color);
-  overflow: visible;
-}
-
-#slider {
-  width: 100% !important;
-  margin: 5px 30px;
-}
-
-.vue-slider-process {
-  background-color: pink !important;
-}
-
-.vue-slider-dot-tooltip-inner {
-  cursor: grab;
-  padding: 4px 10px !important;
-  color: pink !important;
-  background-color: var(--accent-color) !important;
-  border: 1px solid var(--accent-color) !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-.vue-slider-dot-handle {
-  cursor: grab;
-  background-color: var(--accent-color) !important;
-  border: 1px solid black !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
 
 .v-slider {
   .v-slider-track {
@@ -2422,6 +2384,11 @@ video {
   .v-slider-thumb__label::before {
     color: var(--accent-color);
   }
+}
+
+#slider {
+  width: 100% !important;
+  margin: 5px 30px;
 }
 
 #guided-content-container {
@@ -2616,8 +2583,8 @@ video {
 
 #speed-control {
   position: absolute;
-  top: calc(1rem + 1rem); // the +1rem aligns it with the switch
-  right: 2rem;
+  bottom: 6.5rem; // the +1rem aligns it with the switch
+  left: 0.25rem;
   font-size: .9rem; // all 'em' values are scaled to this
   --button-width: 2.5em;
   --button-gap: 0.125em;
