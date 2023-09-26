@@ -419,6 +419,7 @@
               playing = !(playing);
             }"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Play/Pause"
             tooltip-location="top"
             tooltip-offset="5px"
@@ -429,8 +430,10 @@
             @activate="() => {
                   speedIndex -= 1;
                   playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
                 }"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="10x slower"
             tooltip-location="top"
             tooltip-offset="5px"
@@ -441,19 +444,24 @@
             @activate="() => {
                   speedIndex += 1;
                   playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
                 }"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="10x faster"
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
           <div id="speed-text">
             Time rate: 
-            <span v-if="playbackRate===1">
+            <span v-if="playbackRate===1 && playing">
               Real time
             </span>
-            <span v-else>
+            <span v-if="playbackRate!=1 && playing">
               {{ playbackRate }}&times;
+            </span>
+            <span v-if="!playing">
+              Paused
             </span>
           </div>
           <v-slider
@@ -1860,12 +1868,6 @@ export default defineComponent({
       }
       
       this.setClockRate(val);
-      this.$nextTick(() => {
-        this.playing = !(this.playing);
-        this.$nextTick(() => {
-          this.playing = !(this.playing);
-        });
-      });
     },
 
   },
