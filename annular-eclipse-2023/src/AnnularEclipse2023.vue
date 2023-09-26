@@ -218,7 +218,7 @@
             tabindex="0"
             @click="() => {
                 speedIndex += 1;
-                playbackRate = defaultRate * Math.pow(2, speedIndex);
+                playbackRate = Math.pow(10, speedIndex);
               }"
             >
             <font-awesome-icon
@@ -233,7 +233,7 @@
             tabindex="0"
             @click="() => {
                 speedIndex = 0;
-                playbackRate = 1;
+                playbackRate = Math.pow(10, speedIndex);
               }"
             >
             <span id="speed-text-one-x">1&times;</span>
@@ -245,7 +245,7 @@
             tabindex="0"
             @click="() => {
                 speedIndex -= 1;
-                playbackRate = defaultRate * Math.pow(2, speedIndex);
+                playbackRate = Math.pow(10, speedIndex);
               }"
             >
             <font-awesome-icon
@@ -259,8 +259,8 @@
             class="speed-control-button"
             tabindex="0"
             @click="() => {
-                speedIndex = 0;
-                playbackRate = viewerMode === 'Horizon' ? horizonRate : scopeRate;
+                speedIndex = Math.round(Math.log10(defaultRate));
+                playbackRate = defaultRate;
               }"
             >
             <font-awesome-icon
@@ -947,9 +947,9 @@ export default defineComponent({
       horizonOpacity: 1,
 
       playbackRate: 1,
-      horizonRate: this.getplaybackRate('2 hours per 15 seconds'),
-      scopeRate: this.getplaybackRate('2 hours per 30 seconds'),
-      speedIndex: 0,
+      horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
+      scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
+      speedIndex: 3,
       tooFast: false,
 
       sunPlace
