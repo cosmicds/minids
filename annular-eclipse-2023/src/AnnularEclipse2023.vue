@@ -2656,10 +2656,10 @@ video {
   
   .v-chip {
     border: none;
-    color: black;
-    background-color: var(--accent-color);
+    color: blue;
+    background-color: white;
     font-size: 0.8em;
-    opacity: 0.7;
+    opacity: 0.9;
   }
   
 }
