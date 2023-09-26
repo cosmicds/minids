@@ -527,16 +527,16 @@
           ></icon-button>
           <v-slider
             id="slider"
-            adsorb
-            included
-            :order="false"
-            v-model="selectedTime"
-            @change="onTimeSliderChange"
-            :data="times"
-            tooltip="active"
-            :tooltip-formatter="(v: number) => 
-              toTimeString(new Date(v))
-            "
+            v-model='selectedTime'
+            :max="maxTime"
+            :min="minTime"
+            :color="accentColor"
+            :ripple="false"
+            hide-details
+            track-size="4px"
+            thumb-size="14px"
+            thumb-label="always"
+            :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
               {{ toTimeString(new Date(item.modelValue)) }}
