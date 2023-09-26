@@ -1013,6 +1013,10 @@ export default defineComponent({
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
 
       this.updateWWTLocation();
@@ -1198,9 +1202,15 @@ export default defineComponent({
       return this.gotoTarget({
         place: this.sunPlace,
         instant: true,
-        noZoom: false,
+        noZoom: true,
         trackObject: true
       });
+    },
+
+    onWWTRenderFrame(wwtControl: WWTControl) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.trackingSun = wwtControl._trackingObject === this.sunPlace;
     },
 
     clearPlayingInterval() {
@@ -1856,15 +1866,7 @@ export default defineComponent({
       // this turns of sun tracking
       console.log("toggleTrackSun", val);
       if (val) {
-        const currentPlace = new Place();
-        currentPlace.set_RA(this.sunPlace.get_RA());
-        currentPlace.set_dec(this.sunPlace.get_dec());
-        this.gotoTarget({
-          place: currentPlace,
-          instant: true,
-          noZoom: true,
-          trackObject: true
-        });
+        this.trackSun();
         return;
       } else {
         const currentPlace = new Place();

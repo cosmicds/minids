@@ -443,4 +443,8 @@ export function renderOneFrame() {
     }
   }
 
+  if (this.renderFrameCallback) {
+    this.renderFrameCallback(this);
+  }
+
 }
