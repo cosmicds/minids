@@ -508,7 +508,7 @@
         </div>
         
         <div class="speed-text">
-          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ Math.round(playbackRate) }}&times;</span></pre>
+          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ playbackRate }}&times;</span></pre>
           <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
           <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
         </div>
