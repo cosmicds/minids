@@ -726,6 +726,8 @@ import tzlookup from "tz-lookup";
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 type SheetType = "text" | "video" | null;
+type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
+type ViewerMode = "Horizon" | "SunScope";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -963,7 +965,7 @@ export default defineComponent({
         radius: 5
       },
 
-      learnerPath: "Explore", // Choose or Learn
+      learnerPath: "Explore" as LearnerPath,
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -988,7 +990,7 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
-      viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
+      viewerMode: 'Horizon' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -1837,14 +1839,14 @@ export default defineComponent({
       return;
     },
 
-    wwtCurrentTime(_time: Date) {
-      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+    wwtCurrentTime(time: Date) {
+      if (time.getTime() >= this.maxTime || time.getTime() < this.minTime) {
         this.setTime(new Date(this.minTime));
         return;
       }
       
-      this.selectedTime = _time.getTime();
-      this.updateHorizon(_time);
+      this.selectedTime = time.getTime();
+      this.updateHorizon(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -1901,7 +1903,7 @@ export default defineComponent({
       return;
     },
 
-    viewerMode(mode) {
+    viewerMode(mode: ViewerMode) {
       if (mode === 'Horizon') {
         this.startHorizonMode();
       } else if (mode === 'SunScope') {
@@ -1920,7 +1922,7 @@ export default defineComponent({
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
-    sunPosition(pos: typeof this.sunPosition) {
+    sunPosition(pos: EquatorialRad & HorizontalRad) {
 
       const _civilTwilight = -6 * D2R;
       const _nauticalTwilight = 2 * _civilTwilight;
