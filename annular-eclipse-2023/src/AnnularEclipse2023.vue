@@ -65,20 +65,6 @@
             </div>
           </v-col>
         </v-row>
-        <v-row id="location-time-row" class="non-map-row">
-          <v-col>
-              <div id="location-display" class="ltd-container">
-                <p class="ltd-label">View for:</p>
-                <p class="ltd-value">{{ selectedLocationText }}</p>
-              </div>
-          </v-col>
-          <v-col>
-              <div id="time-display" class="ltd-container">
-                <p class="ltd-label">Time:</p>
-                <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
-              </div>
-          </v-col>
-        </v-row>
         <v-row id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
@@ -329,34 +315,6 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
-            
-            <v-switch
-              inset
-              hide-details
-              :ripple="false"
-              v-model="viewerMode"
-              :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
-            >
-            </v-switch>
-          
-          </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
       <div v-if="selectedLocation === 'User Selected'" id="share-button">
         <icon-button
           id="share"
@@ -484,26 +442,56 @@
         </div>
       </div>
     </v-dialog>
-    
-    <div id="location-time-display">
-      <v-chip 
-        prepend-icon="mdi-map-marker-radius"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocationText"
-        @click="() => {
-          showGuidedContent = true; 
-          learnerPath = 'Choose'
-          }"
-      > </v-chip>
-      <v-chip 
-        prepend-icon="mdi-clock"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocaledTimeDateString"
-      > </v-chip>
+  
+  <div id="top-wwt-content">
+      <div id="location-time-display">
+        <v-chip 
+          prepend-icon="mdi-map-marker-radius"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocationText"
+          @click="() => {
+            showGuidedContent = true; 
+            learnerPath = 'Choose'
+            }"
+        > </v-chip>
+        <v-chip 
+          prepend-icon="mdi-clock"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocaledTimeDateString"
+        > </v-chip>
+      </div>
+      <v-tooltip
+          location="right"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="viewer-mode-switch"
+            >
+            
+            <v-switch
+              inset
+              hide-details
+              :ripple="false"
+              v-model="viewerMode"
+              :color="accentColor"
+              false-value="SunScope"
+              false-icon="mdi-telescope"
+              true-value="Horizon"
+              true-icon="mdi-image-filter-hdr"
+            >
+            </v-switch>
+          
+          </div>
+        </template>
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+      </v-tooltip>
     </div>
     
     <div class="bottom-content">
@@ -514,7 +502,6 @@
         <div id="controls-top-row">
           <font-awesome-icon
             size="lg"
-            class="ma-1"
             :color="accentColor"
             :icon="showControls ? `chevron-down` : `gear`"
             @click="showControls = !showControls"
@@ -523,7 +510,7 @@
           /> 
         </div>
         <transition-expand>
-          <div v-if="showControls" class="controls-content">
+          <div v-if="showControls" id="control-checkboxes">
             <v-checkbox
               :color="accentColor"
               v-model="showAltAzGrid"
@@ -545,27 +532,10 @@
               label="Horizon"
               hide-details
             />
-            <!-- <v-btn
-              block
-              :color="accentColor"
-              @click="() => {
-                playing = false;
-                playingCometPath = !playingCometPath;
-              }"
-            >
-              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
-            </v-btn> -->
-            <!--
-            <v-btn
-              block
-              :color="accentColor"
-              @click="setToFirstCometImage"
-            >
-              Best view for comet images
-            </v-btn> -->
           </div>
         </transition-expand>
       </div>
+
       <div id="tools">
         <span class="tool-container">
           <icon-button
@@ -575,24 +545,68 @@
               playing = !(playing);
             }"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Play/Pause"
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
-          <vue-slider
+          <icon-button
+            id="speed-down"
+            :fa-icon="'angle-double-down'"
+            @activate="() => {
+                  speedIndex -= 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
+                }"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="10x slower"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <icon-button
+            id="speed-up"
+            :fa-icon="'angle-double-up'"
+            @activate="() => {
+                  speedIndex += 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
+                }"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="10x faster"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <div id="speed-text">
+            Time rate: 
+            <span v-if="playbackRate===1 && playing">
+              Real time
+            </span>
+            <span v-if="playbackRate!=1 && playing">
+              {{ playbackRate }}&times;
+            </span>
+            <span v-if="!playing">
+              Paused
+            </span>
+          </div>
+          <v-slider
             id="slider"
-            adsorb
-            included
-            :order="false"
-            v-model="selectedTime"
-            @change="onTimeSliderChange"
-            :data="times"
-            tooltip="active"
-            :tooltip-formatter="(v: number) => 
-              toTimeString(new Date(v))
-            "
+            v-model='selectedTime'
+            :max="maxTime"
+            :min="minTime"
+            :color="accentColor"
+            :ripple="false"
+            hide-details
+            track-size="4px"
+            thumb-size="14px"
+            thumb-label="always"
+            :step="millisecondsPerInterval"
             >
-          </vue-slider>
+            <template v-slot:thumb-label="item">
+              {{ toTimeString(new Date(item.modelValue)) }}
+            </template>
+          </v-slider>
           <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
@@ -745,7 +759,7 @@ type LocationRad = {
 
 interface EclipseLocation extends LocationRad {
   name: string;
-  eclipseFracion: number | null;
+  eclipseFraction: number | null;
 }
 
 type LocationDeg = {
@@ -852,61 +866,79 @@ export default defineComponent({
           name: "Albuquerque, NM",
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
-          eclipseFracion: 0.97
+          eclipseFraction: 0.97
         },
         "Eugene, OR": {
           name: "Eugene, OR",
           latitudeRad: D2R * 44.052069,
           longitudeRad: D2R * -123.086754,
-          eclipseFracion: .95
+          eclipseFraction: .95
         },
-        "Las Vegas, NV": {
-          name: "Las Vegas, NV",
-          latitudeRad: D2R * 36.169941,
-          longitudeRad: D2R * -115.139830,
-          eclipseFracion: .87
+        "San Antonio, TX": {
+          name: "San Antonio, TX",
+          latitudeRad: D2R * 29.434210,
+          longitudeRad: D2R * -98.486798,
+          eclipseFraction: .96
         },
+        // "Las Vegas, NV": {
+        //   name: "Las Vegas, NV",
+        //   latitudeRad: D2R * 36.169941,
+        //   longitudeRad: D2R * -115.139830,
+        //   eclipseFraction: .87
+        // },
         "Denver, CO": {
           name: "Denver, CO",
           latitudeRad: D2R * 39.739235,
           longitudeRad: D2R * -104.990250,
-          eclipseFracion: .85
+          eclipseFraction: .85
+        },
+        "Bismarck, ND": {
+          name: "Bismarck, ND",
+          latitudeRad: D2R * 46.806673,
+          longitudeRad: D2R * -100.797396,
+          eclipseFraction: .64
         },
         "Los Angeles, CA": {
           name: "Los Angeles, CA",
           latitudeRad: D2R * 34.05,
           longitudeRad: D2R * -118.24,
-          eclipseFracion: .78
+          eclipseFraction: .78
         },
-        "Omaha, NE": {
-          name: "Omaha, NE",
-          latitudeRad: D2R * 41.256538,
-          longitudeRad: D2R * -95.934502,
-          eclipseFracion: .68
-        },
+        // "Omaha, NE": {
+        //   name: "Omaha, NE",
+        //   latitudeRad: D2R * 41.256538,
+        //   longitudeRad: D2R * -95.934502,
+        //   eclipseFraction: .68
+        // },
         "Chicago, IL": {
           name: "Chicago, IL",
           latitudeRad: D2R * 41.878113,
           longitudeRad: D2R * -87.629799,
-          eclipseFracion: .54
+          eclipseFraction: .54
         },
-        "New York, NY": {
-          name: "New York, NY",
-          latitudeRad: D2R * 40.712776,
-          longitudeRad: D2R * -74.005974,
-          eclipseFracion: .35
-        },
+        // "New York, NY": {
+        //   name: "New York, NY",
+        //   latitudeRad: D2R * 40.712776,
+        //   longitudeRad: D2R * -74.005974,
+        //   eclipseFraction: .35
+        // },
         "Boston, MA": {
           name: "Boston, MA",
           latitudeRad: D2R * 42.360081,
           longitudeRad: D2R * -71.058884,
-          eclipseFracion: .29
+          eclipseFraction: .29
+        },
+        "Charlotte, NC": {
+          name: "Charlotte, NC",
+          latitudeRad: D2R * 35.227085,
+          longitudeRad: D2R * -80.843124,
+          eclipseFraction: .53
         },
         "User Selected": { // by default, user selected is Albaquerque
           name: "User Selected",
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
-          eclipseFracion: 0.97
+          eclipseFraction: 0.97
         }
       } as Record<string, EclipseLocation>,
 
@@ -916,14 +948,14 @@ export default defineComponent({
         color: "#0000FF",
         fillColor: "#0000FF",
         fillOpacity: 0.7,
-        radius: 50000
+        radius: 5 
       },
 
       selectedCircleOptions: {
         color: "#FF0000",
         fillColor: "#FF0000",
         fillOpacity: 0.7,
-        radius: 50000
+        radius: 5
       },
 
       learnerPath: "Explore", // Choose or Learn
@@ -937,6 +969,9 @@ export default defineComponent({
       showEcliptic: false,    
       
       times: times, 
+      minTime: minTime,
+      maxTime: maxTime,
+      millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
       guidedContentHeight: "300px",
@@ -956,7 +991,9 @@ export default defineComponent({
       horizonOpacity: 1,
 
       playbackRate: 1,
-      oldPlayBackRate: 1,
+      horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
+      scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
+      speedIndex: 3,
 
       sunPlace
     };
@@ -1149,6 +1186,12 @@ export default defineComponent({
     tickDurationMS(): number {
       return MILLISECONDS_PER_INTERVAL / (this.playbackRate);
     },
+
+    maxPlaybackRate(): number {
+      const minDuration = 10; //min setInterval on Chrome is ~5ms
+      console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
+      return MILLISECONDS_PER_INTERVAL / minDuration;
+    },
     
     sunPosition() {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
@@ -1180,7 +1223,11 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
-    }
+    },
+
+    defaultRate(): number {
+      return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
+    },
 
   },
 
@@ -1234,7 +1281,10 @@ export default defineComponent({
       const minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
       // get am pm
       const ampm = date.getUTCHours() < 12 ? "AM" : "PM";
-      return `${date.getUTCHours()}:${minuteString} ${ampm}`;
+      // get the 12hr time
+      const hours = date.getUTCHours() % 12;
+      
+      return `${hours != 0 ? hours : 12}:${minuteString} ${ampm}`;
     },
 
     toTimeString(date: Date) {
@@ -1278,7 +1328,7 @@ export default defineComponent({
         name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
         latitudeRad: D2R * location.latitudeDeg,
         longitudeRad: D2R * location.longitudeDeg,
-        eclipseFracion: null
+        eclipseFraction: null
       };
 
       const citySelector = this.$refs.citySelector;
@@ -1577,7 +1627,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: false
       });
-      this.playbackRate = this.getplaybackRate('2 hours per 15 seconds');
+      this.playbackRate = this.horizonRate;
       console.log('=== startHorizonMode ===');
       return;
     },
@@ -1588,7 +1638,7 @@ export default defineComponent({
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
       this.updateHorizon(); // manually update horizon
-      this.playbackRate = this.getplaybackRate('2 hours per 30 seconds');
+      this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
@@ -1740,7 +1790,12 @@ export default defineComponent({
     },
 
     wwtCurrentTime(_time: Date) {
-      // this.selectedTime = _time.getTime();
+      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+        this.setTime(new Date(this.minTime));
+        return;
+      }
+      
+      this.selectedTime = _time.getTime();
       this.updateHorizon(_time);
     },
 
@@ -1783,20 +1838,8 @@ export default defineComponent({
     },
     
     playing(play: boolean) {
-      console.log(`Playing: Updating ticks every ${this.tickDurationMS} ms, ${this.playbackRate}x real time`);
-      this.clearPlayingInterval();
-      if (play) {
-        this.playingIntervalId = setInterval(() => {
-          if (this.selectedTime < maxTime) {
-            this.moveOneIntervalForward();
-          } else {
-            this.selectedTime = minTime;
-          }
-          this.$nextTick(() => {
-            // this.updateViewForDate();
-          });
-        }, this.tickDurationMS);
-      }
+      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      this.setClockSync(play);
     },
 
     showSplashScreen(_val) {
@@ -1848,8 +1891,25 @@ export default defineComponent({
       
       this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
       return;
-    }
-    
+    },
+
+    playbackRate(val) {
+      
+      if (val > 11_000) {
+        console.warn('playbackRate too high, setting to maxPlaybackRate');
+        this.speedIndex = 4;
+        this.playbackRate = 10_000;
+      }
+
+      if (val < .1) {
+        console.warn('playbackRate too low, setting to minPlaybackRate');
+        this.speedIndex = -1;
+        this.playbackRate = .1;
+      }
+      
+      this.setClockRate(val);
+    },
+
   },
 });
 </script>
@@ -2008,17 +2068,6 @@ body {
 
 }
 
-#viewer-mode-switch {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-
-  .v-switch__thumb {
-    color: var(--accent-color);
-    background-color: black; 
-  }
-}
-
 #share-button {
   position: absolute;
   top: 0.7rem;
@@ -2046,9 +2095,9 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: calc(100% - 2rem);
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
@@ -2083,33 +2132,33 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 8px 16px;
+  padding: 5px 5px;
+  min-width: 30px;
   }
 }
 
 #controls {
   background: black;
-  padding: 10px;
-  border-radius: 10px;
+  padding-block: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
   border: solid 1px var(--comet-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
   pointer-events: auto;
 
   .v-label {
+    font-size: 0.8em;
     color: var(--comet-color);
     opacity: 1;
   }
 
-  .controls-content {
+  #control-checkboxes {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 
-        
     @media (max-width: 750px){ //SMALL
       
       .v-checkbox .v-selection-control {
@@ -2147,6 +2196,7 @@ body {
     }
   }
   #controls-top-row {
+    padding-left: 0.5em;
     display: flex;
     width: 100%;
     flex-direction: row;
@@ -2370,57 +2420,50 @@ video {
 
 // Styling the slider
 
-#sliderlabel {
-  padding: 5px 10px;
-  margin:0 5px;
-  color:#fff !important;
-  background-color: var(--accent-color);
-  overflow: visible;
+
+.v-slider {
+  .v-slider-track {
+    --v-slider-track-size: 4px !important;
+
+    .v-slider-track__background {
+      background-color: #CCC !important;
+    }
+
+    .v-slider-track__fill {
+      background-color: rgb(255 193 203)!important;
+      height: var(--v-slider-track-size) !important;
+    }
+
+    .v-slider-track__background--opacity {
+      opacity: 1 !important;
+    }
+  }
+
+  .v-slider-thumb {
+    
+    .v-slider-thumb__surface {
+      border: 1px solid black !important;
+    }
+  }
+  
+
+  .v-slider-thumb__label {
+    min-width: fit-content;
+    white-space: nowrap;
+    color: black;
+    font-size: .9rem;
+    padding: 0.5rem;
+    background-color: var(--accent-color);
+  }
+  
+  .v-slider-thumb__label::before {
+    color: var(--accent-color);
+  }
 }
 
 #slider {
   width: 100% !important;
   margin: 5px 30px;
-}
-
-.vue-slider-process {
-  background-color: pink !important;
-}
-
-.vue-slider-dot-tooltip-inner {
-  cursor: grab;
-  padding: 4px 10px !important;
-  color: pink !important;
-  background-color: var(--accent-color) !important;
-  border: 1px solid var(--accent-color) !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-.vue-slider-dot-handle {
-  cursor: grab;
-  background-color: var(--accent-color) !important;
-  border: 1px solid black !important;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-    
-@media (max-width: 750px){ //SMALL
-
-}
-
-@media (min-width: 751px){ //LARGE
-
-}
-
-#closed-top-container{
-  padding-block: 0.25em;
-  margin-left: 0.5em;
 }
 
 .v-container {
@@ -2527,24 +2570,6 @@ video {
 
         }
       }
-    }
-  }
-  
-  // v-row
-  #location-time-row {
-    gap: 0.5em;
-    // div
-    .ltd-container {
-      background-color: white;
-      color: blue;
-      border-radius: 0.5em;
-      height: 100%;
-      font-size: 0.8em;
-      padding: 0.5rem;
-    }
-    
-    .ltd-label {
-      font-weight: bold;
     }
   }
 
@@ -2674,23 +2699,141 @@ video {
   width: 2em;
 }
 
-#main-content  > #location-time-display  {
+#speed-control {
   position: absolute;
-  top: 2px;
-  right: 5px;
+  bottom: 6.5rem; // the +1rem aligns it with the switch
+  left: 0.25rem;
+  font-size: .9rem; // all 'em' values are scaled to this
+  --button-width: 2.5em;
+  --button-gap: 0.125em;
+  width: calc(4 * var(--button-width) + 6 * var(--button-gap));
+  pointer-events: auto;
   
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap-reverse;
-  gap:5px;
   
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    font-size: 0.8em;
-    opacity: 0.9;
-  }
+  .speed-control-buttons-container {
+    position: relative;
+    
+    //    BUTTON LAYOUT    //
+    .speed-control-button {
+      margin-inline: var(--button-gap);
+    }
+    
+    .speed-control-button:first-child {
+      margin-inline-start: 0;
+    }
+    
+    .speed-control-button:last-child {
+      margin-inline-end: 0;
+    }
+    
+    // create buttons which center their inner content
+    .speed-control-button {
+      position: relative;
+      display: inline-block; // 'block' to put in a column
+      width: var(--button-width);
+      height: var(--button-width);
+      
+      > * {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  
+    //     STYLING     //
+    .speed-control-button {
+      border-radius: 50%;
+      border: 0.125em solid var(--accent-color);
+      background-color: rgba(0, 0, 0, 0.5);
+
+      
+      > * { // all direct children (the inner content)
+        color: var(--accent-color);
+      }
+      
+      // text button
+      #speed-text-now {
+        font-size: 0.6em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-one-x {
+        font-size: 1em;
+        font-weight: bold;
+      }
+      
+      // text button
+      #speed-text-reset {
+        font-size: 2em;
+        font-weight: bold;
+      }
+      
+    }
+    
+    .speed-control-button:active {
+      background-color: #8e3b0b; // hsl sdarker version of accent-color
+    }
+    
+  
+  } 
+
+
   
 }
+
+#speed-text {
+    position: absolute;
+    bottom: 0.3rem;
+    left: 0.3rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 0.4em;
+    padding-block: 0.15em;
+    border-radius: 0.3em;
+    font-size: 0.9rem;
+  }  
+
+#top-wwt-content {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+
+  #location-time-display  {
+  
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: column;
+    gap:5px;
+
+      .v-chip {
+        border: none;
+        color: blue;
+        background-color: white;
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+    }
+  
+
+  #viewer-mode-switch {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+
+    .v-switch__thumb {
+      color: var(--accent-color);
+      background-color: black; 
+    }
+
+    .v-input--density-default {
+      --v-input-control-height: 0;
+    }
+
+    .v-selection-control--density-default {
+      --v-selection-control-size: auto;
+    } 
+    }
+}
+
 </style>
