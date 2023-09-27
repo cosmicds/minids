@@ -130,7 +130,7 @@
             :model-value="locationDeg"
             @place="(place: typeof places[number]) => updateLocation(place.name)"
             :detect-location="false"
-            :map-options="mapOptions"
+            :map-options="presetMapOptions"
             :places="places"
             :initial-place="places.find(p => p.name === 'selectedLocation')"
             :place-circle-options="placeCircleOptions"
@@ -148,6 +148,7 @@
             :model-value="locationDeg"
             @update:modelValue="updateLocationFromMap"
             :detect-location="false"
+            :map-options="userSelectedMapOptions"
             :selected-circle-options="selectedCircleOptions"
             class="leaflet-map"
           ></location-selector>
@@ -830,6 +831,13 @@ export default defineComponent({
     moonPlace.set_names(["Moon"]);
     moonPlace.set_classification(Classification.solarSystem);
     moonPlace.set_target(SolarSystemObjects.moon);
+    const initialView = {
+      initialLocation: {
+        latitudeDeg: 38,
+        longitudeDeg: -97
+      },
+      initialZoom: 3
+    };
 
     return {
       showSplashScreen: false, // FIX later
@@ -865,13 +873,16 @@ export default defineComponent({
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
-      mapOptions: {
+      presetMapOptions: {
         templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
         minZoom: 1,
         maxZoom: 16,
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        ext: 'jpg'
+        ext: 'jpg',
+        ...initialView
       },
+
+      userSelectedMapOptions: initialView,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
@@ -1024,13 +1035,7 @@ export default defineComponent({
       };
     });
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(searchParams.get("lat") ?? "");
-    const lon = parseFloat(searchParams.get("lon") ?? "");
-    if (lat && lon) {
-      this.selectedLocation = "User Selected";
-      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
-    }
+
   },
 
   mounted() {
@@ -1068,25 +1073,36 @@ export default defineComponent({
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
+      this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
+
+      // Force the render of one frame so that planet textures will be loaded
+      // We don't want to attach the callback before this so that we don't mess up sun tracking
+      this.wwtControl.renderOneFrame();
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
+      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
+
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
+      this.setForegroundImageByName("Digitized Sky Survey (Color)");
+      this.setBackgroundImageByName("Black Sky Background");
+      this.setForegroundOpacity(100);
+      this.updateMoonTexture(true);
+
+      // Handle URL lat/long parameters
+      // We need to do this after the forced render
+      const searchParams = new URLSearchParams(window.location.search);
+      const lat = parseFloat(searchParams.get("lat") ?? "");
+      const lon = parseFloat(searchParams.get("lon") ?? "");
+      if (lat && lon) {
+        this.selectedLocation = "User Selected";
+        this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+      }
 
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
       this.setClockRate(1); //
-
-      setTimeout(() => {
-        Planets['_planetTextures'][0] = this.textureFromAssetImage("2023-09-19-SDO-Sun.png");
-        this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("Digitized Sky Survey (Color)");
-        this.setBackgroundImageByName("Black Sky Background");
-        this.setForegroundOpacity(100);
-        this.updateMoonTexture(true);
-        
-      }, 100);
 
       this.playbackRate = 1;  //this.setplaybackRate('8 minutes per second'); // 500;
       
@@ -1098,6 +1114,7 @@ export default defineComponent({
       } else {
         this.startHorizonMode();
       }
+      this.trackSun().then(() => this.positionSet = true);
 
       this.setTimeforSunAlt(10); // 10 degrees above horizon
       
@@ -1649,11 +1666,15 @@ export default defineComponent({
     },
 
     updateHorizon(when: Date | null = null) {
-      this.removeAnnotations();
-      if (this.showHorizon) {
-        this.createHorizon(when);
-        if (this.showSky) {
-          this.createSky(when);
+      try {
+        this.removeAnnotations();
+      }
+      finally {
+        if (this.showHorizon) {
+          this.createHorizon(when);
+          if (this.showSky) {
+            this.createSky(when);
+          }
         }
       }
     },
@@ -1772,10 +1793,12 @@ export default defineComponent({
         return times[0] + dt - (dt % MILLISECONDS_PER_INTERVAL);
       }
 
-      if (this.times.includes(matchTime(out.rising, this.times))) {
-        this.selectedTime = matchTime(out.rising, this.times);
-      } else if (this.times.includes(matchTime(out.setting, this.times))) {
-        this.selectedTime = matchTime(out.setting, this.times);
+      const risingTime = matchTime(out.rising, this.times);
+      const settingTime = matchTime(out.setting, this.times);
+      if (this.times.includes(risingTime)) {
+        this.selectedTime = risingTime;
+      } else if (this.times.includes(settingTime)) {
+        this.selectedTime = settingTime;
       } else {
         console.log("time not in times array");
         // best to leave it alone so it doesn't jump around
