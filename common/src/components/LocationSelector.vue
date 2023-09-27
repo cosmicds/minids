@@ -15,6 +15,8 @@ export interface LocationDeg {
 
 interface MapOptions extends TileLayerOptions {
   templateUrl: string;
+  initialLocation?: LocationDeg;
+  initialZoom?: number;
 }
 
 interface Place extends LocationDeg { 
@@ -24,6 +26,16 @@ interface Place extends LocationDeg {
   radius?: number;
   name?: string;
 }
+
+const defaultMapOptions: MapOptions = {
+  templateUrl: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+  minZoom: 1,
+  maxZoom: 20,
+  subdomains:['mt0','mt1','mt2','mt3'],
+  attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
+  className: 'map-tiles'
+};
+
 export default defineComponent({
 
   emits: ["place", "update:modelValue", "error"],
@@ -49,13 +61,7 @@ export default defineComponent({
     mapOptions: {
       type: Object as PropType<MapOptions>,
       default() {
-        return {
-          templateUrl: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
-          maxZoom: 20,
-          subdomains:['mt0','mt1','mt2','mt3'],
-          attribution: `&copy <a href="https://www.google.com/maps">Google Maps</a>`,
-          className: 'map-tiles'
-        };
+        return defaultMapOptions;
       }
     },
     initialPlace: {
@@ -111,7 +117,7 @@ export default defineComponent({
     if (this.detectLocation) {
       this.getLocation(true);
     }
-    this.setup();
+    this.setup(true);
   },
 
   data() {
@@ -198,12 +204,18 @@ export default defineComponent({
       });
     },
 
-    setup() {
+    setup(initial=false) {
       const mapContainer = this.$el as HTMLDivElement;
-      const map = L.map(mapContainer).setView([this.modelValue.latitudeDeg, this.modelValue.longitudeDeg], 4);
+      const location: [number, number] = initial && this.mapOptions.initialLocation ?
+        [this.mapOptions.initialLocation.latitudeDeg, this.mapOptions.initialLocation.longitudeDeg] :
+        [this.modelValue.latitudeDeg, this.modelValue.longitudeDeg];
+
+      const initialZoom = this.mapOptions.initialZoom ?? 4;
+      const zoom = initial ? initialZoom : (this.map?.getZoom() ?? initialZoom);
+      const map = L.map(mapContainer).setView(location, zoom);
       
-      const options = { minZoom: 1, maxZoom: 20, ...this.mapOptions };
-      L.tileLayer(this.mapOptions.templateUrl, options).addTo(map);
+      const options = { ...defaultMapOptions, ...this.mapOptions };
+      L.tileLayer(options.templateUrl, options).addTo(map);
 
       this.placeCircles = this.places.map(place => this.circleForPlace(place));
       this.placeCircles.forEach((circle, index) => {
