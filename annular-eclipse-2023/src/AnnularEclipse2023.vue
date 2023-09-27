@@ -221,18 +221,18 @@
               <v-card-text class="info-text no-bottom-border-radius">
                 <v-row>
                 <v-col cols="6">
-                    Get ready North America for not one, but two brilliant solar eclipse! 
+                    Get ready North America for not one, but two brilliant solar eclipses! 
                     First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
-                    get read for an awe-inspiring solar eclipse which stretch from coast to coast across the United States.
+                    get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
                     This interactive lets you explore the October "Ring of Fire" eclipse from different locations.    
                     
                     <details>
                       <summary>
                         What causes Solar Eclipses? ☀️🌕🌎
                       </summary>
-                    <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the sun from our view.
+                    <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
                       Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
-                      that we will be on the side of the planet that will catch both of the next two solara eclipses. 
+                      to be in the path of the next two solara eclipses. 
                       </p>
                     </details>
                     
@@ -241,18 +241,18 @@
                       <p>
                         During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
                         in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
-                        doesn't cover the entire face of the Sun, and during an eclipse we see a ring of light around the Moon. This is called an Annular Eclipse.
+                        doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
                       </p>
                     </details>
                     
                     <details> 
                       <summary> Why can only some places see the eclipse? 🌒</summary>
                       <p>
-                        An eclipse is caused by Moon casting a shadow on the Earth. 
-                        People who directly behind the moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
-                        As the Moon moves in its orbit around the Earth, the location of the shadow will moves, sweeping out a path across the surface of the Earth. 
+                        An eclipse is caused by the Moon casting a shadow on the Earth. 
+                        People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
+                        As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
                         For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
-                        the Sun will not be blocked at all, and there will be no eclipse there. 
+                        the Sun will not be blocked at all, and there will be no eclipse visible. 
                       </p> 
                     </details>
                     
@@ -428,6 +428,12 @@
                     <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
                   </template>
                     Choose any location around the world and see how the eclipse would look from there
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="book-open" size="xl"></font-awesome-icon>
+                  </template>
+                    Learn more about solar eclipses. 
                 </v-list-item>
               </ul>
             </div>
@@ -2349,8 +2355,6 @@ video {
       font-weight: bold;
       font-size: 1em;
       cursor: pointer;
-      // list-style-type: "\1F315"; // moon emoji here (🌙)
-      text-decoration: underline;
     }
     
     p {
