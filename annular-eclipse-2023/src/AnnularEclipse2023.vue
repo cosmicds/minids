@@ -65,20 +65,6 @@
             </div>
           </v-col>
         </v-row>
-        <v-row id="location-time-row" class="non-map-row">
-          <v-col>
-              <div id="location-display" class="ltd-container">
-                <p class="ltd-label">View for:</p>
-                <p class="ltd-value">{{ selectedLocationText }}</p>
-              </div>
-          </v-col>
-          <v-col>
-              <div id="time-display" class="ltd-container">
-                <p class="ltd-label">Time:</p>
-                <p class="ltd-value">{{selectedLocaledTimeDateString }}</p>
-              </div>
-          </v-col>
-        </v-row>
         <v-row id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
@@ -203,34 +189,6 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
-            
-            <v-switch
-              inset
-              hide-details
-              :ripple="false"
-              v-model="viewerMode"
-              :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
-            >
-            </v-switch>
-          
-          </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
       <div v-if="selectedLocation === 'User Selected'" id="share-button">
         <icon-button
           id="share"
@@ -358,26 +316,56 @@
         </div>
       </div>
     </v-dialog>
-    
-    <div id="location-time-display">
-      <v-chip 
-        prepend-icon="mdi-map-marker-radius"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocationText"
-        @click="() => {
-          showGuidedContent = true; 
-          learnerPath = 'Choose'
-          }"
-      > </v-chip>
-      <v-chip 
-        prepend-icon="mdi-clock"
-        variant="outlined"
-        size="small"
-        elevation="2"
-        :text="selectedLocaledTimeDateString"
-      > </v-chip>
+  
+  <div id="top-wwt-content">
+      <div id="location-time-display">
+        <v-chip 
+          prepend-icon="mdi-map-marker-radius"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocationText"
+          @click="() => {
+            showGuidedContent = true; 
+            learnerPath = 'Choose'
+            }"
+        > </v-chip>
+        <v-chip 
+          prepend-icon="mdi-clock"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocaledTimeDateString"
+        > </v-chip>
+      </div>
+      <v-tooltip
+          location="right"
+          :color="accentColor"
+          :style="cssVars"
+        >
+        <template v-slot:activator="{props}">
+          <div 
+            v-bind="props"
+            id="viewer-mode-switch"
+            >
+            
+            <v-switch
+              inset
+              hide-details
+              :ripple="false"
+              v-model="viewerMode"
+              :color="accentColor"
+              false-value="SunScope"
+              false-icon="mdi-telescope"
+              true-value="Horizon"
+              true-icon="mdi-image-filter-hdr"
+            >
+            </v-switch>
+          
+          </div>
+        </template>
+        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+      </v-tooltip>
     </div>
     
     <div class="bottom-content">
@@ -388,7 +376,6 @@
         <div id="controls-top-row">
           <font-awesome-icon
             size="lg"
-            class="ma-1"
             :color="accentColor"
             :icon="showControls ? `chevron-down` : `gear`"
             @click="showControls = !showControls"
@@ -397,7 +384,7 @@
           /> 
         </div>
         <transition-expand>
-          <div v-if="showControls" class="controls-content">
+          <div v-if="showControls" id="control-checkboxes">
             <v-checkbox
               :color="accentColor"
               v-model="showAltAzGrid"
@@ -419,100 +406,11 @@
               label="Horizon"
               hide-details
             />
-            <!-- <v-btn
-              block
-              :color="accentColor"
-              @click="() => {
-                playing = false;
-                playingCometPath = !playingCometPath;
-              }"
-            >
-              {{ `${playingCometPath ? 'Stop' : 'Play'} comet images` }}
-            </v-btn> -->
-            <!--
-            <v-btn
-              block
-              :color="accentColor"
-              @click="setToFirstCometImage"
-            >
-              Best view for comet images
-            </v-btn> -->
           </div>
         </transition-expand>
       </div>
+
       <div id="tools">
-        <div id="speed-control">
-        
-        <div class="speed-control-buttons-container">
-          <!-- <div id="time-to-now" class="speed-control-button">
-            <span id="speed-text-now">NOW</span>
-          </div> -->
-          
-          <div 
-            id="speed-up" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex += 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-up"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-real-time" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = 0;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <span id="speed-text-one-x">1&times;</span>
-          </div>
-          
-          <div 
-            id="speed-down" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex -= 1;
-                playbackRate = Math.pow(10, speedIndex);
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="angle-double-down"
-            ></font-awesome-icon>
-          </div>
-          
-          <div 
-            id="speed-reset" 
-            class="speed-control-button"
-            tabindex="0"
-            @click="() => {
-                speedIndex = Math.round(Math.log10(defaultRate));
-                playbackRate = defaultRate;
-              }"
-            >
-            <font-awesome-icon
-              size="lg"
-              icon="arrows-rotate"
-            ></font-awesome-icon>
-          </div>
-          
-        </div>
-        
-        <div class="speed-text">
-          <pre>Time rate: <span id="time-rate" :class="[tooFast ? 'too-fast' : '']">{{ playbackRate }}&times;</span></pre>
-          <span v-if="tooFast" :class="[tooFast ? 'too-fast' : '', 'too-fast-warning']">Too fast for your device. Performance may be degraded</span>
-          <!-- <pre>Speed Index: <span id="time-rate">{{ Math.round(speedIndex*1000)/1000 }}&times;</span></pre> -->
-        </div>
-      </div>
         <span class="tool-container">
           <icon-button
             id="play-pause-icon"
@@ -521,10 +419,51 @@
               playing = !(playing);
             }"
             :color="accentColor"
+            :focus-color="accentColor"
             tooltip-text="Play/Pause"
             tooltip-location="top"
             tooltip-offset="5px"
           ></icon-button>
+          <icon-button
+            id="speed-down"
+            :fa-icon="'angle-double-down'"
+            @activate="() => {
+                  speedIndex -= 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
+                }"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="10x slower"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <icon-button
+            id="speed-up"
+            :fa-icon="'angle-double-up'"
+            @activate="() => {
+                  speedIndex += 1;
+                  playbackRate = Math.pow(10, speedIndex);
+                  playing = true;
+                }"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="10x faster"
+            tooltip-location="top"
+            tooltip-offset="5px"
+          ></icon-button>
+          <div id="speed-text">
+            Time rate: 
+            <span v-if="playbackRate===1 && playing">
+              Real time
+            </span>
+            <span v-if="playbackRate!=1 && playing">
+              {{ playbackRate }}&times;
+            </span>
+            <span v-if="!playing">
+              Paused
+            </span>
+          </div>
           <v-slider
             id="slider"
             v-model='selectedTime'
@@ -1033,7 +972,6 @@ export default defineComponent({
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
-      tooFast: false,
 
       sunPlace
     };
@@ -1879,29 +1817,6 @@ export default defineComponent({
     
     playing(play: boolean) {
       console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
-      // let startTime = Date.now();
-      // this.clearPlayingInterval();
-      // if (play) {
-      //   this.playingIntervalId = setInterval(() => {
-      //     startTime = Date.now();
-      //     if (this.selectedTime < maxTime) {
-      //       this.moveOneIntervalForward();
-      //     } else {
-      //       this.selectedTime = minTime;
-      //     }
-      //     this.$nextTick(() => {
-      //       // this.updateViewForDate();
-
-      //       const endTime = Date.now();
-      //       this.tooFast = endTime - startTime > this.tickDurationMS;
-      //       if (this.tooFast) {
-      //         const excess = endTime - startTime - this.tickDurationMS;
-      //         console.error(`Time to update in loop: ${endTime - startTime} ms is ${Math.round(excess*100)/100} ms longer than the setInterval time (${Math.round(this.tickDurationMS*100)/100} ms)`);
-
-      //       }
-      //     });
-      //   }, this.tickDurationMS);
-      // }
       this.setClockSync(play);
     },
 
@@ -1971,12 +1886,6 @@ export default defineComponent({
       }
       
       this.setClockRate(val);
-      this.$nextTick(() => {
-        this.playing = !(this.playing);
-        this.$nextTick(() => {
-          this.playing = !(this.playing);
-        });
-      });
     },
 
   },
@@ -2137,17 +2046,6 @@ body {
 
 }
 
-#viewer-mode-switch {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-
-  .v-switch__thumb {
-    color: var(--accent-color);
-    background-color: black; 
-  }
-}
-
 #share-button {
   position: absolute;
   top: 0.7rem;
@@ -2175,9 +2073,9 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: calc(100% - 2rem);
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
@@ -2212,33 +2110,33 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 8px 16px;
+  padding: 5px 5px;
+  min-width: 30px;
   }
 }
 
 #controls {
   background: black;
-  padding: 10px;
-  border-radius: 10px;
+  padding-block: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
   border: solid 1px var(--comet-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
   pointer-events: auto;
 
   .v-label {
+    font-size: 0.8em;
     color: var(--comet-color);
     opacity: 1;
   }
 
-  .controls-content {
+  #control-checkboxes {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 
-        
     @media (max-width: 750px){ //SMALL
       
       .v-checkbox .v-selection-control {
@@ -2276,6 +2174,7 @@ body {
     }
   }
   #controls-top-row {
+    padding-left: 0.5em;
     display: flex;
     width: 100%;
     flex-direction: row;
@@ -2610,24 +2509,6 @@ video {
       }
     }
   }
-  
-  // v-row
-  #location-time-row {
-    gap: 0.5em;
-    // div
-    .ltd-container {
-      background-color: white;
-      color: blue;
-      border-radius: 0.5em;
-      height: 100%;
-      font-size: 0.8em;
-      padding: 0.5rem;
-    }
-    
-    .ltd-label {
-      font-weight: bold;
-    }
-  }
 
   #button-row {
     #top-container-buttons{
@@ -2835,47 +2716,61 @@ video {
   
   } 
 
-  .speed-text {
+
+  
+}
+
+#speed-text {
+    position: absolute;
+    bottom: 0.3rem;
+    left: 0.3rem;
     background-color: rgba(0, 0, 0, 0.5);
-    padding-inline: 0.25em;
+    padding-inline: 0.4em;
     padding-block: 0.15em;
-    border-radius: 0.15em;
+    border-radius: 0.3em;
     font-size: 0.9rem;
-  }
-  
+  }  
 
-  .too-fast {
-    color: red;
-  }
-  
-  .too-fast-warning {
-    padding: 0.25em;
-    display: block;
-    background-color: black;
-    color: rgb(252, 108, 108);
-    font-size: 0.75em;
-  }
-  
-  
-}
-
-#main-content  > #location-time-display  {
+#top-wwt-content {
   position: absolute;
-  top: 2px;
-  right: 5px;
+  top: 0.5rem;
+  right: 0.5rem;
+
+  #location-time-display  {
   
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap-reverse;
-  gap:5px;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: column;
+    gap:5px;
+
+      .v-chip {
+        border: none;
+        color: blue;
+        background-color: white;
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+    }
   
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    font-size: 0.8em;
-    opacity: 0.9;
-  }
-  
+
+  #viewer-mode-switch {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+
+    .v-switch__thumb {
+      color: var(--accent-color);
+      background-color: black; 
+    }
+
+    .v-input--density-default {
+      --v-input-control-height: 0;
+    }
+
+    .v-selection-control--density-default {
+      --v-selection-control-size: auto;
+    } 
+    }
 }
+
 </style>
