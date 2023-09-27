@@ -511,7 +511,7 @@
             hide-details
             track-size="4px"
             thumb-size="14px"
-            thumb-label="always"
+            thumb-label
             :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
