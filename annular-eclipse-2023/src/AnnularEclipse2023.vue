@@ -235,7 +235,21 @@
               <v-card-text class="info-text no-bottom-border-radius">
                 <v-row>
                 <v-col cols="6">
-                  Information goes here
+                    Get ready North America for not one, but two brilliant solar eclipse! 
+                    First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
+                    get read for an awe-inspiring solar eclipse which stretch from coast to coast across the United States.
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.    
+                    
+                    <details>
+                      <summary>
+                        What causes Solar Eclipses?🌞🌒✨
+                      </summary>
+                    <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the sun from our view.
+                      Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
+                      that we will be on the side of the planet that will catch both of the next two solara eclipses. 
+                      </p>
+                    </details>
+                    
                 </v-col>
                 <v-col cols="6">
                   <figure>
@@ -2251,6 +2265,26 @@ video {
       padding-inline: 10px 5px;
     }
   }
+  
+  details {
+    font-size: 1em;
+    outline: 1px solid white;
+    margin-block: 0.5em;
+    padding-top: 0.5em;
+    padding-inline: 0.5em;
+    
+    summary {
+      font-weight: Bold;
+      font-size: 1.15em;
+    }
+    
+    &:not([open]) {
+      background-color: #486273;
+      padding: 0.5em;
+    }
+  }
+  
+
   
   .v-overlay__content {
     align-self: center;
