@@ -1660,11 +1660,15 @@ export default defineComponent({
     },
 
     updateHorizon(when: Date | null = null) {
-      this.removeAnnotations();
-      if (this.showHorizon) {
-        this.createHorizon(when);
-        if (this.showSky) {
-          this.createSky(when);
+      try {
+        this.removeAnnotations();
+      }
+      finally {
+        if (this.showHorizon) {
+          this.createHorizon(when);
+          if (this.showSky) {
+            this.createSky(when);
+          }
         }
       }
     },
