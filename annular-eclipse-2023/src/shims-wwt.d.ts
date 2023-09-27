@@ -19,7 +19,9 @@ declare module "@wwtelescope/engine" {
     static create(x: number, y: number, z: number): Vector3d;
   }
 
-  export class Texture {}
+  export class Texture {
+    static fromUrl(url: string): Texture;
+  }
 
   export class PushPin {
     static getPushPinTexture(pinId: number): Texture;
@@ -36,4 +38,8 @@ declare module "@wwtelescope/engine" {
   }
 
   export class RenderTriangle {}
+
+  export class Planets {
+    static _planetTextures: Texture[];
+  }
 }

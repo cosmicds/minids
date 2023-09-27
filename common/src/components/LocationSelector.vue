@@ -97,6 +97,10 @@ export default defineComponent({
           radius: 200
         };
       }
+    },
+    worldRadii: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -112,11 +116,11 @@ export default defineComponent({
 
   data() {
     return {
-      placeCircles: [] as L.Circle[],
+      placeCircles: [] as L.CircleMarker[],
       hoveredPlace: null as Place | null,
-      selectedCircle: null as L.Circle | null,
+      selectedCircle: null as L.CircleMarker | null,
       selectedPlace: null as Place | null,
-      selectedPlaceCircle: null as L.Circle | null,
+      selectedPlaceCircle: null as L.CircleMarker | null,
       map: null as Map | null,
     };
   },
@@ -154,18 +158,18 @@ export default defineComponent({
       );
     },
 
-    circleForLocation(location: LocationDeg, circleOptions: Record<string,any>): L.Circle {
-      return L.circle([location.latitudeDeg, location.longitudeDeg], circleOptions);
+    circleForLocation(location: LocationDeg, circleOptions: Record<string,any>): L.CircleMarker {
+      return this.circleMaker([location.latitudeDeg, location.longitudeDeg], circleOptions);
     },
 
-    circleForSelection() : L.Circle | null {
+    circleForSelection() : L.CircleMarker | null {
       if (this.selectedPlace) {
         return null;
       }
       return this.circleForLocation(this.modelValue, { ...this.selectedCircleOptions, interactive: false });
     },
 
-    circleForPlace(place: Place): L.Circle {
+    circleForPlace(place: Place): L.CircleMarker {
       const options = (place === this.selectedPlace) ? this.selectedCircleOptions : this.placeCircleOptions;
       const circle = this.circleForLocation(place, options);
       if (place.name) {
@@ -246,6 +250,12 @@ export default defineComponent({
       }
     }
 
+  },
+
+  computed: {
+    circleMaker(): (latlng: L.LatLngExpression, options: L.CircleMarkerOptions) => L.CircleMarker {
+      return this.worldRadii ? L.circle : L.circleMarker;
+    }
   },
 
   watch: {
