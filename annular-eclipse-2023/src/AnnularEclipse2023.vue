@@ -1035,13 +1035,7 @@ export default defineComponent({
       };
     });
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(searchParams.get("lat") ?? "");
-    const lon = parseFloat(searchParams.get("lon") ?? "");
-    if (lat && lon) {
-      this.selectedLocation = "User Selected";
-      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
-    }
+
   },
 
   mounted() {
@@ -1085,19 +1079,29 @@ export default defineComponent({
       // @ts-ignore
       this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
 
+      // Force the render of one frame so that planet textures will be loaded
+      this.wwtControl.renderOneFrame();
+
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
+      this.setForegroundImageByName("Digitized Sky Survey (Color)");
+      this.setBackgroundImageByName("Black Sky Background");
+      this.setForegroundOpacity(100);
+      this.updateMoonTexture(true);
+
+      // Handle URL lat/long parameters
+      // We need to do this after the forced render
+      const searchParams = new URLSearchParams(window.location.search);
+      const lat = parseFloat(searchParams.get("lat") ?? "");
+      const lon = parseFloat(searchParams.get("lon") ?? "");
+      if (lat && lon) {
+        this.selectedLocation = "User Selected";
+        this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+      }
+
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
       this.setClockRate(1); //
-
-      setTimeout(() => {
-        Planets['_planetTextures'][0] = this.textureFromAssetImage("2023-09-19-SDO-Sun.png");
-        this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("Digitized Sky Survey (Color)");
-        this.setBackgroundImageByName("Black Sky Background");
-        this.setForegroundOpacity(100);
-        this.updateMoonTexture(true);
-        
-      }, 100);
 
       this.playbackRate = 1;  //this.setplaybackRate('8 minutes per second'); // 500;
       
@@ -1109,6 +1113,7 @@ export default defineComponent({
       } else {
         this.startHorizonMode();
       }
+      this.trackSun().then(() => this.positionSet = true);
 
       this.setTimeforSunAlt(10); // 10 degrees above horizon
       
