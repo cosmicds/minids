@@ -113,15 +113,6 @@
               >
               </icon-button>
               <icon-button
-                fa-icon="sun"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Center view on Sun"
-                :tooltip-location="'bottom'"
-                @activate="() => trackSun()"
-              >
-              </icon-button>
-              <icon-button
                 fa-icon="question"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -338,34 +329,80 @@
           :text="selectedLocaledTimeDateString"
         > </v-chip>
       </div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
+      <div id="top-switches">
+        <v-tooltip
+            location="left"
+            :color="accentColor"
+            :style="cssVars"
+          >
+          <template v-slot:activator="{props}">
+            <div 
+              v-bind="props"
+              id="viewer-mode-switch"
+              >
+              
+              <v-switch
+                inset
+                hide-details
+                :ripple="false"
+                v-model="viewerMode"
+                :color="accentColor"
+                false-value="SunScope"
+                false-icon="mdi-telescope"
+                true-value="Horizon"
+                true-icon="mdi-image-filter-hdr"
+              >
+              </v-switch>
             
+            </div>
+          </template>
+          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+        </v-tooltip>
+
+        <div id="track-sun-switch"> 
+          <v-tooltip
+              location="left"
+              :color="accentColor"
+              :style="cssVars"
+            >
+            <template v-slot:activator="{props}">
+              <div 
+                v-bind="props"
+                v-if="viewerMode=='Horizon'"
+              >
+                <v-switch
+                  inset
+                  hide-details
+                  v-model="toggleTrackSun"
+                  :ripple="false"
+                  :color="accentColor"
+                  true-icon="mdi-white-balance-sunny"
+                  false-icon="mdi-image"
+                >
+                </v-switch>
+                
+              </div>
+            </template>
+            {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
+          </v-tooltip>
+
+          <div 
+            v-if="viewerMode=='SunScope'"
+          >
             <v-switch
               inset
               hide-details
+              disabled
+              v-model="toggleTrackSun"
               :ripple="false"
-              v-model="viewerMode"
               :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
+              true-icon="mdi-target"
+              false-icon="mdi-image"
             >
             </v-switch>
-          
           </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
+        </div>
+      </div>
     </div>
     
     <div class="bottom-content">
@@ -474,7 +511,7 @@
             hide-details
             track-size="4px"
             thumb-size="14px"
-            thumb-label="always"
+            thumb-label
             :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
@@ -946,6 +983,8 @@ export default defineComponent({
       showHorizon: true,
       showEcliptic: false,    
       
+      toggleTrackSun: true,
+      
       times: times, 
       minTime: minTime,
       maxTime: maxTime,
@@ -1027,6 +1066,10 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.wwtControl._updateViewParameters = updateViewParameters.bind(this.wwtControl);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1203,6 +1246,17 @@ export default defineComponent({
       }
     },
 
+    trackingSun: {
+      set(value: boolean) {
+        this.toggleTrackSun = value;
+      },
+      
+      get(): boolean {
+        // do something more useful later
+        return this.toggleTrackSun;
+      }
+      
+    },
     defaultRate(): number {
       return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
     },
@@ -1215,9 +1269,15 @@ export default defineComponent({
       return this.gotoTarget({
         place: this.sunPlace,
         instant: true,
-        noZoom: false,
+        noZoom: true,
         trackObject: true
       });
+    },
+
+    onWWTRenderFrame(wwtControl: WWTControl) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.trackingSun = wwtControl._trackingObject === this.sunPlace;
     },
 
     clearPlayingInterval() {
@@ -1621,7 +1681,12 @@ export default defineComponent({
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
-      this.trackSun();
+      this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
       console.log('=== startSolarScopeMode ===');
       return;
     },
@@ -1871,6 +1936,26 @@ export default defineComponent({
       return;
     },
 
+    toggleTrackSun(val) {
+      // this turns of sun tracking
+      console.log("toggleTrackSun", val);
+      if (val) {
+        this.trackSun();
+        return;
+      } else {
+        const currentPlace = new Place();
+        currentPlace.set_RA(this.wwtRARad * R2D / 15);
+        currentPlace.set_dec(this.wwtDecRad * R2D);
+        this.gotoTarget({
+          place: currentPlace,
+          instant: true,
+          noZoom: true,
+          trackObject: false
+        });
+        return;
+      }
+    },
+    
     playbackRate(val) {
       
       if (val > 11_000) {
@@ -2046,6 +2131,20 @@ body {
 
 }
 
+// these are now in #top-content
+
+#track-sun-switch {
+  // position: absolute;
+  // top: 1rem;
+  // left: 6rem;
+  pointer-events: auto;
+  .v-switch__thumb {
+    color: var(--accent-color);
+    background-color: black; 
+  }
+}
+
+
 #share-button {
   position: absolute;
   top: 0.7rem;
@@ -2060,8 +2159,9 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
 
   #center-buttons {
     display: flex;
@@ -2752,12 +2852,6 @@ video {
       }
     }
   
-
-  #viewer-mode-switch {
-    position: absolute;
-    margin-top: 0.5rem;
-    right: 0;
-
     .v-switch__thumb {
       color: var(--accent-color);
       background-color: black; 
@@ -2770,7 +2864,18 @@ video {
     .v-selection-control--density-default {
       --v-selection-control-size: auto;
     } 
-    }
+
+    pointer-events: auto;
+
+  #top-switches {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+  }
+
+  #track-sun-switch {
+    margin-top: 0.5rem;
+  }
 }
 
 </style>
