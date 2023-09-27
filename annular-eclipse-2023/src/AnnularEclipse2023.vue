@@ -181,7 +181,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button">
+      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -189,11 +189,12 @@
           :focus-color="accentColor"
           background-color="transparent"
           :box-shadow="false"
+          tooltip-text="Share view of this location"
           @activate="copyShareURL"
         ></icon-button>
       </div>
     </div>
-     
+    
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -2199,10 +2200,15 @@ body {
 }
 
 
-#share-button {
+#share-button-wrapper {
   position: absolute;
   top: 0.7rem;
-  right: 1rem;
+  left: 1rem;
+  
+  .icon-wrapper {
+    padding-inline: 7px 8px;
+    width: 2.5rem;
+  }
 
 }
 
