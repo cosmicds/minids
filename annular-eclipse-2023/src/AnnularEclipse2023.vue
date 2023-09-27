@@ -113,15 +113,6 @@
               >
               </icon-button>
               <icon-button
-                fa-icon="sun"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Center view on Sun"
-                :tooltip-location="'bottom'"
-                @activate="() => trackSun()"
-              >
-              </icon-button>
-              <icon-button
                 fa-icon="question"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -188,52 +179,6 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-    <div class="top-content">      
-      <v-tooltip
-          location="bottom"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="track-sun-switch"
-            v-if="viewerMode=='Horizon'"
-          >
-            <v-switch
-              inset
-              hide-details
-              v-model="toggleTrackSun"
-              :ripple="false"
-              :color="accentColor"
-              true-icon="mdi-sun-clock"
-              false-icon="mdi-close"
-            >
-            </v-switch>
-            
-          </div>
-        </template>
-        {{ toggleTrackSun ? 'Tracking Sun' : 'Not Tracking Sun' }}
-      </v-tooltip>
-      <div 
-        id="tracking-sun-indicator"
-        v-if="viewerMode=='Horizon'"
-      >
-        <icon-button
-          fa-icon="sun"
-          :color="trackingSun ? accentColor : 'grey'"
-          :focus-color="accentColor"
-          :tooltip-text="toggleTrackSun ? 'Tracking the Sun' : 'Not Tracking the Sun'"
-          :tooltip-location="'bottom'"
-          @activate="() => {toggleTrackSun = !toggleTrackSun}"
-        > 
-        </icon-button>
-        <p 
-          :style="'color: ' + (toggleTrackSun ? 'limegreen' : 'tomato')"
-          >{{ toggleTrackSun ? 'Tracking' : 'Not Tracking' }}
-        </p>
-      </div>
-    </div>
     <div>
       <div v-if="selectedLocation === 'User Selected'" id="share-button">
         <icon-button
@@ -384,34 +329,80 @@
           :text="selectedLocaledTimeDateString"
         > </v-chip>
       </div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
+      <div id="top-switches">
+        <v-tooltip
+            location="left"
+            :color="accentColor"
+            :style="cssVars"
+          >
+          <template v-slot:activator="{props}">
+            <div 
+              v-bind="props"
+              id="viewer-mode-switch"
+              >
+              
+              <v-switch
+                inset
+                hide-details
+                :ripple="false"
+                v-model="viewerMode"
+                :color="accentColor"
+                false-value="SunScope"
+                false-icon="mdi-telescope"
+                true-value="Horizon"
+                true-icon="mdi-image-filter-hdr"
+              >
+              </v-switch>
             
+            </div>
+          </template>
+          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+        </v-tooltip>
+
+        <div id="track-sun-switch"> 
+          <v-tooltip
+              location="left"
+              :color="accentColor"
+              :style="cssVars"
+            >
+            <template v-slot:activator="{props}">
+              <div 
+                v-bind="props"
+                v-if="viewerMode=='Horizon'"
+              >
+                <v-switch
+                  inset
+                  hide-details
+                  v-model="toggleTrackSun"
+                  :ripple="false"
+                  :color="accentColor"
+                  true-icon="mdi-target"
+                  false-icon="mdi-image"
+                >
+                </v-switch>
+                
+              </div>
+            </template>
+            {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
+          </v-tooltip>
+
+          <div 
+            v-if="viewerMode=='SunScope'"
+          >
             <v-switch
               inset
               hide-details
+              disabled
+              v-model="toggleTrackSun"
               :ripple="false"
-              v-model="viewerMode"
               :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
+              true-icon="mdi-target"
+              false-icon="mdi-image"
             >
             </v-switch>
-          
           </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
+        </div>
+      </div>
     </div>
     
     <div class="bottom-content">
@@ -2153,18 +2144,6 @@ body {
   }
 }
 
-#tracking-sun-indicator {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-  p {
-    font-size: 0.8em;
-    text-align: center;
-  }
-  
-}
 
 #share-button {
   position: absolute;
@@ -2873,12 +2852,6 @@ video {
       }
     }
   
-
-  #viewer-mode-switch {
-    position: absolute;
-    margin-top: 0.5rem;
-    right: 0;
-
     .v-switch__thumb {
       color: var(--accent-color);
       background-color: black; 
@@ -2891,7 +2864,18 @@ video {
     .v-selection-control--density-default {
       --v-selection-control-size: auto;
     } 
-    }
+
+    pointer-events: auto;
+
+  #top-switches {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+  }
+
+  #track-sun-switch {
+    margin-top: 0.5rem;
+  }
 }
 
 </style>
