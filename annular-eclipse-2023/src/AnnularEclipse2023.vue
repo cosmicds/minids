@@ -1299,7 +1299,10 @@ export default defineComponent({
 
     updateMoonTexture(force=false) {
       // Are we even using showSky?
-      const filename = (this.showHorizon && this.showSky) && this.moonPosition.altRad > 0 ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      const blueMoon = (this.showHorizon && this.showSky) &&
+                       this.moonPosition.altRad > 0 &&
+                       this.viewerMode !== 'SunScope';
+      const filename = blueMoon ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
       if (force || (filename !== this.moonTexture && Planets._planetTextures)) {
         Planets._planetTextures[9] = this.textureFromAssetImage(filename);
         this.moonTexture = filename;
@@ -1936,6 +1939,7 @@ export default defineComponent({
         this.horizonOpacity = 0.6;
         this.startSolarScopeMode();
       }
+      this.updateMoonTexture();
     },
 
     skyColor(_color: string) {
@@ -1951,22 +1955,15 @@ export default defineComponent({
     sunPosition(pos: EquatorialRad & HorizontalRad) {
 
       const _civilTwilight = -6 * D2R;
-      const _nauticalTwilight = 2 * _civilTwilight;
+      // const _nauticalTwilight = 2 * _civilTwilight;
       const astronomicalTwilight = 3 * _civilTwilight;
       
       const sunAlt = pos.altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
       this.updateMoonTexture();
 
-      function dssOpacity(alt: number) {
-        if (alt > 0) {
-          return 0;
-        } else {
-          return 1 - (1 + Math.atan(Math.PI * alt / (-astronomicalTwilight))) / 2;
-        }
-      }
-      
-      this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
+      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.setForegroundOpacity(dssOpacity * 100);
       return;
     },
 
