@@ -204,12 +204,32 @@
                     
                     <details>
                       <summary>
-                        What causes Solar Eclipses?🌞🌒✨
+                        What causes Solar Eclipses? ☀️🌕🌎
                       </summary>
                     <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the sun from our view.
                       Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
                       that we will be on the side of the planet that will catch both of the next two solara eclipses. 
                       </p>
+                    </details>
+                    
+                    <details>
+                      <summary> Total vs. Annular Eclipse</summary>
+                      <p>
+                        During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
+                        in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
+                        doesn't cover the entire face of the Sun, and during an eclipse we see a ring of light around the Moon. This is called an Annular Eclipse.
+                      </p>
+                    </details>
+                    
+                    <details> 
+                      <summary> Why can only some places see the eclipse? 🌒</summary>
+                      <p>
+                        An eclipse is caused by Moon casting a shadow on the Earth. 
+                        People who directly behind the moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
+                        As the Moon moves in its orbit around the Earth, the location of the shadow will moves, sweeping out a path across the surface of the Earth. 
+                        For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
+                        the Sun will not be blocked at all, and there will be no eclipse there. 
+                      </p> 
                     </details>
                     
                 </v-col>
@@ -2529,7 +2549,8 @@ body {
 .bottom-sheet {
   
   figure {
-    position: relative;
+    position: sticky;
+    top: 0;
     figcaption{
       position: absolute;
       bottom: 0;
@@ -2543,19 +2564,27 @@ body {
   
   details {
     font-size: 1em;
-    outline: 1px solid white;
+    padding: 0.5em;
+    height: fit-content;
     margin-block: 0.5em;
-    padding-top: 0.5em;
-    padding-inline: 0.5em;
+    border-top-left-radius: 0.5em;
+    background-color: #486273;
     
     summary {
-      font-weight: Bold;
-      font-size: 1.15em;
+      font-weight: bold;
+      font-size: 1em;
+      cursor: pointer;
+      // list-style-type: "\1F315"; // moon emoji here (🌙)
+      text-decoration: underline;
     }
     
-    &:not([open]) {
-      background-color: #486273;
+    p {
+      font-size: 0.9em;
       padding: 0.5em;
+    }
+    
+    &[open] {
+      border-bottom-left-radius: 0.5em;
     }
   }
   
