@@ -2568,7 +2568,7 @@ video {
 }
 
 #guided-content-container {
-  --top-content-max-height: 35%;
+  --top-content-max-height: max(30vmin, 35vh);
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
   --container-padding: 0.5rem;
@@ -2585,7 +2585,15 @@ video {
   user-select: none;
   border: solid 1px var(--accent-color);
   
+  font-size: clamp(8px, 3vmin, 0.9em);
+  overflow-y: auto;
+  
   transition: height 0.5s ease-in-out;
+
+  > div.v-row {
+    height: 100%;
+    display: flex;
+  }
 
   .v-row {
     margin: 0px;
@@ -2639,11 +2647,6 @@ video {
     
     // .v-row.non-map-row#instructions-row
   #instructions-row { 
-    font-size: 0.9em; // just putting this here explicitly
-    
-    @media (max-width: 750px){ //SMALL
-      font-size: 0.75rem;
-    }
     
     // v-col
     #top-container-main-text { 
@@ -2671,32 +2674,24 @@ video {
   }
 
   #button-row {
+    align-self: flex-end;
     #top-container-buttons{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    
     flex-grow: 1;
-    
-    
-    @media (max-width: 750px) {
-      flex-wrap: wrap;
-      flex-basis: 2.5rem;
-      justify-content: space-around;
-    }
-
-      
+    gap: 0.5em;
+          
       .icon-wrapper {
         background-color: rgba(209, 209, 209, .2);
         border: none;
         border-radius: 5px;
         padding-block: 4px;
-        width: 100%;
-        justify-content: center;
-        margin-inline: 5px;
+        width: calc(100%/6);
         
-        @media (max-width: 750px) {
-          max-width: 2rem;
-          margin-block: 5px;
+        @media (max-width: 500px) {
+          padding-inline: 0px;
         }
 
         &.active {
@@ -2711,14 +2706,17 @@ video {
 }
 
 #map-column { // v-col
-  // background-color: blanchedalmond;
   position: relative;
+  --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
+  height: 100%;
+  // max-height: var(--map-max-height);
+  width: 100%;
+  aspect-ratio: 5 / 3;
+
   #map-container {
     height: 100%;
   
-  
     span {
-      color: red;
       padding: 0;
       margin: 0;
     }
