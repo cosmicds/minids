@@ -725,12 +725,6 @@ import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
-// interface MoveOptions {
-//   instant?: boolean;
-//   zoomDeg?: number;
-//   rollRad?: number;
-// }
-
 type SheetType = "text" | "video" | null;
 
 const D2R = Math.PI / 180;
@@ -797,10 +791,6 @@ export default defineComponent({
   extends: MiniDSBase,
   
   props: {
-    // wtml: {
-    //   type: Object,
-    //   required: true
-    // },
     wwtNamespace: {
       type: String,
       required: true
@@ -1080,8 +1070,7 @@ export default defineComponent({
       this.setClockRate(1); //
 
       setTimeout(() => {
-        /* eslint-disable @typescript-eslint/no-var-requires */
-        Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
+        Planets['_planetTextures'][0] = this.textureFromAssetImage("./assets/2023-09-19-SDO-Sun.png");
         this.trackSun().then(() => this.positionSet = true);
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
@@ -1278,6 +1267,11 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.trackingSun = wwtControl._trackingObject === this.sunPlace;
+    },
+
+    textureFromAssetImage(assetPath: string): Texture {
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      return Texture.fromUrl(require(assetPath));
     },
 
     clearPlayingInterval() {
@@ -1613,7 +1607,9 @@ export default defineComponent({
 
 
     updateForDateTime() {
-      this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
+      if (this.syncDateTimeWithWWTCurrentTime) {
+        this.setTime(this.dateTime);
+      }
       this.updateHorizon(this.dateTime); 
     },
 
@@ -1719,8 +1715,8 @@ export default defineComponent({
       const setting = time == maxTime ? null : time;
       
       return {
-        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : (rising !== null ? rising : null),
-        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : (setting !== null ? setting : null)
+        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : rising,
+        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : setting
       };
     },
     
