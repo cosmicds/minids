@@ -130,7 +130,7 @@
             :model-value="locationDeg"
             @place="(place: typeof places[number]) => updateLocation(place.name)"
             :detect-location="false"
-            :map-options="mapOptions"
+            :map-options="presetMapOptions"
             :places="places"
             :initial-place="places.find(p => p.name === 'selectedLocation')"
             :place-circle-options="placeCircleOptions"
@@ -148,6 +148,7 @@
             :model-value="locationDeg"
             @update:modelValue="updateLocationFromMap"
             :detect-location="false"
+            :map-options="userSelectedMapOptions"
             :selected-circle-options="selectedCircleOptions"
             class="leaflet-map"
           ></location-selector>
@@ -830,6 +831,13 @@ export default defineComponent({
     moonPlace.set_names(["Moon"]);
     moonPlace.set_classification(Classification.solarSystem);
     moonPlace.set_target(SolarSystemObjects.moon);
+    const initialView = {
+      initialLocation: {
+        latitudeDeg: 38,
+        longitudeDeg: -97
+      },
+      initialZoom: 3
+    };
 
     return {
       showSplashScreen: false, // FIX later
@@ -865,13 +873,16 @@ export default defineComponent({
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
-      mapOptions: {
+      presetMapOptions: {
         templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
         minZoom: 1,
         maxZoom: 16,
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        ext: 'jpg'
+        ext: 'jpg',
+        ...initialView
       },
+
+      userSelectedMapOptions: initialView,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
