@@ -376,7 +376,7 @@
                   v-model="toggleTrackSun"
                   :ripple="false"
                   :color="accentColor"
-                  true-icon="mdi-target"
+                  true-icon="mdi-white-balance-sunny"
                   false-icon="mdi-image"
                 >
                 </v-switch>
