@@ -1073,14 +1073,15 @@ export default defineComponent({
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
 
       // Force the render of one frame so that planet textures will be loaded
+      // We don't want to attach the callback before this so that we don't mess up sun tracking
       this.wwtControl.renderOneFrame();
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
 
       /* eslint-disable @typescript-eslint/no-var-requires */
       Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
@@ -1792,10 +1793,12 @@ export default defineComponent({
         return times[0] + dt - (dt % MILLISECONDS_PER_INTERVAL);
       }
 
-      if (this.times.includes(matchTime(out.rising, this.times))) {
-        this.selectedTime = matchTime(out.rising, this.times);
-      } else if (this.times.includes(matchTime(out.setting, this.times))) {
-        this.selectedTime = matchTime(out.setting, this.times);
+      const risingTime = matchTime(out.rising, this.times);
+      const settingTime = matchTime(out.setting, this.times);
+      if (this.times.includes(risingTime)) {
+        this.selectedTime = risingTime;
+      } else if (this.times.includes(settingTime)) {
+        this.selectedTime = settingTime;
       } else {
         console.log("time not in times array");
         // best to leave it alone so it doesn't jump around
