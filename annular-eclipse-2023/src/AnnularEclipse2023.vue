@@ -198,7 +198,8 @@
           <div 
             v-bind="props"
             id="track-sun-switch"
-            >
+            v-if="viewerMode=='Horizon'"
+          >
             <v-switch
               inset
               hide-details
@@ -214,7 +215,10 @@
         </template>
         {{ toggleTrackSun ? 'Tracking Sun' : 'Not Tracking Sun' }}
       </v-tooltip>
-      <div id="tracking-sun-indicator">
+      <div 
+        id="tracking-sun-indicator"
+        v-if="viewerMode=='Horizon'"
+      >
         <icon-button
           fa-icon="sun"
           :color="trackingSun ? accentColor : 'grey'"
