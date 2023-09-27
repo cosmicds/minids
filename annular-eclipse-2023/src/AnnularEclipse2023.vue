@@ -725,13 +725,9 @@ import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
-// interface MoveOptions {
-//   instant?: boolean;
-//   zoomDeg?: number;
-//   rollRad?: number;
-// }
-
 type SheetType = "text" | "video" | null;
+type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
+type ViewerMode = "Horizon" | "SunScope";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -797,10 +793,6 @@ export default defineComponent({
   extends: MiniDSBase,
   
   props: {
-    // wtml: {
-    //   type: Object,
-    //   required: true
-    // },
     wwtNamespace: {
       type: String,
       required: true
@@ -833,6 +825,11 @@ export default defineComponent({
     sunPlace.set_classification(Classification.solarSystem);   
     sunPlace.set_target(SolarSystemObjects.sun);
     sunPlace.set_zoomLevel(20);
+
+    const moonPlace = new Place();
+    moonPlace.set_names(["Moon"]);
+    moonPlace.set_classification(Classification.solarSystem);
+    moonPlace.set_target(SolarSystemObjects.moon);
 
     return {
       showSplashScreen: false, // FIX later
@@ -973,7 +970,7 @@ export default defineComponent({
         radius: 5
       },
 
-      learnerPath: "Explore", // Choose or Learn
+      learnerPath: "Explore" as LearnerPath,
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -998,7 +995,7 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
-      viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
+      viewerMode: 'Horizon' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -1006,13 +1003,15 @@ export default defineComponent({
       skyColor: "#4190ED",
       skyOpacity: 0.6,
       horizonOpacity: 1,
+      moonTexture: 'moon-sky-blue-overlay.png' as 'moon-sky-blue-overlay.png' | 'moon-dark-gray-overlay.png',
 
       playbackRate: 1,
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
 
-      sunPlace
+      sunPlace,
+      moonPlace
     };
   },
 
@@ -1080,12 +1079,12 @@ export default defineComponent({
       this.setClockRate(1); //
 
       setTimeout(() => {
-        /* eslint-disable @typescript-eslint/no-var-requires */
-        Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
+        Planets['_planetTextures'][0] = this.textureFromAssetImage("2023-09-19-SDO-Sun.png");
         this.trackSun().then(() => this.positionSet = true);
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
         this.setForegroundOpacity(100);
+        this.updateMoonTexture(true);
         
       }, 100);
 
@@ -1214,7 +1213,7 @@ export default defineComponent({
       return MILLISECONDS_PER_INTERVAL / minDuration;
     },
     
-    sunPosition() {
+    sunPosition(): EquatorialRad & HorizontalRad {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
         this.sunPlace.get_dec() * D2R,
         this.location.latitudeRad,
@@ -1222,10 +1221,23 @@ export default defineComponent({
         this.dateTime);
 
       return {
-        'raRad': this.sunPlace.get_RA() * 15 * D2R,
-        'decRad': this.sunPlace.get_dec() * D2R,
-        'altRad': sunAltAz.altRad,
-        'azRad': sunAltAz.azRad
+        raRad: this.sunPlace.get_RA() * 15 * D2R,
+        decRad: this.sunPlace.get_dec() * D2R,
+        ...sunAltAz
+      };
+    },
+
+    moonPosition(): EquatorialRad & HorizontalRad {
+      const moonAltAz = this.equatorialToHorizontal(this.moonPlace.get_RA() * 15 * D2R,
+        this.moonPlace.get_dec() * D2R,
+        this.location.latitudeRad,
+        this.location.longitudeRad,
+        this.dateTime);
+
+      return {
+        raRad: this.moonPlace.get_RA() * 15 * D2R,
+        decRad: this.moonPlace.get_dec() * D2R,
+        ...moonAltAz
       };
     },
 
@@ -1278,6 +1290,23 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.trackingSun = wwtControl._trackingObject === this.sunPlace;
+    },
+
+    textureFromAssetImage(assetFilename: string): Texture {
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      return Texture.fromUrl(require(`./assets/${assetFilename}`));
+    },
+
+    updateMoonTexture(force=false) {
+      // Are we even using showSky?
+      const blueMoon = (this.showHorizon && this.showSky) &&
+                       this.moonPosition.altRad > 0 &&
+                       this.viewerMode !== 'SunScope';
+      const filename = blueMoon ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      if (force || (filename !== this.moonTexture && Planets._planetTextures)) {
+        Planets._planetTextures[9] = this.textureFromAssetImage(filename);
+        this.moonTexture = filename;
+      }
     },
 
     clearPlayingInterval() {
@@ -1613,7 +1642,9 @@ export default defineComponent({
 
 
     updateForDateTime() {
-      this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
+      if (this.syncDateTimeWithWWTCurrentTime) {
+        this.setTime(this.dateTime);
+      }
       this.updateHorizon(this.dateTime); 
     },
 
@@ -1719,8 +1750,8 @@ export default defineComponent({
       const setting = time == maxTime ? null : time;
       
       return {
-        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : (rising !== null ? rising : null),
-        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : (setting !== null ? setting : null)
+        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : rising,
+        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : setting
       };
     },
     
@@ -1813,17 +1844,22 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
     },
+
     showEcliptic(show: boolean) {
       this.wwtSettings.set_showEcliptic(show);
       this.wwtSettings.set_showEclipticOverviewText(false);
     },
+
     showHorizon(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
+
     showSky(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
-    
+
     dateTime(_date: Date) {
       this.updateForDateTime();
     },
@@ -1832,14 +1868,14 @@ export default defineComponent({
       return;
     },
 
-    wwtCurrentTime(_time: Date) {
-      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+    wwtCurrentTime(time: Date) {
+      if (time.getTime() >= this.maxTime || time.getTime() < this.minTime) {
         this.setTime(new Date(this.minTime));
         return;
       }
       
-      this.selectedTime = _time.getTime();
-      this.updateHorizon(_time);
+      this.selectedTime = time.getTime();
+      this.updateHorizon(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -1885,58 +1921,53 @@ export default defineComponent({
       this.setClockSync(play);
     },
 
-    showSplashScreen(_val) {
-      if (!_val) {
+    showSplashScreen(val: boolean) {
+      if (!val) {
         this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
       }
     },
     
-    introSlide(_val) {
-      this.inIntro = _val < 4;
+    introSlide(val: number) {
+      this.inIntro = val < 4;
       return;
     },
 
-    viewerMode(mode) {
+    viewerMode(mode: ViewerMode) {
       if (mode === 'Horizon') {
         this.startHorizonMode();
       } else if (mode === 'SunScope') {
         this.horizonOpacity = 0.6;
         this.startSolarScopeMode();
       }
+      this.updateMoonTexture();
     },
 
-    skyColor(_color) {
+    skyColor(_color: string) {
       this.updateHorizon();
     },
 
-    sunAboveHorizon(isAbove) {
+    sunAboveHorizon(isAbove: boolean) {
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
-    sunPosition(pos) {
+    sunPosition(pos: EquatorialRad & HorizontalRad) {
 
       const _civilTwilight = -6 * D2R;
-      const _nauticalTwilight = 2 * _civilTwilight;
+      // const _nauticalTwilight = 2 * _civilTwilight;
       const astronomicalTwilight = 3 * _civilTwilight;
       
       const sunAlt = pos.altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.updateMoonTexture();
 
-      function dssOpacity(alt: number) {
-        if (alt > 0) {
-          return 0;
-        } else {
-          return 1 - (1 + Math.atan(Math.PI * alt / (-astronomicalTwilight))) / 2;
-        }
-      }
-      
-      this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
+      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.setForegroundOpacity(dssOpacity * 100);
       return;
     },
 
-    toggleTrackSun(val) {
+    toggleTrackSun(val: boolean) {
       // this turns of sun tracking
       console.log("toggleTrackSun", val);
       if (val) {
@@ -1956,7 +1987,7 @@ export default defineComponent({
       }
     },
     
-    playbackRate(val) {
+    playbackRate(val: number) {
       
       if (val > 11_000) {
         console.warn('playbackRate too high, setting to maxPlaybackRate');
