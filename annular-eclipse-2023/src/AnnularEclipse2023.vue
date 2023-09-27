@@ -1070,11 +1070,12 @@ export default defineComponent({
       this.setClockRate(1); //
 
       setTimeout(() => {
-        Planets['_planetTextures'][0] = this.textureFromAssetImage("./assets/2023-09-19-SDO-Sun.png");
+        Planets['_planetTextures'][0] = this.textureFromAssetImage("2023-09-19-SDO-Sun.png");
         this.trackSun().then(() => this.positionSet = true);
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
         this.setForegroundOpacity(100);
+        this.updateMoonTexture();
         
       }, 100);
 
@@ -1203,7 +1204,7 @@ export default defineComponent({
       return MILLISECONDS_PER_INTERVAL / minDuration;
     },
     
-    sunPosition() {
+    sunPosition(): EquatorialRad & HorizontalRad {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
         this.sunPlace.get_dec() * D2R,
         this.location.latitudeRad,
@@ -1211,10 +1212,10 @@ export default defineComponent({
         this.dateTime);
 
       return {
-        'raRad': this.sunPlace.get_RA() * 15 * D2R,
-        'decRad': this.sunPlace.get_dec() * D2R,
-        'altRad': sunAltAz.altRad,
-        'azRad': sunAltAz.azRad
+        raRad: this.sunPlace.get_RA() * 15 * D2R,
+        decRad: this.sunPlace.get_dec() * D2R,
+        altRad: sunAltAz.altRad,
+        azRad: sunAltAz.azRad
       };
     },
 
@@ -1269,9 +1270,15 @@ export default defineComponent({
       this.trackingSun = wwtControl._trackingObject === this.sunPlace;
     },
 
-    textureFromAssetImage(assetPath: string): Texture {
+    textureFromAssetImage(assetFilename: string): Texture {
       /* eslint-disable @typescript-eslint/no-var-requires */
-      return Texture.fromUrl(require(assetPath));
+      return Texture.fromUrl(require(`./assets/${assetFilename}`));
+    },
+
+    updateMoonTexture() {
+      // Weird condition - are we even using showSky?
+      const filename = (this.showHorizon && this.showSky) ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      Planets['_planetTextures'][9] = this.textureFromAssetImage(filename);
     },
 
     clearPlayingInterval() {
@@ -1815,9 +1822,11 @@ export default defineComponent({
     },
     showHorizon(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
     showSky(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
     
     dateTime(_date: Date) {
@@ -1881,14 +1890,14 @@ export default defineComponent({
       this.setClockSync(play);
     },
 
-    showSplashScreen(_val) {
-      if (!_val) {
+    showSplashScreen(val: boolean) {
+      if (!val) {
         this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
       }
     },
     
-    introSlide(_val) {
-      this.inIntro = _val < 4;
+    introSlide(val: number) {
+      this.inIntro = val < 4;
       return;
     },
 
@@ -1901,17 +1910,17 @@ export default defineComponent({
       }
     },
 
-    skyColor(_color) {
+    skyColor(_color: string) {
       this.updateHorizon();
     },
 
-    sunAboveHorizon(isAbove) {
+    sunAboveHorizon(isAbove: boolean) {
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
-    sunPosition(pos) {
+    sunPosition(pos: typeof this.sunPosition) {
 
       const _civilTwilight = -6 * D2R;
       const _nauticalTwilight = 2 * _civilTwilight;
@@ -1932,7 +1941,7 @@ export default defineComponent({
       return;
     },
 
-    toggleTrackSun(val) {
+    toggleTrackSun(val: boolean) {
       // this turns of sun tracking
       console.log("toggleTrackSun", val);
       if (val) {
@@ -1952,7 +1961,7 @@ export default defineComponent({
       }
     },
     
-    playbackRate(val) {
+    playbackRate(val: number) {
       
       if (val > 11_000) {
         console.warn('playbackRate too high, setting to maxPlaybackRate');
