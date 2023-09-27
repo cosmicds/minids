@@ -1686,7 +1686,12 @@ export default defineComponent({
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
-      this.trackSun();
+      this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
       console.log('=== startSolarScopeMode ===');
       return;
     },
