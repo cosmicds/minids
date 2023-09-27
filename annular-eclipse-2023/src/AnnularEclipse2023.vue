@@ -826,6 +826,11 @@ export default defineComponent({
     sunPlace.set_target(SolarSystemObjects.sun);
     sunPlace.set_zoomLevel(20);
 
+    const moonPlace = new Place();
+    moonPlace.set_names(["Moon"]);
+    moonPlace.set_classification(Classification.solarSystem);
+    moonPlace.set_target(SolarSystemObjects.moon);
+
     return {
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
@@ -998,13 +1003,15 @@ export default defineComponent({
       skyColor: "#4190ED",
       skyOpacity: 0.6,
       horizonOpacity: 1,
+      moonTexture: 'moon-sky-blue-overlay.png' as 'moon-sky-blue-overlay.png' | 'moon-dark-gray-overlay.png',
 
       playbackRate: 1,
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
 
-      sunPlace
+      sunPlace,
+      moonPlace
     };
   },
 
@@ -1077,7 +1084,7 @@ export default defineComponent({
         this.setForegroundImageByName("Digitized Sky Survey (Color)");
         this.setBackgroundImageByName("Black Sky Background");
         this.setForegroundOpacity(100);
-        this.updateMoonTexture();
+        this.updateMoonTexture(true);
         
       }, 100);
 
@@ -1216,8 +1223,21 @@ export default defineComponent({
       return {
         raRad: this.sunPlace.get_RA() * 15 * D2R,
         decRad: this.sunPlace.get_dec() * D2R,
-        altRad: sunAltAz.altRad,
-        azRad: sunAltAz.azRad
+        ...sunAltAz
+      };
+    },
+
+    moonPosition(): EquatorialRad & HorizontalRad {
+      const moonAltAz = this.equatorialToHorizontal(this.moonPlace.get_RA() * 15 * D2R,
+        this.moonPlace.get_dec() * D2R,
+        this.location.latitudeRad,
+        this.location.longitudeRad,
+        this.dateTime);
+
+      return {
+        raRad: this.moonPlace.get_RA() * 15 * D2R,
+        decRad: this.moonPlace.get_dec() * D2R,
+        ...moonAltAz
       };
     },
 
@@ -1277,10 +1297,13 @@ export default defineComponent({
       return Texture.fromUrl(require(`./assets/${assetFilename}`));
     },
 
-    updateMoonTexture() {
-      // Weird condition - are we even using showSky?
-      const filename = (this.showHorizon && this.showSky) ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
-      Planets['_planetTextures'][9] = this.textureFromAssetImage(filename);
+    updateMoonTexture(force=false) {
+      // Are we even using showSky?
+      const filename = (this.showHorizon && this.showSky) && this.moonPosition.altRad > 0 ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      if (force || (filename !== this.moonTexture && Planets._planetTextures)) {
+        Planets._planetTextures[9] = this.textureFromAssetImage(filename);
+        this.moonTexture = filename;
+      }
     },
 
     clearPlayingInterval() {
@@ -1818,19 +1841,22 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
     },
+
     showEcliptic(show: boolean) {
       this.wwtSettings.set_showEcliptic(show);
       this.wwtSettings.set_showEclipticOverviewText(false);
     },
+
     showHorizon(_show: boolean) {
       this.updateHorizon();
       this.updateMoonTexture();
     },
+
     showSky(_show: boolean) {
       this.updateHorizon();
       this.updateMoonTexture();
     },
-    
+
     dateTime(_date: Date) {
       this.updateForDateTime();
     },
@@ -1930,6 +1956,7 @@ export default defineComponent({
       
       const sunAlt = pos.altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.updateMoonTexture();
 
       function dssOpacity(alt: number) {
         if (alt > 0) {
