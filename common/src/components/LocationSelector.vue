@@ -298,5 +298,38 @@ export default defineComponent({
   margin: auto;
   padding: 5px 0px;
   border-radius: 5px;
+  
+  .leaflet-bottom.leaflet-right::before {
+    content: " Credit: © Leaflet.js";
+    top: 100%;
+    left: 100%;
+    transform: translate(-100%, -100%);
+    pointer-events: auto;
+  }
+
+  .leaflet-bottom.leaflet-right::before {
+    /* match formatting for actual attribution */
+    color: #0078a8;
+    background-color: rgba(255,255,255,0.8);
+    font-size: 0.75em;
+    padding-inline: 0.5em;
+    padding-block: 0.3em;
+  }
+
+  .leaflet-bottom.leaflet-right:hover::before {
+    content: "";
+    background-color: transparent;
+  }
+
+  .leaflet-bottom.leaflet-right:hover > .leaflet-control-attribution {
+    display: block;
+  }
+
+
+  .leaflet-control-attribution {
+    display: none;
+  }
+
+  
 }
 </style>
