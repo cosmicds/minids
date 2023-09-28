@@ -103,22 +103,6 @@
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :tooltip-location="'bottom'"
               ></icon-button>
-              <icon-button
-                v-model="showVideoSheet"
-                fa-icon="video"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Watch video"
-                :tooltip-location="'bottom'"
-              >
-              </icon-button>
-              <icon-button
-                fa-icon="question"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-location="'bottom'"
-                @activate="() => { inIntro=true; introSlide = 2 }"
-              ></icon-button>
             </div>
           <!-- </v-col> -->
         </v-row>
@@ -206,7 +190,51 @@
         v-click-outside="closeSplashScreen"
         :style="cssVars"
       >
-        Splash Screen
+      <div
+          id="first-splash-row"
+        >
+          <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >&times;</div>
+          <div id="splash-screen-text">
+            <p>WATCH the October </p>
+            <p class="highlight"> Annular Eclipse </p>
+          </div>
+        </div>
+        
+        <div id="splash-screen-guide">
+          <v-row>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="rocket"
+              /> Explore the view 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="puzzle-piece"
+              /> Identify the path 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="location-dot"
+              /> Choose any location 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="book-open"
+              /> Learn more 
+            </v-col>
+        </v-row>
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
+          
+          <div id="splash-screen-icons">
+            <mini-credits/>
+          </div>
+        </div>
       </div>
     </v-overlay>
 
@@ -575,33 +603,6 @@
       </div>
     </div>
 
-    <!-- This contains the video that is displayed when the video icon is clicked. -->
-
-    <v-dialog
-      id="video-container"
-      v-model="showVideoSheet"
-      transition="slide-y-transition"
-      fullscreen
-    >
-      <div class="video-wrapper">
-        <font-awesome-icon
-          id="video-close-icon"
-          class="close-icon"
-          icon="times"
-          size="lg"
-          @click="showVideoSheet = false"
-          @keyup.enter="showVideoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <video
-          controls
-          id="info-video"
-        >
-          <source src="" type="video/mp4">
-        </video>
-      </div>
-    </v-dialog>
-
     <!-- This contains the informational content that is displayed when the book icon is clicked. -->
 
     <v-dialog
@@ -849,7 +850,6 @@ export default defineComponent({
 
       showMapTooltip: false,
       showTextTooltip: false,
-      showVideoTooltip: false,
       showControls: true, 
       showMapSelector: false,
       showLocationSelector: false,
@@ -999,6 +999,7 @@ export default defineComponent({
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
+      moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
@@ -1161,6 +1162,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
+        '--moon-color': this.moonColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
@@ -1190,18 +1192,6 @@ export default defineComponent({
       },
       set(_value: boolean) {
         this.selectSheet('text');
-      }
-    },
-    showVideoSheet: {
-      get(): boolean {
-        return this.sheet === "video";
-      },
-      set(value: boolean) {
-        this.selectSheet('video');
-        if (!value) {
-          const video = document.querySelector("#info-video") as HTMLVideoElement;
-          video.pause();
-        }
       }
     },
 
@@ -2392,6 +2382,7 @@ body {
 }
 
 #splash-screen {
+  color: var(--moon-color);
   max-height: calc(min(90vh, 2040px));
   max-width: 90vw;
   background-color: black;
@@ -2403,32 +2394,92 @@ body {
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-}
 
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
+  div {
+    margin-inline: auto;
+    text-align: center;
+  }
+  // make a paragraph inside the div centered horizontally and vertically
+  p {
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
+  }
+    
+  p.highlight {
+    color: var(--moon-color);
+    -webkit-text-stroke: 0.1px var(--accent-color);
+    filter: drop-shadow(0px 0px 0.25em var(--accent-color));
 
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
+    // make uppercase
+    font-size: 1.15em;
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: .75em;
+    font-weight: bold;
+  }
 
-#video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0px;
-  z-index: 1000;
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    text-align: end;
+    margin-top: 0%;
+    margin-right: 6%;
+    color: var(--accent-color-2);
+    font-size: min(8vw, 5vh);
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  #splash-screen-guide {
+    margin-block: 1em;
+    font-size: .6em;
+    width: 75%;
+
+    .v-col{
+      padding: 0;
+    }
+    
+    .svg-inline--fa {
+      color:var(--accent-color);
+      margin: 0 10px;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    font-size: .5em;
+    width: 70%; 
+  }
+
+  #splash-screen-icons {
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+    
+    #credits {
+      background-color: transparent;
+      border: 2px solid transparent;
+    }
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--accent-color-3);
+    white-space: nowrap;
+  }
 }
 
 .bottom-sheet {
