@@ -1308,6 +1308,16 @@ export default defineComponent({
       });
     },
 
+    async centerSun(): Promise<void> {
+      return this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: true,
+        trackObject: this.trackingSun
+      });
+    },
+
+
     onWWTRenderFrame(wwtControl: WWTControl) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1943,6 +1953,8 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateHorizon();
       });
+
+      this.centerSun();
     },
 
     selectedLocation(locname: string) {
