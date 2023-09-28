@@ -300,7 +300,7 @@ export default defineComponent({
   border-radius: 5px;
   
   .leaflet-bottom.leaflet-right::before {
-    content: "&copy; Credit: Leaflet.js";
+    content: " Credit: © Leaflet.js";
     top: 100%;
     left: 100%;
     transform: translate(-100%, -100%);
