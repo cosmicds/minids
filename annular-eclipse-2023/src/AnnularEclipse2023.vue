@@ -324,11 +324,11 @@
             }"
         > </v-chip>
         <v-chip 
-          prepend-icon="mdi-clock"
+          prepend-icon="mdi-calendar"
           variant="outlined"
           size="small"
           elevation="2"
-          :text="selectedLocaledTimeDateString"
+          :text="selectedLocalDateString"
         > </v-chip>
       </div>
       <div id="top-switches">
@@ -513,7 +513,7 @@
             hide-details
             track-size="4px"
             thumb-size="14px"
-            thumb-label
+            thumb-label="always"
             :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
@@ -1139,6 +1139,10 @@ export default defineComponent({
       return getTimezoneOffset(this.selectedTimezone);
     },
 
+    selectedLocalDateString() {
+      return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MMMM dd, yyyy');
+    },
+    
     selectedLocaledTimeDateString() {
       return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
     },
@@ -1373,7 +1377,8 @@ export default defineComponent({
     },
 
     toTimeString(date: Date) {
-      return this.toLocaleTimeString(date);
+      // return this.toLocaleTimeString(date);
+      return formatInTimeZone(date, this.selectedTimezone, 'h:mm aaa (zzz)');
     },
 
     closeSplashScreen() {
