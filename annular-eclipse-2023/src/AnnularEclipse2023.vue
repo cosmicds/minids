@@ -790,6 +790,8 @@ type HorizontalRad = {
   azRad: number;
 };
 
+let queryData: LocationDeg | null = null;
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -863,11 +865,14 @@ export default defineComponent({
       timeOfDay: { hours: annularEclipseTimeNMTZ.getHours(), minutes: annularEclipseTimeNMTZ.getMinutes(), seconds: annularEclipseTimeNMTZ.getSeconds() },
       selectedTime: _annularEclipseTimeUTC.getTime(), //1697302060000,
       selectedTimezone: "America/Denver",
-      location: {
+      location: queryData ? {
+        latitudeRad: D2R * queryData.latitudeDeg,
+        longitudeRad: D2R * queryData.longitudeDeg
+      } : {
         latitudeRad: D2R * 35.106766,
         longitudeRad: D2R * -106.629181
       } as LocationRad,
-      selectedLocation: "Albuquerque, NM",
+      selectedLocation: queryData ? "User Selected" : "Albuquerque, NM",
       locationErrorMessage: "",
       
       syncDateTimeWithWWTCurrentTime: true,
@@ -882,7 +887,7 @@ export default defineComponent({
         ...initialView
       },
 
-      userSelectedMapOptions: initialView,
+      userSelectedMapOptions: queryData ? { ...queryData, initialZoom: 5 } : initialView,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
@@ -981,7 +986,7 @@ export default defineComponent({
         radius: 5
       },
 
-      learnerPath: "Explore" as LearnerPath,
+      learnerPath: (queryData ? "Choose" : "Explore") as LearnerPath,
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -1022,8 +1027,20 @@ export default defineComponent({
       speedIndex: 3,
 
       sunPlace,
-      moonPlace
+      moonPlace,
+
+      queryData
     };
+  },
+
+  beforeCreate() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const lat = parseFloat(searchParams.get("lat") ?? "");
+    const lon = parseFloat(searchParams.get("lon") ?? "");
+    if (lat && lon) {
+      queryData = { latitudeDeg: lat, longitudeDeg: lon };
+    }
+
   },
 
   created() {
@@ -1089,16 +1106,6 @@ export default defineComponent({
       this.setBackgroundImageByName("Black Sky Background");
       this.setForegroundOpacity(100);
       this.updateMoonTexture(true);
-
-      // Handle URL lat/long parameters
-      // We need to do this after the forced render
-      const searchParams = new URLSearchParams(window.location.search);
-      const lat = parseFloat(searchParams.get("lat") ?? "");
-      const lon = parseFloat(searchParams.get("lon") ?? "");
-      if (lat && lon) {
-        this.selectedLocation = "User Selected";
-        this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
-      }
 
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
