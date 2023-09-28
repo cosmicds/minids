@@ -1,9 +1,9 @@
 <template>
   <div id="credits" class="ui-text">
     <div id="icons-container">
-      <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
+      <!-- <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
         ><img alt="CosmicDS Logo" :src="require('../../../assets/cosmicds_logo_for_dark_backgrounds.png')"
-      /></a>
+      /></a> -->
       <!-- <a href="https://worldwidetelescope.org/home/" target="_blank"
         ><img alt="WWT Logo" src="../../../assets/logo_wwt.png"
       /></a>
