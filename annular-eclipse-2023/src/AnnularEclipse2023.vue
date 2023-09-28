@@ -2464,7 +2464,8 @@ body {
     
   p.highlight {
     color: var(--moon-color);
-    -webkit-text-stroke: 0.5px var(--accent-color);
+    -webkit-text-stroke: 0.1px var(--accent-color);
+    filter: drop-shadow(0px 0px 0.25em var(--accent-color));
 
     // make uppercase
     font-size: 1.15em;
