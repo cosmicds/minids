@@ -206,7 +206,51 @@
         v-click-outside="closeSplashScreen"
         :style="cssVars"
       >
-        Splash Screen
+      <div
+          id="first-splash-row"
+        >
+          <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >&times;</div>
+          <div id="splash-screen-text">
+            <p>WATCH the October </p>
+            <p class="highlight"> Annular Eclipse </p>
+          </div>
+        </div>
+        
+        <div id="splash-screen-guide">
+          <v-row>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="rocket"
+              /> Explore the view 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="puzzle-piece"
+              /> Identify the path 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="location-dot"
+              /> Choose any location 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="book-open"
+              /> Learn more 
+            </v-col>
+        </v-row>
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
+          
+          <div id="splash-screen-icons">
+            <mini-credits/>
+          </div>
+        </div>
       </div>
     </v-overlay>
 
@@ -840,7 +884,7 @@ export default defineComponent({
     };
 
     return {
-      showSplashScreen: false, // FIX later
+      showSplashScreen: true, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -999,6 +1043,7 @@ export default defineComponent({
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
+      moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
@@ -1161,6 +1206,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
+        '--moon-color': this.moonColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
       };
@@ -2392,6 +2438,7 @@ body {
 }
 
 #splash-screen {
+  color: var(--moon-color);
   max-height: calc(min(90vh, 2040px));
   max-width: 90vw;
   background-color: black;
@@ -2403,6 +2450,91 @@ body {
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+
+  div {
+    margin-inline: auto;
+    text-align: center;
+  }
+  // make a paragraph inside the div centered horizontally and vertically
+  p {
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
+  }
+    
+  p.highlight {
+    color: var(--moon-color);
+    -webkit-text-stroke: 0.5px var(--accent-color);
+
+    // make uppercase
+    font-size: 1.15em;
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: .75em;
+    font-weight: bold;
+  }
+
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    text-align: end;
+    margin-top: 0%;
+    margin-right: 6%;
+    color: var(--accent-color-2);
+    font-size: min(8vw, 5vh);
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  #splash-screen-guide {
+    margin-block: 1em;
+    font-size: .6em;
+    width: 75%;
+
+    .v-col{
+      padding: 0;
+    }
+    
+    .svg-inline--fa {
+      color:var(--accent-color);
+      margin: 0 10px;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    font-size: .5em;
+    width: 70%; 
+  }
+
+  #splash-screen-icons {
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+    
+    #credits {
+      background-color: transparent;
+      border: 2px solid transparent;
+    }
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--accent-color-3);
+    white-space: nowrap;
+  }
 }
 
 .video-wrapper {
