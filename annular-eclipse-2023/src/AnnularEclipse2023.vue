@@ -1936,6 +1936,7 @@ export default defineComponent({
       }
 
       this.selectedTimezone = tzlookup(...locationDeg);
+      this.playing = false;
       this.updateWWTLocation();
 
       // We need to let the location update before we redraw the horizon
