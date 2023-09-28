@@ -103,13 +103,6 @@
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :tooltip-location="'bottom'"
               ></icon-button>
-              <icon-button
-                fa-icon="question"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-location="'bottom'"
-                @activate="() => { inIntro=true; introSlide = 2 }"
-              ></icon-button>
             </div>
           <!-- </v-col> -->
         </v-row>
@@ -857,7 +850,6 @@ export default defineComponent({
 
       showMapTooltip: false,
       showTextTooltip: false,
-      showVideoTooltip: false,
       showControls: true, 
       showMapSelector: false,
       showLocationSelector: false,
