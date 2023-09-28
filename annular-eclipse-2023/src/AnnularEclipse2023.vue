@@ -2220,7 +2220,7 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   gap: 10px;
 
