@@ -374,7 +374,6 @@
                 <v-switch
                   inset
                   hide-details
-                  :disabled="viewerMode=='SunScope'"
                   v-model="toggleTrackSun"
                   :ripple="false"
                   :color="accentColor"
