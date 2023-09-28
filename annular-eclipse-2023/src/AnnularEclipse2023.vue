@@ -1041,7 +1041,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: false,
+      inIntro: true,
 
       tab: 0,
       introSlide: 1,
@@ -2918,21 +2918,30 @@ body {
   width: 75%;
   height: fit-content;
   // outline: 5px solid var(--accent-color);
-  border-radius: 2em;
+  border-radius: 1em;
   padding: 2em;
-  font-size: 1em;
+
   // rotated translucent background gradient
   background: linear-gradient(45deg,
-                            rgb(15, 32, 39), 
-                            rgb(32, 58, 67), 
-                            rgba(44, 83, 100));
+                            rgb(14, 30, 40), 
+                            rgb(22, 50, 65), 
+                            rgb(30 70 90));
+
+  
+  @media (max-width: 750px){ //SMALL
+    font-size: 0.7em;    
+    }
+
+  @media (min-width: 751px){ //LARGE
+      font-size: 1em;
+  }
 
   .v-list-item__prepend {
     margin-right: 0.75em;
   }
   
   .intro-text {
-    color: var(--accent-color);
+    color: white;
   }
   
   div#intro-bottom-controls {
@@ -2941,8 +2950,26 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+
     gap: 1em;
     margin-top:1em;
+
+    .v-btn.v-btn--density-default {
+        max-height: 8em;
+      }  
+        
+    @media (max-width: 750px){ //SMALL
+      .v-btn--size-default {
+      font-size: 0.3em;
+      }  
+    }
+
+    @media (min-width: 751px){ //LARGE
+      .v-btn--size-default {
+      font-size: 0.8em;
+      }    
+    }
+
   
     #intro-reminder {
       outline: 1px solid red;
