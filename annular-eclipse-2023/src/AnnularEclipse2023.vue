@@ -103,31 +103,6 @@
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :tooltip-location="'bottom'"
               ></icon-button>
-              <icon-button
-                v-model="showVideoSheet"
-                fa-icon="video"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Watch video"
-                :tooltip-location="'bottom'"
-              >
-              </icon-button>
-              <icon-button
-                fa-icon="sun"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Center view on Sun"
-                :tooltip-location="'bottom'"
-                @activate="() => trackSun()"
-              >
-              </icon-button>
-              <icon-button
-                fa-icon="question"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-location="'bottom'"
-                @activate="() => { inIntro=true; introSlide = 2 }"
-              ></icon-button>
             </div>
           <!-- </v-col> -->
         </v-row>
@@ -139,7 +114,7 @@
             :model-value="locationDeg"
             @place="(place: typeof places[number]) => updateLocation(place.name)"
             :detect-location="false"
-            :map-options="mapOptions"
+            :map-options="presetMapOptions"
             :places="places"
             :initial-place="places.find(p => p.name === 'selectedLocation')"
             :place-circle-options="placeCircleOptions"
@@ -157,6 +132,7 @@
             :model-value="locationDeg"
             @update:modelValue="updateLocationFromMap"
             :detect-location="false"
+            :map-options="userSelectedMapOptions"
             :selected-circle-options="selectedCircleOptions"
             class="leaflet-map"
           ></location-selector>
@@ -361,7 +337,51 @@
         v-click-outside="closeSplashScreen"
         :style="cssVars"
       >
-        Splash Screen
+      <div
+          id="first-splash-row"
+        >
+          <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >&times;</div>
+          <div id="splash-screen-text">
+            <p>WATCH the October </p>
+            <p class="highlight"> Annular Eclipse </p>
+          </div>
+        </div>
+        
+        <div id="splash-screen-guide">
+          <v-row>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="rocket"
+              /> Explore the view 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="puzzle-piece"
+              /> Identify the path 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="location-dot"
+              /> Choose any location 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="book-open"
+              /> Learn more 
+            </v-col>
+        </v-row>
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
+          
+          <div id="splash-screen-icons">
+            <mini-credits/>
+          </div>
+        </div>
       </div>
     </v-overlay>
 
@@ -491,34 +511,80 @@
           :text="selectedLocaledTimeDateString"
         > </v-chip>
       </div>
-      <v-tooltip
-          location="right"
-          :color="accentColor"
-          :style="cssVars"
-        >
-        <template v-slot:activator="{props}">
-          <div 
-            v-bind="props"
-            id="viewer-mode-switch"
-            >
+      <div id="top-switches">
+        <v-tooltip
+            location="left"
+            :color="accentColor"
+            :style="cssVars"
+          >
+          <template v-slot:activator="{props}">
+            <div 
+              v-bind="props"
+              id="viewer-mode-switch"
+              >
+              
+              <v-switch
+                inset
+                hide-details
+                :ripple="false"
+                v-model="viewerMode"
+                :color="accentColor"
+                false-value="SunScope"
+                false-icon="mdi-telescope"
+                true-value="Horizon"
+                true-icon="mdi-image-filter-hdr"
+              >
+              </v-switch>
             
+            </div>
+          </template>
+          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+        </v-tooltip>
+
+        <div id="track-sun-switch"> 
+          <v-tooltip
+              location="left"
+              :color="accentColor"
+              :style="cssVars"
+            >
+            <template v-slot:activator="{props}">
+              <div 
+                v-bind="props"
+                v-if="viewerMode=='Horizon'"
+              >
+                <v-switch
+                  inset
+                  hide-details
+                  v-model="toggleTrackSun"
+                  :ripple="false"
+                  :color="accentColor"
+                  true-icon="mdi-white-balance-sunny"
+                  false-icon="mdi-image"
+                >
+                </v-switch>
+                
+              </div>
+            </template>
+            {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
+          </v-tooltip>
+
+          <div 
+            v-if="viewerMode=='SunScope'"
+          >
             <v-switch
               inset
               hide-details
+              disabled
+              v-model="toggleTrackSun"
               :ripple="false"
-              v-model="viewerMode"
               :color="accentColor"
-              false-value="SunScope"
-              false-icon="mdi-telescope"
-              true-value="Horizon"
-              true-icon="mdi-image-filter-hdr"
+              true-icon="mdi-target"
+              false-icon="mdi-image"
             >
             </v-switch>
-          
           </div>
-        </template>
-        Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-      </v-tooltip>
+        </div>
+      </div>
     </div>
     
     <div class="bottom-content">
@@ -627,7 +693,7 @@
             hide-details
             track-size="4px"
             thumb-size="14px"
-            thumb-label="always"
+            thumb-label
             :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
@@ -690,33 +756,6 @@
       </div>
     </div>
 
-    <!-- This contains the video that is displayed when the video icon is clicked. -->
-
-    <v-dialog
-      id="video-container"
-      v-model="showVideoSheet"
-      transition="slide-y-transition"
-      fullscreen
-    >
-      <div class="video-wrapper">
-        <font-awesome-icon
-          id="video-close-icon"
-          class="close-icon"
-          icon="times"
-          size="lg"
-          @click="showVideoSheet = false"
-          @keyup.enter="showVideoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <video
-          controls
-          id="info-video"
-        >
-          <source src="" type="video/mp4">
-        </video>
-      </div>
-    </v-dialog>
-
     <!-- This contains the informational content that is displayed when the book icon is clicked. -->
 
   <notifications group="copy-url" position="top right" />
@@ -737,13 +776,9 @@ import tzlookup from "tz-lookup";
 
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
-// interface MoveOptions {
-//   instant?: boolean;
-//   zoomDeg?: number;
-//   rollRad?: number;
-// }
-
 type SheetType = "text" | "video" | null;
+type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
+type ViewerMode = "Horizon" | "SunScope";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -809,10 +844,6 @@ export default defineComponent({
   extends: MiniDSBase,
   
   props: {
-    // wtml: {
-    //   type: Object,
-    //   required: true
-    // },
     wwtNamespace: {
       type: String,
       required: true
@@ -846,6 +877,18 @@ export default defineComponent({
     sunPlace.set_target(SolarSystemObjects.sun);
     sunPlace.set_zoomLevel(20);
 
+    const moonPlace = new Place();
+    moonPlace.set_names(["Moon"]);
+    moonPlace.set_classification(Classification.solarSystem);
+    moonPlace.set_target(SolarSystemObjects.moon);
+    const initialView = {
+      initialLocation: {
+        latitudeDeg: 38,
+        longitudeDeg: -97
+      },
+      initialZoom: 3
+    };
+
     return {
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
@@ -856,7 +899,6 @@ export default defineComponent({
 
       showMapTooltip: false,
       showTextTooltip: false,
-      showVideoTooltip: false,
       showControls: true, 
       showMapSelector: false,
       showLocationSelector: false,
@@ -880,13 +922,16 @@ export default defineComponent({
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
-      mapOptions: {
+      presetMapOptions: {
         templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
         minZoom: 1,
         maxZoom: 16,
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        ext: 'jpg'
+        ext: 'jpg',
+        ...initialView
       },
+
+      userSelectedMapOptions: initialView,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
@@ -985,7 +1030,7 @@ export default defineComponent({
         radius: 5
       },
 
-      learnerPath: "Explore", // Choose or Learn
+      learnerPath: "Explore" as LearnerPath,
       
       playing: false,
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
@@ -995,12 +1040,15 @@ export default defineComponent({
       showHorizon: true,
       showEcliptic: false,    
       
+      toggleTrackSun: true,
+      
       times: times, 
       minTime: minTime,
       maxTime: maxTime,
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
       accentColor: "#ef7e3d",
+      moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
@@ -1008,7 +1056,7 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
-      viewerMode: 'Horizon' as  'Horizon' | 'SunScope',
+      viewerMode: 'Horizon' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -1016,13 +1064,15 @@ export default defineComponent({
       skyColor: "#4190ED",
       skyOpacity: 0.6,
       horizonOpacity: 1,
+      moonTexture: 'moon-sky-blue-overlay.png' as 'moon-sky-blue-overlay.png' | 'moon-dark-gray-overlay.png',
 
       playbackRate: 1,
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
 
-      sunPlace
+      sunPlace,
+      moonPlace
     };
   },
 
@@ -1035,13 +1085,7 @@ export default defineComponent({
       };
     });
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(searchParams.get("lat") ?? "");
-    const lon = parseFloat(searchParams.get("lon") ?? "");
-    if (lat && lon) {
-      this.selectedLocation = "User Selected";
-      this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
-    }
+
   },
 
   mounted() {
@@ -1081,19 +1125,34 @@ export default defineComponent({
       // @ts-ignore
       this.wwtControl.renderOneFrame = renderOneFrame.bind(this.wwtControl);
 
+      // Force the render of one frame so that planet textures will be loaded
+      // We don't want to attach the callback before this so that we don't mess up sun tracking
+      this.wwtControl.renderOneFrame();
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.wwtControl.renderFrameCallback = this.onWWTRenderFrame;
+
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
+      this.setForegroundImageByName("Digitized Sky Survey (Color)");
+      this.setBackgroundImageByName("Black Sky Background");
+      this.setForegroundOpacity(100);
+      this.updateMoonTexture(true);
+
+      // Handle URL lat/long parameters
+      // We need to do this after the forced render
+      const searchParams = new URLSearchParams(window.location.search);
+      const lat = parseFloat(searchParams.get("lat") ?? "");
+      const lon = parseFloat(searchParams.get("lon") ?? "");
+      if (lat && lon) {
+        this.selectedLocation = "User Selected";
+        this.locationDeg = { latitudeDeg: lat, longitudeDeg: lon };
+      }
+
       this.updateWWTLocation();
       this.setClockSync(false); // set to false to pause
       this.setClockRate(1); //
-
-      setTimeout(() => {
-        /* eslint-disable @typescript-eslint/no-var-requires */
-        Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
-        this.trackSun().then(() => this.positionSet = true);
-        this.setForegroundImageByName("Digitized Sky Survey (Color)");
-        this.setBackgroundImageByName("Black Sky Background");
-        this.setForegroundOpacity(100);
-        
-      }, 100);
 
       this.playbackRate = 1;  //this.setplaybackRate('8 minutes per second'); // 500;
       
@@ -1105,6 +1164,7 @@ export default defineComponent({
       } else {
         this.startHorizonMode();
       }
+      this.trackSun().then(() => this.positionSet = true);
 
       this.setTimeforSunAlt(10); // 10 degrees above horizon
       
@@ -1152,7 +1212,7 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
         '--app-content-height': this.showTextSheet ? '100%' : '100%',
-        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
+        '--moon-color': this.moonColor,
       };
     },
     wwtControl(): WWTControl {
@@ -1182,18 +1242,6 @@ export default defineComponent({
         this.selectSheet('text');
       }
     },
-    showVideoSheet: {
-      get(): boolean {
-        return this.sheet === "video";
-      },
-      set(value: boolean) {
-        this.selectSheet('video');
-        if (!value) {
-          const video = document.querySelector("#info-video") as HTMLVideoElement;
-          video.pause();
-        }
-      }
-    },
 
     locationDeg: {
       get(): LocationDeg {
@@ -1220,7 +1268,7 @@ export default defineComponent({
       return MILLISECONDS_PER_INTERVAL / minDuration;
     },
     
-    sunPosition() {
+    sunPosition(): EquatorialRad & HorizontalRad {
       const sunAltAz = this.equatorialToHorizontal(this.sunPlace.get_RA() * 15 * D2R,
         this.sunPlace.get_dec() * D2R,
         this.location.latitudeRad,
@@ -1228,10 +1276,23 @@ export default defineComponent({
         this.dateTime);
 
       return {
-        'raRad': this.sunPlace.get_RA() * 15 * D2R,
-        'decRad': this.sunPlace.get_dec() * D2R,
-        'altRad': sunAltAz.altRad,
-        'azRad': sunAltAz.azRad
+        raRad: this.sunPlace.get_RA() * 15 * D2R,
+        decRad: this.sunPlace.get_dec() * D2R,
+        ...sunAltAz
+      };
+    },
+
+    moonPosition(): EquatorialRad & HorizontalRad {
+      const moonAltAz = this.equatorialToHorizontal(this.moonPlace.get_RA() * 15 * D2R,
+        this.moonPlace.get_dec() * D2R,
+        this.location.latitudeRad,
+        this.location.longitudeRad,
+        this.dateTime);
+
+      return {
+        raRad: this.moonPlace.get_RA() * 15 * D2R,
+        decRad: this.moonPlace.get_dec() * D2R,
+        ...moonAltAz
       };
     },
 
@@ -1252,6 +1313,17 @@ export default defineComponent({
       }
     },
 
+    trackingSun: {
+      set(value: boolean) {
+        this.toggleTrackSun = value;
+      },
+      
+      get(): boolean {
+        // do something more useful later
+        return this.toggleTrackSun;
+      }
+      
+    },
     defaultRate(): number {
       return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
     },
@@ -1264,9 +1336,32 @@ export default defineComponent({
       return this.gotoTarget({
         place: this.sunPlace,
         instant: true,
-        noZoom: false,
+        noZoom: true,
         trackObject: true
       });
+    },
+
+    onWWTRenderFrame(wwtControl: WWTControl) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.trackingSun = wwtControl._trackingObject === this.sunPlace;
+    },
+
+    textureFromAssetImage(assetFilename: string): Texture {
+      /* eslint-disable @typescript-eslint/no-var-requires */
+      return Texture.fromUrl(require(`./assets/${assetFilename}`));
+    },
+
+    updateMoonTexture(force=false) {
+      // Are we even using showSky?
+      const blueMoon = (this.showHorizon && this.showSky) &&
+                       this.moonPosition.altRad > 0 &&
+                       this.viewerMode !== 'SunScope';
+      const filename = blueMoon ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      if (force || (filename !== this.moonTexture && Planets._planetTextures)) {
+        Planets._planetTextures[9] = this.textureFromAssetImage(filename);
+        this.moonTexture = filename;
+      }
     },
 
     clearPlayingInterval() {
@@ -1602,16 +1697,22 @@ export default defineComponent({
 
 
     updateForDateTime() {
-      this.syncDateTimeWithWWTCurrentTime ? this.setTime(this.dateTime) : null;
+      if (this.syncDateTimeWithWWTCurrentTime) {
+        this.setTime(this.dateTime);
+      }
       this.updateHorizon(this.dateTime); 
     },
 
     updateHorizon(when: Date | null = null) {
-      this.removeAnnotations();
-      if (this.showHorizon) {
-        this.createHorizon(when);
-        if (this.showSky) {
-          this.createSky(when);
+      try {
+        this.removeAnnotations();
+      }
+      finally {
+        if (this.showHorizon) {
+          this.createHorizon(when);
+          if (this.showSky) {
+            this.createSky(when);
+          }
         }
       }
     },
@@ -1670,7 +1771,12 @@ export default defineComponent({
       // this.setForegroundOpacity(100);
       this.sunPlace.set_zoomLevel(20); // the original default value
       // track sun
-      this.trackSun();
+      this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: false,
+        trackObject: true
+      });
       console.log('=== startSolarScopeMode ===');
       return;
     },
@@ -1703,8 +1809,8 @@ export default defineComponent({
       const setting = time == maxTime ? null : time;
       
       return {
-        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : (rising !== null ? rising : null),
-        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : (setting !== null ? setting : null)
+        'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : rising,
+        'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : setting
       };
     },
     
@@ -1725,10 +1831,12 @@ export default defineComponent({
         return times[0] + dt - (dt % MILLISECONDS_PER_INTERVAL);
       }
 
-      if (this.times.includes(matchTime(out.rising, this.times))) {
-        this.selectedTime = matchTime(out.rising, this.times);
-      } else if (this.times.includes(matchTime(out.setting, this.times))) {
-        this.selectedTime = matchTime(out.setting, this.times);
+      const risingTime = matchTime(out.rising, this.times);
+      const settingTime = matchTime(out.setting, this.times);
+      if (this.times.includes(risingTime)) {
+        this.selectedTime = risingTime;
+      } else if (this.times.includes(settingTime)) {
+        this.selectedTime = settingTime;
       } else {
         console.log("time not in times array");
         // best to leave it alone so it doesn't jump around
@@ -1797,17 +1905,22 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
     },
+
     showEcliptic(show: boolean) {
       this.wwtSettings.set_showEcliptic(show);
       this.wwtSettings.set_showEclipticOverviewText(false);
     },
+
     showHorizon(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
+
     showSky(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
     },
-    
+
     dateTime(_date: Date) {
       this.updateForDateTime();
     },
@@ -1816,14 +1929,14 @@ export default defineComponent({
       return;
     },
 
-    wwtCurrentTime(_time: Date) {
-      if (_time.getTime() >= this.maxTime || _time.getTime() < this.minTime) {
+    wwtCurrentTime(time: Date) {
+      if (time.getTime() >= this.maxTime || time.getTime() < this.minTime) {
         this.setTime(new Date(this.minTime));
         return;
       }
       
-      this.selectedTime = _time.getTime();
-      this.updateHorizon(_time);
+      this.selectedTime = time.getTime();
+      this.updateHorizon(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -1869,58 +1982,73 @@ export default defineComponent({
       this.setClockSync(play);
     },
 
-    showSplashScreen(_val) {
-      if (!_val) {
+    showSplashScreen(val: boolean) {
+      if (!val) {
         this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
       }
     },
     
-    introSlide(_val) {
-      this.inIntro = _val < 4;
+    introSlide(val: number) {
+      this.inIntro = val < 4;
       return;
     },
 
-    viewerMode(mode) {
+    viewerMode(mode: ViewerMode) {
       if (mode === 'Horizon') {
         this.startHorizonMode();
       } else if (mode === 'SunScope') {
         this.horizonOpacity = 0.6;
         this.startSolarScopeMode();
       }
+      this.updateMoonTexture();
     },
 
-    skyColor(_color) {
+    skyColor(_color: string) {
       this.updateHorizon();
     },
 
-    sunAboveHorizon(isAbove) {
+    sunAboveHorizon(isAbove: boolean) {
       console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
 
-    sunPosition(pos) {
+    sunPosition(pos: EquatorialRad & HorizontalRad) {
 
       const _civilTwilight = -6 * D2R;
-      const _nauticalTwilight = 2 * _civilTwilight;
+      // const _nauticalTwilight = 2 * _civilTwilight;
       const astronomicalTwilight = 3 * _civilTwilight;
       
       const sunAlt = pos.altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.updateMoonTexture();
 
-      function dssOpacity(alt: number) {
-        if (alt > 0) {
-          return 0;
-        } else {
-          return 1 - (1 + Math.atan(Math.PI * alt / (-astronomicalTwilight))) / 2;
-        }
-      }
-      
-      this.setForegroundOpacity((dssOpacity(sunAlt)) * 100);
+      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.setForegroundOpacity(dssOpacity * 100);
       return;
     },
 
-    playbackRate(val) {
+    toggleTrackSun(val: boolean) {
+      // this turns of sun tracking
+      console.log("toggleTrackSun", val);
+      if (val) {
+        this.trackSun();
+        return;
+      } else {
+        const currentPlace = new Place();
+        currentPlace.set_RA(this.wwtRARad * R2D / 15);
+        currentPlace.set_dec(this.wwtDecRad * R2D);
+        this.gotoTarget({
+          place: currentPlace,
+          instant: true,
+          noZoom: true,
+          trackObject: false
+        });
+        return;
+      }
+    },
+    
+    playbackRate(val: number) {
       
       if (val > 11_000) {
         console.warn('playbackRate too high, setting to maxPlaybackRate');
@@ -2095,6 +2223,20 @@ body {
 
 }
 
+// these are now in #top-content
+
+#track-sun-switch {
+  // position: absolute;
+  // top: 1rem;
+  // left: 6rem;
+  pointer-events: auto;
+  .v-switch__thumb {
+    color: var(--accent-color);
+    background-color: black; 
+  }
+}
+
+
 #share-button {
   position: absolute;
   top: 0.7rem;
@@ -2109,8 +2251,9 @@ body {
   width: calc(100% - 2rem);
   pointer-events: none;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
 
   #center-buttons {
     display: flex;
@@ -2287,6 +2430,7 @@ body {
 }
 
 #splash-screen {
+  color: var(--moon-color);
   max-height: calc(min(90vh, 2040px));
   max-width: 90vw;
   background-color: black;
@@ -2298,32 +2442,92 @@ body {
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-}
 
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
+  div {
+    margin-inline: auto;
+    text-align: center;
+  }
+  // make a paragraph inside the div centered horizontally and vertically
+  p {
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
+  }
+    
+  p.highlight {
+    color: var(--moon-color);
+    -webkit-text-stroke: 0.1px var(--accent-color);
+    filter: drop-shadow(0px 0px 0.25em var(--accent-color));
 
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
+    // make uppercase
+    font-size: 1.15em;
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: .75em;
+    font-weight: bold;
+  }
 
-#video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0px;
-  z-index: 1000;
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    text-align: end;
+    margin-top: 0%;
+    margin-right: 6%;
+    color: var(--accent-color-2);
+    font-size: min(8vw, 5vh);
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  #splash-screen-guide {
+    margin-block: 1em;
+    font-size: .6em;
+    width: 75%;
+
+    .v-col{
+      padding: 0;
+    }
+    
+    .svg-inline--fa {
+      color:var(--accent-color);
+      margin: 0 10px;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    font-size: .5em;
+    width: 70%; 
+  }
+
+  #splash-screen-icons {
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+    
+    #credits {
+      background-color: transparent;
+      border: 2px solid transparent;
+    }
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--accent-color-3);
+    white-space: nowrap;
+  }
 }
 
 
@@ -2852,12 +3056,6 @@ video {
       }
     }
   
-
-  #viewer-mode-switch {
-    position: absolute;
-    margin-top: 0.5rem;
-    right: 0;
-
     .v-switch__thumb {
       color: var(--accent-color);
       background-color: black; 
@@ -2870,7 +3068,18 @@ video {
     .v-selection-control--density-default {
       --v-selection-control-size: auto;
     } 
-    }
+
+    pointer-events: auto;
+
+  #top-switches {
+    position: absolute;
+    margin-top: 0.5rem;
+    right: 0;
+  }
+
+  #track-sun-switch {
+    margin-top: 0.5rem;
+  }
 }
 
 </style>

@@ -5,6 +5,7 @@ import { LocationSelector } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import GifPlayPause from "./GifPlayPause.vue";
+import  { DefaultMiniCredits } from "@minids/common";
 
 import "./polyfills";
 
@@ -108,6 +109,7 @@ createApp(AnnularEclipse2023, {
   .component('location-selector', LocationSelector)
   .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
+  .component('mini-credits', DefaultMiniCredits)
   .component('date-picker', Datepicker)
   .component('gif-play-pause', GifPlayPause)
 
