@@ -370,11 +370,11 @@
             <template v-slot:activator="{props}">
               <div 
                 v-bind="props"
-                v-if="viewerMode=='Horizon'"
               >
                 <v-switch
                   inset
                   hide-details
+                  :disabled="viewerMode=='SunScope'"
                   v-model="toggleTrackSun"
                   :ripple="false"
                   :color="accentColor"
@@ -387,22 +387,6 @@
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
           </v-tooltip>
-
-          <div 
-            v-if="viewerMode=='SunScope'"
-          >
-            <v-switch
-              inset
-              hide-details
-              disabled
-              v-model="toggleTrackSun"
-              :ripple="false"
-              :color="accentColor"
-              true-icon="mdi-target"
-              false-icon="mdi-image"
-            >
-            </v-switch>
-          </div>
         </div>
       </div>
     </div>
