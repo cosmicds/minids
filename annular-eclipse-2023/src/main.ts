@@ -4,6 +4,7 @@ import { IconButton } from "@minids/common";
 import { LocationSelector } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 import TransitionExpand from "./TransitionExpand.vue";
+import GifPlayPause from "./GifPlayPause.vue";
 
 import "./polyfills";
 
@@ -108,6 +109,7 @@ createApp(AnnularEclipse2023, {
   .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
+  .component('gif-play-pause', GifPlayPause)
 
   // Mount
   .mount("#app");

@@ -220,7 +220,7 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
                 <v-row>
-                <v-col cols="6">
+                <v-col id="FAQ" cols="6">
                     Get ready North America for not one, but two brilliant solar eclipses! 
                     First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
                     get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
@@ -259,7 +259,8 @@
                 </v-col>
                 <v-col cols="6">
                   <figure>
-                    <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img>
+                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                    <gif-play-pause :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
                     <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
                   </figure>
                 </v-col>
@@ -2343,27 +2344,30 @@ video {
     }
   }
   
-  details {
-    font-size: 1em;
-    padding: 0.5em;
-    height: fit-content;
-    margin-block: 0.5em;
-    border-top-left-radius: 0.5em;
-    background-color: #486273;
-    
-    summary {
-      font-weight: bold;
+  #FAQ{
+  
+    details {
       font-size: 1em;
-      cursor: pointer;
-    }
-    
-    p {
-      font-size: 0.9em;
       padding: 0.5em;
-    }
-    
-    &[open] {
-      border-bottom-left-radius: 0.5em;
+      height: fit-content;
+      margin-block: 0.5em;
+      border-top-left-radius: 0.5em;
+      background-color: #486273;
+      
+      summary {
+        font-weight: bold;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      
+      p {
+        font-size: 0.9em;
+        padding: 0.5em;
+      }
+      
+      &[open] {
+        border-bottom-left-radius: 0.5em;
+      }
     }
   }
   
