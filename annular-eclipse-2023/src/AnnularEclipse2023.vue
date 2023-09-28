@@ -165,7 +165,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button">
+      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -173,11 +173,12 @@
           :focus-color="accentColor"
           background-color="transparent"
           :box-shadow="false"
+          tooltip-text="Share view of this location"
           @activate="copyShareURL"
         ></icon-button>
       </div>
     </div>
-     
+    
     <v-overlay
       :model-value="showSplashScreen"
       absolute
@@ -315,6 +316,7 @@
 
         <div id="intro-bottom-controls">
           <v-btn
+            v-if="introSlide > 1"
             id="intro-next-button"
             :color="accentColor"
             @click="introSlide--"
@@ -351,11 +353,11 @@
             }"
         > </v-chip>
         <v-chip 
-          prepend-icon="mdi-clock"
+          prepend-icon="mdi-calendar"
           variant="outlined"
           size="small"
           elevation="2"
-          :text="selectedLocaledTimeDateString"
+          :text="selectedLocalDateString"
         > </v-chip>
       </div>
       <div id="top-switches">
@@ -397,7 +399,6 @@
             <template v-slot:activator="{props}">
               <div 
                 v-bind="props"
-                v-if="viewerMode=='Horizon'"
               >
                 <v-switch
                   inset
@@ -414,22 +415,6 @@
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
           </v-tooltip>
-
-          <div 
-            v-if="viewerMode=='SunScope'"
-          >
-            <v-switch
-              inset
-              hide-details
-              disabled
-              v-model="toggleTrackSun"
-              :ripple="false"
-              :color="accentColor"
-              true-icon="mdi-target"
-              false-icon="mdi-image"
-            >
-            </v-switch>
-          </div>
         </div>
       </div>
     </div>
@@ -540,7 +525,7 @@
             hide-details
             track-size="4px"
             thumb-size="14px"
-            thumb-label
+            thumb-label="always"
             :step="millisecondsPerInterval"
             >
             <template v-slot:thumb-label="item">
@@ -1139,6 +1124,10 @@ export default defineComponent({
       return getTimezoneOffset(this.selectedTimezone);
     },
 
+    selectedLocalDateString() {
+      return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MMMM dd, yyyy');
+    },
+    
     selectedLocaledTimeDateString() {
       return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
     },
@@ -1293,6 +1282,16 @@ export default defineComponent({
       });
     },
 
+    async centerSun(): Promise<void> {
+      return this.gotoTarget({
+        place: this.sunPlace,
+        instant: true,
+        noZoom: true,
+        trackObject: this.trackingSun
+      });
+    },
+
+
     onWWTRenderFrame(wwtControl: WWTControl) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1362,7 +1361,8 @@ export default defineComponent({
     },
 
     toTimeString(date: Date) {
-      return this.toLocaleTimeString(date);
+      // return this.toLocaleTimeString(date);
+      return formatInTimeZone(date, this.selectedTimezone, 'h:mm aaa (zzz)');
     },
 
     closeSplashScreen() {
@@ -1883,7 +1883,14 @@ export default defineComponent({
 
     wwtCurrentTime(time: Date) {
       if (time.getTime() >= this.maxTime || time.getTime() < this.minTime) {
-        this.setTime(new Date(this.minTime));
+        if (this.playing) {
+          this.playing = false;
+          this.selectedTime = this.minTime;
+          setTimeout(() => {
+            this.playing = true;
+          }, 1000);
+        }
+        
         return;
       }
       
@@ -1913,12 +1920,15 @@ export default defineComponent({
       }
 
       this.selectedTimezone = tzlookup(...locationDeg);
+      this.playing = false;
       this.updateWWTLocation();
 
       // We need to let the location update before we redraw the horizon
       this.$nextTick(() => {
         this.updateHorizon();
       });
+
+      this.centerSun();
     },
 
     selectedLocation(locname: string) {
@@ -2189,10 +2199,15 @@ body {
 }
 
 
-#share-button {
+#share-button-wrapper {
   position: absolute;
   top: 0.7rem;
-  right: 1rem;
+  left: 1rem;
+  
+  .icon-wrapper {
+    padding-inline: 7px 8px;
+    width: 2.5rem;
+  }
 
 }
 
@@ -2613,7 +2628,7 @@ body {
 }
 
 #guided-content-container {
-  --top-content-max-height: 35%;
+  --top-content-max-height: max(30vmin, 35vh);
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
   --container-padding: 0.5rem;
@@ -2622,7 +2637,7 @@ body {
   padding: var(--container-padding);
 
   width: calc(100% - 2*var(--margin));
-  // max-height: var(--top-content-max-height);
+  max-height: var(--top-content-max-height);
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
@@ -2630,7 +2645,15 @@ body {
   user-select: none;
   border: solid 1px var(--accent-color);
   
+  font-size: clamp(8px, 3vmin, 0.9em);
+  overflow-y: auto;
+  
   transition: height 0.5s ease-in-out;
+
+  > div.v-row {
+    height: 100%;
+    display: flex;
+  }
 
   .v-row {
     margin: 0px;
@@ -2684,11 +2707,6 @@ body {
     
     // .v-row.non-map-row#instructions-row
   #instructions-row { 
-    font-size: 0.9em; // just putting this here explicitly
-    
-    @media (max-width: 750px){ //SMALL
-      font-size: 0.75rem;
-    }
     
     // v-col
     #top-container-main-text { 
@@ -2716,32 +2734,24 @@ body {
   }
 
   #button-row {
+    align-self: flex-end;
     #top-container-buttons{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    
     flex-grow: 1;
-    
-    
-    @media (max-width: 750px) {
-      flex-wrap: wrap;
-      flex-basis: 2.5rem;
-      justify-content: space-around;
-    }
-
-      
+    gap: 0.5em;
+          
       .icon-wrapper {
         background-color: rgba(209, 209, 209, .2);
         border: none;
         border-radius: 5px;
         padding-block: 4px;
-        width: 100%;
-        justify-content: center;
-        margin-inline: 5px;
+        width: calc(100%/6);
         
-        @media (max-width: 750px) {
-          max-width: 2rem;
-          margin-block: 5px;
+        @media (max-width: 500px) {
+          padding-inline: 0px;
         }
 
         &.active {
@@ -2756,14 +2766,17 @@ body {
 }
 
 #map-column { // v-col
-  // background-color: blanchedalmond;
   position: relative;
+  --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
+  height: 100%;
+  // max-height: var(--map-max-height);
+  width: 100%;
+  aspect-ratio: 5 / 3;
+
   #map-container {
     height: 100%;
   
-  
     span {
-      color: red;
       padding: 0;
       margin: 0;
     }
