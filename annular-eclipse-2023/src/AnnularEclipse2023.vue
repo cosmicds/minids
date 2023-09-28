@@ -1894,7 +1894,14 @@ export default defineComponent({
 
     wwtCurrentTime(time: Date) {
       if (time.getTime() >= this.maxTime || time.getTime() < this.minTime) {
-        this.setTime(new Date(this.minTime));
+        if (this.playing) {
+          this.playing = false;
+          this.selectedTime = this.minTime;
+          setTimeout(() => {
+            this.playing = true;
+          }, 1000);
+        }
+        
         return;
       }
       
