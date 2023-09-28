@@ -104,15 +104,6 @@
                 :tooltip-location="'bottom'"
               ></icon-button>
               <icon-button
-                v-model="showVideoSheet"
-                fa-icon="video"
-                :color="accentColor"
-                :focus-color="accentColor"
-                tooltip-text="Watch video"
-                :tooltip-location="'bottom'"
-              >
-              </icon-button>
-              <icon-button
                 fa-icon="question"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -618,33 +609,6 @@
         </div>
       </div>
     </div>
-
-    <!-- This contains the video that is displayed when the video icon is clicked. -->
-
-    <v-dialog
-      id="video-container"
-      v-model="showVideoSheet"
-      transition="slide-y-transition"
-      fullscreen
-    >
-      <div class="video-wrapper">
-        <font-awesome-icon
-          id="video-close-icon"
-          class="close-icon"
-          icon="times"
-          size="lg"
-          @click="showVideoSheet = false"
-          @keyup.enter="showVideoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <video
-          controls
-          id="info-video"
-        >
-          <source src="" type="video/mp4">
-        </video>
-      </div>
-    </v-dialog>
 
     <!-- This contains the informational content that is displayed when the book icon is clicked. -->
 
@@ -1236,18 +1200,6 @@ export default defineComponent({
       },
       set(_value: boolean) {
         this.selectSheet('text');
-      }
-    },
-    showVideoSheet: {
-      get(): boolean {
-        return this.sheet === "video";
-      },
-      set(value: boolean) {
-        this.selectSheet('video');
-        if (!value) {
-          const video = document.querySelector("#info-video") as HTMLVideoElement;
-          video.pause();
-        }
       }
     },
 
@@ -2536,32 +2488,6 @@ body {
     color: var(--accent-color-3);
     white-space: nowrap;
   }
-}
-
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-#video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0px;
-  z-index: 1000;
 }
 
 .bottom-sheet {
