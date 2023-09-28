@@ -1,7 +1,5 @@
 <template>
-
-
-
+  <!-- WCAG (Web Accessability compliant GIF display) -->
   <div 
     :id="id"
     class="wcag-gif-container"
@@ -11,7 +9,14 @@
       :alt="alt" 
       loading="lazy">
     <details open>
-      <summary role="button" aria-label="static image"></summary>
+      <summary role="button" aria-label="static image" v-on:click="onClick">
+        <v-icon 
+          v-if = "!stayPaused"
+          color="black"
+        >
+          {{ (pause || stayPaused) ? 'mdi-play' : 'mdi-pause' }}
+        </v-icon>
+      </summary>
       <div class="wcag-gif-container1">
         <img 
         :src="gif" 
@@ -22,20 +27,33 @@
     </details>
     
     <cite style="display: none"> <!--  in the markup but not visible  -->
-      Inspired by https://css-tricks.com/pause-gif-details-summary/ and https://codepen.io/chriscoyier/pen/pogQJER 
+      Adapted from <a href="https://css-tricks.com/pause-gif-details-summary/">CSS Tricks</a> and <a href="https://codepen.io/chriscoyier/pen/pogQJER">CodePen</a>
     </cite>
   </div>
+  
   
 </template>
   
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
+import { VIcon } from "vuetify/components/VIcon";
+
 
 export default defineComponent({
   name: "GifPlayPause",
+
+  components: {
+    'v-icon': VIcon,
+  },
   
 
   props: {
+    paused : {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+
     id: {
       type: String,
       default: "wcag-gif",
@@ -55,13 +73,33 @@ export default defineComponent({
     },
   },
 
+  data() {
+    return {
+      stayPaused: this.paused,
+      pause: false,
+    };
+  },
+
   mounted() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce))");
     const details = document.querySelector(".wcag-gif-container > details");
 
     if (mediaQuery.matches && details) {
+      this.stayPaused = false;
       details.removeAttribute("open");
     }
+  },
+
+  methods: {
+
+    onClick(): void {
+      if (this.stayPaused) {
+        return;
+      } 
+
+      this.pause = !this.pause;
+      
+    },
   }
 
 });
@@ -72,13 +110,16 @@ export default defineComponent({
 
 
 .wcag-gif-container {
-  display: inline-block;
+  /* display: inline-block; */
+  display: flex;
   position: relative;
+  width: 100%;
+  
 }
 
 .wcag-gif-container summary {
   color: #fff;
-  background: #000;
+  background: transparent;
   width: 2rem;
   height: 2rem;
   position: absolute;
@@ -86,16 +127,10 @@ export default defineComponent({
   right: 0.5rem;
   z-index: 2;
   border-radius: 50%;
-  background-image: url("https://assets.codepen.io/128034/play_circle_filled-24px.svg");
-  background-size: 90% auto;
-  background-repeat: no-repeat;
-  background-position: center;
   background-color: white;
 }
 
-.wcag-gif-container [open] summary {
-  background-image: url("https://assets.codepen.io/128034/pause_circle_filled-24px.svg");
-  box-shadow: 0 0 0 2px #fff;
+.wcag-gif-container details[open] summary {
   background-color: white;
 }
 
@@ -108,21 +143,10 @@ export default defineComponent({
   list-style: none;
 }
 
-.wcag-gif-container summary + * {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 1rem;
-  padding-top: 3rem;
-  background: #000;
-  color: #fff;
-  overflow-y: auto;
-}
-
-.wcag-gif-container summary + * a {
-  color: #fff;
+.wcag-gif-container summary > .v-icon {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .wcag-gif-container summary:focus {
@@ -136,6 +160,10 @@ export default defineComponent({
   top: 0px;
   left: 0px;
   overflow: visible;
+}
+
+.wcag-gif-container img {
+  width: 100%;
 }
 
 </style>
