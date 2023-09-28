@@ -288,6 +288,7 @@
 
         <div id="intro-bottom-controls">
           <v-btn
+            v-if="introSlide > 1"
             id="intro-next-button"
             :color="accentColor"
             @click="introSlide--"
