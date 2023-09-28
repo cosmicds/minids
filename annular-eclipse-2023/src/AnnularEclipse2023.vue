@@ -2577,7 +2577,7 @@ video {
   padding: var(--container-padding);
 
   width: calc(100% - 2*var(--margin));
-  // max-height: var(--top-content-max-height);
+  max-height: var(--top-content-max-height);
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
