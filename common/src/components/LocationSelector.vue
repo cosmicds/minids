@@ -330,6 +330,14 @@ export default defineComponent({
     display: none;
   }
 
+  path.leaflet-interactive:focus {
+    outline: none;
+  }
+
+  path.leaflet-interactive:focus-visible {
+    outline: auto 5px black;
+  }
+
   
 }
 </style>
