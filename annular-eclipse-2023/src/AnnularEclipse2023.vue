@@ -1087,13 +1087,15 @@ export default defineComponent({
   },
 
   created() {
-    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== "User Selected").map(([_, pl]) => {
-      return {
-        ...pl,
-        latitudeDeg: R2D * pl.latitudeRad,
-        longitudeDeg: R2D * pl.longitudeRad
-      };
-    });
+    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== "User Selected")
+      .sort(([_, pl1], [__, pl2]) => pl1.longitudeRad - pl2.longitudeRad)
+      .map(([_, pl]) => {
+        return {
+          ...pl,
+          latitudeDeg: R2D * pl.latitudeRad,
+          longitudeDeg: R2D * pl.longitudeRad
+        };
+      });
 
 
   },
