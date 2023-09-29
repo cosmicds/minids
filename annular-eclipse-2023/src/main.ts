@@ -109,9 +109,9 @@ createApp(AnnularEclipse2023, {
   .component('location-selector', LocationSelector)
   .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
+  .component('gif-play-pause', GifPlayPause)
   .component('mini-credits', DefaultMiniCredits)
   .component('date-picker', Datepicker)
-  .component('gif-play-pause', GifPlayPause)
 
   // Mount
   .mount("#app");

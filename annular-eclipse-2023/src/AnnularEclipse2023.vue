@@ -412,14 +412,14 @@
           <v-window-item :value="1">
             <div class="intro-text">
               <p>
-              On October 14, 2023, the U.S. will experience
+              On October 14, 2023, the Americas will experience
               a partial solar eclipse, where the Moon 
               will appear to travel across the Sun and 
               block a portion of it.
               </p>
             <br />
               <p>
-              A lucky segment of the U.S. will 
+              A lucky segment of the U.S., Central, and South America will 
               experience what is known as an <b>annular eclipse</b>.
               </p>
             </div>
@@ -428,56 +428,53 @@
           <v-window-item :value="2">
             <div class="intro-text">
               <p>
-                In this interactive page you can
+                In this interactive page you can:
               </p>
               
               <ul
               >
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Explore what the eclipse will look like from different parts of the country
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Use some detective work to identify the Path of Visibility for the annular eclipse
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world and see how the eclipse would look from there
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="book-open" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about solar eclipses. 
                 </v-list-item>
               </ul>
             </div>
           </v-window-item>
-          <v-window-item :value="3">
-            <p>
-              Press <font-awesome-icon icon="question"></font-awesome-icon> to see this introduction again
-            </p>
-          </v-window-item>
         </v-window>
 
         <div id="intro-bottom-controls">
-          <v-btn
-            v-if="introSlide > 1"
-            id="intro-next-button"
-            :color="accentColor"
-            @click="introSlide--"
-            @keyup.enter="introSlide--"
-            elevation="0"
-            >
-            Previous
-          </v-btn>
+          <div>
+            <v-btn
+              v-if="introSlide > 1"
+              id="intro-next-button"
+              :color="accentColor"
+              @click="introSlide--"
+              @keyup.enter="introSlide--"
+              elevation="0"
+              >
+              Back
+            </v-btn>
+          </div>
           
           <v-btn
             id="intro-next-button"
@@ -486,7 +483,7 @@
             @keyup.enter="introSlide++"
             elevation="0"
             >
-            Next
+            {{ introSlide === 1 ? 'Next' : 'Get Started' }}
           </v-btn>
         </div>
       </div>
@@ -566,7 +563,7 @@
                 
               </div>
             </template>
-            {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
+            {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
           </v-tooltip>
         </div>
       </div>
@@ -1041,12 +1038,12 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: false,
+      inIntro: true,
 
       tab: 0,
       introSlide: 1,
 
-      viewerMode: 'Horizon' as ViewerMode,
+      viewerMode: 'SunScope' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -1758,12 +1755,12 @@ export default defineComponent({
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
       this.horizonOpacity = 1;
       // this.setForegroundImageByName("Digitized Sky Survey (Color)");
-      this.sunPlace.set_zoomLevel(60 * 6);
+      this.sunPlace.set_zoomLevel(60);
       this.gotoTarget({
         place: this.sunPlace,
         instant: true,
         noZoom: false,
-        trackObject: false
+        trackObject: this.toggleTrackSun
       });
       this.playbackRate = this.horizonRate;
       console.log('=== startHorizonMode ===');
@@ -2009,7 +2006,7 @@ export default defineComponent({
     },
     
     introSlide(val: number) {
-      this.inIntro = val < 4;
+      this.inIntro = val < 3;
       return;
     },
 
@@ -2922,21 +2919,34 @@ body {
   width: 75%;
   height: fit-content;
   // outline: 5px solid var(--accent-color);
-  border-radius: 2em;
+  border-radius: 1em;
   padding: 2em;
-  font-size: 1em;
+
   // rotated translucent background gradient
   background: linear-gradient(45deg,
-                            rgb(15, 32, 39), 
-                            rgb(32, 58, 67), 
-                            rgba(44, 83, 100));
+                            rgb(14, 30, 40), 
+                            rgb(22, 50, 65), 
+                            rgb(30 70 90));
+
+  
+  @media (max-width: 750px){ //SMALL
+    font-size: 0.7em;    
+    }
+
+  @media (min-width: 751px){ //LARGE
+      font-size: 1em;
+  }
 
   .v-list-item__prepend {
     margin-right: 0.75em;
   }
   
   .intro-text {
-    color: var(--accent-color);
+    color: white;
+
+    .bullet-icon {
+      color: var(--accent-color)
+    }
   }
   
   div#intro-bottom-controls {
@@ -2945,8 +2955,26 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+
     gap: 1em;
     margin-top:1em;
+
+    .v-btn.v-btn--density-default {
+        max-height: 8em;
+      }  
+        
+    @media (max-width: 750px){ //SMALL
+      .v-btn--size-default {
+      font-size: 0.3em;
+      }  
+    }
+
+    @media (min-width: 751px){ //LARGE
+      .v-btn--size-default {
+      font-size: 0.8em;
+      }    
+    }
+
   
     #intro-reminder {
       outline: 1px solid red;
