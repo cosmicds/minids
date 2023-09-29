@@ -1214,6 +1214,7 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
         '--app-content-height': this.showTextSheet ? '100%' : '100%',
+        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
         '--moon-color': this.moonColor,
       };
     },
