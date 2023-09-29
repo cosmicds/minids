@@ -428,56 +428,53 @@
           <v-window-item :value="2">
             <div class="intro-text">
               <p>
-                In this interactive page you can
+                In this interactive page you can:
               </p>
               
               <ul
               >
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="rocket" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Explore what the eclipse will look like from different parts of the country
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Use some detective work to identify the Path of Visibility for the annular eclipse
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world and see how the eclipse would look from there
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="book-open" size="xl"></font-awesome-icon>
+                    <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about solar eclipses. 
                 </v-list-item>
               </ul>
             </div>
           </v-window-item>
-          <v-window-item :value="3">
-            <p>
-              Press <font-awesome-icon icon="question"></font-awesome-icon> to see this introduction again
-            </p>
-          </v-window-item>
         </v-window>
 
         <div id="intro-bottom-controls">
-          <v-btn
-            v-if="introSlide > 1"
-            id="intro-next-button"
-            :color="accentColor"
-            @click="introSlide--"
-            @keyup.enter="introSlide--"
-            elevation="0"
-            >
-            Previous
-          </v-btn>
+          <div>
+            <v-btn
+              v-if="introSlide > 1"
+              id="intro-next-button"
+              :color="accentColor"
+              @click="introSlide--"
+              @keyup.enter="introSlide--"
+              elevation="0"
+              >
+              Previous
+            </v-btn>
+          </div>
           
           <v-btn
             id="intro-next-button"
@@ -486,7 +483,7 @@
             @keyup.enter="introSlide++"
             elevation="0"
             >
-            Next
+            {{ introSlide === 1 ? 'Next' : 'Get Started' }}
           </v-btn>
         </div>
       </div>
@@ -2005,7 +2002,7 @@ export default defineComponent({
     },
     
     introSlide(val: number) {
-      this.inIntro = val < 4;
+      this.inIntro = val < 3;
       return;
     },
 
@@ -2942,6 +2939,10 @@ body {
   
   .intro-text {
     color: white;
+
+    .bullet-icon {
+      color: var(--accent-color)
+    }
   }
   
   div#intro-bottom-controls {
