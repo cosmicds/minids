@@ -412,14 +412,14 @@
           <v-window-item :value="1">
             <div class="intro-text">
               <p>
-              On October 14, 2023, the U.S. will experience
+              On October 14, 2023, the Americas will experience
               a partial solar eclipse, where the Moon 
               will appear to travel across the Sun and 
               block a portion of it.
               </p>
             <br />
               <p>
-              A lucky segment of the U.S. will 
+              A lucky segment of the U.S., Central, and South America will 
               experience what is known as an <b>annular eclipse</b>.
               </p>
             </div>
@@ -472,7 +472,7 @@
               @keyup.enter="introSlide--"
               elevation="0"
               >
-              Previous
+              Back
             </v-btn>
           </div>
           
@@ -563,7 +563,7 @@
                 
               </div>
             </template>
-            {{ toggleTrackSun ? "Don't Track Sun" : 'Track Sun' }}
+            {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
           </v-tooltip>
         </div>
       </div>
@@ -1043,7 +1043,7 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
-      viewerMode: 'Horizon' as ViewerMode,
+      viewerMode: 'SunScope' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -1751,12 +1751,12 @@ export default defineComponent({
       this.showHorizon = true; // automatically calls it's watcher and updates horizon
       this.horizonOpacity = 1;
       // this.setForegroundImageByName("Digitized Sky Survey (Color)");
-      this.sunPlace.set_zoomLevel(60 * 6);
+      this.sunPlace.set_zoomLevel(60);
       this.gotoTarget({
         place: this.sunPlace,
         instant: true,
         noZoom: false,
-        trackObject: false
+        trackObject: this.toggleTrackSun
       });
       this.playbackRate = this.horizonRate;
       console.log('=== startHorizonMode ===');
