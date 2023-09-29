@@ -444,6 +444,13 @@
               label="Horizon"
               hide-details
             />
+          <v-checkbox
+              :color="accentColor"
+              v-model="useRegularMoon"
+              @keyup.enter="useRegularMoon = !useRegularMoon"
+              label="Bright Moon"
+              hide-details
+            />
           </div>
         </transition-expand>
       </div>
