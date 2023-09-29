@@ -119,12 +119,6 @@ export default defineComponent({
     }
     this.setup(true);
 
-    // make sure all links in this component open in a new tab
-    const links = this.$el.getElementsByTagName("a");
-    for (let i = 0; i < links.length; i++) {
-      links[i].setAttribute("target", "_blank");
-    }
-
   },
 
   data() {
@@ -252,6 +246,9 @@ export default defineComponent({
       if (this.selectable) {
         map.on('dblclick', this.onMapSelect);
       }
+
+      map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noopener noreferrer" >Leaflet</a>');
+      
       this.map = map;
     },
 
