@@ -827,15 +827,6 @@ export default defineComponent({
       initialZoom: 3
     };
 
-    const presetMapOptions = {
-      templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
-      minZoom: 1,
-      maxZoom: 16,
-      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      ext: 'jpg',
-      ...initialView
-    };
-
     return {
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
@@ -872,9 +863,16 @@ export default defineComponent({
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
-      presetMapOptions: presetMapOptions,
+      presetMapOptions: {
+        templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
+        minZoom: 1,
+        maxZoom: 16,
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        ext: 'jpg',
+        ...initialView
+      },
 
-      userSelectedMapOptions: queryData ? { ...presetMapOptions, 'initialLocation':queryData, initialZoom: 5 } : presetMapOptions,
+      userSelectedMapOptions: queryData ? { ...queryData, initialZoom: 5 } : initialView,
 
       eclipsePathLocations: {
         "Albuquerque, NM": {
