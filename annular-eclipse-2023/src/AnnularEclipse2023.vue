@@ -157,6 +157,153 @@
       tooltip-location="start"
     /> 
   </div>
+  
+  
+
+    <v-dialog
+      scrim="false"
+      transition="slide-y-transition"
+      v-model="showTextSheet" 
+      class='bottom-sheet'
+      id="text-bottom-sheet"
+      :style="cssVars"
+    >
+      <v-card
+        id="bottom-sheet-card">
+        <v-tabs
+          v-model="tab"
+          height="32px"
+          :color="accentColor"
+          :slider-color="accentColor"
+          id="tabs"
+          dense
+          grow
+        >
+          <v-tab tabindex="0"><h3>Information</h3></v-tab>
+          <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
+        </v-tabs>
+        <font-awesome-icon
+          id="close-text-icon"
+          class="control-icon"
+          icon="times"
+          size="lg"
+          @click="showTextSheet = false"
+          @keyup.enter="showTextSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
+        <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
+          <v-window-item>
+            <v-card class="no-bottom-border-radius scrollable">
+              <v-card-text class="info-text no-bottom-border-radius">
+                <v-row>
+                <v-col id="FAQ" cols="6">
+                    Get ready North America for not one, but two brilliant solar eclipses! 
+                    First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
+                    get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.    
+                    
+                    <details>
+                      <summary>
+                        What causes Solar Eclipses? ☀️🌕🌎
+                      </summary>
+                    <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
+                      Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
+                      to be in the path of the next two solara eclipses. 
+                      </p>
+                    </details>
+                    
+                    <details>
+                      <summary> Total vs. Annular Eclipse</summary>
+                      <p>
+                        During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
+                        in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
+                        doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
+                      </p>
+                    </details>
+                    
+                    <details> 
+                      <summary> Why can only some places see the eclipse? 🌒</summary>
+                      <p>
+                        An eclipse is caused by the Moon casting a shadow on the Earth. 
+                        People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
+                        As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
+                        For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
+                        the Sun will not be blocked at all, and there will be no eclipse visible. 
+                      </p> 
+                    </details>
+                    
+                </v-col>
+                <v-col cols="6">
+                  <figure>
+                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                  </figure>
+                </v-col>
+              </v-row>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item>
+            <v-card class="no-bottom-border-radius scrollable">
+              <v-card-text class="info-text no-bottom-border-radius">
+                <v-container>
+                  <v-row align="center">
+                  <v-col cols="4">
+                      <v-chip
+                        label
+                        outlined
+                      >
+                        Pan
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="8" class="pt-1">
+                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                    </v-col>
+                  </v-row>
+                  <v-row align="center">
+                    <v-col cols="4">
+                      <v-chip
+                        label
+                        outlined
+                      >
+                        Zoom
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="8" class="pt-1">
+                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <div class="credits">
+                      <h3>Credits:</h3>
+                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
+                      Pat Udomprasert<br>
+                      Jon Carifio<br>
+                      John Lewis<br>
+                      Alyssa Goodman<br>
+                      Mary Dussault<br>
+                      Harry Houghton<br>
+                      Anna Nolin<br>
+                      Evaluator: Sue Sunbury<br>
+                      <br>
+                      <h4>WorldWide Telescope Team:</h4>
+                      Peter Williams<br>
+                      A. David Weigel<br>
+                      Jon Carifio<br>
+                      </div>
+                      <v-spacer class="end-spacer"></v-spacer>
+                    </v-col>
+                  </v-row>
+                </v-container>              
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </v-dialog>
+
 
   <div
     id="main-content"
@@ -303,6 +450,12 @@
                     <font-awesome-icon icon="location-dot" size="xl"></font-awesome-icon>
                   </template>
                     Choose any location around the world and see how the eclipse would look from there
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="book-open" size="xl"></font-awesome-icon>
+                  </template>
+                    Learn more about solar eclipses. 
                 </v-list-item>
               </ul>
             </div>
@@ -589,110 +742,6 @@
     </div>
 
     <!-- This contains the informational content that is displayed when the book icon is clicked. -->
-
-    <v-dialog
-      :style="cssVars"
-      class="bottom-sheet"
-      id="text-bottom-sheet"
-      hide-overlay
-      persistent
-      no-click-animation
-      absolute
-      width="100%"
-      :scrim="false"
-      location="bottom"
-      v-model="showTextSheet"
-      transition="dialog-bottom-transition"
-    >
-      <v-card height="100%">
-        <v-tabs
-          v-model="tab"
-          height="32px"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3>Information</h3></v-tab>
-          <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
-        </v-tabs>
-        <font-awesome-icon
-          id="close-text-icon"
-          class="control-icon"
-          icon="times"
-          size="lg"
-          @click="showTextSheet = false"
-          @keyup.enter="showTextSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                <v-container>
-                  <v-row align="center">
-                  <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Pan
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row align="center">
-                    <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Zoom
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="credits">
-                      <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                      John Lewis<br>
-                      Jon Carifio<br>
-                      Pat Udomprasert<br>
-                      Alyssa Goodman<br>
-                      Mary Dussault<br>
-                      Harry Houghton<br>
-                      Anna Nolin<br>
-                      Evaluator: Sue Sunbury<br>
-                      <br>
-                      <h4>WorldWide Telescope Team:</h4>
-                      Peter Williams<br>
-                      A. David Weigel<br>
-                      Jon Carifio<br>
-                      </div>
-                      <v-spacer class="end-spacer"></v-spacer>
-                    </v-col>
-                  </v-row>
-                </v-container>              
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-        </v-window>
-      </v-card>
-    </v-dialog>
 
   <notifications group="copy-url" position="top right" />
   </div>
@@ -1012,6 +1061,8 @@ export default defineComponent({
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
 
+      startPaused: false,
+
       sunPlace,
       moonPlace,
 
@@ -1158,9 +1209,9 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
-        '--moon-color': this.moonColor,
-        '--app-content-height': this.showTextSheet ? '66%' : '100%',
+        '--app-content-height': this.showTextSheet ? '100%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
+        '--moon-color': this.moonColor,
       };
     },
     wwtControl(): WWTControl {
@@ -2308,7 +2359,7 @@ body {
       .v-checkbox .v-selection-control {
       height: 1.5em !important;
       min-height: 1em !important;
-     }
+      }
 
     }
 
@@ -2316,7 +2367,7 @@ body {
       .v-checkbox .v-selection-control {
       height: 2em !important;
       min-height: 1em !important;
-     }
+      }
     }
 
 
@@ -2504,82 +2555,133 @@ body {
   }
 }
 
+
+
 .bottom-sheet {
+  
+  figure {
+    position: sticky;
+    top: 0;
+    figcaption{
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-size: 0.5em;
+      background-color: #4a4a4a4a;
+      border-radius: 10px 0 0 0;
+      padding-inline: 10px 5px;
+    }
+  }
+  
+  #FAQ{
+  
+    details {
+      font-size: 1em;
+      padding: 0.5em;
+      height: fit-content;
+      margin-block: 0.5em;
+      border-top-left-radius: 0.5em;
+      background-color: #486273;
+      
+      summary {
+        font-weight: bold;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      
+      p {
+        font-size: 0.9em;
+        padding: 0.5em;
+      }
+      
+      &[open] {
+        border-bottom-left-radius: 0.5em;
+      }
+    }
+  }
+  
+
+  
   .v-overlay__content {
-    align-self: flex-end;
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-    height: 34%;
+    align-self: center;
+    padding: unset;
+    margin: unset;
   }
-}
-
-#tabs {
-  width: calc(100% - 3em);
-  align-self: left;
-}
-
-.info-text {
-  height: 33vh;
-  padding-bottom: 25px;
-
-  & a {
-    text-decoration: none;
+  
+  #bottom-sheet-card {
+    height: fit-content;
+    width: 100%;
+    align-self: center;
   }
-}
-
-.close-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 15;
-
-  &:hover {
-    cursor: pointer;
+  
+  #tabs {
+    width: calc(100% - 3em);
+    align-self: left;
   }
-
-  &:focus {
-    color: white;
-    border: 2px solid white;
-  }
-}
-
-.scrollable {
-  overflow-y: auto;
-}
-
-.no-bottom-border-radius {
-  border-bottom-left-radius: 0px !important;
-  border-bottom-right-radius: 0px !important;
-}
-
-#tab-items {
-  // padding-bottom: 2px !important;
 
   .v-card-text {
-    font-size: ~"max(14px, calc(0.7em + 0.3vw))";
-    padding-top: ~"max(2vw, 16px)";
-    padding-left: ~"max(4vw, 16px)";
-    padding-right: ~"max(4vw, 16px)";
-
-    .end-spacer {
-      height: 25px;
+    height: 33vh;
+    padding-bottom: 25px;
+    
+    & a {
+      text-decoration: none;
     }
   }
 
-}
+  .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 15;
 
-#close-text-icon {
-  position: absolute;
-  top: 0.25em;
-  right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
-  color: white;
-}
+    &:hover {
+      cursor: pointer;
+    }
 
-// This prevents the tabs from having some extra space to the left when the screen is small
-// (around 400px or less)
-.v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
-  display: none;
+    &:focus {
+      color: white;
+      border: 2px solid white;
+    }
+  }
+
+  .scrollable {
+    overflow-y: auto;
+  }
+
+  .no-bottom-border-radius {
+    // border-bottom-left-radius: 0px !important;
+    // border-bottom-right-radius: 0px !important;
+    width: auto;
+  }
+
+  #tab-items {
+    // padding-bottom: 2px !important;
+
+    .v-card-text {
+      font-size: ~"max(14px, calc(0.7em + 0.3vw))";
+      padding-top: ~"max(2vw, 16px)";
+      padding-left: ~"max(4vw, 16px)";
+      padding-right: ~"max(4vw, 16px)";
+
+      .end-spacer {
+        height: 25px;
+      }
+    }
+
+  }
+
+  #close-text-icon {
+    position: absolute;
+    top: 0.25em;
+    right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
+    color: white;
+  }
+
+  // This prevents the tabs from having some extra space to the left when the screen is small
+  // (around 400px or less)
+  .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
+    display: none;
+  }
 }
 
 // Styling the slider
