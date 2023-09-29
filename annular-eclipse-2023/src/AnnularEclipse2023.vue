@@ -9,7 +9,7 @@
     <div id="close-guided-content-container">
       <font-awesome-icon
         v-model="showGuidedContent"
-        size="lg"
+        size="xl"
         class="ma-1"
         :color="accentColor"
         :icon="`square-xmark`"
@@ -75,6 +75,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'View eclipse from multiple locations'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
@@ -84,6 +85,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Identify eclipse path'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
               <icon-button
@@ -93,6 +95,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Choose any viewing location'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
@@ -102,6 +105,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
               ></icon-button>
             </div>
           <!-- </v-col> -->
@@ -619,57 +623,59 @@
 
       <div id="tools">
         <span class="tool-container">
-          <icon-button
-            id="play-pause-icon"
-            :fa-icon="!(playing) ? 'play' : 'pause'"
-            @activate="() => {
-              playing = !(playing);
-            }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Play/Pause"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <icon-button
-            id="speed-down"
-            :fa-icon="'angle-double-down'"
-            @activate="() => {
-                  speedIndex -= 1;
-                  playbackRate = Math.pow(10, speedIndex);
-                  playing = true;
-                }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="10x slower"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <icon-button
-            id="speed-up"
-            :fa-icon="'angle-double-up'"
-            @activate="() => {
-                  speedIndex += 1;
-                  playbackRate = Math.pow(10, speedIndex);
-                  playing = true;
-                }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="10x faster"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <div id="speed-text">
-            Time rate: 
-            <span v-if="playbackRate===1 && playing">
-              Real time
-            </span>
-            <span v-if="playbackRate!=1 && playing">
-              {{ playbackRate }}&times;
-            </span>
-            <span v-if="!playing">
-              Paused
-            </span>
+          <div id="speed-control">
+            <icon-button
+              id="play-pause-icon"
+              :fa-icon="!(playing) ? 'play' : 'pause'"
+              @activate="() => {
+                playing = !(playing);
+              }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="Play/Pause"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <icon-button
+              id="speed-down"
+              :fa-icon="'angle-double-down'"
+              @activate="() => {
+                    speedIndex -= 1;
+                    playbackRate = Math.pow(10, speedIndex);
+                    playing = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="10x slower"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <icon-button
+              id="speed-up"
+              :fa-icon="'angle-double-up'"
+              @activate="() => {
+                    speedIndex += 1;
+                    playbackRate = Math.pow(10, speedIndex);
+                    playing = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="10x faster"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <div id="speed-text">
+              Time rate: 
+              <span v-if="playbackRate===1 && playing">
+                Real time
+              </span>
+              <span v-if="playbackRate!=1 && playing">
+                {{ playbackRate }}&times;
+              </span>
+              <span v-if="!playing">
+                Paused
+              </span>
+            </div>
           </div>
           <v-slider
             id="slider"
@@ -2727,9 +2733,18 @@ body {
     min-width: fit-content;
     white-space: nowrap;
     color: black;
-    font-size: .9rem;
-    padding: 0.5rem;
+    padding-inline: 0.7rem;
     background-color: var(--accent-color);
+
+    @media (max-width: 750px ) { //SMALL
+      font-size: 1rem;
+      padding-block: 0.7rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      font-size: 1.1rem;
+      padding-block: 1rem;
+    } 
   }
   
   .v-slider-thumb__label::before {
@@ -2745,6 +2760,13 @@ body {
 .v-container {
   max-width: 100%;
 }
+
+#closed-top-container {
+    position: absolute;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    z-index: 500;
+  }
 
 #guided-content-container {
   --top-content-max-height: max(30vmin, 35vh);
@@ -2762,7 +2784,7 @@ body {
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
   user-select: none;
-  border: solid 1px var(--accent-color);
+  border: solid 1.5px var(--accent-color);
   
   font-size: clamp(8px, 3vmin, 0.9em);
   overflow-y: auto;
@@ -2783,13 +2805,13 @@ body {
     margin: 0px;
     padding: 0px;
   }
-  
+
   #close-guided-content-container {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 500;
-  }
+  }  
 
   #non-map-container { // Keep content away from the x to close
     --padding-left: 1rem;
@@ -2805,7 +2827,9 @@ body {
   }
 
   .non-map-row {
-    margin-bottom: 0.5em;
+    @media (min-width: 750px) {
+      margin-bottom: 0.5em;
+    }
   }
     
     // .v-row.non-map-row#title-row
@@ -2813,15 +2837,20 @@ body {
     color: var(--accent-color);
     font-weight: bold;
     text-align: right;
-    font-size: 1rem;
+    padding-left: 1rem;
     
-    @media (max-width: 600px){ //SMALL
-      padding-left: 1rem;
+    @media (max-width: 390px){ //TINY
+      font-size: 0.9rem;
     }
-    @media (max-width: 390px){ //SMALL
-      font-size: 0.8rem;
-      padding-left: 1rem;
+
+    @media (max-width: 750px){ //SMALL
+      font-size: 1.1rem;
     }
+
+    @media (min-width: 751px){ //LARGE
+      font-size: 1.3rem;
+    }
+
   }
     
     // .v-row.non-map-row#instructions-row
@@ -2837,6 +2866,16 @@ body {
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
         
+        @media (max-width: 600px){ //SMALL
+          font-size: 0.9rem;
+        }
+        @media (min-width: 601px){ //MEDIUM
+          font-size: 1.1rem;
+        }
+        @media (min-width: 900px){ //LARGE
+          font-size: 1.2rem;
+        }
+
         // span
         .description {
           line-height: 1.4em;
@@ -2846,22 +2885,23 @@ body {
           p {
             margin-block: .3em;
           }
-
         }
       }
     }
   }
 
   #button-row {
+    padding-top: 0.5em;
     align-self: flex-end;
+
     #top-container-buttons{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    
-    flex-grow: 1;
-    gap: 0.5em;
-          
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      
+      flex-grow: 1;
+      gap: 0.5em;
+            
       .icon-wrapper {
         background-color: rgba(209, 209, 209, .2);
         border: none;
@@ -2875,8 +2915,9 @@ body {
 
         &.active {
           border: 2px solid var(--sky-color);
-        }
 
+          
+        }
       }
     }
   }
@@ -3005,14 +3046,17 @@ body {
 }
 
 #speed-control {
-  position: absolute;
-  bottom: 6.5rem; // the +1rem aligns it with the switch
-  left: 0.25rem;
-  font-size: .9rem; // all 'em' values are scaled to this
-  --button-width: 2.5em;
-  --button-gap: 0.125em;
-  width: calc(4 * var(--button-width) + 6 * var(--button-gap));
-  pointer-events: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin-left: 10px;
+
+  .icon-wrapper {
+    padding-inline: 0.5em;
+    padding-block: 0.6em;
+    border: 2px solid var(--accent-color);
+  }
+
 }
 
 #speed-text {
@@ -3023,7 +3067,13 @@ body {
     padding-inline: 0.4em;
     padding-block: 0.15em;
     border-radius: 0.3em;
-    font-size: 0.9rem;
+
+    @media (max-width: 750px){ //SMALL
+          font-size: 0.9rem;
+        }
+    @media (min-width: 751px){ //LARGE
+          font-size: 1.1rem;
+    }
   }  
 
 #top-wwt-content {
@@ -3056,10 +3106,14 @@ body {
     }
   }
     .v-switch__thumb {
-      color: var(--accent-color);
+      color: #f39d6c;
       background-color: black; 
-      height: 2.1rem;
-      width: 2.2rem;
+
+      @media (min-width: 751px) { //LARGE
+        height: 2.1rem;
+        width: 2.2rem;
+      }
+
     }
 
     .v-input--density-default {
@@ -3071,20 +3125,36 @@ body {
     } 
 
     .v-switch--inset .v-switch__track {
-      height: 2.5rem;
-      width: 4.2rem;
+      @media (min-width: 751px) { //LARGE
+        height: 2.5rem;
+        width: 4.2rem;
+      }
     }
 
     pointer-events: auto;
 
   #top-switches {
     position: absolute;
-    margin-top: 0.7rem;
     right: 0;
+
+    @media (max-width: 750px ) { //SMALL
+      margin-top: 0.5rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      margin-top: 0.7rem;
+    } 
+
   }
  
   #track-sun-switch {
-    margin-top: 0.7rem;
+    @media (max-width: 750px ) { //SMALL
+      margin-top: 0.5rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      margin-top: 0.7rem;
+    } 
   }
 }
 
