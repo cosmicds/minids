@@ -118,6 +118,13 @@ export default defineComponent({
       this.getLocation(true);
     }
     this.setup(true);
+
+    // make sure all links in this component open in a new tab
+    const links = this.$el.getElementsByTagName("a");
+    for (let i = 0; i < links.length; i++) {
+      links[i].setAttribute("target", "_blank");
+    }
+
   },
 
   data() {
