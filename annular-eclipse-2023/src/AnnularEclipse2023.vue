@@ -490,7 +490,7 @@
     </v-dialog>
   
   <div id="top-wwt-content">
-      <div id="location-time-display">
+      <div id="location-date-display">
         <v-chip 
           prepend-icon="mdi-map-marker-radius"
           variant="outlined"
@@ -521,7 +521,6 @@
               v-bind="props"
               id="viewer-mode-switch"
               >
-              
               <v-switch
                 inset
                 hide-details
@@ -590,7 +589,7 @@
               :color="accentColor"
               v-model="showAltAzGrid"
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
-              label="Grid"
+              label="Sky Grid"
               hide-details 
             />
             <v-checkbox
@@ -611,7 +610,7 @@
               :color="accentColor"
               v-model="useRegularMoon"
               @keyup.enter="useRegularMoon = !useRegularMoon"
-              label="Bright Moon"
+              label="Visible Moon"
               hide-details
             />
           </div>
@@ -1046,7 +1045,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: true,
+      inIntro: false,
 
       tab: 0,
       introSlide: 1,
@@ -2258,16 +2257,7 @@ body {
 
 // these are now in #top-content
 
-#track-sun-switch {
-  // position: absolute;
-  // top: 1rem;
-  // left: 6rem;
-  pointer-events: auto;
-  .v-switch__thumb {
-    color: var(--accent-color);
-    background-color: black; 
-  }
-}
+
 
 
 #share-button-wrapper {
@@ -2357,9 +2347,16 @@ body {
   pointer-events: auto;
 
   .v-label {
-    font-size: 0.8em;
     color: var(--comet-color);
     opacity: 1;
+
+    @media (max-width: 500px){ //SMALL
+      font-size: 0.8em;
+    }
+
+    @media (min-width: 501px){ //LARGE
+      font-size: 1.1em;
+    }
   }
 
   #control-checkboxes {
@@ -2378,7 +2375,7 @@ body {
 
     @media (min-width: 751px){ //LARGE
       .v-checkbox .v-selection-control {
-      height: 2em !important;
+      height: 2.1em !important;
       min-height: 1em !important;
       }
     }
@@ -3016,79 +3013,6 @@ body {
   --button-gap: 0.125em;
   width: calc(4 * var(--button-width) + 6 * var(--button-gap));
   pointer-events: auto;
-  
-  
-  .speed-control-buttons-container {
-    position: relative;
-    
-    //    BUTTON LAYOUT    //
-    .speed-control-button {
-      margin-inline: var(--button-gap);
-    }
-    
-    .speed-control-button:first-child {
-      margin-inline-start: 0;
-    }
-    
-    .speed-control-button:last-child {
-      margin-inline-end: 0;
-    }
-    
-    // create buttons which center their inner content
-    .speed-control-button {
-      position: relative;
-      display: inline-block; // 'block' to put in a column
-      width: var(--button-width);
-      height: var(--button-width);
-      
-      > * {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-  
-    //     STYLING     //
-    .speed-control-button {
-      border-radius: 50%;
-      border: 0.125em solid var(--accent-color);
-      background-color: rgba(0, 0, 0, 0.5);
-
-      
-      > * { // all direct children (the inner content)
-        color: var(--accent-color);
-      }
-      
-      // text button
-      #speed-text-now {
-        font-size: 0.6em;
-        font-weight: bold;
-      }
-      
-      // text button
-      #speed-text-one-x {
-        font-size: 1em;
-        font-weight: bold;
-      }
-      
-      // text button
-      #speed-text-reset {
-        font-size: 2em;
-        font-weight: bold;
-      }
-      
-    }
-    
-    .speed-control-button:active {
-      background-color: #8e3b0b; // hsl sdarker version of accent-color
-    }
-    
-  
-  } 
-
-
-  
 }
 
 #speed-text {
@@ -3107,25 +3031,35 @@ body {
   top: 0.5rem;
   right: 0.5rem;
 
-  #location-time-display  {
+  #location-date-display  {
   
     display: flex;
     justify-content: flex-end;
     flex-wrap: column;
     gap:5px;
 
-      .v-chip {
-        border: none;
-        color: blue;
-        background-color: white;
-        font-size: 0.8em;
-        opacity: 0.9;
+    .v-chip {
+      border: none;
+      color: blue;
+      background-color: white;
+      opacity: 0.9;
+
+      @media (max-width: 750px){ //SMALL
+        font-size: 1em;
+        padding: 1em;
+      }
+
+      @media (min-width: 751px){ //LARGE
+        font-size: 1.1em;
+        padding: 1.1em;
       }
     }
-  
+  }
     .v-switch__thumb {
       color: var(--accent-color);
       background-color: black; 
+      height: 2.1rem;
+      width: 2.2rem;
     }
 
     .v-input--density-default {
@@ -3136,16 +3070,21 @@ body {
       --v-selection-control-size: auto;
     } 
 
+    .v-switch--inset .v-switch__track {
+      height: 2.5rem;
+      width: 4.2rem;
+    }
+
     pointer-events: auto;
 
   #top-switches {
     position: absolute;
-    margin-top: 0.5rem;
+    margin-top: 0.7rem;
     right: 0;
   }
-
+ 
   #track-sun-switch {
-    margin-top: 0.5rem;
+    margin-top: 0.7rem;
   }
 }
 
