@@ -1888,6 +1888,10 @@ export default defineComponent({
       this.updateMoonTexture();
     },
 
+    useRegularMoon(_show: boolean) {
+      this.updateMoonTexture();
+    },
+
     dateTime(_date: Date) {
       this.updateForDateTime();
     },
