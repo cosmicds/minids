@@ -71,6 +71,7 @@
               <icon-button
                 :model-value="learnerPath == 'Explore'"
                 fa-icon="rocket"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'View eclipse from multiple locations'"
@@ -81,6 +82,7 @@
               <icon-button
                 :model-value="learnerPath == 'Answer'"
                 fa-icon="puzzle-piece"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'Identify eclipse path'"
@@ -91,6 +93,7 @@
               <icon-button
                 :model-value="learnerPath == 'Choose'" 
                 fa-icon="location-dot"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'Choose any viewing location'"
@@ -101,6 +104,7 @@
               <icon-button
                 v-model="showTextSheet"
                 fa-icon="book-open"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
@@ -2984,11 +2988,11 @@ body {
 
   
   @media (max-width: 750px){ //SMALL
-    font-size: 0.7em;    
+    font-size: 1em;    
     }
 
   @media (min-width: 751px){ //LARGE
-      font-size: 1em;
+      font-size: 1.1em;
   }
 
   .v-list-item__prepend {
@@ -3019,13 +3023,13 @@ body {
         
     @media (max-width: 750px){ //SMALL
       .v-btn--size-default {
-      font-size: 0.3em;
+      font-size: 0.8em;
       }  
     }
 
     @media (min-width: 751px){ //LARGE
       .v-btn--size-default {
-      font-size: 0.8em;
+      font-size: 0.9em;
       }    
     }
 
