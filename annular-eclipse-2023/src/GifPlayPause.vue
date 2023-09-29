@@ -8,13 +8,12 @@
       :src="still" 
       :alt="alt" 
       loading="lazy">
-    <details open>
-      <summary role="button" aria-label="static image" v-on:click="onClick">
+    <details v-if="!(stayPaused || stillOnly)">
+      <summary  role="button" aria-label="static image" v-on:click="onClick">
         <v-icon 
-          v-if = "!stayPaused"
           color="black"
         >
-          {{ (pause || stayPaused) ? 'mdi-play' : 'mdi-pause' }}
+          {{ pause ? 'mdi-play' : 'mdi-pause' }}
         </v-icon>
       </summary>
       <div class="wcag-gif-container1">
@@ -48,10 +47,16 @@ export default defineComponent({
   
 
   props: {
-    paused : {
+    stillOnly : {
       type: Boolean,
       default: false,
-      required: true,
+      required: false,
+    },
+
+    startPaused: {
+      type: Boolean,
+      default: false,
+      required: false,
     },
 
     id: {
@@ -75,18 +80,21 @@ export default defineComponent({
 
   data() {
     return {
-      stayPaused: this.paused,
-      pause: false,
+      stayPaused: this.stillOnly,
+      pause: this.stillOnly || this.startPaused,
     };
   },
 
   mounted() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce))");
-    const details = document.querySelector(".wcag-gif-container > details");
+    const details = document.querySelector(".wcag-gif-container > details") as HTMLDetailsElement;
 
     if (mediaQuery.matches && details) {
-      this.stayPaused = false;
+      this.stayPaused = true;
       details.removeAttribute("open");
+      return;
+    } else if (details) {
+      details.open = ! (this.startPaused || this.stillOnly);
     }
   },
 

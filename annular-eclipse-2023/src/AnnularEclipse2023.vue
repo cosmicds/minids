@@ -236,7 +236,7 @@
                 <v-col cols="6">
                   <figure>
                     <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                    <gif-play-pause :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
                     <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
                   </figure>
                 </v-col>
@@ -1070,6 +1070,8 @@ export default defineComponent({
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
       scopeRate: 1000, //this.getplaybackRate('2 hours per 30 seconds'),
       speedIndex: 3,
+
+      startPaused: false,
 
       sunPlace,
       moonPlace
