@@ -607,6 +607,13 @@
               label="Horizon"
               hide-details
             />
+          <v-checkbox
+              :color="accentColor"
+              v-model="useRegularMoon"
+              @keyup.enter="useRegularMoon = !useRegularMoon"
+              label="Bright Moon"
+              hide-details
+            />
           </div>
         </transition-expand>
       </div>
@@ -761,6 +768,7 @@ import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParamet
 type SheetType = "text" | "video" | null;
 type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
 type ViewerMode = "Horizon" | "SunScope";
+type MoonImageFile = "moon.png" | "moon-dark-gray-overlay.png" | "moon-sky-blue-overlay.png";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -1051,7 +1059,8 @@ export default defineComponent({
       skyColor: "#4190ED",
       skyOpacity: 0.6,
       horizonOpacity: 1,
-      moonTexture: 'moon-sky-blue-overlay.png' as 'moon-sky-blue-overlay.png' | 'moon-dark-gray-overlay.png',
+      useRegularMoon: false,
+      moonTexture: 'moon-sky-blue-overlay.png' as MoonImageFile,
 
       playbackRate: 1,
       horizonRate: 1000, //this.getplaybackRate('2 hours per 15 seconds'),
@@ -1353,17 +1362,20 @@ export default defineComponent({
       this.trackingSun = wwtControl._trackingObject === this.sunPlace;
     },
 
-    textureFromAssetImage(assetFilename: string): Texture {
+    textureFromAssetImage(assetFilename: MoonImageFile): Texture {
       /* eslint-disable @typescript-eslint/no-var-requires */
       return Texture.fromUrl(require(`./assets/${assetFilename}`));
     },
 
     updateMoonTexture(force=false) {
-      // Are we even using showSky?
-      const blueMoon = (this.showHorizon && this.showSky) &&
-                       this.moonPosition.altRad > 0 &&
-                       this.viewerMode !== 'SunScope';
-      const filename = blueMoon ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      let filename: MoonImageFile = "moon.png";
+      if (!this.useRegularMoon) {
+        // Are we even using showSky?
+        const blueMoon = (this.showHorizon && this.showSky) &&
+                         this.moonPosition.altRad > 0 &&
+                         this.viewerMode !== 'SunScope';
+        filename = blueMoon ? 'moon-sky-blue-overlay.png' : 'moon-dark-gray-overlay.png';
+      }
       if (force || (filename !== this.moonTexture && Planets._planetTextures)) {
         Planets._planetTextures[9] = this.textureFromAssetImage(filename);
         this.moonTexture = filename;
@@ -1925,6 +1937,10 @@ export default defineComponent({
 
     showSky(_show: boolean) {
       this.updateHorizon();
+      this.updateMoonTexture();
+    },
+
+    useRegularMoon(_show: boolean) {
       this.updateMoonTexture();
     },
 
