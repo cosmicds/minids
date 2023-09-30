@@ -1065,7 +1065,6 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
-      showInfoSheet: false,   
       
       toggleTrackSun: true,
       
@@ -1271,14 +1270,14 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
-    // showInfoSheet: {
-    //   get(): boolean {
-    //     return this.sheet === 'text';
-    //   },
-    //   set(_value: boolean) {
-    //     this.selectSheet('text');
-    //   }
-    // },
+    showInfoSheet: {
+      get(): boolean {
+        return this.sheet === 'text';
+      },
+      set(_value: boolean) {
+        this.selectSheet('text');
+      }
+    },
 
     locationDeg: {
       get(): LocationDeg {
