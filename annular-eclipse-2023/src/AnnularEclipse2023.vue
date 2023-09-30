@@ -45,7 +45,8 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click the highlighted cities to view the eclipse from other locations.</p>
+                <p>Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
             </div>
@@ -1046,7 +1047,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
-      showTextSheet: true,   
+      showTextSheet: false,   
       
       toggleTrackSun: true,
       
@@ -2965,6 +2966,10 @@ body {
   }
 }
 
+.bullet-icon {
+  color: var(--accent-color)
+}
+
 #introduction-overlay {
   position: absolute;
   top: 50%;
@@ -2997,10 +3002,6 @@ body {
   
   .intro-text {
     color: white;
-
-    .bullet-icon {
-      color: var(--accent-color)
-    }
   }
   
   div#intro-bottom-controls {
