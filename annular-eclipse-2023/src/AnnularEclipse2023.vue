@@ -431,15 +431,14 @@
               </p>
             <br />
               <p>
-              A lucky segment of the U.S., Central, and South America will 
-              experience what is known as an <b>annular eclipse</b>.
+              A lucky segment of the U.S., Central, and South America will experience a dazzling <b>"Ring of Fire"</b> created by an <b>annular eclipse</b>.
               </p>
             </div>
           </v-window-item>
           
           <v-window-item :value="2">
-            <div class="intro-text">
-              <p>
+            <div class="intro-text mb-3">
+              <p class="mb-3">
                 In this interactive page you can:
               </p>
               
@@ -449,13 +448,13 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Explore what the eclipse will look like from different parts of the country
+                    Explore what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Use some detective work to identify the Path of Visibility for the annular eclipse
+                    Use some detective work to identify the Path of Visibility in the U.S. for the annular eclipse
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -467,7 +466,7 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses. 
+                    Learn more about solar eclipses 
                 </v-list-item>
               </ul>
             </div>
@@ -1060,7 +1059,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: false,
+      inIntro: false, //FIX
 
       tab: 0,
       introSlide: 1,
