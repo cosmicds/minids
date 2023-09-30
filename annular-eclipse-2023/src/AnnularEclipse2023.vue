@@ -54,14 +54,15 @@
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
                 <p>Have you determined the eclipse path? Click to select it.</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring.</p>
+                <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
             </div>
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
-                <p>Select any location you like by clicking on the map, and view the eclipse from there.</p>
+                <p>Select any location you like by double-clicking on the map, and view the eclipse from there.</p>
+                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
           </v-col>
@@ -103,12 +104,22 @@
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
-                v-model="showTextSheet"
+                v-model="showInfoSheet"
                 fa-icon="book-open"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
+                :tooltip-location="'bottom'"
+                :box-shadow="false"
+              ></icon-button>
+              <icon-button
+                v-model="showWWTGuideSheet"
+                fa-icon="computer-mouse"
+                fa-size="xl"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'Feature Guide'"
                 :tooltip-location="'bottom'"
                 :box-shadow="false"
               ></icon-button>
@@ -172,7 +183,7 @@
     <v-dialog
       scrim="false"
       transition="slide-y-transition"
-      v-model="showTextSheet" 
+      v-model="showInfoSheet" 
       class='bottom-sheet'
       id="text-bottom-sheet"
       :style="cssVars"
@@ -196,8 +207,8 @@
           class="control-icon"
           icon="times"
           size="lg"
-          @click="showTextSheet = false"
-          @keyup.enter="showTextSheet = false"
+          @click="showInfoSheet = false"
+          @keyup.enter="showInfoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
@@ -208,10 +219,13 @@
                 <v-col cols="6" id="info-text-box">
                   <div id="main-info-text">
                     <p>
-                    Get ready North America for not one, but two brilliant solar eclipses! 
-                    First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
-                    get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
-                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.
+                    Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
+                    </p>
+                    <p>
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
+                    </p>
+                    <p id="safety-warning">
+                      SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
                     </p>
                   </div>  
                     <div id="FAQ">
@@ -219,29 +233,25 @@
                         <summary>
                           What causes Solar Eclipses?
                         </summary>
-                      <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
-                        Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
-                        to be in the path of the next two solara eclipses. 
+                        <p>
+                          A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
                         </p>
                       </details>
                       
                       <details>
                         <summary> Total vs. Annular Eclipse</summary>
                         <p>
-                          During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
-                          in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
-                          doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
+                          During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
                         </p>
                       </details>
                       
                       <details> 
                         <summary> Why can only some places see the eclipse?</summary>
                         <p>
-                          An eclipse is caused by the Moon casting a shadow on the Earth. 
-                          People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
-                          As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
-                          For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
-                          the Sun will not be blocked at all, and there will be no eclipse visible. 
+                          An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                        </p>
+                        <p> 
+                          The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
                         </p> 
                       </details>
                     </div>
@@ -1047,7 +1057,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
-      showTextSheet: false,   
+      showInfoSheet: false,   
       
       toggleTrackSun: true,
       
@@ -1229,7 +1239,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
-        '--app-content-height': this.showTextSheet ? '100%' : '100%',
+        '--app-content-height': this.showInfoSheet ? '100%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
         '--moon-color': this.moonColor,
       };
@@ -1253,7 +1263,7 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
-    // showTextSheet: {
+    // showInfoSheet: {
     //   get(): boolean {
     //     return this.sheet === 'text';
     //   },
@@ -2281,8 +2291,9 @@ body {
   left: 1rem;
   
   .icon-wrapper {
-    padding-inline: 7px 8px;
-    width: 2.5rem;
+    padding-inline: 0.5em;
+    padding-block: 0.6em;
+    border: 2px solid var(--accent-color);
   }
 
 }
@@ -2594,6 +2605,13 @@ body {
   }
   #main-info-text {
     padding-inline: 0.5em;
+  }
+
+  #safety-warning{
+    margin-top: 0.4em;
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: ~"max(20px, calc(1em + 0.3vw))";
   }
   
   #FAQ{
