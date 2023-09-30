@@ -82,17 +82,6 @@
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
-                :model-value="learnerPath == 'Answer'"
-                fa-icon="puzzle-piece"
-                fa-size="xl"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-text="'Identify eclipse path'"
-                :tooltip-location="'bottom'"
-                :box-shadow="false"
-                @activate="() => { learnerPath = 'Answer'}"
-              ></icon-button>   
-              <icon-button
                 :model-value="learnerPath == 'Choose'" 
                 fa-icon="location-dot"
                 fa-size="xl"
@@ -103,6 +92,17 @@
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
+              <icon-button
+                :model-value="learnerPath == 'Answer'"
+                fa-icon="puzzle-piece"
+                fa-size="xl"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'Identify eclipse path'"
+                :tooltip-location="'bottom'"
+                :box-shadow="false"
+                @activate="() => { learnerPath = 'Answer'}"
+              ></icon-button>   
               <icon-button
                 v-model="showInfoSheet"
                 fa-icon="book-open"
@@ -434,15 +434,17 @@
         <v-window v-model="introSlide">
           <v-window-item :value="1">
             <div class="intro-text">
-              <p>
+              <p class="mb-5">
               On October 14, 2023, the Americas will experience
               a partial solar eclipse, where the Moon 
               will appear to travel across the Sun and 
               block a portion of it.
               </p>
-            <br />
-              <p>
+              <p  class="mb-5">
               A lucky segment of the U.S., Central, and South America will experience a dazzling <b>"Ring of Fire"</b> created by an <b>annular eclipse</b>.
+              </p>
+              <p class="mb-5">
+              Use your detective skills to identify where those lucky people are in our map quiz.
               </p>
             </div>
           </v-window-item>
@@ -465,7 +467,7 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Use some detective work to identify the Path of Visibility in the U.S. for the annular eclipse
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -478,6 +480,12 @@
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about solar eclipses 
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
+                  </template>
+                    Learn more about how to navigate this app 
                 </v-list-item>
               </ul>
             </div>
@@ -1070,7 +1078,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: false, //FIX
+      inIntro: true, //FIX
 
       tab: 0,
       introSlide: 1,
