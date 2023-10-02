@@ -210,63 +210,59 @@
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
-        <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                <v-row>
-                <v-col cols="6" id="info-text-box">
-                  <div id="main-info-text">
+        <v-card class="no-bottom-border-radius scrollable">
+          <v-card-text class="info-text no-bottom-border-radius">
+            <v-row>
+            <v-col cols="6" id="info-text-box">
+              <div id="main-info-text">
+                <p>
+                Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
+                </p>
+                <p>
+                This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
+                </p>
+                <p id="safety-warning">
+                  SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
+                </p>
+              </div>  
+                <div id="FAQ">
+                  <details>
+                    <summary>
+                      What causes Solar Eclipses?
+                    </summary>
                     <p>
-                    Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
+                      A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
                     </p>
+                  </details>
+                  
+                  <details>
+                    <summary> Total vs. Annular Eclipse</summary>
                     <p>
-                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
+                      During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
                     </p>
-                    <p id="safety-warning">
-                      SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
+                  </details>
+                  
+                  <details> 
+                    <summary> Why can only some places see the eclipse?</summary>
+                    <p>
+                      An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
                     </p>
-                  </div>  
-                    <div id="FAQ">
-                      <details>
-                        <summary>
-                          What causes Solar Eclipses?
-                        </summary>
-                        <p>
-                          A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
-                        </p>
-                      </details>
-                      
-                      <details>
-                        <summary> Total vs. Annular Eclipse</summary>
-                        <p>
-                          During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
-                        </p>
-                      </details>
-                      
-                      <details> 
-                        <summary> Why can only some places see the eclipse?</summary>
-                        <p>
-                          An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
-                        </p>
-                        <p> 
-                          The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
-                        </p> 
-                      </details>
-                    </div>
-                </v-col>
-                <v-col cols="6">
-                  <figure>
-                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-                  </figure>
-                </v-col>
-              </v-row>
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-        </v-window>
+                    <p> 
+                      The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                    </p> 
+                  </details>
+                </div>
+            </v-col>
+            <v-col cols="6">
+              <figure>
+                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+              </figure>
+            </v-col>
+          </v-row>
+          </v-card-text>
+        </v-card>
       </v-card>
     </v-dialog>
     
@@ -279,7 +275,7 @@
       :style="cssVars"
     >
       <v-card
-        id="wwt-sheet-card">
+        class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
           height="32px"
@@ -300,64 +296,60 @@
           @keyup.enter="showWWTGuideSheet = false"
           tabindex="0"
         ></font-awesome-icon>
-        <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                <v-container>
-                  <v-row align="center">
-                  <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Pan
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row align="center">
-                    <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Zoom
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="credits">
-                      <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                      Pat Udomprasert<br>
-                      Jon Carifio<br>
-                      John Lewis<br>
-                      Alyssa Goodman<br>
-                      Mary Dussault<br>
-                      Harry Houghton<br>
-                      Anna Nolin<br>
-                      Evaluator: Sue Sunbury<br>
-                      <br>
-                      <h4>WorldWide Telescope Team:</h4>
-                      Peter Williams<br>
-                      A. David Weigel<br>
-                      Jon Carifio<br>
-                      </div>
-                      <v-spacer class="end-spacer"></v-spacer>
-                    </v-col>
-                  </v-row>
-                </v-container>              
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-        </v-window>
+        <v-card class="no-bottom-border-radius scrollable">
+          <v-card-text class="info-text no-bottom-border-radius">
+            <v-container>
+              <v-row align="center">
+              <v-col cols="4">
+                  <v-chip
+                    label
+                    outlined
+                  >
+                    Pan
+                  </v-chip>
+                </v-col>
+                <v-col cols="8" class="pt-1">
+                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                </v-col>
+              </v-row>
+              <v-row align="center">
+                <v-col cols="4">
+                  <v-chip
+                    label
+                    outlined
+                  >
+                    Zoom
+                  </v-chip>
+                </v-col>
+                <v-col cols="8" class="pt-1">
+                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div class="credits">
+                  <h3>Credits:</h3>
+                  <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
+                  Pat Udomprasert<br>
+                  Jon Carifio<br>
+                  John Lewis<br>
+                  Alyssa Goodman<br>
+                  Mary Dussault<br>
+                  Harry Houghton<br>
+                  Anna Nolin<br>
+                  Evaluator: Sue Sunbury<br>
+                  <br>
+                  <h4>WorldWide Telescope Team:</h4>
+                  Peter Williams<br>
+                  A. David Weigel<br>
+                  Jon Carifio<br>
+                  </div>
+                  <v-spacer class="end-spacer"></v-spacer>
+                </v-col>
+              </v-row>
+            </v-container>              
+          </v-card-text>
+        </v-card>
       </v-card>
     </v-dialog>
 
