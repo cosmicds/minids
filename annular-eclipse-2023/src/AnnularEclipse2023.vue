@@ -880,7 +880,7 @@ export default defineComponent({
     sunPlace.set_names(["Sun"]);
     sunPlace.set_classification(Classification.solarSystem);   
     sunPlace.set_target(SolarSystemObjects.sun);
-    sunPlace.set_zoomLevel(5.2);
+    sunPlace.set_zoomLevel(20);
 
     const moonPlace = new Place();
     moonPlace.set_names(["Moon"]);
