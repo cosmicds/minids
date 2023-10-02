@@ -1392,7 +1392,7 @@ export default defineComponent({
     createMoonOverlay() {
 
       // Don't draw an overlay if we're using the regular WWT moon image
-      if (this.useRegularMoon) {
+      if (this.useRegularMoon || this.viewerMode === 'SunScope') {
         return;
       }
 
