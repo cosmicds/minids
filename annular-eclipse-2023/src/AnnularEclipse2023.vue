@@ -1390,6 +1390,12 @@ export default defineComponent({
     },
 
     createMoonOverlay() {
+
+      // Don't draw an overlay if we're using the regular WWT moon image
+      if (this.useRegularMoon) {
+        return;
+      }
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const canvasHeight: number = this.wwtControl.canvas.height;
@@ -1537,7 +1543,7 @@ export default defineComponent({
       const locations = points.map(pt => this.findRADecForScreenPoint({ x: pt.x, y: canvasHeight - pt.y }));
       const overlay = new Poly2();
       overlay.set_fill(true);
-      const color = this.moonTexture === "moon-sky-blue-overlay.png" ? this.skyColor : (this.moonTexture === "moon-dark-gray-overlay.png" ? "#5A5A5A" : "#808080");
+      const color = "#1F1F1F";
       overlay.set_fillColor(color);
       overlay.set_lineColor(color);
       locations.forEach(pt => overlay.addPoint(pt.ra, pt.dec));
@@ -1627,10 +1633,7 @@ export default defineComponent({
 
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
-      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
-      if(this.showHorizon) {
-        this.updateFrontAnnotations();
-      }
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad);
     },
 
     updateLocation(location: string) {
