@@ -53,9 +53,18 @@
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click to select it.</p>
+                <p>Have you determined the eclipse path? Click below to select it.</p>
                 <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
+              <mc-radiogroup
+                v-if="learnerPath=='Answer'"
+                row
+                :radio-options="['A', 'B','C']"
+                :feedbacks="['', '', '(C) Correct! It passes from Washington through Texas']"
+                :correct-answers="[2]"
+                @select="(e: any) => { console.log(e);}"
+                >
+              </mc-radiogroup>
             </div>
             
             <!-- Choose Path -->
@@ -144,7 +153,7 @@
           ></location-selector>
 
           <span v-if="learnerPath=='Answer'">
-            <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+            <img alt="CosmicDS Logo" src="./assets/AnnularEclipseMap.png"/>
           </span>
 
           <location-selector
