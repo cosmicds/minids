@@ -1429,7 +1429,7 @@ export default defineComponent({
         return;
       }
 
-      const n = 25;
+      const n = 50;
       
       // If the moon is completely "inside" of the sun
       if (sunMoonDistance < rSunPx - rMoonPx) {
@@ -2147,6 +2147,7 @@ export default defineComponent({
 
     useRegularMoon(_show: boolean) {
       this.updateMoonTexture();
+      this.updateFrontAnnotations(this.dateTime);
     },
 
     dateTime(_date: Date) {
@@ -2162,9 +2163,9 @@ export default defineComponent({
         if (this.playing) {
           this.playing = false;
           this.selectedTime = this.minTime;
-          setTimeout(() => {
-            this.playing = true;
-          }, 1000);
+          // setTimeout(() => {
+          //   this.playing = true;
+          // }, 1000);
         }
         
         return;
