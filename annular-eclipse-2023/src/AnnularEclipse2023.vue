@@ -2922,15 +2922,7 @@ body {
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
         
-        @media (max-width: 600px){ //SMALL
-          font-size: 0.9rem;
-        }
-        @media (min-width: 601px){ //MEDIUM
-          font-size: 1.1rem;
-        }
-        @media (min-width: 900px){ //LARGE
-          font-size: 1.2rem;
-        }
+        font-size: clamp(0.6rem, 1.75vw, 1.2rem);
 
         // span
         .description {
