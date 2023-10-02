@@ -200,7 +200,6 @@
           grow
         >
           <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
-          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"
@@ -267,6 +266,41 @@
               </v-card-text>
             </v-card>
           </v-window-item>
+        </v-window>
+      </v-card>
+    </v-dialog>
+    
+    <v-dialog
+      scrim="false"
+      transition="slide-y-transition"
+      v-model="showWWTGuideSheet" 
+      class='bottom-sheet'
+      id="wwt-guide-sheet"
+      :style="cssVars"
+    >
+      <v-card
+        id="wwt-sheet-card">
+        <v-tabs
+          v-model="tab"
+          height="32px"
+          :color="accentColor"
+          :slider-color="accentColor"
+          id="tabs"
+          dense
+          grow
+        >
+          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
+        </v-tabs>
+        <font-awesome-icon
+          id="close-text-icon"
+          class="control-icon"
+          icon="times"
+          size="lg"
+          @click="showWWTGuideSheet = false"
+          @keyup.enter="showWWTGuideSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
+        <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
@@ -926,6 +960,8 @@ export default defineComponent({
       showMapSelector: false,
       showLocationSelector: false,
 
+      showWWTGuideSheet: false,
+      
       selectionProximity: 4,
       pointerMoveThreshold: 6,
       isPointerMoving: false,
@@ -2598,7 +2634,10 @@ body {
   }
 }
 
-
+#wwt-sheet-card {
+  width: 50%;
+  align-self: center;
+}
 
 .bottom-sheet {
 
