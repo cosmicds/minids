@@ -61,7 +61,7 @@
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
-                <p>Select any location you like by double-clicking on the map, and view the eclipse from there.</p>
+                <p>Select any location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
                 <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
@@ -119,7 +119,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'Feature Guide'"
+                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :box-shadow="false"
               ></icon-button>
@@ -285,7 +285,7 @@
           dense
           grow
         >
-          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
+          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"
@@ -323,6 +323,127 @@
                 </v-col>
                 <v-col cols="8" class="pt-1">
                   <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div
+                      style="min-height: 120px;"
+                  >
+                    <p>
+                      This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
+                    </p>
+                    
+                    <h4 class="user-guide-header">Time Controls:</h4>
+                    <p  class="mb-3">(See bottom-left of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="play"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to move time forward at 1000x the real speed.
+                      </li>
+                      <li>
+                        If playing, click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="pause"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to pause time.
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-down"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to decrease speed by 10x.                        
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-up"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to increase speed by 10x. 
+                      </li>
+                      <li>
+                        You can also control time by dragging <v-icon
+                          class="bullet-icon"
+                          icon="mdi-circle"
+                          size="medium" 
+                        ></v-icon> along the slider.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Viewing Mode:</h4>
+                    <p  class="mb-3">(See upper-right of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        The <span 
+                        style="color: blue; background-color: white;
+                        padding-inline: 0.7em;
+                        border-radius: 20px;
+                        font-weight: bold ">selected location</span> is displayed under the map.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-telescope"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image-filter-hdr"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-white-balance-sunny"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Display Options:</h4>
+                    <p  class="mb-3">(See bottom-right of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        <span class="user-guide-emphasis-white">Sky Grid:</span> Display altitude/azimuth grid with cardinal directions.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Ecliptic:</span> Display path on sky that Sun appears to travel throughout a year.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Horizon:</span> Display a virtual "ground" that delineates where the Sun rises and sets.                     
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
+                      </li>
+                    </ul>
+
+                  </div>
+                          
+                  <v-divider thickness="2px" class="solid-divider"></v-divider>
+                  
+                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
                 </v-col>
               </v-row>
               <v-row>
@@ -1104,7 +1225,7 @@ export default defineComponent({
       maxTime: maxTime,
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
-      accentColor: "#ef7e3d",
+      accentColor: "#ff8f00",
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
@@ -2892,6 +3013,7 @@ body {
     height: fit-content;
     width: 100%;
     align-self: center;
+    border-bottom: solid #212121 0.5em;
   }
   
   #tabs {
@@ -2945,6 +3067,27 @@ body {
   // (around 400px or less)
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
+  }
+
+  .user-guide-header {
+    margin-top: 1rem;
+    color: var(--accent-color);
+    font-size: larger;
+  }
+
+  .user-guide-emphasis {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  .user-guide-emphasis-white {
+    font-weight: bold;
+  }
+
+  .solid-divider {
+    margin-top: 1rem;
+    color: var(--sky-color);
+    opacity: 0.7;
   }
 }
 
