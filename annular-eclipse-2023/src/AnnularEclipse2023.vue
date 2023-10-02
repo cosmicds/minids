@@ -1118,16 +1118,12 @@ export default defineComponent({
   },
 
   mounted() {
-    console.log(Annotation2);
     this.waitForReady().then(async () => {
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
       console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.app = this;
       console.log(this);
       this.setTime(this.dateTime);
 
@@ -1441,8 +1437,6 @@ export default defineComponent({
         let y1: number;
         let x2: number;
         let y2: number;
-        let xc: number;
-        let yc: number;
 
         if (sunPoint.x === 0) {
 
@@ -1457,15 +1451,12 @@ export default defineComponent({
           y1 = ysh;
           x2 = -x1;
           y2 = ysh;
-          xc = 0;
-          yc = ysh;
 
         } else {
 
           // m is the slope of the line joining the moon and the sun
-          // mPerp is the slope of a perpendicular line
-          // yInt is the y-intercept of the perpendicular bisector between Sun and Moon points
-          const m = sunPoint.y / sunPoint.x;
+          // mPerp is the slope of a line perpendicular to the line joining the moon and the sun
+          // yInt is the y-intercept of a line passing through the two points of intersection
           const mPerp = -sunPoint.x / sunPoint.y;
           const yInt = (sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y - (rSunPx * rSunPx - rMoonPx * rMoonPx)) / (2 * sunPoint.y);
 
@@ -1482,14 +1473,6 @@ export default defineComponent({
           x2 = (-b - sqrDisc) / (2 * a);
           y1 = mPerp * x1 + yInt;
           y2 = mPerp * x2 + yInt;
-
-          // Find the point at the edge of the moon along the line joining their centers
-          xc = rMoonPx / Math.sqrt(1 + m * m);
-          if (sunPoint.x < 0) {
-            xc *= -1;
-          }
-          yc = m * xc;
-          yc;
         }
 
         // The standard-position angle of the sun-moon line in the moon's reference frame
