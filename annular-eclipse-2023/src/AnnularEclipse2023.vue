@@ -770,7 +770,7 @@ import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
-import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture } from "@wwtelescope/engine";
+import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture, CAAMoon } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
@@ -1195,6 +1195,7 @@ export default defineComponent({
       window.addEventListener('resize', this.onResize);
       this.onResize();
     });
+
   },
 
   computed: {
@@ -1374,6 +1375,181 @@ export default defineComponent({
       });
     },
 
+    angleInZeroToTwoPi(angle: number): number {
+      const twoPi = 2 * Math.PI;
+      return ((angle% twoPi) + twoPi) % twoPi;
+    },
+
+    // This assumes that the input angles are in the range [0, 2pi)
+    angleBetween(test: number, lower: number, upper: number): boolean {
+      if (lower < upper) {
+        return test >= lower && test <= upper;
+      } else {
+        return test >= lower || test <= upper;
+      }
+    },
+
+    createMoonOverlay() {
+
+      // Don't draw an overlay if we're using the regular WWT moon image
+      if (this.useRegularMoon || this.viewerMode === 'SunScope') {
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const canvasHeight: number = this.wwtControl.canvas.height;
+
+      const sunPosition = Planets['_planetLocations'][0];
+      const moonPosition = Planets['_planetLocations'][9];
+      const sunPoint = this.findScreenPointForRADec({ ra: sunPosition.RA * 15, dec: sunPosition.dec });
+      const moonPoint = this.findScreenPointForRADec({ ra: moonPosition.RA * 15, dec: moonPosition.dec });
+      moonPoint.y = canvasHeight - moonPoint.y;
+      sunPoint.x -= moonPoint.x;
+      sunPoint.y = canvasHeight - sunPoint.y - moonPoint.y;
+
+      const jd = this.getJulian(this.selectedDate);
+      const distanceToMoon = CAAMoon.radiusVector(jd);
+      const distanceToSun = 149_597_871;
+
+      const rMoon = 1740;  // radius of the moon in km
+      const rSun = 696_340;
+      const thetaMoon = Math.atan2(rMoon, distanceToMoon);
+      const thetaSun = Math.atan2(rSun, distanceToSun);
+
+      // The factor of 6 comes from the relation between wwtZoomDeg and the actual size of the FOV in degrees
+      const rMoonPx = 6 * thetaMoon * canvasHeight / (this.wwtZoomDeg * D2R);
+      const rSunPx = 6 * thetaSun * canvasHeight / (this.wwtZoomDeg * D2R);
+
+      const points: { x: number; y: number }[] = [];
+      const sunMoonDistance = Math.sqrt(sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y);
+
+      // If there's no sun/moon intersection, no need to continue
+      if (sunMoonDistance > rMoonPx + rSunPx) {
+        return;
+      }
+
+      const n = 50;
+      
+      // If the moon is completely "inside" of the sun
+      if (sunMoonDistance < rSunPx - rMoonPx) {
+        for (let i = 0; i <= n; i++) {
+          const angle = (i / n) * 2 * Math.PI;
+          points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
+        }
+      } else {
+
+        let x1: number;
+        let y1: number;
+        let x2: number;
+        let y2: number;
+
+        if (sunPoint.x === 0) {
+
+          const ysh = 0.5 * sunPoint.y;
+          if (ysh >= rMoonPx) {
+            return;
+          }
+          x1 = Math.sqrt(rMoonPx * rMoonPx - ysh * ysh);
+          if (isNaN(x1)) {
+            return;
+          }
+          y1 = ysh;
+          x2 = -x1;
+          y2 = ysh;
+
+        } else {
+
+          // m is the slope of the line joining the moon and the sun
+          // mPerp is the slope of a line perpendicular to the line joining the moon and the sun
+          // yInt is the y-intercept of a line passing through the two points of intersection
+          const mPerp = -sunPoint.x / sunPoint.y;
+          const yInt = (sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y - (rSunPx * rSunPx - rMoonPx * rMoonPx)) / (2 * sunPoint.y);
+
+          // Find the x-coordinates of the edge points of the moon-sun intersection
+          const a = (1 + mPerp * mPerp);
+          const b = 2 * mPerp * yInt;
+          const c = yInt * yInt - rMoonPx * rMoonPx;
+
+          const sqrDisc = Math.sqrt(b * b - 4 * a * c);
+          if (isNaN(sqrDisc)) {
+            return;
+          }
+          x1 = (-b + sqrDisc) / (2 * a);
+          x2 = (-b - sqrDisc) / (2 * a);
+          y1 = mPerp * x1 + yInt;
+          y2 = mPerp * x2 + yInt;
+        }
+
+        // The standard-position angle of the sun-moon line in the moon's reference frame
+        const alpha = this.angleInZeroToTwoPi(Math.atan2(sunPoint.y, sunPoint.x));
+
+        let theta1 = Math.atan2(y1 / rMoonPx, x1 / rMoonPx);
+        let theta2 = Math.atan2(y2 / rMoonPx, x2 / rMoonPx);
+        theta1 = this.angleInZeroToTwoPi(theta1);
+        theta2 = this.angleInZeroToTwoPi(theta2);
+        if (!this.angleBetween(alpha, theta1, theta2)) {
+          const t = theta1;
+          theta1 = theta2;
+          theta2 = t;
+        }
+
+        if (theta1 > theta2) {
+          theta1 -= 2 * Math.PI;
+        }
+
+        const rangeSize = theta2 - theta1;
+        for (let i = 0; i <= n; i++) {
+          const angle = theta1 + (i / n) * rangeSize;
+          points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
+        }
+
+
+        // We now need to somewhat repeat this analysis in the Sun frame
+
+        let thetaS1 = Math.atan2((y1 - sunPoint.y) / rSunPx, (x1 - sunPoint.x) / rSunPx);
+        let thetaS2 = Math.atan2((y2 - sunPoint.y) / rSunPx, (x2 - sunPoint.x) / rSunPx);
+        thetaS1 = this.angleInZeroToTwoPi(thetaS1);
+        thetaS2 = this.angleInZeroToTwoPi(thetaS2);
+        const alphaS = this.angleInZeroToTwoPi(Math.PI + alpha);
+        if (!this.angleBetween(alphaS, thetaS1, thetaS2)) {
+          const t = thetaS1;
+          thetaS1 = thetaS2;
+          thetaS2 = t;
+        }
+
+        if (thetaS1 > thetaS2) {
+          thetaS1 -= 2 * Math.PI;
+        }
+        const rangeSizeS = thetaS2 - thetaS1;
+        for (let i = 0; i <= n; i++) {
+          const angle = thetaS1 + (i / n) * rangeSizeS;
+          points.push({ x: rSunPx * Math.cos(angle) + sunPoint.x, y: rSunPx * Math.sin(angle) + sunPoint.y });
+        }
+      }
+
+      // We made a translation into the moon's frame, so undo that
+      for (let i = 0; i < points.length; i++) {
+        points[i].x += moonPoint.x;
+        points[i].y += moonPoint.y;
+      }
+
+      const centroidX = points.reduce((s, p) => s + p.x, 0) / points.length;
+      const centroidY = points.reduce((s, p) => s + p.y, 0) / points.length;
+
+      // The fact that we're going to re-flip the y axis makes the sign here opposite from what one would expect
+      points.sort((p1, p2) => - Math.atan2(p2.y - centroidY, p2.x - centroidX) + Math.atan2(p1.y - centroidY, p1.x - centroidX));
+
+      const locations = points.map(pt => this.findRADecForScreenPoint({ x: pt.x, y: canvasHeight - pt.y }));
+      const overlay = new Poly2();
+      overlay.set_fill(true);
+      const color = "#1F1F1F";
+      overlay.set_fillColor(color);
+      overlay.set_lineColor(color);
+      locations.forEach(pt => overlay.addPoint(pt.ra, pt.dec));
+      Annotation2.addAnnotation(overlay);
+    },
+
 
     onWWTRenderFrame(wwtControl: WWTControl) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1457,10 +1633,7 @@ export default defineComponent({
 
     updateWWTLocation() {
       this.wwtSettings.set_locationLat(R2D * this.location.latitudeRad);
-      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad );
-      if(this.showHorizon) {
-        this.updateHorizon();
-      }
+      this.wwtSettings.set_locationLng(R2D * this.location.longitudeRad);
     },
 
     updateLocation(location: string) {
@@ -1507,7 +1680,7 @@ export default defineComponent({
 
     onTimeSliderChange() {
       this.$nextTick(() => {
-        this.updateHorizon(this.dateTime);
+        this.updateFrontAnnotations(this.dateTime);
       });
     },
 
@@ -1738,14 +1911,15 @@ export default defineComponent({
       if (this.syncDateTimeWithWWTCurrentTime) {
         this.setTime(this.dateTime);
       }
-      this.updateHorizon(this.dateTime); 
+      this.updateFrontAnnotations(this.dateTime);
     },
 
-    updateHorizon(when: Date | null = null) {
+    updateFrontAnnotations(when: Date | null = null) {
       try {
         this.removeAnnotations();
       }
       finally {
+        this.createMoonOverlay();
         if (this.showHorizon) {
           this.createHorizon(when);
           if (this.showSky) {
@@ -1803,7 +1977,7 @@ export default defineComponent({
       this.showAltAzGrid = false;
       this.skyColor = this.skyColorNight;
       this.horizonOpacity = 0.6;
-      this.updateHorizon(); // manually update horizon
+      this.updateFrontAnnotations(); // manually update horizon
       this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
       // this.setForegroundOpacity(100);
@@ -1950,17 +2124,30 @@ export default defineComponent({
     },
 
     showHorizon(_show: boolean) {
-      this.updateHorizon();
+      this.updateFrontAnnotations();
       this.updateMoonTexture();
     },
 
     showSky(_show: boolean) {
-      this.updateHorizon();
+      this.updateFrontAnnotations();
       this.updateMoonTexture();
+    },
+
+    wwtRollRad(angle: number) {
+      if (angle !== 0) {
+        this.gotoRADecZoom({
+          raRad: this.wwtRARad,
+          decRad: this.wwtDecRad,
+          zoomDeg: this.wwtZoomDeg,
+          rollRad: 0,
+          instant: true
+        });
+      }
     },
 
     useRegularMoon(_show: boolean) {
       this.updateMoonTexture();
+      this.updateFrontAnnotations(this.dateTime);
     },
 
     dateTime(_date: Date) {
@@ -1976,16 +2163,16 @@ export default defineComponent({
         if (this.playing) {
           this.playing = false;
           this.selectedTime = this.minTime;
-          setTimeout(() => {
-            this.playing = true;
-          }, 1000);
+          // setTimeout(() => {
+          //   this.playing = true;
+          // }, 1000);
         }
         
         return;
       }
       
       this.selectedTime = time.getTime();
-      this.updateHorizon(time);
+      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -2013,10 +2200,10 @@ export default defineComponent({
       this.playing = false;
       this.updateWWTLocation();
 
-      // We need to let the location update before we redraw the horizon
-      this.$nextTick(() => {
-        this.updateHorizon();
-      });
+      // We need to let the location update before we redraw the horizon and overlay
+      // Not a huge fan of having to do this, but we really need a frame render to update e.g. sun/moon positions
+      this.wwtControl.renderOneFrame();
+      this.updateFrontAnnotations();
 
       this.centerSun();
     },
@@ -2056,7 +2243,7 @@ export default defineComponent({
     },
 
     skyColor(_color: string) {
-      this.updateHorizon();
+      this.updateFrontAnnotations();
     },
 
     sunAboveHorizon(isAbove: boolean) {
