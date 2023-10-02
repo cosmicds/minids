@@ -187,8 +187,8 @@
           dense
           grow
         >
-          <v-tab tabindex="0"><h3>Information</h3></v-tab>
-          <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
+          <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
+          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"
@@ -204,42 +204,46 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
                 <v-row>
-                <v-col id="FAQ" cols="6">
+                <v-col cols="6" id="info-text-box">
+                  <div id="main-info-text">
+                    <p>
                     Get ready North America for not one, but two brilliant solar eclipses! 
                     First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
                     get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
-                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.    
-                    
-                    <details>
-                      <summary>
-                        What causes Solar Eclipses? ☀️🌕🌎
-                      </summary>
-                    <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
-                      Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
-                      to be in the path of the next two solara eclipses. 
-                      </p>
-                    </details>
-                    
-                    <details>
-                      <summary> Total vs. Annular Eclipse</summary>
-                      <p>
-                        During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
-                        in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
-                        doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
-                      </p>
-                    </details>
-                    
-                    <details> 
-                      <summary> Why can only some places see the eclipse? 🌒</summary>
-                      <p>
-                        An eclipse is caused by the Moon casting a shadow on the Earth. 
-                        People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
-                        As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
-                        For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
-                        the Sun will not be blocked at all, and there will be no eclipse visible. 
-                      </p> 
-                    </details>
-                    
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.
+                    </p>
+                  </div>  
+                    <div id="FAQ">
+                      <details>
+                        <summary>
+                          What causes Solar Eclipses?
+                        </summary>
+                      <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
+                        Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
+                        to be in the path of the next two solara eclipses. 
+                        </p>
+                      </details>
+                      
+                      <details>
+                        <summary> Total vs. Annular Eclipse</summary>
+                        <p>
+                          During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
+                          in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
+                          doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
+                        </p>
+                      </details>
+                      
+                      <details> 
+                        <summary> Why can only some places see the eclipse?</summary>
+                        <p>
+                          An eclipse is caused by the Moon casting a shadow on the Earth. 
+                          People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
+                          As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
+                          For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
+                          the Sun will not be blocked at all, and there will be no eclipse visible. 
+                        </p> 
+                      </details>
+                    </div>
                 </v-col>
                 <v-col cols="6">
                   <figure>
@@ -1042,7 +1046,8 @@ export default defineComponent({
 
       showAltAzGrid: true,
       showHorizon: true,
-      showEcliptic: false,    
+      showEcliptic: false, 
+      showTextSheet: true,   
       
       toggleTrackSun: true,
       
@@ -1250,14 +1255,14 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
-    showTextSheet: {
-      get(): boolean {
-        return this.sheet === 'text';
-      },
-      set(_value: boolean) {
-        this.selectSheet('text');
-      }
-    },
+    // showTextSheet: {
+    //   get(): boolean {
+    //     return this.sheet === 'text';
+    //   },
+    //   set(_value: boolean) {
+    //     this.selectSheet('text');
+    //   }
+    // },
 
     locationDeg: {
       get(): LocationDeg {
@@ -2580,7 +2585,43 @@ body {
 
 
 .bottom-sheet {
+
+  .tab-title {
+    font-size: ~"max(18px, calc(1.1em + 0.3vw))";
+  }
+
+  #info-text-box {
+    font-size: ~"max(16px, calc(1em + 0.3vw))";
+    line-height: ~"max(20px, calc(1.1em + 0.4vw))";
+  }
+  #main-info-text {
+    padding-inline: 0.5em;
+  }
   
+  #FAQ{
+    margin-top: 1em;
+
+    details {
+      padding-block: 0.7em;
+      padding-inline: 1.2em;
+      height: fit-content;
+      background-color: #486273;
+      
+      summary {
+        font-weight: bold;
+        font-size: ~"max(16px, calc(0.8em + 0.3vw))";
+        cursor: pointer;
+      }
+      
+      p {
+
+        padding-top: 0.5em;
+        padding-inline: 1em;
+      }
+    
+    }
+  }
+
   figure {
     position: sticky;
     top: 0;
@@ -2594,35 +2635,6 @@ body {
       padding-inline: 10px 5px;
     }
   }
-  
-  #FAQ{
-  
-    details {
-      font-size: 1em;
-      padding: 0.5em;
-      height: fit-content;
-      margin-block: 0.5em;
-      border-top-left-radius: 0.5em;
-      background-color: #486273;
-      
-      summary {
-        font-weight: bold;
-        font-size: 1em;
-        cursor: pointer;
-      }
-      
-      p {
-        font-size: 0.9em;
-        padding: 0.5em;
-      }
-      
-      &[open] {
-        border-bottom-left-radius: 0.5em;
-      }
-    }
-  }
-  
-
   
   .v-overlay__content {
     align-self: center;
@@ -2675,22 +2687,7 @@ body {
     // border-bottom-right-radius: 0px !important;
     width: auto;
   }
-
-  #tab-items {
-    // padding-bottom: 2px !important;
-
-    .v-card-text {
-      font-size: ~"max(14px, calc(0.7em + 0.3vw))";
-      padding-top: ~"max(2vw, 16px)";
-      padding-left: ~"max(4vw, 16px)";
-      padding-right: ~"max(4vw, 16px)";
-
-      .end-spacer {
-        height: 25px;
-      }
-    }
-
-  }
+  
 
   #close-text-icon {
     position: absolute;
