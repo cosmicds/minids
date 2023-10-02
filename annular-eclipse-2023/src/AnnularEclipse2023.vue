@@ -9,7 +9,7 @@
     <div id="close-guided-content-container">
       <font-awesome-icon
         v-model="showGuidedContent"
-        size="lg"
+        size="xl"
         class="ma-1"
         :color="accentColor"
         :icon="`square-xmark`"
@@ -71,37 +71,45 @@
               <icon-button
                 :model-value="learnerPath == 'Explore'"
                 fa-icon="rocket"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'View eclipse from multiple locations'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
                 :model-value="learnerPath == 'Answer'"
                 fa-icon="puzzle-piece"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'Identify eclipse path'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
               <icon-button
                 :model-value="learnerPath == 'Choose'" 
                 fa-icon="location-dot"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="'Choose any viewing location'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
                 v-model="showTextSheet"
                 fa-icon="book-open"
+                fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :tooltip-location="'bottom'"
+                :box-shadow="false"
               ></icon-button>
             </div>
           <!-- </v-col> -->
@@ -490,7 +498,7 @@
     </v-dialog>
   
   <div id="top-wwt-content">
-      <div id="location-time-display">
+      <div id="location-date-display">
         <v-chip 
           prepend-icon="mdi-map-marker-radius"
           variant="outlined"
@@ -521,7 +529,6 @@
               v-bind="props"
               id="viewer-mode-switch"
               >
-              
               <v-switch
                 inset
                 hide-details
@@ -590,7 +597,7 @@
               :color="accentColor"
               v-model="showAltAzGrid"
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
-              label="Grid"
+              label="Sky Grid"
               hide-details 
             />
             <v-checkbox
@@ -611,7 +618,7 @@
               :color="accentColor"
               v-model="useRegularMoon"
               @keyup.enter="useRegularMoon = !useRegularMoon"
-              label="Bright Moon"
+              label="Visible Moon"
               hide-details
             />
           </div>
@@ -620,57 +627,59 @@
 
       <div id="tools">
         <span class="tool-container">
-          <icon-button
-            id="play-pause-icon"
-            :fa-icon="!(playing) ? 'play' : 'pause'"
-            @activate="() => {
-              playing = !(playing);
-            }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="Play/Pause"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <icon-button
-            id="speed-down"
-            :fa-icon="'angle-double-down'"
-            @activate="() => {
-                  speedIndex -= 1;
-                  playbackRate = Math.pow(10, speedIndex);
-                  playing = true;
-                }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="10x slower"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <icon-button
-            id="speed-up"
-            :fa-icon="'angle-double-up'"
-            @activate="() => {
-                  speedIndex += 1;
-                  playbackRate = Math.pow(10, speedIndex);
-                  playing = true;
-                }"
-            :color="accentColor"
-            :focus-color="accentColor"
-            tooltip-text="10x faster"
-            tooltip-location="top"
-            tooltip-offset="5px"
-          ></icon-button>
-          <div id="speed-text">
-            Time rate: 
-            <span v-if="playbackRate===1 && playing">
-              Real time
-            </span>
-            <span v-if="playbackRate!=1 && playing">
-              {{ playbackRate }}&times;
-            </span>
-            <span v-if="!playing">
-              Paused
-            </span>
+          <div id="speed-control">
+            <icon-button
+              id="play-pause-icon"
+              :fa-icon="!(playing) ? 'play' : 'pause'"
+              @activate="() => {
+                playing = !(playing);
+              }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="Play/Pause"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <icon-button
+              id="speed-down"
+              :fa-icon="'angle-double-down'"
+              @activate="() => {
+                    speedIndex -= 1;
+                    playbackRate = Math.pow(10, speedIndex);
+                    playing = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="10x slower"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <icon-button
+              id="speed-up"
+              :fa-icon="'angle-double-up'"
+              @activate="() => {
+                    speedIndex += 1;
+                    playbackRate = Math.pow(10, speedIndex);
+                    playing = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="10x faster"
+              tooltip-location="top"
+              tooltip-offset="5px"
+            ></icon-button>
+            <div id="speed-text">
+              Time rate: 
+              <span v-if="playbackRate===1 && playing">
+                Real time
+              </span>
+              <span v-if="playbackRate!=1 && playing">
+                {{ playbackRate }}&times;
+              </span>
+              <span v-if="!playing">
+                Paused
+              </span>
+            </div>
           </div>
           <v-slider
             id="slider"
@@ -1046,7 +1055,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: true,
+      inIntro: false,
 
       tab: 0,
       introSlide: 1,
@@ -2260,16 +2269,7 @@ body {
 
 // these are now in #top-content
 
-#track-sun-switch {
-  // position: absolute;
-  // top: 1rem;
-  // left: 6rem;
-  pointer-events: auto;
-  .v-switch__thumb {
-    color: var(--accent-color);
-    background-color: black; 
-  }
-}
+
 
 
 #share-button-wrapper {
@@ -2359,9 +2359,16 @@ body {
   pointer-events: auto;
 
   .v-label {
-    font-size: 0.8em;
     color: var(--comet-color);
     opacity: 1;
+
+    @media (max-width: 500px){ //SMALL
+      font-size: 0.8em;
+    }
+
+    @media (min-width: 501px){ //LARGE
+      font-size: 1.1em;
+    }
   }
 
   #control-checkboxes {
@@ -2380,7 +2387,7 @@ body {
 
     @media (min-width: 751px){ //LARGE
       .v-checkbox .v-selection-control {
-      height: 2em !important;
+      height: 2.1em !important;
       min-height: 1em !important;
       }
     }
@@ -2732,9 +2739,18 @@ body {
     min-width: fit-content;
     white-space: nowrap;
     color: black;
-    font-size: .9rem;
-    padding: 0.5rem;
+    padding-inline: 0.7rem;
     background-color: var(--accent-color);
+
+    @media (max-width: 750px ) { //SMALL
+      font-size: 1rem;
+      padding-block: 0.7rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      font-size: 1.1rem;
+      padding-block: 1rem;
+    } 
   }
   
   .v-slider-thumb__label::before {
@@ -2750,6 +2766,13 @@ body {
 .v-container {
   max-width: 100%;
 }
+
+#closed-top-container {
+    position: absolute;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    z-index: 500;
+  }
 
 #guided-content-container {
   --top-content-max-height: max(30vmin, 35vh);
@@ -2767,7 +2790,7 @@ body {
   // border-bottom: 1px solid var(--accent-color);
   background-color: #272727;
   user-select: none;
-  border: solid 1px var(--accent-color);
+  border: solid 1.5px var(--accent-color);
   
   font-size: clamp(8px, 3vmin, 0.9em);
   overflow-y: auto;
@@ -2788,13 +2811,13 @@ body {
     margin: 0px;
     padding: 0px;
   }
-  
+
   #close-guided-content-container {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 500;
-  }
+  }  
 
   #non-map-container { // Keep content away from the x to close
     --padding-left: 1rem;
@@ -2810,7 +2833,9 @@ body {
   }
 
   .non-map-row {
-    margin-bottom: 0.5em;
+    @media (min-width: 750px) {
+      margin-bottom: 0.5em;
+    }
   }
     
     // .v-row.non-map-row#title-row
@@ -2818,15 +2843,20 @@ body {
     color: var(--accent-color);
     font-weight: bold;
     text-align: right;
-    font-size: 1rem;
+    padding-left: 1rem;
     
-    @media (max-width: 600px){ //SMALL
-      padding-left: 1rem;
+    @media (max-width: 390px){ //TINY
+      font-size: 0.9rem;
     }
-    @media (max-width: 390px){ //SMALL
-      font-size: 0.8rem;
-      padding-left: 1rem;
+
+    @media (max-width: 750px){ //SMALL
+      font-size: 1.1rem;
     }
+
+    @media (min-width: 751px){ //LARGE
+      font-size: 1.3rem;
+    }
+
   }
     
     // .v-row.non-map-row#instructions-row
@@ -2842,6 +2872,16 @@ body {
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
         
+        @media (max-width: 600px){ //SMALL
+          font-size: 0.9rem;
+        }
+        @media (min-width: 601px){ //MEDIUM
+          font-size: 1.1rem;
+        }
+        @media (min-width: 900px){ //LARGE
+          font-size: 1.2rem;
+        }
+
         // span
         .description {
           line-height: 1.4em;
@@ -2851,22 +2891,23 @@ body {
           p {
             margin-block: .3em;
           }
-
         }
       }
     }
   }
 
   #button-row {
+    padding-top: 0.5em;
     align-self: flex-end;
+
     #top-container-buttons{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    
-    flex-grow: 1;
-    gap: 0.5em;
-          
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      
+      flex-grow: 1;
+      gap: 0.5em;
+            
       .icon-wrapper {
         background-color: rgba(209, 209, 209, .2);
         border: none;
@@ -2880,8 +2921,9 @@ body {
 
         &.active {
           border: 2px solid var(--sky-color);
-        }
 
+          
+        }
       }
     }
   }
@@ -2948,11 +2990,11 @@ body {
 
   
   @media (max-width: 750px){ //SMALL
-    font-size: 0.7em;    
+    font-size: 1em;    
     }
 
   @media (min-width: 751px){ //LARGE
-      font-size: 1em;
+      font-size: 1.1em;
   }
 
   .v-list-item__prepend {
@@ -2983,13 +3025,13 @@ body {
         
     @media (max-width: 750px){ //SMALL
       .v-btn--size-default {
-      font-size: 0.3em;
+      font-size: 0.8em;
       }  
     }
 
     @media (min-width: 751px){ //LARGE
       .v-btn--size-default {
-      font-size: 0.8em;
+      font-size: 0.9em;
       }    
     }
 
@@ -3010,87 +3052,17 @@ body {
 }
 
 #speed-control {
-  position: absolute;
-  bottom: 6.5rem; // the +1rem aligns it with the switch
-  left: 0.25rem;
-  font-size: .9rem; // all 'em' values are scaled to this
-  --button-width: 2.5em;
-  --button-gap: 0.125em;
-  width: calc(4 * var(--button-width) + 6 * var(--button-gap));
-  pointer-events: auto;
-  
-  
-  .speed-control-buttons-container {
-    position: relative;
-    
-    //    BUTTON LAYOUT    //
-    .speed-control-button {
-      margin-inline: var(--button-gap);
-    }
-    
-    .speed-control-button:first-child {
-      margin-inline-start: 0;
-    }
-    
-    .speed-control-button:last-child {
-      margin-inline-end: 0;
-    }
-    
-    // create buttons which center their inner content
-    .speed-control-button {
-      position: relative;
-      display: inline-block; // 'block' to put in a column
-      width: var(--button-width);
-      height: var(--button-width);
-      
-      > * {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-  
-    //     STYLING     //
-    .speed-control-button {
-      border-radius: 50%;
-      border: 0.125em solid var(--accent-color);
-      background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin-left: 10px;
 
-      
-      > * { // all direct children (the inner content)
-        color: var(--accent-color);
-      }
-      
-      // text button
-      #speed-text-now {
-        font-size: 0.6em;
-        font-weight: bold;
-      }
-      
-      // text button
-      #speed-text-one-x {
-        font-size: 1em;
-        font-weight: bold;
-      }
-      
-      // text button
-      #speed-text-reset {
-        font-size: 2em;
-        font-weight: bold;
-      }
-      
-    }
-    
-    .speed-control-button:active {
-      background-color: #8e3b0b; // hsl sdarker version of accent-color
-    }
-    
-  
-  } 
+  .icon-wrapper {
+    padding-inline: 0.5em;
+    padding-block: 0.6em;
+    border: 2px solid var(--accent-color);
+  }
 
-
-  
 }
 
 #speed-text {
@@ -3101,7 +3073,13 @@ body {
     padding-inline: 0.4em;
     padding-block: 0.15em;
     border-radius: 0.3em;
-    font-size: 0.9rem;
+
+    @media (max-width: 750px){ //SMALL
+          font-size: 0.9rem;
+        }
+    @media (min-width: 751px){ //LARGE
+          font-size: 1.1rem;
+    }
   }  
 
 #top-wwt-content {
@@ -3109,25 +3087,39 @@ body {
   top: 0.5rem;
   right: 0.5rem;
 
-  #location-time-display  {
+  #location-date-display  {
   
     display: flex;
     justify-content: flex-end;
     flex-wrap: column;
     gap:5px;
 
-      .v-chip {
-        border: none;
-        color: blue;
-        background-color: white;
-        font-size: 0.8em;
-        opacity: 0.9;
+    .v-chip {
+      border: none;
+      color: blue;
+      background-color: white;
+      opacity: 0.9;
+
+      @media (max-width: 750px){ //SMALL
+        font-size: 1em;
+        padding: 1em;
+      }
+
+      @media (min-width: 751px){ //LARGE
+        font-size: 1.1em;
+        padding: 1.1em;
       }
     }
-  
+  }
     .v-switch__thumb {
-      color: var(--accent-color);
+      color: #f39d6c;
       background-color: black; 
+
+      @media (min-width: 751px) { //LARGE
+        height: 2.1rem;
+        width: 2.2rem;
+      }
+
     }
 
     .v-input--density-default {
@@ -3138,16 +3130,37 @@ body {
       --v-selection-control-size: auto;
     } 
 
+    .v-switch--inset .v-switch__track {
+      @media (min-width: 751px) { //LARGE
+        height: 2.5rem;
+        width: 4.2rem;
+      }
+    }
+
     pointer-events: auto;
 
   #top-switches {
     position: absolute;
-    margin-top: 0.5rem;
     right: 0;
-  }
 
+    @media (max-width: 750px ) { //SMALL
+      margin-top: 0.5rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      margin-top: 0.7rem;
+    } 
+
+  }
+ 
   #track-sun-switch {
-    margin-top: 0.5rem;
+    @media (max-width: 750px ) { //SMALL
+      margin-top: 0.5rem;
+    } 
+
+    @media (min-width: 751px ) { //LARGE
+      margin-top: 0.7rem;
+    } 
   }
 }
 
