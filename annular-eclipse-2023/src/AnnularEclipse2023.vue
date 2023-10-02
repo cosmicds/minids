@@ -1386,7 +1386,6 @@ export default defineComponent({
 
     // This assumes that the input angles are in the range [0, 2pi)
     angleBetween(test: number, lower: number, upper: number): boolean {
-      console.log(test, lower, upper);
       if (lower < upper) {
         return test >= lower && test <= upper;
       } else {
@@ -1394,7 +1393,7 @@ export default defineComponent({
       }
     },
 
-    updateMoonOverlay() {
+    createMoonOverlay() {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const canvasHeight: number = this.wwtControl.canvas.height;
@@ -1422,6 +1421,12 @@ export default defineComponent({
 
       const points: { x: number; y: number }[] = [];
       const sunMoonDistance = Math.sqrt(sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y);
+
+      // If there's no sun/moon intersection, no need to continue
+      if (sunMoonDistance > rMoonPx + rSunPx) {
+        return;
+      }
+
       const n = 25;
       
       // If the moon is completely "inside" of the sun
@@ -1934,7 +1939,7 @@ export default defineComponent({
             this.createSky(when);
           }
         }
-        this.updateMoonOverlay();
+        this.createMoonOverlay();
       }
     },
 
