@@ -1391,12 +1391,7 @@ export default defineComponent({
       }
     },
 
-    createMoonOverlay() {
-
-      // Don't draw an overlay if we're using the regular WWT moon image
-      if (this.useRegularMoon) {
-        return;
-      }
+    updateIntersection() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1443,6 +1438,7 @@ export default defineComponent({
       if (moonInsideSun) {
         this.currentPercentEclipsed = moonArea / sunArea;
       } else {
+        // See https://mathworld.wolfram.com/Circle-CircleIntersection.html
         const intersectionArea =
           rMoonSq * Math.acos((dSq + rMoonSq - rSunSq) / (2 * sunMoonDistance * rMoonPx)) +
           rSunSq * Math.acos((dSq + rSunSq - rMoonSq) / (2 * sunMoonDistance * rSunPx)) -
@@ -1452,8 +1448,8 @@ export default defineComponent({
         this.currentPercentEclipsed = intersectionArea / sunArea;
       }
 
-      // If we're in sun scope mode, we don't want the overlay but did want the percentage eclipsed
-      if (this.viewerMode === "SunScope") {
+      // If we're using the regular WWT moon, or in sun scope mode, we don't want the overlay but did want the percentage eclipsed
+      if (this.useRegularMoon || this.viewerMode === "SunScope") {
         return;
       }
 
@@ -1949,7 +1945,7 @@ export default defineComponent({
         this.removeAnnotations();
       }
       finally {
-        this.createMoonOverlay();
+        this.updateIntersection();
         if (this.showHorizon) {
           this.createHorizon(when);
           if (this.showSky) {
