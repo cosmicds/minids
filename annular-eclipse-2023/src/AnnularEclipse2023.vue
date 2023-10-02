@@ -189,7 +189,7 @@
       :style="cssVars"
     >
       <v-card
-        id="bottom-sheet-card">
+        class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
           height="32px"
@@ -2696,7 +2696,7 @@ body {
     margin: unset;
   }
   
-  #bottom-sheet-card {
+  .bottom-sheet-card {
     height: fit-content;
     width: 100%;
     align-self: center;
@@ -2708,8 +2708,7 @@ body {
   }
 
   .v-card-text {
-    height: 33vh;
-    padding-bottom: 25px;
+    height: 40vh;
     
     & a {
       text-decoration: none;
