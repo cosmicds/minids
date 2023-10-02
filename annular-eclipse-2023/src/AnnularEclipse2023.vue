@@ -2895,17 +2895,7 @@ body {
     text-align: right;
     padding-left: 1rem;
     
-    @media (max-width: 390px){ //TINY
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 750px){ //SMALL
-      font-size: 1.1rem;
-    }
-
-    @media (min-width: 751px){ //LARGE
-      font-size: 1.3rem;
-    }
+    font-size: clamp(0.9rem, 2.1vw, 2rem);
 
   }
     
