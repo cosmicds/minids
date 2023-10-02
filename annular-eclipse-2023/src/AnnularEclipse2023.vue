@@ -441,7 +441,8 @@
 
                   </div>
                           
-
+                  <v-divider thickness="2px" class="solid-divider"></v-divider>
+                  
                   <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
                 </v-col>
               </v-row>
