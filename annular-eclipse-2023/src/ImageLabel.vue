@@ -9,8 +9,7 @@
     tabindex="0"
   >
     <div
-      id="image-label-container"
-      class="image-label"
+      class="image-label-container"
       :style="containerCSS"
       @mouseover="hovered = true"
       @mouseout="hovered = false"
@@ -61,12 +60,12 @@ export default defineComponent({
 
     width: {
       type: String,
-      default: '100%'
+      default: 'auto'
     },
 
     height: {
       type: String,
-      default: ''
+      default: 'auto'
     },
 
     fontSize: {
@@ -187,13 +186,13 @@ export default defineComponent({
   pointer-events: auto;
 }
 
-#image-label-container {
+.image-label-container {
   position: relative;
   overflow: hidden;
   
 }
   
-#image-label-container img { 
+.image-label-container img { 
   position: absolute;
   top: 0;
   left: 0;
