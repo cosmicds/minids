@@ -131,8 +131,8 @@ export default defineComponent({
   width: 2rem;
   height: 2rem;
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.5rem;
   z-index: 2;
   border-radius: 50%;
   background-color: white;

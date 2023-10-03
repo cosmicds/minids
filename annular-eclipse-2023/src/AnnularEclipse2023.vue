@@ -192,7 +192,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="clamp(20px, min(5vh, 5vw) ,32px)"
+          height="clamp(25px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -202,6 +202,7 @@
           <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
         </v-tabs>
           <font-awesome-icon
+          v-if="!mobile"
           id="close-text-icon"
           class="control-icon"
           :icon="`square-xmark`"
@@ -210,57 +211,69 @@
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
+        <font-awesome-icon
+          v-else
+          id="close-text-icon"
+          class="control-icon"
+          :icon="`square-xmark`"
+          size="m"
+          @click="showInfoSheet = false"
+          @keyup.enter="showInfoSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
-            <v-row>
-            <v-col cols="6" id="info-text-box">
-              <div id="main-info-text">
-                <p>
-                Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
-                </p>
-                <p>
-                This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
-                </p>
-                <p id="safety-warning">
-                  SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
-                </p>
-              </div>  
-                <div id="FAQ">
-                  <details>
-                    <summary>
-                      What causes Solar Eclipses?
-                    </summary>
+            <v-container id="learn-more-content">
+                <div id="info-text-box">
+
+                  <div id="main-info-text">
                     <p>
-                      A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
+                    Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
                     </p>
-                  </details>
-                  
-                  <details>
-                    <summary> Total vs. Annular Eclipse</summary>
                     <p>
-                      During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
                     </p>
-                  </details>
-                  
-                  <details> 
-                    <summary> Why can only some places see the eclipse?</summary>
-                    <p>
-                      An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                    <p id="safety-warning">
+                      SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
                     </p>
-                    <p> 
-                      The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
-                    </p> 
-                  </details>
+                  </div>  
+                  <div id="FAQ">
+                    <details>
+                      <summary>
+                        What causes Solar Eclipses?
+                      </summary>
+                      <p>
+                        A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
+                      </p>
+                    </details>
+                    
+                    <details>
+                      <summary> Total vs. Annular Eclipse</summary>
+                      <p>
+                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                      </p>
+                    </details>
+                    
+                    <details> 
+                      <summary> Why can only some places see the eclipse?</summary>
+                      <p>
+                        An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                      </p>
+                      <p> 
+                        The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                      </p> 
+                    </details>
+                  </div>
                 </div>
-            </v-col>
-            <v-col cols="6">
-              <figure>
-                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-              </figure>
-            </v-col>
-          </v-row>
+
+                  <figure>
+                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                  </figure>
+
+
+            </v-container>
           </v-card-text>
         </v-card>
       </v-card>
@@ -278,7 +291,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="clamp(20px, min(5vh, 5vw) ,32px)"
+          height="clamp(25px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -2969,9 +2982,27 @@ body {
     font-size: calc(1.2 * var(--default-font-size));
   }
 
+  #learn-more-content{
+    display: flex;
+
+    @media (max-width: 700px ) {
+      flex-direction: column;
+    }
+
+    @media (min-width: 701px ) {
+      flex-direction: row;
+    }
+
+  }
+
   #info-text-box {
     font-size: var(--default-font-size);
     line-height: var(--default-line-height);
+
+    @media (min-width: 701px ) {
+      min-width: 50%;
+      padding-right: 1em;
+    }
   }
   #main-info-text {
     padding-inline: 0.5em;
@@ -3008,13 +3039,25 @@ body {
   }
 
   figure {
-    // position: sticky;
+    position: sticky;
+
+    @media (max-width: 700px ) {
+      width: 100%;
+    }
+
+    @media (min-width: 701px ) {
+      width: 50%;
+    }
+
+    flex-shrink: 0;
     top: 0;
+    margin-top: 1em;
+
     figcaption{
-      position: absolute;
       bottom: -2em;
       right: 0;
-      font-size: calc(0.7 * var(--default-font-size));
+      font-size: calc(0.8 * var(--default-font-size));
+      line-height: calc(0.8 * var(--default-line-height));
       background-color: #212121;
       padding-inline: 10px 5px;
     }
