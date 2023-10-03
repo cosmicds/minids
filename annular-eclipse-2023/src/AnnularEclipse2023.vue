@@ -514,7 +514,7 @@
             learnerPath = 'Choose'
             }"
         > </v-chip>
-        <v-chip 
+        <v-chip
           prepend-icon="mdi-calendar"
           variant="outlined"
           size="small"
@@ -581,6 +581,15 @@
     </div>
     
     <div class="bottom-content">
+      <div id="eclipse-percent-chip">
+        <v-chip 
+          v-if="showEclipsePercentage"
+          prepend-icon="mdi-sun-angle"
+          size="medium"
+          elevation="2"
+          :text="percentEclipsedText"
+        > </v-chip>
+      </div>
       <div
         id="controls"
         class="control-icon-wrapper"
@@ -618,13 +627,20 @@
               label="Horizon"
               hide-details
             />
-          <v-checkbox
-              :color="accentColor"
-              v-model="useRegularMoon"
-              @keyup.enter="useRegularMoon = !useRegularMoon"
-              label="Visible Moon"
-              hide-details
+            <v-checkbox
+                :color="accentColor"
+                v-model="useRegularMoon"
+                @keyup.enter="useRegularMoon = !useRegularMoon"
+                label="Visible Moon"
+                hide-details
             />
+            <v-checkbox
+                :color="accentColor"
+                v-model="showEclipsePercentage"
+                @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
+                label="Show Amount Eclipsed"
+                hide-details
+            />            
           </div>
         </transition-expand>
       </div>
@@ -1052,7 +1068,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
-      showTextSheet: true,   
+      showTextSheet: false, 
+      showEclipsePercentage: true,  
       
       toggleTrackSun: true,
       
@@ -1338,6 +1355,11 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
+    },
+
+    percentEclipsedText(): string {
+      const percentEclipsed = Math.abs(this.currentPercentEclipsed * 100).toFixed(0);
+      return `Eclipsed: ${percentEclipsed}%`;
     },
 
     trackingSun: {
@@ -3294,6 +3316,29 @@ body {
           font-size: 1.1rem;
     }
   }  
+
+#eclipse-percent-chip{
+  position: absolute;
+  right: 0.5rem;
+  top: -3rem;
+
+  .v-chip {
+      border: none;
+      color: blue;
+      background-color: white;
+      opacity: 1;
+      padding: 0.5em;
+
+      @media (max-width: 750px){ //SMALL
+        font-size: 1em;
+
+      }
+
+      @media (min-width: 751px){ //LARGE
+        font-size: 1.1em;
+      }
+    }  
+}
 
 #top-wwt-content {
   position: absolute;
