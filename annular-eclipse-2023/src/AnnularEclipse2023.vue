@@ -60,33 +60,43 @@
                 v-if="learnerPath=='Answer'"
                 row
                 hide-input
+                :stopOnComplete="false"
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
                 @select="(e: any) => { console.log(e);}"
                 > 
+                <!-- for images width=100px, height=58px for correct aspect ratio -->
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
+                      :id="text"
                       width="100px"
-                      height="58px"
+                      height="50px"
                       duration="0.8s"
+                      flipBack
+                      flipBackAfter="1000" 
                       >
                       <template v-slot:front>
                       <image-label 
-                        :image="require(`./assets/${text}.png`)"
-                        background-size="cover"
-                        color="black"
-                        :background-color="(selected ? `${color}` : ['blue','orange','purple'][index])"
-                        background-opacity="0.5"
+                        :color="['rgb(10,150,150)','orange','#f0a'][index]"
+                        :background-color="(selected ? `${color}` : '#bbb')"
                         width="100px"
-                        height="58px"
+                        height="50px"
                         font-size="2em"
                       >
                       {{ text }}
                       </image-label>
                       </template>
                       <template v-slot:back>
-                        <span v-html=feedback></span>
+                        <image-label 
+                          color="black"
+                          :background-color="color"
+                          width="100px"
+                          height="50px"
+                          font-size="0.5rem"
+                        >
+                        {{ feedback }}
+                        </image-label>
                       </template>
                   </flip-transition>
                 </template>
@@ -3060,7 +3070,7 @@ body {
   }
   background-color: transparent!important;
 
-  #image-label-container {
+  .image-label-container {
     border-radius: 10px;
   }
 }
