@@ -1016,6 +1016,7 @@ import { Annotation2, Poly2 } from "./Annotation2";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
+import { v4 } from "uuid";
 
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
@@ -1140,7 +1141,11 @@ export default defineComponent({
     const presetLocationsVisited = queryData ? [] : [selectedLocation];
     const userSelectedLocationsVisited = queryData ? [[queryData.latitudeDeg, queryData.longitudeDeg]] : [];
 
+    const uuid = v4();
+
     return {
+      uuid,
+
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
