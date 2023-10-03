@@ -201,11 +201,11 @@
         >
           <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
         </v-tabs>
-        <font-awesome-icon
+          <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
-          icon="times"
-          size="lg"
+          :icon="`square-xmark`"
+          size="xl"
           @click="showInfoSheet = false"
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
@@ -290,8 +290,8 @@
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
-          icon="times"
-          size="lg"
+          :icon="`square-xmark`"
+          size="xl"
           @click="showWWTGuideSheet = false"
           @keyup.enter="showWWTGuideSheet = false"
           tabindex="0"
@@ -2883,7 +2883,6 @@ body {
 }
 
 #splash-overlay {
-  position: fixed;
   align-items: center;
   justify-content: center;
   font-size: min(8vw, 7vh);
@@ -3111,7 +3110,7 @@ body {
     position: absolute;
     top: 0.25em;
     right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
-    color: white;
+    color: var(--accent-color);
   }
 
   // This prevents the tabs from having some extra space to the left when the screen is small
