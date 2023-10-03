@@ -437,6 +437,9 @@
                       <li>
                         <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
                       </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Show Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
+                      </li>
                     </ul>
 
                   </div>
