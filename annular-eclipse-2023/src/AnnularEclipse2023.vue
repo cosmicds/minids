@@ -72,7 +72,7 @@
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      width="100px"
+                      width="70px"
                       height="50px"
                       duration="0.8s"
                       flipBack
@@ -83,9 +83,8 @@
                         :color="['rgb(10,150,150)','orange','#f0a'][index]"
                         :background-color="(selected ? `${color}` : '#bbb')"
                         :background-opacity="(selected ? '1' : '0.5')"
-                        width="100px"
+                        width="70px"
                         height="50px"
-                        font-size="2em"
                       >
                       {{ text }}
                       </image-label>
@@ -94,7 +93,7 @@
                         <image-label 
                           color="black"
                           :background-color="color"
-                          width="100px"
+                          width="70px"
                           height="50px"
                           font-size="1rem"
                         >
@@ -3066,16 +3065,19 @@ body {
 
 #mc-radiogroup-container {
   
-  label {
-    // overflow: inherit;
-    // outline: 1px solid white;
-    // border: 1px solid white;
-  }
+  // by default mc-radiogroup has dark background
   background-color: transparent!important;
 
   .image-label-container {
     border-radius: 10px;
   }
+  
+  .image-label-text {
+    // filter: drop-shadow(0px 0px 0.1em white);
+    font-size: 2em !important;
+  }
+  
+  
 }
 
 #guided-content-container {
