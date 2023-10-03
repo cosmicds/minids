@@ -59,14 +59,37 @@
               <mc-radiogroup
                 v-if="learnerPath=='Answer'"
                 row
+                hide-input
                 :radio-options="['A', 'B','C']"
-                :feedbacks="['', '', '(C) Correct! It passes from Washington through Texas']"
+                :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
-                :images="[require('./assets/A.png'), require('./assets/B.png'), require('./assets/C.png')]"
-                image-width="100px"
-                image-height="58px"
                 @select="(e: any) => { console.log(e);}"
-                >
+                > 
+                <template #default="{index, text, selected, color, feedback}">
+                    <flip-transition
+                      width="100px"
+                      height="58px"
+                      duration="0.8s"
+                      >
+                      <template v-slot:front>
+                      <image-label 
+                        :image="require(`./assets/${text}.png`)"
+                        background-size="cover"
+                        color="black"
+                        :background-color="(selected ? `${color}` : ['blue','orange','purple'][index])"
+                        background-opacity="0.5"
+                        width="100px"
+                        height="58px"
+                        font-size="2em"
+                      >
+                      {{ text }}
+                      </image-label>
+                      </template>
+                      <template v-slot:back>
+                        <span v-html=feedback></span>
+                      </template>
+                  </flip-transition>
+                </template>
               </mc-radiogroup>
             </div>
             
@@ -3030,6 +3053,11 @@ body {
 
 #mc-radiogroup-container {
   
+  label {
+    // overflow: inherit;
+    // outline: 1px solid white;
+    // border: 1px solid white;
+  }
   background-color: transparent!important;
 
   #image-label-container {

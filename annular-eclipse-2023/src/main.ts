@@ -7,6 +7,8 @@ import TransitionExpand from "./TransitionExpand.vue";
 import GifPlayPause from "./GifPlayPause.vue";
 import { DefaultMiniCredits } from "@minids/common";
 import MCRadiogroup from "./MCRadiogroup.vue";
+import FlipTransition from "./FlipTransition.vue";
+import ImageLabel from "./ImageLabel.vue";
 
 import "./polyfills";
 
@@ -116,6 +118,8 @@ createApp(AnnularEclipse2023, {
   .component('mini-credits', DefaultMiniCredits)
   .component('date-picker', Datepicker)
   .component('mc-radiogroup', MCRadiogroup)
+  .component('flip-transition', FlipTransition)
+  .component('image-label', ImageLabel)
 
   // Mount
   .mount("#app");

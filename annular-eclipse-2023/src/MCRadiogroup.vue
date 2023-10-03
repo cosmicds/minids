@@ -19,20 +19,16 @@
         :label="option"
         @change="selectChoice(index)"
         :true-icon="`${icon(index)}`"
+        :class="[hideInput ? 'hidden' : '']"
       >
-      <template v-if="images.length > 0" v-slot:label>
-        <image-label 
-          :background-image="images[index]"
-          background-size="cover"
-          color="black"
-          :background-color="(index==column ? `${color(index)}` : 'transparent')"
-          background-opacity="0.5"
-          :width="imageWidth"
-          :height="imageHeight"
-          @click="!complete ? selectChoice(index) : null"
-        >
-        {{ option }}
-        </image-label>
+      <template v-slot:label>
+        <slot 
+          :index="index" 
+          :text="option" 
+          :feedback="feedbacks[index]"
+          :selected="index==column"
+          :color="color(index)"
+          > {{ option }} </slot>
       </template>
     </v-radio>
     </v-radio-group>
@@ -64,7 +60,7 @@
   }
   
 
-#mc-radiogroup-container .v-selection-control__wrapper {
+#mc-radiogroup-container .hidden .v-selection-control__wrapper {
   display: none;
 }
 
@@ -78,7 +74,6 @@
 import { defineComponent } from 'vue';
 import { VRadioGroup } from 'vuetify/components/VRadioGroup';
 import { VRadio } from 'vuetify/components/VRadio';
-import ImageLabel from './ImageLabel.vue';
 
 
 // :border="(index==column ? `10px solid ${color(index)}` : '10px solid transparent')"
@@ -98,7 +93,6 @@ export default defineComponent({
   components: {
     'v-radio-group': VRadioGroup,
     'v-radio': VRadio,
-    'image-label': ImageLabel
   },
   
   props: {
@@ -136,20 +130,11 @@ export default defineComponent({
       default: false
     },
 
-    images: {
-      type: Array<string>,
-      default: () => []
-    },
-
-    imageWidth: {
-      type: String,
-      default: '100%'
-    },
-
-    imageHeight: {
-      type: String,
-      default: ''
+    hideInput: {
+      type: Boolean,
+      default: false
     }
+    
   },
   emits: {
     select(status: Status) {

@@ -8,29 +8,29 @@
     @keydown.enter="$emit('click')"
     tabindex="0"
   >
-  <div
-    id="image-label-container"
-    class="image-label"
-    :style="backgroundImageCSS"
-    @mouseover="hovered = true"
-    @mouseout="hovered = false"
-    @mousedown="active = true"
-    @mouseup="active = false"
-    @blur="focused = false"
-    
-  >
-  <img :src="backgroundImage" :alt="backgroundImage">
     <div
-      class="image-label-background"
-      :style="backgroundCSS"
-    ></div>
-    <div
-      class="image-label-text"
-      :style="textCSS"
+      id="image-label-container"
+      class="image-label"
+      :style="containerCSS"
+      @mouseover="hovered = true"
+      @mouseout="hovered = false"
+      @mousedown="active = true"
+      @mouseup="active = false"
+      @blur="focused = false"
+      
     >
-      <slot></slot>
+    <img v-if="image" :src="image" :alt="image">
+      <div
+        class="image-label-background"
+        :style="backgroundCSS"
+      ></div>
+      <div
+        class="image-label-text"
+        :style="textCSS"
+      >
+        <slot></slot>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -42,9 +42,9 @@ export default defineComponent({
   name: 'ImageLabel',
 
   props: {
-    backgroundImage: {
-      type: String,
-      default: ''
+    image: {
+      type: String || null,
+      default: null
     },
     backgroundColor: {
       type: String,
@@ -67,6 +67,11 @@ export default defineComponent({
     height: {
       type: String,
       default: ''
+    },
+
+    fontSize: {
+      type: String,
+      default: '1em'
     },
 
     border: {
@@ -117,10 +122,10 @@ export default defineComponent({
 
   computed: {
 
-    backgroundImageCSS() {
+    containerCSS() {
       const css = {
         color: this.color,
-        width: this.width,
+        width: `calc(${this.width}-2px)`,
         height: this.height,
         border: this.border,
       };
@@ -145,6 +150,7 @@ export default defineComponent({
     textCSS() {
 
       const css = {
+        fontSize: this.fontSize,
       };
       
       // if hovered
@@ -178,7 +184,6 @@ export default defineComponent({
 
 .focus-wrapper {
   display: block;
-  padding: 2px;
   pointer-events: auto;
 }
 
@@ -188,8 +193,10 @@ export default defineComponent({
   
 }
   
-img { 
+#image-label-container img { 
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 }
