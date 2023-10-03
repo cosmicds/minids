@@ -1192,6 +1192,8 @@ export default defineComponent({
         }
       } as Record<string, EclipseLocation>,
 
+      currentPercentEclipsed: 0,
+
       places: [] as (LocationRad & { name: string })[],
         
       placeCircleOptions: {
@@ -1555,12 +1557,7 @@ export default defineComponent({
       }
     },
 
-    createMoonOverlay() {
-
-      // Don't draw an overlay if we're using the regular WWT moon image
-      if (this.useRegularMoon || this.viewerMode === 'SunScope') {
-        return;
-      }
+    updateIntersection() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1592,13 +1589,40 @@ export default defineComponent({
 
       // If there's no sun/moon intersection, no need to continue
       if (sunMoonDistance > rMoonPx + rSunPx) {
+        this.currentPercentEclipsed = 0;
+        return;
+      }
+
+      const moonInsideSun = sunMoonDistance < rSunPx - rMoonPx;
+
+      const dSq = sunMoonDistance * sunMoonDistance;
+      const rMoonSq = rMoonPx * rMoonPx;
+      const rSunSq = rSunPx * rSunPx;
+
+      const moonArea = Math.PI * rMoonSq;
+      const sunArea = Math.PI * rSunSq;
+      if (moonInsideSun) {
+        this.currentPercentEclipsed = moonArea / sunArea;
+      } else {
+        // See https://mathworld.wolfram.com/Circle-CircleIntersection.html
+        const intersectionArea =
+          rMoonSq * Math.acos((dSq + rMoonSq - rSunSq) / (2 * sunMoonDistance * rMoonPx)) +
+          rSunSq * Math.acos((dSq + rSunSq - rMoonSq) / (2 * sunMoonDistance * rSunPx)) -
+          0.5 * Math.sqrt(
+            (rSunPx + rMoonPx - sunMoonDistance) * (sunMoonDistance + rMoonPx - rSunPx) * (sunMoonDistance - rMoonPx + rSunPx) * (sunMoonDistance + rSunPx + rMoonPx)
+          );
+        this.currentPercentEclipsed = intersectionArea / sunArea;
+      }
+
+      // If we're using the regular WWT moon, or in sun scope mode, we don't want the overlay but did want the percentage eclipsed
+      if (this.useRegularMoon || this.viewerMode === "SunScope") {
         return;
       }
 
       const n = 50;
       
       // If the moon is completely "inside" of the sun
-      if (sunMoonDistance < rSunPx - rMoonPx) {
+      if (moonInsideSun) {
         for (let i = 0; i <= n; i++) {
           const angle = (i / n) * 2 * Math.PI;
           points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
@@ -1618,6 +1642,7 @@ export default defineComponent({
           }
           x1 = Math.sqrt(rMoonPx * rMoonPx - ysh * ysh);
           if (isNaN(x1)) {
+            this.currentPercentEclipsed = 0;
             return;
           }
           y1 = ysh;
@@ -1639,6 +1664,7 @@ export default defineComponent({
 
           const sqrDisc = Math.sqrt(b * b - 4 * a * c);
           if (isNaN(sqrDisc)) {
+            this.currentPercentEclipsed = 0;
             return;
           }
           x1 = (-b + sqrDisc) / (2 * a);
@@ -2085,7 +2111,7 @@ export default defineComponent({
         this.removeAnnotations();
       }
       finally {
-        this.createMoonOverlay();
+        this.updateIntersection();
         if (this.showHorizon) {
           this.createHorizon(when);
           if (this.showSky) {
