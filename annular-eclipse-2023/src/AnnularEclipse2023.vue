@@ -62,6 +62,9 @@
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['', '', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
+                :images="[require('./assets/A.png'), require('./assets/B.png'), require('./assets/C.png')]"
+                image-width="100px"
+                image-height="58px"
                 @select="(e: any) => { console.log(e);}"
                 >
               </mc-radiogroup>
@@ -3024,6 +3027,15 @@ body {
     margin-left: 0.5rem;
     z-index: 500;
   }
+
+#mc-radiogroup-container {
+  
+  background-color: transparent!important;
+
+  #image-label-container {
+    border-radius: 10px;
+  }
+}
 
 #guided-content-container {
   --top-content-max-height: max(30vmin, 35vh);

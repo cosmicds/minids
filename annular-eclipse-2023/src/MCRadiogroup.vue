@@ -3,7 +3,7 @@
     id="mc-radiogroup-container"
   >
     <v-radio-group
-      v-if="!complete"
+      v-if="!complete || !useAlert"
       class="mc-radiogroup"
       v-model="column"
       :inline="row"
@@ -19,10 +19,25 @@
         :label="option"
         @change="selectChoice(index)"
         :true-icon="`${icon(index)}`"
-      ></v-radio>
+      >
+      <template v-if="images.length > 0" v-slot:label>
+        <image-label 
+          :background-image="images[index]"
+          background-size="cover"
+          color="black"
+          :background-color="(index==column ? `${color(index)}` : 'transparent')"
+          background-opacity="0.5"
+          :width="imageWidth"
+          :height="imageHeight"
+          @click="!complete ? selectChoice(index) : null"
+        >
+        {{ option }}
+        </image-label>
+      </template>
+    </v-radio>
     </v-radio-group>
     <v-alert
-      v-if="complete"
+      v-if="complete && useAlert"
       v-show="column !== null"
       variant="tonal"
       :color="`${color(column)}`"
@@ -47,6 +62,15 @@
 #mc-radiogroup-container .v-selection-control-group--inline {
     justify-content: space-evenly;
   }
+  
+
+.v-selection-control__wrapper {
+  display: none;
+}
+
+.v-label {
+  opacity: inherit;
+}
 
 </style>
 
@@ -54,6 +78,10 @@
 import { defineComponent } from 'vue';
 import { VRadioGroup } from 'vuetify/components/VRadioGroup';
 import { VRadio } from 'vuetify/components/VRadio';
+import ImageLabel from './ImageLabel.vue';
+
+
+// :border="(index==column ? `10px solid ${color(index)}` : '10px solid transparent')"
 
 // create a select type
 type Status = {
@@ -69,7 +97,8 @@ export default defineComponent({
 
   components: {
     'v-radio-group': VRadioGroup,
-    'v-radio': VRadio
+    'v-radio': VRadio,
+    'image-label': ImageLabel
   },
   
   props: {
@@ -100,6 +129,26 @@ export default defineComponent({
     maxTries: {
       type: Number || null,
       default: null
+    },
+
+    useAlert: {
+      type: Boolean,
+      default: false
+    },
+
+    images: {
+      type: Array<string>,
+      default: () => []
+    },
+
+    imageWidth: {
+      type: String,
+      default: '100%'
+    },
+
+    imageHeight: {
+      type: String,
+      default: ''
     }
   },
   emits: {
@@ -132,7 +181,7 @@ export default defineComponent({
   
   methods: {
     selectChoice: function (index: number) {
-      // this.column = index;
+      this.column = index;
 
       // if we exceed maxtries get the correct answer
       if (this.maxTries && (this.tries >= this.maxTries)) {
