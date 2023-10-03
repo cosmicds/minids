@@ -9,6 +9,7 @@
     tabindex="0"
   >
     <div
+      :id="`image-label-${id}`"
       class="image-label-container"
       :style="containerCSS"
       @mouseover="hovered = true"
@@ -41,6 +42,12 @@ export default defineComponent({
   name: 'ImageLabel',
 
   props: {
+
+    id: {
+      type: String,
+      default: ''
+    },
+    
     image: {
       type: String || null,
       default: null
@@ -50,8 +57,8 @@ export default defineComponent({
       default: 'transparent'
     },
     backgroundOpacity: {
-      type: String,
-      default: '1'
+      type: Number,
+      default: 1
     },
     color: {
       type: String,
@@ -70,44 +77,44 @@ export default defineComponent({
 
     fontSize: {
       type: String,
-      default: '1em'
+      default: null
     },
 
     border: {
       type: String,
-      default: ''
+      default: null
     },
 
     borderRadius: {
       type: String,
-      default: ''
+      default: null
     },
     // hovered, active, and focused states
     
     hoveredColor: {
       type: String,
-      default: ''
+      default: null
     },
     activeColor: {
       type: String,
-      default: ''
+      default: null
     },
     focusedColor: {
       type: String,
-      default: ''
+      default: null
     },
     
     hoveredBorder: {
       type: String,
-      default: '3px solid white'
+      default: '2px solid white'
     },
     activeBorder: {
       type: String,
-      default: ''
+      default: null
     },
     focusedBorder: {
       type: String,
-      default: ''
+      default: null
     },
   },
 

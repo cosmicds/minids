@@ -60,13 +60,13 @@
                 v-if="learnerPath=='Answer'"
                 row
                 hide-input
-                :stopOnComplete="false"
+                useAlert
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
                 @select="(e: any) => { console.log(e);}"
                 colorWrong="#4a2323"
-                colorRight="#234a23"
+                colorRight="green"
                 > 
                 <!-- for images width=100px, height=58px for correct aspect ratio -->
                 <template #default="{index, text, selected, color, feedback}">
@@ -76,13 +76,14 @@
                       height="50px"
                       duration="0.8s"
                       flipBack
-                      flipBackAfter="1000" 
+                      :flipBackAfter="1000" 
                       >
                       <template v-slot:front>
                       <image-label 
+                        id="front"
                         :color="['rgb(10,150,150)','orange','#f0a'][index]"
                         :background-color="(selected ? `${color}` : '#bbb')"
-                        :background-opacity="(selected ? '1' : '0.5')"
+                        :background-opacity="(selected ? 1 : 0.5)"
                         width="70px"
                         height="50px"
                       >
@@ -90,12 +91,13 @@
                       </image-label>
                       </template>
                       <template v-slot:back>
-                        <image-label 
+                        <image-label
+                          id="front" 
                           color="black"
                           :background-color="color"
                           width="70px"
                           height="50px"
-                          font-size="1rem"
+                          font-size="0.5em"
                         >
                         <span v-html="feedback"></span>
                         </image-label>
@@ -3067,14 +3069,15 @@ body {
   
   // by default mc-radiogroup has dark background
   background-color: transparent!important;
+  
 
   .image-label-container {
     border-radius: 10px;
   }
   
-  .image-label-text {
+  #image-label-front .image-label-text {
     // filter: drop-shadow(0px 0px 0.1em white);
-    font-size: 2em !important;
+    font-size: 6em;
   }
   
   

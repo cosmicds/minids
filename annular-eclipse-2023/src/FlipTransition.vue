@@ -58,7 +58,7 @@ export default defineComponent({
 
     id : {
       type: String,
-      default: ''
+      default: null
     },
 
     hover: {
