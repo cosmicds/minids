@@ -400,7 +400,11 @@
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
                         border-radius: 20px;
-                        font-weight: bold ">selected location</span> is displayed under the map.
+                        font-weight: bold ">selected location</span> and <span 
+                        style="color: blue; background-color: white;
+                        padding-inline: 0.7em;
+                        border-radius: 20px;
+                        font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
                       <li>
                         <v-icon
@@ -696,13 +700,13 @@
             learnerPath = 'Choose'
             }"
         > </v-chip>
-        <v-chip
-          prepend-icon="mdi-calendar"
-          variant="outlined"
-          size="small"
-          elevation="2"
-          :text="selectedLocalDateString"
-        > </v-chip>
+        <v-chip 
+        prepend-icon="mdi-clock"
+        variant="outlined"
+        size="small"
+        elevation="2"
+        :text="selectedLocaledTimeDateString"
+      > </v-chip>
       </div>
       <div id="top-switches">
         <v-tooltip
@@ -1407,7 +1411,13 @@ export default defineComponent({
     },
     
     selectedLocaledTimeDateString() {
-      return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
+      if (this.smallSize) {
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd, HH:mm (zzz)');
+      } else {
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
+      }
+
+
     },
 
     ready(): boolean {
