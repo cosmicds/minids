@@ -192,7 +192,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="32px"
+          height="clamp(20px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -278,7 +278,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="32px"
+          height="clamp(20px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -299,7 +299,7 @@
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
             <v-container  id="user-guide">
-              <p style="font-size: larger" class="mb-5">
+              <p style="font-size: calc(1.1 * var(--default-font-size))" class="mb-5">
                 This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
               </p>
               <v-row align="center">
@@ -434,7 +434,7 @@
                         <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
                       </li>
                       <li>
-                        <span class="user-guide-emphasis-white">Show Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
+                        <span class="user-guide-emphasis-white">Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
                       </li>
                     </ul>
 
@@ -800,7 +800,7 @@
                 :color="accentColor"
                 v-model="showEclipsePercentage"
                 @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
-                label="Show Amount Eclipsed"
+                label="Amount Eclipsed"
                 hide-details
             />            
           </div>
@@ -2519,6 +2519,11 @@ export default defineComponent({
   src: url("../../assets/HighwayGothicNarrow.ttf");
 }
 
+:root {
+  --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
+  --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+}
+
 html {
   height: 100%;
   margin: 0;
@@ -2561,7 +2566,6 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-size: 11pt;
 
   .wwtelescope-component {
     position: relative;
@@ -2760,14 +2764,7 @@ body {
   .v-label {
     color: var(--comet-color);
     opacity: 1;
-
-    @media (max-width: 500px){ //SMALL
-      font-size: 0.8em;
-    }
-
-    @media (min-width: 501px){ //LARGE
-      font-size: 1.1em;
-    }
+    font-size: var(--default-font-size);
   }
 
   #control-checkboxes {
@@ -2776,9 +2773,9 @@ body {
     justify-content: flex-start;
 
     .v-checkbox .v-selection-control {
-      font-size: clamp(10px, min(2vw, 2vh),18px);
-      height: clamp(20px, min(3vw, 3vh), 30px);
-      min-height: clamp(16px, min(2.5vw, 2.5vh), 24px);
+      font-size: calc(1.1 * var(--default-font-size));
+      height: calc(1.2 * var(--default-line-height));
+      min-height: calc(1.2 * var(--default-line-height));
     }
 
     .v-btn {
@@ -2795,7 +2792,6 @@ body {
     .v-btn__content {
       color: black;
       font-weight: 900;
-      font-size: 0.75em;
       white-space: break-spaces;
       width: 150px;
     }
@@ -2900,7 +2896,7 @@ body {
   }
   
   p.small {
-    font-size: smaller;
+    font-size: var(--default-font-size);
     font-weight: bold;
   }
 
@@ -2946,7 +2942,7 @@ body {
   }
 
   #splash-screen-acknowledgements {
-    font-size: .5em;
+    font-size: calc(2 * var(--default-font-size));
     width: 70%; 
   }
 
@@ -2967,20 +2963,15 @@ body {
   }
 }
 
-#wwt-sheet-card {
-  width: 50%;
-  align-self: center;
-}
-
 .bottom-sheet {
 
   .tab-title {
-    font-size: ~"max(18px, calc(1.1em + 0.3vw))";
+    font-size: calc(1.2 * var(--default-font-size));
   }
 
   #info-text-box {
-    font-size: ~"max(16px, calc(1em + 0.3vw))";
-    line-height: ~"max(20px, calc(1.1em + 0.4vw))";
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
   }
   #main-info-text {
     padding-inline: 0.5em;
@@ -2990,7 +2981,8 @@ body {
     margin-top: 0.4em;
     font-weight: bold;
     color: var(--accent-color);
-    font-size: ~"max(20px, calc(1em + 0.3vw))";
+    font-size: calc(1.2 * var(--default-font-size));
+    line-height: calc(1.2 * var(--default-line-height));
   }
   
   #FAQ{
@@ -3000,16 +2992,14 @@ body {
       padding-block: 0.7em;
       padding-inline: 1.2em;
       height: fit-content;
-      background-color: #486273;
+      background-color: #37474F;
       
       summary {
         font-weight: bold;
-        font-size: ~"max(16px, calc(0.8em + 0.3vw))";
         cursor: pointer;
       }
       
       p {
-
         padding-top: 0.5em;
         padding-inline: 1em;
       }
@@ -3018,15 +3008,14 @@ body {
   }
 
   figure {
-    position: sticky;
+    // position: sticky;
     top: 0;
     figcaption{
       position: absolute;
-      bottom: 0;
+      bottom: -2em;
       right: 0;
-      font-size: 0.5em;
-      background-color: #4a4a4a4a;
-      border-radius: 10px 0 0 0;
+      font-size: calc(0.7 * var(--default-font-size));
+      background-color: #212121;
       padding-inline: 10px 5px;
     }
   }
@@ -3098,18 +3087,18 @@ body {
   }
 
   #user-guide {
-    font-size: ~"max(12px, calc(0.9em + 0.2vw))";
-    line-height: ~"max(18px, calc(1.2em + 0.4vw))";
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
 
     .v-chip {
-      font-size: ~"max(16px, calc(0.9em + 0.2vw))";
+      font-size: var(--default-font-size);
     }
   }
 
   .user-guide-header {
     margin-top: 1rem;
     color: var(--accent-color);
-    font-size: larger;
+    font-size: calc(1.2 * var(--default-font-size));
   }
 
   .user-guide-emphasis {
@@ -3164,15 +3153,8 @@ body {
     padding-inline: 0.7rem;
     background-color: var(--accent-color);
 
-    @media (max-width: 750px ) { //SMALL
-      font-size: 1rem;
-      padding-block: 0.7rem;
-    } 
-
-    @media (min-width: 751px ) { //LARGE
-      font-size: 1.1rem;
-      padding-block: 1rem;
-    } 
+    font-size: var(--default-font-size);
+    padding-block: calc(0.5 * var(--default-line-height));
   }
   
   .v-slider-thumb__label::before {
@@ -3214,7 +3196,8 @@ body {
   user-select: none;
   border: solid 1.5px var(--accent-color);
   
-  font-size: clamp(8px, 3vmin, 0.9em);
+  font-size: var(--default-font-size);
+  line-height: var(--default-line-height);
   overflow-y: auto;
   
   transition: height 0.5s ease-in-out;
@@ -3267,7 +3250,7 @@ body {
     text-align: right;
     padding-left: 1rem;
     
-    font-size: clamp(0.9rem, 2.1vw, 2rem);
+    font-size: calc(1.3 * var(--default-font-size));
 
   }
     
@@ -3283,8 +3266,6 @@ body {
         border-radius: 5px;
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
-        
-        font-size: clamp(0.6rem, 1.75vw, 1.2rem);
 
         // span
         .description {
@@ -3384,11 +3365,20 @@ body {
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  width: 75%;
   height: fit-content;
   // outline: 5px solid var(--accent-color);
   border-radius: 1em;
-  padding: 2em;
+
+  @media (max-width: 700px) {
+    width: 90%;
+    padding: 1.5em;
+  }
+
+  @media (min-width: 701px) {
+    width: 75%;
+    padding: 2em;
+  }
+
 
   // rotated translucent background gradient
   background: linear-gradient(45deg,
@@ -3397,13 +3387,8 @@ body {
                             rgb(30 70 90));
 
   
-  @media (max-width: 750px){ //SMALL
-    font-size: 1em;    
-    }
-
-  @media (min-width: 751px){ //LARGE
-      font-size: 1.1em;
-  }
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
 
   .v-list-item__prepend {
     margin-right: 0.75em;
@@ -3421,24 +3406,15 @@ body {
     align-items: center;
 
     gap: 1em;
-    margin-top:1em;
+    margin-top:0.5em;
 
     .v-btn.v-btn--density-default {
-        max-height: 8em;
+        max-height: calc(1.6 * var(--default-line-height));
       }  
-        
-    @media (max-width: 750px){ //SMALL
-      .v-btn--size-default {
-      font-size: 0.8em;
-      }  
-    }
 
-    @media (min-width: 751px){ //LARGE
-      .v-btn--size-default {
-      font-size: 0.9em;
-      }    
-    }
-
+    .v-btn--size-default {
+      font-size: calc(0.9 * var(--default-font-size));
+    }    
   
     #intro-reminder {
       outline: 1px solid red;
@@ -3462,51 +3438,39 @@ body {
   margin-left: 10px;
 
   .icon-wrapper {
-    padding-inline: 0.5em;
-    padding-block: 0.6em;
+    padding-inline: calc(0.3 * var(--default-line-height));
+    padding-block: calc(0.4 * var(--default-line-height));
     border: 2px solid var(--accent-color);
   }
 
 }
 
 #speed-text {
-    position: absolute;
-    bottom: 0.3rem;
-    left: 0.3rem;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding-inline: 0.4em;
-    padding-block: 0.15em;
-    border-radius: 0.3em;
+  position: absolute;
+  bottom: 0.3rem;
+  left: 0.3rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-inline: 0.4em;
+  padding-block: 0.15em;
+  border-radius: 0.3em;
 
-    @media (max-width: 750px){ //SMALL
-          font-size: 0.9rem;
-        }
-    @media (min-width: 751px){ //LARGE
-          font-size: 1.1rem;
-    }
+  font-size: var(--default-font-size)
   }  
 
 #eclipse-percent-chip{
   position: absolute;
   right: 0.5rem;
-  top: -3rem;
+  top: calc(-2.2 * var(--default-line-height));
 
   .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 1;
-      padding: 0.5em;
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 1;
+    padding: 0.5em;
 
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-      }
-    }  
+    font-size: calc(1 * var(--default-font-size));
+  }  
 }
 
 #top-wwt-content {
@@ -3526,16 +3490,9 @@ body {
       color: blue;
       background-color: white;
       opacity: 0.9;
+      padding: calc(0.8 * var(--default-line-height));
 
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-        padding: 1em;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-        padding: 1.1em;
-      }
+      font-size: calc(1.2 * var(--default-font-size));
     }
   }
     .v-switch__thumb {
