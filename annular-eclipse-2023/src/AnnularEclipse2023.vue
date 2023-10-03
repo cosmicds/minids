@@ -1238,7 +1238,7 @@ export default defineComponent({
       showHorizon: true,
       showEcliptic: false, 
       showTextSheet: false, 
-      showEclipsePercentage: true,  
+      showEclipsePercentage: false,  
       
       toggleTrackSun: true,
       
