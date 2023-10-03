@@ -65,6 +65,8 @@
                 :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
                 @select="(e: any) => { console.log(e);}"
+                colorWrong="#4a2323"
+                colorRight="#234a23"
                 > 
                 <!-- for images width=100px, height=58px for correct aspect ratio -->
                 <template #default="{index, text, selected, color, feedback}">
@@ -80,6 +82,7 @@
                       <image-label 
                         :color="['rgb(10,150,150)','orange','#f0a'][index]"
                         :background-color="(selected ? `${color}` : '#bbb')"
+                        :background-opacity="(selected ? '1' : '0.5')"
                         width="100px"
                         height="50px"
                         font-size="2em"
@@ -93,9 +96,9 @@
                           :background-color="color"
                           width="100px"
                           height="50px"
-                          font-size="0.5rem"
+                          font-size="1rem"
                         >
-                        {{ feedback }}
+                        <span v-html="feedback"></span>
                         </image-label>
                       </template>
                   </flip-transition>
