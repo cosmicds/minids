@@ -1981,6 +1981,9 @@ export default defineComponent({
     },
 
     onAnswerSelected(event: unknown) { // Update with a real type
+      if (this.responseOptOut) {
+        return;
+      }
       fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
         method: "POST",
         body: JSON.stringify({
