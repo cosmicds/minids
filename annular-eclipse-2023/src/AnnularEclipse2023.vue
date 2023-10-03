@@ -545,6 +545,11 @@
                 icon="book-open"
               /> Learn more 
             </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="computer-mouse"
+              /> User guide 
+            </v-col>
         </v-row>
         </div>
         
@@ -2896,6 +2901,8 @@ body {
   backdrop-filter: blur(5px);
   justify-content: space-around;
   align-content: center;
+  padding-top: 4rem;
+  padding-bottom: 1rem;
 
   border-radius: 10%;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
@@ -2916,16 +2923,14 @@ body {
   p.highlight {
     color: var(--moon-color);
     -webkit-text-stroke: 0.1px var(--accent-color);
-    filter: drop-shadow(0px 0px 0.25em var(--accent-color));
-
+  
     // make uppercase
-    font-size: 1.15em;
     text-transform: uppercase;
     font-weight: bolder;
   }
   
   p.small {
-    font-size: .75em;
+    font-size: smaller;
     font-weight: bold;
   }
 
@@ -2934,10 +2939,11 @@ body {
   }
 
   #close-splash-button {
+    position: absolute;
+    top: 0;
+    right: 2.5rem;
     text-align: end;
-    margin-top: 0%;
-    margin-right: 6%;
-    color: var(--accent-color-2);
+    color: var(--accent-color);
     font-size: min(8vw, 5vh);
 
     &:hover {
@@ -2949,12 +2955,14 @@ body {
     // in the grid, the text is in the 2nd column
     display: flex;
     flex-direction: column;
+    line-height: 130%;
     
   }
 
   #splash-screen-guide {
     margin-block: 1em;
-    font-size: .6em;
+    font-size: min(5vw, 4vh);
+    line-height: 140%;
     width: 75%;
 
     .v-col{
