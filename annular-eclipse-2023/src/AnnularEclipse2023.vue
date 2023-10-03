@@ -45,7 +45,8 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click the highlighted cities to view the eclipse from other locations.</p>
+                <p>Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
             </div>
@@ -53,14 +54,15 @@
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
                 <p>Have you determined the eclipse path? Click to select it.</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket"></font-awesome-icon> to keep exploring.</p>
+                <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
             </div>
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
-                <p>Select any location you like by clicking on the map, and view the eclipse from there.</p>
+                <p>Select any location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
+                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
           </v-col>
@@ -80,17 +82,6 @@
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
-                :model-value="learnerPath == 'Answer'"
-                fa-icon="puzzle-piece"
-                fa-size="xl"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-text="'Identify eclipse path'"
-                :tooltip-location="'bottom'"
-                :box-shadow="false"
-                @activate="() => { learnerPath = 'Answer'}"
-              ></icon-button>   
-              <icon-button
                 :model-value="learnerPath == 'Choose'" 
                 fa-icon="location-dot"
                 fa-size="xl"
@@ -102,12 +93,33 @@
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
-                v-model="showTextSheet"
+                :model-value="learnerPath == 'Answer'"
+                fa-icon="puzzle-piece"
+                fa-size="xl"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'Identify eclipse path'"
+                :tooltip-location="'bottom'"
+                :box-shadow="false"
+                @activate="() => { learnerPath = 'Answer'}"
+              ></icon-button>   
+              <icon-button
+                v-model="showInfoSheet"
                 fa-icon="book-open"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
+                :tooltip-location="'bottom'"
+                :box-shadow="false"
+              ></icon-button>
+              <icon-button
+                v-model="showWWTGuideSheet"
+                fa-icon="computer-mouse"
+                fa-size="xl"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :box-shadow="false"
               ></icon-button>
@@ -171,13 +183,13 @@
     <v-dialog
       scrim="false"
       transition="slide-y-transition"
-      v-model="showTextSheet" 
+      v-model="showInfoSheet" 
       class='bottom-sheet'
       id="text-bottom-sheet"
       :style="cssVars"
     >
       <v-card
-        id="bottom-sheet-card">
+        class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
           height="32px"
@@ -188,131 +200,277 @@
           grow
         >
           <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
-          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
           icon="times"
           size="lg"
-          @click="showTextSheet = false"
-          @keyup.enter="showTextSheet = false"
+          @click="showInfoSheet = false"
+          @keyup.enter="showInfoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
-        <v-window v-model="tab" id="tab-items" class="pa-2 no-bottom-border-radius">
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                <v-row>
-                <v-col cols="6" id="info-text-box">
-                  <div id="main-info-text">
+        <v-card class="no-bottom-border-radius scrollable">
+          <v-card-text class="info-text no-bottom-border-radius">
+            <v-row>
+            <v-col cols="6" id="info-text-box">
+              <div id="main-info-text">
+                <p>
+                Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
+                </p>
+                <p>
+                This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
+                </p>
+                <p id="safety-warning">
+                  SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
+                </p>
+              </div>  
+                <div id="FAQ">
+                  <details>
+                    <summary>
+                      What causes Solar Eclipses?
+                    </summary>
                     <p>
-                    Get ready North America for not one, but two brilliant solar eclipses! 
-                    First, a dazzling annular or <i>Ring of Fire</i> eclipse on October 14, 2023. Only 6 months late, on April 8, 2024,
-                    get ready for an awe-inspiring solar eclipse which stretches from coast-to-coast across the United States.
-                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations.
+                      A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
                     </p>
-                  </div>  
-                    <div id="FAQ">
-                      <details>
-                        <summary>
-                          What causes Solar Eclipses?
-                        </summary>
-                      <p>A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view.
-                        Partial eclipses occur about every 6 months somewhere on the Earth (Can you think of WHY this is?). The U.S. is lucky 
-                        to be in the path of the next two solara eclipses. 
-                        </p>
-                      </details>
-                      
-                      <details>
-                        <summary> Total vs. Annular Eclipse</summary>
-                        <p>
-                          During a Total Eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth
-                          in a perfect circle, sometimes it is farther away from the Earth and appears smaller. When this happens, the Moon
-                          doesn't cover the entire face of the Sun, and during the eclipse we can still see a ring of light around the Moon. This is called an Annular Eclipse.
-                        </p>
-                      </details>
-                      
-                      <details> 
-                        <summary> Why can only some places see the eclipse?</summary>
-                        <p>
-                          An eclipse is caused by the Moon casting a shadow on the Earth. 
-                          People who are directly behind the Moon are in the darkest part of the shadow, and will see an annular (Oct) or total (Apr) eclipse. 
-                          As the Moon moves in its orbit around the Earth, the location of the shadow will move, sweeping out a path across the surface of the Earth. 
-                          For a larger number of people, those not directly behind the moon, the Sun will only be partially blocked, causing a partial eclipse. Even further outside the shadow
-                          the Sun will not be blocked at all, and there will be no eclipse visible. 
-                        </p> 
-                      </details>
-                    </div>
+                  </details>
+                  
+                  <details>
+                    <summary> Total vs. Annular Eclipse</summary>
+                    <p>
+                      During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                    </p>
+                  </details>
+                  
+                  <details> 
+                    <summary> Why can only some places see the eclipse?</summary>
+                    <p>
+                      An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                    </p>
+                    <p> 
+                      The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                    </p> 
+                  </details>
+                </div>
+            </v-col>
+            <v-col cols="6">
+              <figure>
+                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+              </figure>
+            </v-col>
+          </v-row>
+          </v-card-text>
+        </v-card>
+      </v-card>
+    </v-dialog>
+    
+    <v-dialog
+      scrim="false"
+      transition="slide-y-transition"
+      v-model="showWWTGuideSheet" 
+      class='bottom-sheet'
+      id="wwt-guide-sheet"
+      :style="cssVars"
+    >
+      <v-card
+        class="bottom-sheet-card">
+        <v-tabs
+          v-model="tab"
+          height="32px"
+          :color="accentColor"
+          :slider-color="accentColor"
+          id="tabs"
+          dense
+          grow
+        >
+          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
+        </v-tabs>
+        <font-awesome-icon
+          id="close-text-icon"
+          class="control-icon"
+          icon="times"
+          size="lg"
+          @click="showWWTGuideSheet = false"
+          @keyup.enter="showWWTGuideSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
+        <v-card class="no-bottom-border-radius scrollable">
+          <v-card-text class="info-text no-bottom-border-radius">
+            <v-container>
+              <v-row align="center">
+              <v-col cols="4">
+                  <v-chip
+                    label
+                    outlined
+                  >
+                    Pan
+                  </v-chip>
                 </v-col>
-                <v-col cols="6">
-                  <figure>
-                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-                  </figure>
+                <v-col cols="8" class="pt-1">
+                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
                 </v-col>
               </v-row>
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-          <v-window-item>
-            <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                <v-container>
-                  <v-row align="center">
-                  <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Pan
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row align="center">
-                    <v-col cols="4">
-                      <v-chip
-                        label
-                        outlined
-                      >
-                        Zoom
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="8" class="pt-1">
-                      <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <div class="credits">
-                      <h3>Credits:</h3>
-                      <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                      Pat Udomprasert<br>
-                      Jon Carifio<br>
-                      John Lewis<br>
-                      Alyssa Goodman<br>
-                      Mary Dussault<br>
-                      Harry Houghton<br>
-                      Anna Nolin<br>
-                      Evaluator: Sue Sunbury<br>
-                      <br>
-                      <h4>WorldWide Telescope Team:</h4>
-                      Peter Williams<br>
-                      A. David Weigel<br>
-                      Jon Carifio<br>
-                      </div>
-                      <v-spacer class="end-spacer"></v-spacer>
-                    </v-col>
-                  </v-row>
-                </v-container>              
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-        </v-window>
+              <v-row align="center">
+                <v-col cols="4">
+                  <v-chip
+                    label
+                    outlined
+                  >
+                    Zoom
+                  </v-chip>
+                </v-col>
+                <v-col cols="8" class="pt-1">
+                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div
+                      style="min-height: 120px;"
+                  >
+                    <p>
+                      This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
+                    </p>
+                    
+                    <h4 class="user-guide-header">Time Controls:</h4>
+                    <p  class="mb-3">(See bottom-left of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="play"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to move time forward at 1000x the real speed.
+                      </li>
+                      <li>
+                        If playing, click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="pause"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to pause time.
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-down"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to decrease speed by 10x.                        
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-up"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to increase speed by 10x. 
+                      </li>
+                      <li>
+                        You can also control time by dragging <v-icon
+                          class="bullet-icon"
+                          icon="mdi-circle"
+                          size="medium" 
+                        ></v-icon> along the slider.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Viewing Mode:</h4>
+                    <p  class="mb-3">(See upper-right of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        The <span 
+                        style="color: blue; background-color: white;
+                        padding-inline: 0.7em;
+                        border-radius: 20px;
+                        font-weight: bold ">selected location</span> is displayed under the map.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-telescope"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image-filter-hdr"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-white-balance-sunny"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Display Options:</h4>
+                    <p  class="mb-3">(See bottom-right of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        <span class="user-guide-emphasis-white">Sky Grid:</span> Display altitude/azimuth grid with cardinal directions.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Ecliptic:</span> Display path on sky that Sun appears to travel throughout a year.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Horizon:</span> Display a virtual "ground" that delineates where the Sun rises and sets.                     
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
+                      </li>
+                    </ul>
+
+                  </div>
+                          
+                  <v-divider thickness="2px" class="solid-divider"></v-divider>
+                  
+                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div class="credits">
+                  <h3>Credits:</h3>
+                  <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
+                  Pat Udomprasert<br>
+                  Jon Carifio<br>
+                  John Lewis<br>
+                  Alyssa Goodman<br>
+                  Mary Dussault<br>
+                  Harry Houghton<br>
+                  Anna Nolin<br>
+                  Evaluator: Sue Sunbury<br>
+                  <br>
+                  <h4>WorldWide Telescope Team:</h4>
+                  Peter Williams<br>
+                  A. David Weigel<br>
+                  Jon Carifio<br>
+                  </div>
+                  <v-spacer class="end-spacer"></v-spacer>
+                </v-col>
+              </v-row>
+            </v-container>              
+          </v-card-text>
+        </v-card>
       </v-card>
     </v-dialog>
 
@@ -423,23 +581,24 @@
         <v-window v-model="introSlide">
           <v-window-item :value="1">
             <div class="intro-text">
-              <p>
+              <p class="mb-5">
               On October 14, 2023, the Americas will experience
               a partial solar eclipse, where the Moon 
               will appear to travel across the Sun and 
               block a portion of it.
               </p>
-            <br />
-              <p>
-              A lucky segment of the U.S., Central, and South America will 
-              experience what is known as an <b>annular eclipse</b>.
+              <p  class="mb-5">
+              A lucky segment of the U.S., Central, and South America will experience a dazzling <b>"Ring of Fire"</b> created by an <b>annular eclipse</b>.
+              </p>
+              <p class="mb-5">
+              Use your detective skills to identify where those lucky people are in our map quiz.
               </p>
             </div>
           </v-window-item>
           
           <v-window-item :value="2">
-            <div class="intro-text">
-              <p>
+            <div class="intro-text mb-3">
+              <p class="mb-3">
                 In this interactive page you can:
               </p>
               
@@ -449,13 +608,13 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Explore what the eclipse will look like from different parts of the country
+                    Explore what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Use some detective work to identify the Path of Visibility for the annular eclipse
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -467,7 +626,13 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses. 
+                    Learn more about solar eclipses 
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
+                  </template>
+                    Learn more about how to navigate this app 
                 </v-list-item>
               </ul>
             </div>
@@ -924,6 +1089,8 @@ export default defineComponent({
       showMapSelector: false,
       showLocationSelector: false,
 
+      showWWTGuideSheet: false,
+      
       selectionProximity: 4,
       pointerMoveThreshold: 6,
       isPointerMoving: false,
@@ -1078,11 +1245,11 @@ export default defineComponent({
       maxTime: maxTime,
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
-      accentColor: "#ef7e3d",
+      accentColor: "#ff8f00",
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: false,
+      inIntro: true, //FIX
 
       tab: 0,
       introSlide: 1,
@@ -1254,7 +1421,7 @@ export default defineComponent({
       return {
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
-        '--app-content-height': this.showTextSheet ? '100%' : '100%',
+        '--app-content-height': this.showInfoSheet ? '100%' : '100%',
         '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
         '--moon-color': this.moonColor,
       };
@@ -1278,14 +1445,14 @@ export default defineComponent({
       const todMs = 1000 * (3600 * dateForTOD.getUTCHours() + 60 * dateForTOD.getUTCMinutes() + dateForTOD.getUTCSeconds());
       return todMs / MILLISECONDS_PER_DAY;
     },
-    // showTextSheet: {
-    //   get(): boolean {
-    //     return this.sheet === 'text';
-    //   },
-    //   set(_value: boolean) {
-    //     this.selectSheet('text');
-    //   }
-    // },
+    showInfoSheet: {
+      get(): boolean {
+        return this.sheet === 'text';
+      },
+      set(_value: boolean) {
+        this.selectSheet('text');
+      }
+    },
 
     locationDeg: {
       get(): LocationDeg {
@@ -2521,8 +2688,9 @@ body {
   left: 1rem;
   
   .icon-wrapper {
-    padding-inline: 7px 8px;
-    width: 2.5rem;
+    padding-inline: 0.5em;
+    padding-block: 0.6em;
+    border: 2px solid var(--accent-color);
   }
 
 }
@@ -2820,7 +2988,10 @@ body {
   }
 }
 
-
+#wwt-sheet-card {
+  width: 50%;
+  align-self: center;
+}
 
 .bottom-sheet {
 
@@ -2834,6 +3005,13 @@ body {
   }
   #main-info-text {
     padding-inline: 0.5em;
+  }
+
+  #safety-warning{
+    margin-top: 0.4em;
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: ~"max(20px, calc(1em + 0.3vw))";
   }
   
   #FAQ{
@@ -2880,10 +3058,11 @@ body {
     margin: unset;
   }
   
-  #bottom-sheet-card {
+  .bottom-sheet-card {
     height: fit-content;
     width: 100%;
     align-self: center;
+    border-bottom: solid #212121 0.5em;
   }
   
   #tabs {
@@ -2892,8 +3071,7 @@ body {
   }
 
   .v-card-text {
-    height: 33vh;
-    padding-bottom: 25px;
+    height: 40vh;
     
     & a {
       text-decoration: none;
@@ -2938,6 +3116,27 @@ body {
   // (around 400px or less)
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
+  }
+
+  .user-guide-header {
+    margin-top: 1rem;
+    color: var(--accent-color);
+    font-size: larger;
+  }
+
+  .user-guide-emphasis {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  .user-guide-emphasis-white {
+    font-weight: bold;
+  }
+
+  .solid-divider {
+    margin-top: 1rem;
+    color: var(--sky-color);
+    opacity: 0.7;
   }
 }
 
@@ -3080,17 +3279,7 @@ body {
     text-align: right;
     padding-left: 1rem;
     
-    @media (max-width: 390px){ //TINY
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 750px){ //SMALL
-      font-size: 1.1rem;
-    }
-
-    @media (min-width: 751px){ //LARGE
-      font-size: 1.3rem;
-    }
+    font-size: clamp(0.9rem, 2.1vw, 2rem);
 
   }
     
@@ -3107,15 +3296,7 @@ body {
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
         
-        @media (max-width: 600px){ //SMALL
-          font-size: 0.9rem;
-        }
-        @media (min-width: 601px){ //MEDIUM
-          font-size: 1.1rem;
-        }
-        @media (min-width: 900px){ //LARGE
-          font-size: 1.2rem;
-        }
+        font-size: clamp(0.6rem, 1.75vw, 1.2rem);
 
         // span
         .description {
@@ -3206,6 +3387,10 @@ body {
   }
 }
 
+.bullet-icon {
+  color: var(--accent-color)
+}
+
 #introduction-overlay {
   position: absolute;
   top: 50%;
@@ -3238,10 +3423,6 @@ body {
   
   .intro-text {
     color: white;
-
-    .bullet-icon {
-      color: var(--accent-color)
-    }
   }
   
   div#intro-bottom-controls {
