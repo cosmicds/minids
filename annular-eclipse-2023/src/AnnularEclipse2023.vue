@@ -1078,7 +1078,7 @@ export default defineComponent({
     };
 
     return {
-      showSplashScreen: false, // FIX later
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -1251,7 +1251,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: true, //FIX
+      inIntro: false,
 
       tab: 0,
       introSlide: 1,
@@ -2440,7 +2440,7 @@ export default defineComponent({
 
     showSplashScreen(val: boolean) {
       if (!val) {
-        this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
+        this.inIntro = true; 
       }
     },
     
