@@ -3077,7 +3077,7 @@ body {
   
   #image-label-front .image-label-text {
     // filter: drop-shadow(0px 0px 0.1em white);
-    font-size: 6em;
+    font-size: 2em;
   }
   
   
