@@ -1082,7 +1082,6 @@ export default defineComponent({
 
       showMapTooltip: false,
       showTextTooltip: false,
-      showControls: true, 
       showMapSelector: false,
       showLocationSelector: false,
 
@@ -1229,6 +1228,7 @@ export default defineComponent({
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
 
+      showControls: true,
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
@@ -1376,6 +1376,7 @@ export default defineComponent({
       this.onResize();
     });
 
+    this.showControls = !this.mobile;
   },
 
   computed: {
@@ -2774,22 +2775,11 @@ body {
     flex-direction: column;
     justify-content: flex-start;
 
-    @media (max-width: 750px){ //SMALL
-      
-      .v-checkbox .v-selection-control {
-      height: 1.5em !important;
-      min-height: 1em !important;
-      }
-
+    .v-checkbox .v-selection-control {
+      font-size: clamp(10px, min(2vw, 2vh),18px);
+      height: clamp(20px, min(3vw, 3vh), 30px);
+      min-height: clamp(16px, min(2.5vw, 2.5vh), 24px);
     }
-
-    @media (min-width: 751px){ //LARGE
-      .v-checkbox .v-selection-control {
-      height: 2.1em !important;
-      min-height: 1em !important;
-      }
-    }
-
 
     .v-btn {
       align-self: center;
