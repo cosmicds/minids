@@ -64,11 +64,11 @@
   }
   
 
-.v-selection-control__wrapper {
+#mc-radiogroup-container .v-selection-control__wrapper {
   display: none;
 }
 
-.v-label {
+#mc-radiogroup-container .v-label {
   opacity: inherit;
 }
 
