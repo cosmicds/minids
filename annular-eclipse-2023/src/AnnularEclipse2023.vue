@@ -428,9 +428,6 @@
                         <span class="user-guide-emphasis-white">Sky Grid:</span> Display altitude/azimuth grid with cardinal directions.
                       </li>
                       <li>
-                        <span class="user-guide-emphasis-white">Ecliptic:</span> Display path on sky that Sun appears to travel throughout a year.
-                      </li>
-                      <li>
                         <span class="user-guide-emphasis-white">Horizon:</span> Display a virtual "ground" that delineates where the Sun rises and sets.                     
                       </li>
                       <li>
@@ -784,13 +781,6 @@
               @keyup.enter="showAltAzGrid = !showAltAzGrid"
               label="Sky Grid"
               hide-details 
-            />
-            <v-checkbox
-              :color="accentColor"
-              v-model="showEcliptic"
-              @keyup.enter="showEcliptic = !showEcliptic"
-              label="Ecliptic"
-              hide-details
             />
             <v-checkbox
               :color="accentColor"
@@ -1241,7 +1231,6 @@ export default defineComponent({
 
       showAltAzGrid: true,
       showHorizon: true,
-      showEcliptic: false, 
       showTextSheet: false, 
       showEclipsePercentage: false,  
       
@@ -1323,8 +1312,6 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
-      this.wwtSettings.set_showEcliptic(this.showEcliptic);
-      this.wwtSettings.set_showEclipticOverviewText(false);
 
       // This is kinda horrible, but it works!
 
@@ -1518,7 +1505,6 @@ export default defineComponent({
       return this.sunPosition.altRad > 0;
     },
 
-
     selectedLocationText(): string {
       if (this.selectedLocation !== 'User Selected') {
         return this.selectedLocation;
@@ -1550,7 +1536,6 @@ export default defineComponent({
     defaultRate(): number {
       return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
     },
-
   },
 
   methods: {
@@ -2338,11 +2323,6 @@ export default defineComponent({
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
-    },
-
-    showEcliptic(show: boolean) {
-      this.wwtSettings.set_showEcliptic(show);
-      this.wwtSettings.set_showEclipticOverviewText(false);
     },
 
     showHorizon(_show: boolean) {
