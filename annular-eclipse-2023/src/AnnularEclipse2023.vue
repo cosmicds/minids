@@ -912,7 +912,7 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" class="ui-text">
+      <div id="credits" class="ui-text" v-if= "!smallSize">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -3190,6 +3190,9 @@ body {
   
 
   .v-slider-thumb__label {
+    @media (max-width: 600px) {
+      display: none;
+    }
     min-width: fit-content;
     white-space: nowrap;
     color: black;
@@ -3490,12 +3493,21 @@ body {
 
 #speed-text {
   position: absolute;
-  bottom: 0.3rem;
-  left: 0.3rem;
+
   background-color: rgba(0, 0, 0, 0.5);
   padding-inline: 0.4em;
   padding-block: 0.15em;
   border-radius: 0.3em;
+
+  @media (max-width: 959px) {
+    bottom: -0.4rem;
+    left: 7.5rem;
+  }
+  @media (min-width: 960px) {
+    bottom: 0.3rem;
+    left: 0.3rem;
+  }
+
 
   font-size: var(--default-font-size)
   }  
@@ -3535,7 +3547,7 @@ body {
       opacity: 0.9;
       padding: calc(0.8 * var(--default-line-height));
 
-      font-size: calc(1.2 * var(--default-font-size));
+      font-size: calc(1.1 * var(--default-font-size));
     }
   }
     .v-switch__thumb {
