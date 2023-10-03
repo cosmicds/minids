@@ -298,7 +298,10 @@
         ></font-awesome-icon>
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
-            <v-container>
+            <v-container  id="user-guide">
+              <p style="font-size: larger" class="mb-5">
+                This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
+              </p>
               <v-row align="center">
               <v-col cols="4">
                   <v-chip
@@ -329,11 +332,7 @@
                 <v-col cols="12">
                   <div
                       style="min-height: 120px;"
-                  >
-                    <p>
-                      This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
-                    </p>
-                    
+                  >                   
                     <h4 class="user-guide-header">Time Controls:</h4>
                     <p  class="mb-3">(See bottom-left of the screen)</p>
                     <ul class="text-list">
@@ -383,7 +382,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li>
+                      <li class="mb-1">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -3119,6 +3118,15 @@ body {
   // (around 400px or less)
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
+  }
+
+  #user-guide {
+    font-size: ~"max(12px, calc(0.9em + 0.2vw))";
+    line-height: ~"max(18px, calc(1.2em + 0.4vw))";
+
+    .v-chip {
+      font-size: ~"max(16px, calc(0.9em + 0.2vw))";
+    }
   }
 
   .user-guide-header {
