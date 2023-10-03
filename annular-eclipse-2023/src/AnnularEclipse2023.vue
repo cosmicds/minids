@@ -1085,6 +1085,7 @@ type HorizontalRad = {
 };
 
 let queryData: LocationDeg | null = null;
+const USER_SELECTED = "User Selected" as const;
 
 export default defineComponent({
   extends: MiniDSBase,
@@ -1135,6 +1136,10 @@ export default defineComponent({
       initialZoom: 3
     };
 
+    const selectedLocation = queryData ? USER_SELECTED : "Albuquerque, NM";
+    const presetLocationsVisited = queryData ? [] : [selectedLocation];
+    const userSelectedLocationsVisited = queryData ? [[queryData.latitudeDeg, queryData.longitudeDeg]] : [];
+
     return {
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
@@ -1167,7 +1172,7 @@ export default defineComponent({
         latitudeRad: D2R * 35.106766,
         longitudeRad: D2R * -106.629181
       } as LocationRad,
-      selectedLocation: queryData ? "User Selected" : "Albuquerque, NM",
+      selectedLocation: queryData ? USER_SELECTED : "Albuquerque, NM",
       locationErrorMessage: "",
       
       syncDateTimeWithWWTCurrentTime: true,
@@ -1260,8 +1265,8 @@ export default defineComponent({
           longitudeRad: D2R * -80.843124,
           eclipseFraction: .53
         },
-        "User Selected": { // by default, user selected is Albaquerque
-          name: "User Selected",
+        [USER_SELECTED]: { // by default, user selected is Albaquerque
+          name: USER_SELECTED,
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
           eclipseFraction: 0.97
@@ -1337,7 +1342,10 @@ export default defineComponent({
       sunPlace,
       moonPlace,
 
-      queryData
+      queryData,
+
+      presetLocationsVisited,
+      userSelectedLocationsVisited
     };
   },
 
@@ -1352,7 +1360,7 @@ export default defineComponent({
   },
 
   created() {
-    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== "User Selected")
+    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== USER_SELECTED)
       .sort(([_, pl1], [__, pl2]) => pl1.longitudeRad - pl2.longitudeRad)
       .map(([_, pl]) => {
         return {
@@ -1575,7 +1583,7 @@ export default defineComponent({
 
 
     selectedLocationText(): string {
-      if (this.selectedLocation !== 'User Selected') {
+      if (this.selectedLocation !== USER_SELECTED) {
         return this.selectedLocation;
       } else {
         const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
@@ -1931,10 +1939,10 @@ export default defineComponent({
         return;
       }
       console.log("updateLocationFromMap", location);
-      this.selectedLocation = 'User Selected';
+      this.selectedLocation = USER_SELECTED;
       this.locationDeg = location;
 
-      this.eclipsePathLocations['User Selected'] = {
+      this.eclipsePathLocations[USER_SELECTED] = {
         name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
         latitudeRad: D2R * location.latitudeDeg,
         longitudeRad: D2R * location.longitudeDeg,
@@ -2485,10 +2493,19 @@ export default defineComponent({
       this.centerSun();
     },
 
+    locationDeg(loc: LocationDeg) {
+      if (this.selectedLocation === USER_SELECTED) {
+        this.userSelectedLocationsVisited.push([loc.latitudeDeg, loc.longitudeDeg]);
+      }
+    },
+
     selectedLocation(locname: string) {
       if (!(locname in this.eclipsePathLocations)) {
         console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
+      }
+      if (locname !== USER_SELECTED) {
+        this.presetLocationsVisited.push(locname);
       }
       console.log("selected location", locname);
     },
