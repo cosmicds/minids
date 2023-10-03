@@ -65,7 +65,7 @@
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
-                @select="(e: any) => { console.log(e);}"
+                @select="onAnswerSelected"
                 colorWrong="#4a2323"
                 colorRight="green"
                 > 
@@ -1007,8 +1007,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
+import { defineComponent, toRaw, PropType } from "vue";
+import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, MINIDS_BASE_URL } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture, CAAMoon } from "@wwtelescope/engine";
@@ -1977,6 +1977,17 @@ export default defineComponent({
     onTimeSliderChange() {
       this.$nextTick(() => {
         this.updateFrontAnnotations(this.dateTime);
+      });
+    },
+
+    onAnswerSelected(event: unknown) { // Update with a real type
+      fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
+        method: "POST",
+        body: JSON.stringify({
+          response: event.response,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          user_uuid: this.uuid, preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
+        })
       });
     },
 
