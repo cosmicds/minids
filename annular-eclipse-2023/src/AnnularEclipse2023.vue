@@ -1087,6 +1087,8 @@ type HorizontalRad = {
 
 let queryData: LocationDeg | null = null;
 const USER_SELECTED = "User Selected" as const;
+const UUID_KEY = "eclipse-mini-uuid" as const;
+const OPT_OUT_KEY = "eclipse-mini-optout" as const;
 
 export default defineComponent({
   extends: MiniDSBase,
@@ -1141,10 +1143,14 @@ export default defineComponent({
     const presetLocationsVisited = queryData ? [] : [selectedLocation];
     const userSelectedLocationsVisited = queryData ? [[queryData.latitudeDeg, queryData.longitudeDeg]] : [];
 
-    const uuid = v4();
+    const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
+    window.localStorage.setItem(UUID_KEY, uuid);
+
+    const responseOptOut = window.localStorage.getItem(OPT_OUT_KEY) === "true" ?? false;
 
     return {
       uuid,
+      responseOptOut,
 
       showSplashScreen: false, // FIX later
       backgroundImagesets: [] as BackgroundImageset[],
@@ -2403,6 +2409,10 @@ export default defineComponent({
   },
 
   watch: {
+    responseOptOut(optOut: boolean) {
+      window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
+    },
+
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
