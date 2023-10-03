@@ -81,6 +81,7 @@ import { VRadio } from 'vuetify/components/VRadio';
 // create a select type
 type Status = {
   index: number,
+  text: string,
   correct: boolean,
   neutral: boolean,
   tries: number
@@ -144,6 +145,7 @@ export default defineComponent({
   emits: {
     select(status: Status) {
       return typeof status.index === 'number' &&
+            typeof status.text === 'string' &&
             typeof status.correct === 'boolean' &&
             typeof status.neutral === 'boolean' &&
             typeof status.tries === 'number';
@@ -188,6 +190,7 @@ export default defineComponent({
 
       this.$emit('select', {
         index: index,
+        text: this.radioOptions[index],
         correct: correct,
         neutral: this.neutralAnswers.includes(index),
         tries: this.tries
