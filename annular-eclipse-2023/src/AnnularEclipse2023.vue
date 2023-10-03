@@ -752,6 +752,7 @@
         <v-chip 
           v-if="showEclipsePercentage"
           prepend-icon="mdi-sun-angle"
+          variant="outlined"
           size="medium"
           elevation="2"
           :text="percentEclipsedText"
@@ -2568,6 +2569,23 @@ body {
   overflow: hidden;
 
   // transition: height 0.1s ease-in-out;
+
+  .v-chip {
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 0.9;
+
+    @media (max-width: 750px) { // SMALL
+      font-size: 1em;
+      padding: 1em;
+    }
+
+    @media (min-width: 751px) { // LARGE
+      font-size: 1.1em;
+      padding: 1.1em;
+    }
+  }
 }
 
 #app {
@@ -3501,34 +3519,21 @@ body {
     padding-block: 0.15em;
     border-radius: 0.3em;
 
-    @media (max-width: 750px){ //SMALL
+    @media (max-width: 750px) { //SMALL
           font-size: 0.9rem;
         }
-    @media (min-width: 751px){ //LARGE
+    @media (min-width: 751px) { //LARGE
           font-size: 1.1rem;
     }
   }  
 
-#eclipse-percent-chip{
+#eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
   top: -3rem;
 
   .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 1;
       padding: 0.5em;
-
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-      }
     }  
 }
 
@@ -3544,22 +3549,6 @@ body {
     flex-wrap: column;
     gap:5px;
 
-    .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 0.9;
-
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-        padding: 1em;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-        padding: 1.1em;
-      }
-    }
   }
     .v-switch__thumb {
       color: #f39d6c;
