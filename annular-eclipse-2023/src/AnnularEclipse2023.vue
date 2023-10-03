@@ -301,7 +301,10 @@
         ></font-awesome-icon>
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
-            <v-container>
+            <v-container  id="user-guide">
+              <p style="font-size: larger" class="mb-5">
+                This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
+              </p>
               <v-row align="center">
               <v-col cols="4">
                   <v-chip
@@ -332,11 +335,7 @@
                 <v-col cols="12">
                   <div
                       style="min-height: 120px;"
-                  >
-                    <p>
-                      This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
-                    </p>
-                    
+                  >                   
                     <h4 class="user-guide-header">Time Controls:</h4>
                     <p  class="mb-3">(See bottom-left of the screen)</p>
                     <ul class="text-list">
@@ -386,7 +385,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li>
+                      <li class="mb-1">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -439,6 +438,9 @@
                       </li>
                       <li>
                         <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Show Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
                       </li>
                     </ul>
 
@@ -682,7 +684,7 @@
             learnerPath = 'Choose'
             }"
         > </v-chip>
-        <v-chip 
+        <v-chip
           prepend-icon="mdi-calendar"
           variant="outlined"
           size="small"
@@ -749,6 +751,16 @@
     </div>
     
     <div class="bottom-content">
+      <div id="eclipse-percent-chip">
+        <v-chip 
+          v-if="showEclipsePercentage"
+          prepend-icon="mdi-sun-angle"
+          variant="outlined"
+          size="medium"
+          elevation="2"
+          :text="percentEclipsedText"
+        > </v-chip>
+      </div>
       <div
         id="controls"
         class="control-icon-wrapper"
@@ -786,13 +798,20 @@
               label="Horizon"
               hide-details
             />
-          <v-checkbox
-              :color="accentColor"
-              v-model="useRegularMoon"
-              @keyup.enter="useRegularMoon = !useRegularMoon"
-              label="Visible Moon"
-              hide-details
+            <v-checkbox
+                :color="accentColor"
+                v-model="useRegularMoon"
+                @keyup.enter="useRegularMoon = !useRegularMoon"
+                label="Visible Moon"
+                hide-details
             />
+            <v-checkbox
+                :color="accentColor"
+                v-model="showEclipsePercentage"
+                @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
+                label="Show Amount Eclipsed"
+                hide-details
+            />            
           </div>
         </transition-expand>
       </div>
@@ -1222,6 +1241,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
+      showTextSheet: false, 
+      showEclipsePercentage: false,  
       
       toggleTrackSun: true,
       
@@ -1507,6 +1528,11 @@ export default defineComponent({
         const lon = Math.abs(this.locationDeg.longitudeDeg).toFixed(3);
         return `${lat}° ${ns}, ${lon}° ${ew}`;
       }
+    },
+
+    percentEclipsedText(): string {
+      const percentEclipsed = Math.abs(this.currentPercentEclipsed * 100).toFixed(0);
+      return `Eclipsed: ${percentEclipsed}%`;
     },
 
     trackingSun: {
@@ -2546,6 +2572,23 @@ body {
   overflow: hidden;
 
   // transition: height 0.1s ease-in-out;
+
+  .v-chip {
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 0.9;
+
+    @media (max-width: 750px) { // SMALL
+      font-size: 1em;
+      padding: 1em;
+    }
+
+    @media (min-width: 751px) { // LARGE
+      font-size: 1.1em;
+      padding: 1.1em;
+    }
+  }
 }
 
 #app {
@@ -3098,6 +3141,15 @@ body {
     display: none;
   }
 
+  #user-guide {
+    font-size: ~"max(12px, calc(0.9em + 0.2vw))";
+    line-height: ~"max(18px, calc(1.2em + 0.4vw))";
+
+    .v-chip {
+      font-size: ~"max(16px, calc(0.9em + 0.2vw))";
+    }
+  }
+
   .user-guide-header {
     margin-top: 1rem;
     color: var(--accent-color);
@@ -3470,13 +3522,23 @@ body {
     padding-block: 0.15em;
     border-radius: 0.3em;
 
-    @media (max-width: 750px){ //SMALL
+    @media (max-width: 750px) { //SMALL
           font-size: 0.9rem;
         }
-    @media (min-width: 751px){ //LARGE
+    @media (min-width: 751px) { //LARGE
           font-size: 1.1rem;
     }
   }  
+
+#eclipse-percent-chip {
+  position: absolute;
+  right: 0.5rem;
+  top: -3rem;
+
+  .v-chip {
+      padding: 0.5em;
+    }  
+}
 
 #top-wwt-content {
   position: absolute;
@@ -3490,22 +3552,6 @@ body {
     flex-wrap: column;
     gap:5px;
 
-    .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 0.9;
-
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-        padding: 1em;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-        padding: 1.1em;
-      }
-    }
   }
     .v-switch__thumb {
       color: #f39d6c;
