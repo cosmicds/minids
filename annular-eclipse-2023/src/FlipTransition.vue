@@ -1,5 +1,8 @@
 <template>
-  <div class="flip-card" :style="size">
+  <div
+    :id="'flip-transition-' + `${id}`"
+    class="flip-card" :style="size"
+    >
     <div class="flip-card-inner" :style="cssVars">
     
       <div class="flip-card-front">
@@ -42,6 +45,54 @@ export default defineComponent({
       type: String,
       default: '0.8s'
     },
+
+    flipBack: {
+      type: Boolean,
+      default: false
+    },
+
+    flipBackAfter: {
+      type: Number, // ms
+      default: 1000
+    },
+
+    id : {
+      type: String,
+      default: ''
+    },
+
+    hover: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  mounted() {
+
+    const id = 'flip-transition-' + `${this.id}`;
+    const card = document.querySelector(`#${id} .flip-card-inner`);
+
+    if (this.hover) {
+      card?.addEventListener('mouseenter', () => {
+        card.classList.toggle('do-flip');
+      });
+      card?.addEventListener('mouseleave', () => {
+        card.classList.toggle('do-flip');
+      });
+    }
+    
+    card?.addEventListener('click', () => {
+      card.classList.toggle('do-flip');
+
+      if (this.flipBack) {
+        setTimeout(() => {
+
+          card.classList.toggle('do-flip');
+          
+        }, this.flipBackAfter); 
+      }
+      
+    });
   },
 
   computed: {
@@ -60,10 +111,11 @@ export default defineComponent({
 
 </script>
 
-<style scoped>
+<style>
 /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
 .flip-card {
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
+  pointer-events: none;
 }
 
 /* This container is needed to position the front and back side */
@@ -74,10 +126,16 @@ export default defineComponent({
   text-align: center;
   transition: transform var(--duration);
   transform-style: preserve-3d;
+  pointer-events: auto;
 }
 
+/* replace :hover state in javascript with mouseenter mouseleave */
 /* Do an horizontal flip when you move the mouse over the flip box container */
-.flip-card:hover .flip-card-inner {
+/* .flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+} */
+
+.do-flip {
   transform: rotateY(180deg);
 }
 
