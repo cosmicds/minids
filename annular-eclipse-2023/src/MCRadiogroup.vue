@@ -139,7 +139,22 @@ export default defineComponent({
     stopOnComplete: {
       type: Boolean,
       default: true
-    }
+    },
+
+    colorWrong: {
+      type: String,
+      default: 'red'
+    },
+
+    colorNeutral: {
+      type: String,
+      default: 'orange'
+    },
+
+    colorRight: {
+      type: String,
+      default: 'green'
+    },
     
   },
   emits: {
@@ -159,9 +174,6 @@ export default defineComponent({
   data: function () {
     return {
       column: null as unknown as number,
-      colorRight: 'green',
-      colorNeutral: 'orange',
-      colorWrong: 'red',
       iconRight: 'mdi-check-circle-outline',
       iconNeutral: 'mdi-lightbulb-on-outline',
       iconWrong: 'mdi-alert-circle-outline',
