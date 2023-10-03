@@ -45,7 +45,7 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p>Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
