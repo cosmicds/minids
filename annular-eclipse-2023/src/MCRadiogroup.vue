@@ -9,7 +9,7 @@
       :inline="row"
       :column="!row"
       hide-details
-      :readonly="complete"
+      :readonly="complete && stopOnComplete"
     >
       <v-radio
         v-for="[index, option] of radioOptions.entries()"
@@ -133,6 +133,11 @@ export default defineComponent({
     hideInput: {
       type: Boolean,
       default: false
+    },
+
+    stopOnComplete: {
+      type: Boolean,
+      default: true
     }
     
   },
