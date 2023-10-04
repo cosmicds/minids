@@ -1164,6 +1164,7 @@ export default defineComponent({
     return {
       uuid,
       responseOptOut,
+      currentAnswer: null as string | null,
 
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -1995,19 +1996,23 @@ export default defineComponent({
       });
     },
 
-    onAnswerSelected(event: MCSelectionStatus) { // Update with a real type
+    sendDataToDatabase() {
       if (this.responseOptOut) {
         return;
       }
       fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          response: event.text,
+          response: this.currentAnswer,
           // eslint-disable-next-line @typescript-eslint/naming-convention
           user_uuid: this.uuid, preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
         })
       });
+    },
+
+    onAnswerSelected(event: MCSelectionStatus) {
+      this.currentAnswer = event.text;
     },
 
     logLocation() {
@@ -2536,6 +2541,7 @@ export default defineComponent({
     locationDeg(loc: LocationDeg) {
       if (this.selectedLocation === USER_SELECTED) {
         this.userSelectedLocationsVisited.push([loc.latitudeDeg, loc.longitudeDeg]);
+        this.sendDataToDatabase();
       }
     },
 
@@ -2546,8 +2552,13 @@ export default defineComponent({
       }
       if (locname !== USER_SELECTED) {
         this.presetLocationsVisited.push(locname);
+        this.sendDataToDatabase();
       }
       console.log("selected location", locname);
+    },
+
+    currentAnswer(_answer: string) {
+      this.sendDataToDatabase();
     },
     
     playing(play: boolean) {
