@@ -3,6 +3,7 @@ import MiniDSBase from "./components/MiniDSBase";
 import IconButton from "./components/IconButton.vue";
 import LocationSelector from "./components/LocationSelector.vue";
 import DefaultMiniCredits from "./components/DefaultMiniCredits.vue";
+import FundingAcknowledgment from "./components/FundingAcknowledgment.vue";
 import { BackgroundImageset, skyBackgroundImagesets } from "./background";
 import Gallery from "./components/Gallery.vue";
 
@@ -14,5 +15,6 @@ export {
   IconButton,
   LocationSelector,
   skyBackgroundImagesets,
-  DefaultMiniCredits
+  DefaultMiniCredits,
+  FundingAcknowledgment,
 };
