@@ -22,7 +22,7 @@
       tooltip-location="start"
     /> 
   </div>
-  <div id="guided-content-container" v-if="showGuidedContent">
+  <v-container id="guided-content-container" v-if="showGuidedContent">
     
     <div id="non-map-container">
         <div id="title-row" class="non-map-row">
@@ -146,7 +146,7 @@
             class="leaflet-map"
           ></location-selector>
 
-          <span v-if="learnerPath=='Answer'">
+          <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
             <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
           </span>
 
@@ -161,7 +161,7 @@
           ></location-selector>
         </div>
       </div>
-  </div>
+    </v-container>
   
   
   
@@ -2532,7 +2532,6 @@ export default defineComponent({
 :root {
   --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
-  box-sizing: border-box;
 }
 
 html {
@@ -2621,10 +2620,6 @@ body {
   align-items: center;
   justify-content: center;
 }
-
-.scrollable {
-    overflow-y: auto;
-  }
 
 #modal-loading {
   background-color: #000;
@@ -3116,6 +3111,10 @@ body {
     }
   }
 
+  .scrollable {
+    overflow-y: auto;
+  }
+
   .no-bottom-border-radius {
     // border-bottom-left-radius: 0px !important;
     // border-bottom-right-radius: 0px !important;
@@ -3220,6 +3219,10 @@ body {
 #slider {
   width: 100% !important;
   margin: 5px 30px;
+}
+
+.v-container {
+  max-width: 100%;
 }
 
 #closed-top-container {
@@ -3399,7 +3402,7 @@ body {
       margin: 0;
     }
     
-    img {
+    #eclipse-path-map > img {
       display: block;
       max-width: 100%;
       max-height: 100%;
