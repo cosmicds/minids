@@ -1013,6 +1013,7 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture, CAAMoon } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
+import { MCSelectionStatus } from "./MCRadiogroup.vue";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
@@ -1980,14 +1981,15 @@ export default defineComponent({
       });
     },
 
-    onAnswerSelected(event: unknown) { // Update with a real type
+    onAnswerSelected(event: MCSelectionStatus) { // Update with a real type
       if (this.responseOptOut) {
         return;
       }
       fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          response: event.response,
+          response: event.text,
           // eslint-disable-next-line @typescript-eslint/naming-convention
           user_uuid: this.uuid, preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
         })
