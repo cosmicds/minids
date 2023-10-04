@@ -77,6 +77,8 @@
                       height="6vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
+                      tabindex="0"
+                      role="button"
                       >
                       <template v-slot:front>
                       <image-label 

@@ -72,6 +72,14 @@ export default defineComponent({
     const id = 'flip-transition-' + `${this.id}`;
     const card = document.querySelector(`#${id} .flip-card-inner`);
 
+    // set up some stuff for accessiblity
+    const frontCard = document.querySelector('.flip-card-front');
+    const backCard = document.querySelector(`#${id} .flip-card-back`);
+    // initially front card is visible so
+    frontCard?.setAttribute('aria-hidden', 'false');
+    backCard?.setAttribute('aria-hidden', 'true');
+    
+
     if (this.hover) {
       const hoverTaget = document.querySelector(`#${id}`);
       hoverTaget?.addEventListener('mouseenter', () => {
@@ -84,11 +92,17 @@ export default defineComponent({
     
     card?.addEventListener('click', () => {
       card.classList.toggle('do-flip');
+      // toggle aria-hidden
+      frontCard?.setAttribute('aria-hidden', 'true');
+      backCard?.setAttribute('aria-hidden', 'false');
 
       if (this.flipBack) {
         setTimeout(() => {
 
           card.classList.toggle('do-flip');
+          // toggle aria-hidden
+          frontCard?.setAttribute('aria-hidden', 'false');
+          backCard?.setAttribute('aria-hidden', 'true');
           
         }, this.flipBackAfter); 
       }

@@ -6,7 +6,8 @@
   <div class="focus-wrapper"
     @focus="focused = true"
     @keydown.enter="$emit('click')"
-    tabindex="0"
+    :aria-label="altText ? 'Select if ' + altText : 'Image Label'"
+    role="button"
   >
     <div
       :id="`image-label-${id}`"
@@ -17,12 +18,13 @@
       @mousedown="active = true"
       @mouseup="active = false"
       @blur="focused = false"
-      
+      aria-hidden="true"
     >
-    <img v-if="image" :src="image" :alt="image">
+    <img v-if="image" :src="image" :alt="altText ?? image">
       <div
         class="image-label-background"
         :style="backgroundCSS"
+        aria-hidden="true"
       ></div>
       <div
         class="image-label-text"
@@ -49,6 +51,11 @@ export default defineComponent({
     },
     
     image: {
+      type: String || null,
+      default: null
+    },
+
+    altText: {
       type: String || null,
       default: null
     },
