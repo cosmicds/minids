@@ -61,7 +61,6 @@
                 id = "mc-radiogroup-container"
                 row
                 hide-input
-                useAlert
                 :preselected="quizAnswer"
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
