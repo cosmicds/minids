@@ -204,7 +204,7 @@
           ></location-selector>
 
           <span v-if="learnerPath=='Answer'">
-            <img alt="CosmicDS Logo" src="./assets/AnnularEclipseMap.png"/>
+            <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
           </span>
 
           <location-selector
