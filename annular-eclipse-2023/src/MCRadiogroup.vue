@@ -239,9 +239,13 @@ export default defineComponent({
     preselected: function (newVal: number) {
       if (newVal !== null) {
         console.log('set answer');
-        this.column = newVal;
+        this.selectChoice(newVal);
       }
-    }
+    },
+
+    useAlert: function (newVal: boolean) {
+      console.log('useAlert changes', newVal);
+    },
   }
 });
 </script>
