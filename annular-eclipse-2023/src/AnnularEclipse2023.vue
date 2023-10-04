@@ -87,6 +87,7 @@
                         fontSize="4vh"
                         width="11vw"
                         height="6vh"
+                        :border="selected ? '1px solid white' : null"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
                       {{ text }}
@@ -101,8 +102,7 @@
                           width="11vw"
                           height="6vh"
                           fontSize="min(1.1vh,1.1vw)"
-                          @activeBorder="'1px solid white'"
-                          @focusedBorder="'1px solid white'"
+                          :border="selected ? '1px solid white' : null"
                         >
                         <span v-html="feedback"></span>
                         </image-label>
