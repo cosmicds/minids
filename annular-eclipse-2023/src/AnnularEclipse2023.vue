@@ -45,7 +45,7 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p v-if="!queryData">Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
@@ -61,7 +61,10 @@
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
-                <p>Select any location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
+                <p v-if="queryData">
+                  Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
+                </p>
+                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
                 <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
@@ -635,25 +638,25 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Choose any location around the world and see how the eclipse would look from there
+                    Choose any location around the world. See and share how the eclipse would look from there.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses 
+                    Learn more about solar eclipses. 
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about how to navigate this app 
+                    Learn more about how to navigate this app. 
                 </v-list-item>
               </ul>
             </div>
@@ -771,6 +774,7 @@
         <v-chip 
           v-if="showEclipsePercentage"
           prepend-icon="mdi-sun-angle"
+          variant="outlined"
           size="medium"
           elevation="2"
           :text="percentEclipsedText"
@@ -2582,6 +2586,23 @@ body {
   overflow: hidden;
 
   // transition: height 0.1s ease-in-out;
+
+  .v-chip {
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 0.9;
+
+    @media (max-width: 750px) { // SMALL
+      font-size: 1em;
+      padding: 1em;
+    }
+
+    @media (min-width: 751px) { // LARGE
+      font-size: 1.1em;
+      padding: 1.1em;
+    }
+  }
 }
 
 #app {
@@ -3522,7 +3543,7 @@ body {
   font-size: var(--default-font-size)
   }  
 
-#eclipse-percent-chip{
+#eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
   top: calc(-2.2 * var(--default-line-height));
