@@ -5,27 +5,28 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  <v-container id="guided-content-container" v-if="showGuidedContent">
-    <div id="close-guided-content-container">
-      <font-awesome-icon
-        v-model="showGuidedContent"
-        size="xl"
-        class="ma-1"
-        :color="accentColor"
-        :icon="`square-xmark`"
-        @click="() => {
-          console.log('showGuidedContent = ', showGuidedContent);
-          showGuidedContent = !showGuidedContent;
-          onResize();
-        }"
-        @keyup.enter="showGuidedContent = !showGuidedContent"
-        tabindex="0"
-        tooltip-location="start"
-      /> 
-    </div>
+  <div id="closed-top-container">
+    <font-awesome-icon
+      v-model="showGuidedContent"
+      :size="showGuidedContent ? 'xl' : 'lg'"
+      class="ma-1"
+      :color="accentColor"
+      :icon="showGuidedContent ? 'square-xmark' : 'gear'"
+      @click="() => {
+        console.log('showGuidedContent = ', showGuidedContent);
+        showGuidedContent = !showGuidedContent;
+        onResize();
+      }"
+      @keyup.enter="showGuidedContent = !showGuidedContent"
+      tabindex="0"
+      tooltip-location="start"
+    /> 
+  </div>
+  <div id="guided-content-container" v-if="showGuidedContent">
+    
     <div id="non-map-container">
-        <v-row id="title-row" class="non-map-row">
-          <v-col>
+        <div id="title-row" class="non-map-row">
+
             <div id="title">
               <span v-if="learnerPath=='Explore'"
                 >Watch and Compare
@@ -37,10 +38,10 @@
                 >Choose Any Location
               </span>
             </div>
-          </v-col>
-        </v-row>
-        <v-row id="instructions-row" class="non-map-row">
-          <v-col id="top-container-main-text">
+
+        </div>
+        <div id="instructions-row" class="non-map-row">
+          <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
@@ -67,9 +68,9 @@
                 <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
-          </v-col>
-        </v-row>
-        <v-row id="button-row" class="non-map-row">
+          </div>
+        </div>
+        <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
               <icon-button
@@ -127,7 +128,7 @@
               ></icon-button>
             </div>
           <!-- </v-col> -->
-        </v-row>
+        </div>
       </div>
       <div id="map-column">
         <div id="map-container" >
@@ -160,24 +161,8 @@
           ></location-selector>
         </div>
       </div>
-  </v-container>
-  <div v-if="!showGuidedContent" id="closed-top-container">
-    <font-awesome-icon
-      v-model="showGuidedContent"
-      size="lg"
-      class="ma-1"
-      :color="accentColor"
-      :icon="`gear`"
-      @click="() => {
-        console.log('showGuidedContent = ', showGuidedContent);
-        showGuidedContent = !showGuidedContent;
-        onResize();
-      }"
-      @keyup.enter="showGuidedContent = !showGuidedContent"
-      tabindex="0"
-      tooltip-location="start"
-    /> 
   </div>
+  
   
   
 
@@ -2547,6 +2532,7 @@ export default defineComponent({
 :root {
   --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+  box-sizing: border-box;
 }
 
 html {
@@ -2574,7 +2560,16 @@ body {
   overflow: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: var(--default-font-size);
 }
+
+.v-chip {
+  border: none;
+  color: blue;
+  background-color: white;
+  opacity: 1;
+  padding: 0.5em;
+}  
 
 #main-content {
   position: relative;
@@ -2584,23 +2579,6 @@ body {
   overflow: hidden;
 
   // transition: height 0.1s ease-in-out;
-
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    opacity: 0.9;
-
-    @media (max-width: 750px) { // SMALL
-      font-size: 1em;
-      padding: 1em;
-    }
-
-    @media (min-width: 751px) { // LARGE
-      font-size: 1.1em;
-      padding: 1.1em;
-    }
-  }
 }
 
 #app {
@@ -2643,6 +2621,10 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+.scrollable {
+    overflow-y: auto;
+  }
 
 #modal-loading {
   background-color: #000;
@@ -3134,10 +3116,6 @@ body {
     }
   }
 
-  .scrollable {
-    overflow-y: auto;
-  }
-
   .no-bottom-border-radius {
     // border-bottom-left-radius: 0px !important;
     // border-bottom-right-radius: 0px !important;
@@ -3163,7 +3141,9 @@ body {
     line-height: var(--default-line-height);
 
     .v-chip {
-      font-size: var(--default-font-size);
+      color: unset;
+      background-color: unset;
+      // font-size: var(--default-font-size);
     }
   }
 
@@ -3242,32 +3222,54 @@ body {
   margin: 5px 30px;
 }
 
-.v-container {
-  max-width: 100%;
-}
-
 #closed-top-container {
     position: absolute;
-    margin-top: 0.5rem;
-    margin-left: 0.5rem;
+    top: 0.5rem;
+    left: 0.5rem;
     z-index: 500;
   }
+  
 
 #guided-content-container {
   display: flex;
+  flex-direction: row;
   
-  @media (max-width: 599px) {
-    flex-direction: column;
-  }
-
-  @media (min-width: 600px) {
-    flex-direction: row;
+  #non-map-container {
+    flex-basis: 100%;
     
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    height: 100%;
+    gap: 0.5em;
   }
-  .scrollable {
-    overflow-y: auto;
+    
+  #map-column {
+    flex-basis: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    outline: 1px solid red;
   }
-
+  
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    /* switch positions when on small screen */
+    #non-map-container {
+      order: 1;
+      -ms-flex-order: 1;
+    }
+    
+    #map-column {
+      order: 0;
+      -ms-flex-order: 0;
+    }
+  }
+  
   --top-content-max-height: max(30vmin, 35vh);
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
@@ -3291,69 +3293,45 @@ body {
   
   transition: height 0.5s ease-in-out;
 
-  > div.v-row {
-    height: 100%;
-    display: flex;
-  }
-
-  .v-row {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  .v-col {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  #close-guided-content-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 500;
-  }  
 
   #non-map-container { // Keep content away from the x to close
-    --padding-left: 1rem;
-    
-    @media (max-width: 600px) { //phone-size
-      --padding-left: 0em;
-    }
-    
+    --padding-left: 0.5rem;
     padding-left: var(--padding-left);
-    // padding-right: padding+left + container-padding;
     padding-right: calc(var(--padding-left) + var(--container-padding));
+    
+    
+    .non-map-row {
+      margin: 0;
+      padding: 0;
+    }
   
   }
 
-  .non-map-row {
-    @media (min-width: 960px) {
-      min-width: 40%;
-      margin-bottom: 0.5em;
-    }
-  }
+
     
     // .v-row.non-map-row#title-row
   #title-row {
     color: var(--accent-color);
     font-weight: bold;
-    text-align: center;
-    padding-left: 1rem;
-    
+    text-align: right;
     font-size: calc(1.3 * var(--default-font-size));
 
   }
     
     // .v-row.non-map-row#instructions-row
   #instructions-row { 
+    display: flex;
+    flex-grow: 0.5;
+    border: 1.5px solid var(--sky-color);
+    border-radius: 5px;
+    align-items: center;
     
     // v-col
     #top-container-main-text { 
     
       // div
       .instructions-text {
-        border: 1.5px solid var(--sky-color);
-        border-radius: 5px;
+        
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
 
@@ -3372,15 +3350,12 @@ body {
   }
 
   #button-row {
-    padding-top: 0.5em;
-    align-self: flex-end;
+    width: 100%;
 
     #top-container-buttons{
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      
-      flex-grow: 1;
+      justify-content: space-evenly;
       gap: 0.5em;
             
       .icon-wrapper {
@@ -3388,11 +3363,10 @@ body {
         border: none;
         border-radius: 5px;
         padding-block: 4px;
-        width: calc(100%/6);
+        // be as large as you can but shrink if needed
+        width: 100%;
+        flex-shrink: 1;
         
-        @media (max-width: 500px) {
-          padding-inline: 0px;
-        }
 
         &.active {
           border: 2px solid var(--sky-color);
@@ -3416,7 +3390,11 @@ body {
   aspect-ratio: 5 / 3;
 
   #map-container {
+    position: relative;
     height: 100%;
+    width: 100%;
+    outline: 1px solid blue;
+
   
     span {
       padding: 0;
@@ -3424,7 +3402,15 @@ body {
     }
     
     img {
-      width: 100%;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      
+      
     }
 
     .leaflet-control-zoom-in, .leaflet-control-zoom-out {
@@ -3561,16 +3547,6 @@ body {
   position: absolute;
   right: 0.5rem;
   top: calc(-2.2 * var(--default-line-height));
-
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    opacity: 1;
-    padding: 0.5em;
-
-    font-size: calc(1 * var(--default-font-size));
-  }  
 }
 
 #top-wwt-content {
@@ -3585,15 +3561,6 @@ body {
     flex-wrap: column;
     gap:5px;
 
-    .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 0.9;
-      padding: calc(0.8 * var(--default-line-height));
-
-      font-size: calc(1.1 * var(--default-font-size));
-    }
   }
     .v-switch__thumb {
       color: #f39d6c;
