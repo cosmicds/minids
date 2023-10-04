@@ -35,11 +35,11 @@ export default defineComponent({
   props: {
     width: {
       type: String,
-      default: 'auto'
+      required: true,
     },
     height: {
       type: String,
-      default: 'auto'
+      required: true,
     },
     duration: {
       type: String,

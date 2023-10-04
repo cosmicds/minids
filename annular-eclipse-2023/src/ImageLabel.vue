@@ -67,12 +67,12 @@ export default defineComponent({
 
     width: {
       type: String,
-      default: 'auto'
+      required: true
     },
 
     height: {
       type: String,
-      default: 'auto'
+      required: true
     },
 
     fontSize: {
