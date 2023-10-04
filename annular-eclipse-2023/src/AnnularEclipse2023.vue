@@ -188,7 +188,12 @@
         </div>
       </div>
       <div id="map-column">
-        <div id="map-container" >
+      <v-hover v-slot="{isHovering, props}">
+        <v-btn v-bind="props" v-if="!isHovering && !smAndUp" color="blue" :width="'100%'">Tap here to reveal map</v-btn>
+        <v-slide-y-transition
+          :disabled="smAndUp"
+          >
+        <div v-if="isHovering || smAndUp" id="map-container" >
           <location-selector
             v-if="learnerPath == 'Explore'"
             :model-value="locationDeg"
@@ -217,6 +222,8 @@
             class="leaflet-map"
           ></location-selector>
         </div>
+        </v-slide-y-transition>
+      </v-hover>
       </div>
     </v-container>
   
@@ -1131,7 +1138,7 @@ export default defineComponent({
     };
 
     return {
-      showSplashScreen: true,
+      showSplashScreen: false,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -1478,6 +1485,10 @@ export default defineComponent({
     smallSize(): boolean {
       return this.$vuetify.display.smAndDown;
     },
+    smAndUp(): boolean {
+      return this.$vuetify.display.smAndUp;
+    },
+    
     mobile(): boolean {
       return this.smallSize && this.touchscreen;
     },
@@ -3291,46 +3302,13 @@ body {
     z-index: 500;
   }
 
-#guided-content-container {
-  display: flex;
-  flex-direction: row;
-  
-  #non-map-container {
-    flex-basis: 100%;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: flex-end;
-    height: 100%;
-    gap: 0.5em;
-  }
-    
-  #map-column {
-    flex-basis: 100%;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-  }
-  
+#guided-content-container {  
+  --top-content-max-height: max(30vmin, 35vh);
   
   @media (max-width: 600px) {
-    flex-direction: column;
-    /* switch positions when on small screen */
-    #non-map-container {
-      order: 1;
-      -ms-flex-order: 1;
-    }
-    
-    #map-column {
-      order: 0;
-      -ms-flex-order: 0;
-    }
+    --top-content-max-height: max(40vmin, 50vh);
   }
   
-  --top-content-max-height: max(30vmin, 35vh);
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
   --container-padding: 0.5rem;
@@ -3352,12 +3330,38 @@ body {
   overflow-y: auto;
   
   transition: height 0.5s ease-in-out;
+  
+  display: flex;
+  flex-direction: row;
+  
+  #non-map-container {
+    flex-basis: 100%;
+  }
+    
+  #map-column {
+    flex-basis: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
 
 
   #non-map-container { // Keep content away from the x to close
     --padding-left: 0.5rem;
     padding-left: var(--padding-left);
     padding-right: calc(var(--padding-left) + var(--container-padding));
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    gap: 0.5em;
     
     
     .non-map-row {
@@ -3443,14 +3447,14 @@ body {
 #map-column { // v-col
   position: relative;
   --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
-  min-height: 200px;
+  // min-height: 200px;
   height: 100%;
   // max-height: var(--map-max-height);
   width: 100%;
   aspect-ratio: 5 / 3;
 
   #map-container {
-    position: relative;
+    position: static;
     height: 100%;
     width: 100%;
 
