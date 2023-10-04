@@ -136,15 +136,15 @@ export default defineComponent({
         border: this.border,
       };
 
-      if (this.hovered) {
+      if (this.hovered && this.hoveredBorder) {
         return {...css, border: this.hoveredBorder };
       }
 
-      if (this.active) {
+      if (this.active && this.activeBorder) {
         return {...css, border: this.activeBorder };
       }
 
-      if (this.focused) {
+      if (this.focused && this.focusedBorder) {
         return {...css, border: this.focusedBorder };
       }
 
@@ -155,17 +155,21 @@ export default defineComponent({
 
     textCSS() {
 
-      const css = {
+      let css = {
         fontSize: this.fontSize,
-      };
+      } as object as Record<string, string>;
+
+      if (this.hovered || this.focused) {
+        css = {...css, fontWeight: 'bold' };
+      }
       
       // if hovered
-      if (this.hovered) {
-        return {...css, color: this.hoveredColor, fontWeight: 'bold' };
+      if (this.hovered && this.hoveredColor) {
+        return {...css, color: this.hoveredColor,  };
       }
 
       // if active
-      if (this.active) {
+      if (this.active && this.activeColor) {
         return {...css, color: this.activeColor, fontWeight: 'bold' };
       }
 
