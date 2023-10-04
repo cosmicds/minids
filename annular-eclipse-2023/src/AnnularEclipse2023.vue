@@ -3252,7 +3252,6 @@ body {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    outline: 1px solid red;
   }
   
   
@@ -3393,7 +3392,6 @@ body {
     position: relative;
     height: 100%;
     width: 100%;
-    outline: 1px solid blue;
 
   
     span {
