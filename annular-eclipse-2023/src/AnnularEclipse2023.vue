@@ -102,9 +102,9 @@
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          width="11vw"
-                          height="6vh"
-                          fontSize="min(1.1vh,1.1vw)"
+                          width="12vw"
+                          height="7vh"
+                          fontSize="min(1.5vh,1.5vw)"
                           :border="selected ? '1px solid white' : null"
                         >
                         <span v-html="feedback"></span>
@@ -1336,9 +1336,9 @@ export default defineComponent({
       startPaused: false,
 
       quizAnswer: null as string | null,
-      longAnswers: ['Eclipse moves North to South from Bismark, North Dakota and onward past Denver',
-        'Eclipse moves hoizontally East to West from LA to Charlotte',
-        'Eclipse moves from Pacific Northwest (Washington) thru Texas'],
+      longAnswers: ['Eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM',
+        'Eclipse moves West to East from Los Angeles, CA to Charlotte, NC',
+        'Eclipse moves Northwest to South from Eugene, OR to San Antonio, TX'],
 
       sunPlace,
       moonPlace,
