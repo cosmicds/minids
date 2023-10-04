@@ -3302,7 +3302,10 @@ body {
   
   // by default mc-radiogroup has dark background
   background-color: transparent!important;
-
+  
+  label {
+    overflow: visible;
+  }
 
   .image-label-container {
     border-radius: 10px;
