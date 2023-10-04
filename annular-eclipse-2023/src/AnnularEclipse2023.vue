@@ -77,10 +77,13 @@
                       height="6vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
+                      tabindex="0"
+                      role="button"
                       >
                       <template v-slot:front>
                       <image-label 
                         id="front"
+                        :alt-text="longAnswers[index]"
                         :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
@@ -99,9 +102,9 @@
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          width="11vw"
-                          height="6vh"
-                          fontSize="min(1.1vh,1.1vw)"
+                          width="12vw"
+                          height="7vh"
+                          fontSize="min(1.5vh,1.5vw)"
                           :border="selected ? '1px solid white' : null"
                         >
                         <span v-html="feedback"></span>
@@ -201,7 +204,7 @@
           ></location-selector>
 
           <span v-if="learnerPath=='Answer'">
-            <img alt="CosmicDS Logo" src="./assets/AnnularEclipseMap.png"/>
+            <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
           </span>
 
           <location-selector
@@ -322,14 +325,11 @@
                     </details>
                   </div>
                 </div>
-
-                  <figure>
-                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-                  </figure>
-
-
+              <figure>
+                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth. The Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience the annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse."/>
+                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+              </figure>
             </v-container>
           </v-card-text>
         </v-card>
@@ -541,6 +541,12 @@
                   <v-spacer class="end-spacer"></v-spacer>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col>
+                  <funding-acknowledgment/>
+                </v-col>
+              </v-row>
+
             </v-container>              
           </v-card-text>
         </v-card>
@@ -603,13 +609,13 @@
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="puzzle-piece"
-              /> Identify the path 
+                icon="location-dot"
+              /> Choose any location 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="location-dot"
-              /> Choose any location 
+                icon="puzzle-piece"
+              /> Identify the path 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
@@ -690,15 +696,15 @@
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
-                  </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
-                </v-list-item>
-                <v-list-item>
-                  <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world. See and share how the eclipse would look from there.
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
+                  </template>
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -950,6 +956,7 @@
             thumb-size="14px"
             thumb-label="always"
             :step="millisecondsPerInterval"
+            @mousedown="() => {playing = false;}"
             >
             <template v-slot:thumb-label="item">
               {{ toTimeString(new Date(item.modelValue)) }}
@@ -1362,6 +1369,9 @@ export default defineComponent({
       startPaused: false,
 
       quizAnswer: null as string | null,
+      longAnswers: ['Eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM',
+        'Eclipse moves West to East from Los Angeles, CA to Charlotte, NC',
+        'Eclipse moves Northwest to South from Eugene, OR to San Antonio, TX'],
 
       sunPlace,
       moonPlace,
@@ -3018,8 +3028,18 @@ body {
 
 #splash-screen {
   color: var(--moon-color);
-  max-height: calc(min(90vh, 2040px));
-  max-width: 90vw;
+
+  @media (max-width: 699px) {
+    max-height: 80vh;
+    max-width: 90vw;
+  }
+
+  @media (min-width: 700px) {
+    max-height: 85vh;
+    max-width: min(70vw, 800px);
+  }
+
+
   background-color: black;
   backdrop-filter: blur(5px);
   justify-content: space-around;
