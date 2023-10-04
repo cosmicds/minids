@@ -28,6 +28,7 @@
           :feedback="feedbacks[index]"
           :selected="index==column"
           :color="color(index)"
+          :column="column"
           > {{ option }} </slot>
       </template>
     </v-radio>
@@ -155,6 +156,11 @@ export default defineComponent({
       type: String,
       default: 'green'
     },
+
+    preselected: {
+      type: Number,
+      default: null
+    }
     
   },
   emits: {
@@ -228,5 +234,14 @@ export default defineComponent({
       }
     },
   },
+
+  watch: {
+    preselected: function (newVal: number) {
+      if (newVal !== null) {
+        console.log('set answer');
+        this.column = newVal;
+      }
+    }
+  }
 });
 </script>
