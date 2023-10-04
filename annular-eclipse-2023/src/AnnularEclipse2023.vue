@@ -23,8 +23,7 @@
         tooltip-location="start"
       /> 
     </div>
-    <v-row>
-      <v-col cols="6" id="non-map-container">
+    <div id="non-map-container">
         <v-row id="title-row" class="non-map-row">
           <v-col>
             <div id="title">
@@ -126,8 +125,8 @@
             </div>
           <!-- </v-col> -->
         </v-row>
-      </v-col>
-      <v-col cols="6" id="map-column">
+      </div>
+      <div id="map-column">
         <div id="map-container" >
           <location-selector
             v-if="learnerPath == 'Explore'"
@@ -157,8 +156,7 @@
             class="leaflet-map"
           ></location-selector>
         </div>
-      </v-col>
-    </v-row>
+      </div>
   </v-container>
   <div v-if="!showGuidedContent" id="closed-top-container">
     <font-awesome-icon
@@ -2995,11 +2993,11 @@ body {
   #learn-more-content{
     display: flex;
 
-    @media (max-width: 700px ) {
+    @media (max-width: 959px ) {
       flex-direction: column;
     }
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       flex-direction: row;
     }
 
@@ -3009,7 +3007,7 @@ body {
     font-size: var(--default-font-size);
     line-height: var(--default-line-height);
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       min-width: 50%;
       padding-right: 1em;
     }
@@ -3235,6 +3233,20 @@ body {
   }
 
 #guided-content-container {
+  display: flex;
+  
+  @media (max-width: 599px) {
+    flex-direction: column;
+  }
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    
+  }
+  .scrollable {
+    overflow-y: auto;
+  }
+
   --top-content-max-height: max(30vmin, 35vh);
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
@@ -3294,7 +3306,8 @@ body {
   }
 
   .non-map-row {
-    @media (min-width: 750px) {
+    @media (min-width: 960px) {
+      min-width: 40%;
       margin-bottom: 0.5em;
     }
   }
@@ -3303,7 +3316,7 @@ body {
   #title-row {
     color: var(--accent-color);
     font-weight: bold;
-    text-align: right;
+    text-align: center;
     padding-left: 1rem;
     
     font-size: calc(1.3 * var(--default-font-size));
@@ -3375,6 +3388,7 @@ body {
 #map-column { // v-col
   position: relative;
   --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
+  min-height: 200px;
   height: 100%;
   // max-height: var(--map-max-height);
   width: 100%;
