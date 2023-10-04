@@ -53,9 +53,66 @@
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click to select it.</p>
+                <p>Have you determined the eclipse path? Click below to select it.</p>
                 <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
+              <mc-radiogroup
+                v-if="learnerPath=='Answer'"
+                id = "mc-radiogroup-container"
+                row
+                hide-input
+                :preselected="quizAnswer"
+                :radio-options="['A', 'B','C']"
+                :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
+                :correct-answers="[2]"
+                @select="(e: any) => { console.log(e);}"
+                colorWrong="#4a2323"
+                colorRight="green"
+                > 
+                <!-- for images width=100px, height=58px for correct aspect ratio -->
+                <template #default="{index, text, selected, color, feedback}">
+                    <flip-transition
+                      :id="text"
+                      width="11vw"
+                      height="6vh"
+                      duration="0.8s"
+                      :flipBackAfter="3000" 
+                      tabindex="0"
+                      role="button"
+                      >
+                      <template v-slot:front>
+                      <image-label 
+                        id="front"
+                        :alt-text="longAnswers[index]"
+                        :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
+                        :background-color="(selected ? `${color}` : '#F0DCB9')"
+                        :background-opacity="1"
+                        fontSize="4vh"
+                        width="11vw"
+                        height="6vh"
+                        :border="selected ? '1px solid white' : null"
+                        @click="() => { console.log('clicked'); quizAnswer = index;}"
+                      >
+                      {{ text }}
+                      </image-label>
+                      </template>
+                      <template v-slot:back>
+                        <image-label
+                          id="front" 
+                          :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
+                          background-color="black"
+                          :background-opacity="1"
+                          width="12vw"
+                          height="7vh"
+                          fontSize="min(1.5vh,1.5vw)"
+                          :border="selected ? '1px solid white' : null"
+                        >
+                        <span v-html="feedback"></span>
+                        </image-label>
+                      </template>
+                  </flip-transition>
+                </template>
+              </mc-radiogroup>
             </div>
             
             <!-- Choose Path -->
@@ -147,7 +204,7 @@
           ></location-selector>
 
           <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
-            <img alt="CosmicDS Logo" src="../../assets/EclipseMapPaths.png"/>
+            <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
           </span>
 
           <location-selector
@@ -251,14 +308,11 @@
                     </details>
                   </div>
                 </div>
-
-                  <figure>
-                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-                  </figure>
-
-
+              <figure>
+                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth. The Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience the annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse."/>
+                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+              </figure>
             </v-container>
           </v-card-text>
         </v-card>
@@ -1271,6 +1325,11 @@ export default defineComponent({
       speedIndex: 3,
 
       startPaused: false,
+
+      quizAnswer: null as string | null,
+      longAnswers: ['Eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM',
+        'Eclipse moves West to East from Los Angeles, CA to Charlotte, NC',
+        'Eclipse moves Northwest to South from Eugene, OR to San Antonio, TX'],
 
       sunPlace,
       moonPlace,
@@ -3231,7 +3290,6 @@ body {
     left: 0.5rem;
     z-index: 500;
   }
-  
 
 #guided-content-container {
   display: flex;
