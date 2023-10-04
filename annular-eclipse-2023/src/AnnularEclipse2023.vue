@@ -1164,7 +1164,7 @@ export default defineComponent({
     return {
       uuid,
       responseOptOut,
-      currentAnswer: null as string | null,
+      mcResponses: [] as string[],
 
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -2004,15 +2004,17 @@ export default defineComponent({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          response: this.currentAnswer,
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          user_uuid: this.uuid, preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
+          user_uuid: this.uuid, mc_responses: this.mcResponses,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
         })
       });
     },
 
     onAnswerSelected(event: MCSelectionStatus) {
-      this.currentAnswer = event.text;
+      this.mcResponses.push(event.text);
+      this.sendDataToDatabase();
     },
 
     logLocation() {
@@ -2557,10 +2559,6 @@ export default defineComponent({
       console.log("selected location", locname);
     },
 
-    currentAnswer(_answer: string) {
-      this.sendDataToDatabase();
-    },
-    
     playing(play: boolean) {
       console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
       this.setClockSync(play);

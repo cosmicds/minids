@@ -8,7 +8,7 @@ import GifPlayPause from "./GifPlayPause.vue";
 import MCRadiogroup from "./MCRadiogroup.vue";
 import FlipTransition from "./FlipTransition.vue";
 import ImageLabel from "./ImageLabel.vue";
-import  Credits from "./Credits.vue";
+import Credits from "./Credits.vue";
 
 import "./polyfills";
 
