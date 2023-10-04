@@ -43,7 +43,7 @@ export default defineComponent({
 <style lang="less">
 
 #funding-acknowledgment {
-  color: white;
+  color: #E0E0E0;
   background-color: #0c3d91;
   font-size: calc(0.8em + 0.1vw + 0.1vh);
   line-height: calc(1em + 0.3vw + 0.3vh);
