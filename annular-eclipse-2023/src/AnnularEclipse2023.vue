@@ -603,13 +603,13 @@
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="puzzle-piece"
-              /> Identify the path 
+                icon="location-dot"
+              /> Choose any location 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="location-dot"
-              /> Choose any location 
+                icon="puzzle-piece"
+              /> Identify the path 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
@@ -690,15 +690,15 @@
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
-                  </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
-                </v-list-item>
-                <v-list-item>
-                  <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world. See and share how the eclipse would look from there.
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
+                  </template>
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -2964,8 +2964,18 @@ body {
 
 #splash-screen {
   color: var(--moon-color);
-  max-height: calc(min(90vh, 2040px));
-  max-width: 90vw;
+
+  @media (max-width: 699px) {
+    max-height: 80vh;
+    max-width: 90vw;
+  }
+
+  @media (min-width: 700px) {
+    max-height: 85vh;
+    max-width: min(70vw, 800px);
+  }
+
+
   background-color: black;
   backdrop-filter: blur(5px);
   justify-content: space-around;
