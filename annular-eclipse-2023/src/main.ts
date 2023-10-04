@@ -5,7 +5,11 @@ import { LocationSelector } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import GifPlayPause from "./GifPlayPause.vue";
-import  Credits from "./Credits.vue";
+import Credits from "./Credits.vue";
+import MCRadiogroup from "./MCRadiogroup.vue";
+import FlipTransition from "./FlipTransition.vue";
+import ImageLabel from "./ImageLabel.vue";
+
 
 import "./polyfills";
 
@@ -114,6 +118,9 @@ createApp(AnnularEclipse2023, {
   .component('gif-play-pause', GifPlayPause)
   .component('mini-credits', Credits)
   .component('date-picker', Datepicker)
+  .component('mc-radiogroup', MCRadiogroup)
+  .component('flip-transition', FlipTransition)
+  .component('image-label', ImageLabel)
 
   // Mount
   .mount("#app");
