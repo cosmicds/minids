@@ -316,7 +316,7 @@
             <v-col cols="6">
               <figure>
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth. The Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience the annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
               </figure>
             </v-col>
