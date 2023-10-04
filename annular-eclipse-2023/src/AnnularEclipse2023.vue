@@ -950,6 +950,7 @@
             thumb-size="14px"
             thumb-label="always"
             :step="millisecondsPerInterval"
+            @mousedown="() => {playing = false;}"
             >
             <template v-slot:thumb-label="item">
               {{ toTimeString(new Date(item.modelValue)) }}
