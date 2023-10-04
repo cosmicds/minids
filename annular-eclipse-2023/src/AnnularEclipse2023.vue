@@ -58,12 +58,13 @@
               </span>
               <mc-radiogroup
                 v-if="learnerPath=='Answer'"
+                id = "mc-radiogroup-container"
                 row
                 hide-input
                 useAlert
                 :preselected="quizAnswer"
                 :radio-options="['A', 'B','C']"
-                :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
+                :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
                 @select="(e: any) => { console.log(e);}"
                 colorWrong="#4a2323"
@@ -73,21 +74,20 @@
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      width="70px"
-                      height="50px"
+                      width="11vw"
+                      height="6vh"
                       duration="0.8s"
-
-                      :flipBackAfter="1000" 
-                      :hover="true"
+                      :flipBackAfter="3000" 
                       >
                       <template v-slot:front>
                       <image-label 
                         id="front"
-                        :color="['rgb(10,150,150)','orange','#f0a'][index]"
-                        :background-color="(selected ? `${color}` : '#bbb')"
-                        :background-opacity="(selected ? 1 : 0.5)"
-                        width="70px"
-                        height="50px"
+                        :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
+                        :background-color="(selected ? `${color}` : '#F0DCB9')"
+                        :background-opacity="1"
+                        fontSize="4vh"
+                        width="11vw"
+                        height="6vh"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
                       {{ text }}
@@ -96,11 +96,14 @@
                       <template v-slot:back>
                         <image-label
                           id="front" 
-                          color="black"
-                          :background-color="color"
-                          width="70px"
-                          height="50px"
-                          font-size="0.5em"
+                          :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
+                          background-color="black"
+                          :background-opacity="1"
+                          width="11vw"
+                          height="6vh"
+                          fontSize="min(1.1vh,1.1vw)"
+                          @activeBorder="'1px solid white'"
+                          @focusedBorder="'1px solid white'"
                         >
                         <span v-html="feedback"></span>
                         </image-label>
@@ -3295,6 +3298,7 @@ body {
   }
 
 #mc-radiogroup-container {
+  padding-block: 0.5em;
   
   // by default mc-radiogroup has dark background
   background-color: transparent!important;
