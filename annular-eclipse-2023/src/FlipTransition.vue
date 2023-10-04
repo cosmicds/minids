@@ -73,11 +73,12 @@ export default defineComponent({
     const card = document.querySelector(`#${id} .flip-card-inner`);
 
     if (this.hover) {
-      card?.addEventListener('mouseenter', () => {
-        card.classList.toggle('do-flip');
+      const hoverTaget = document.querySelector(`#${id}`);
+      hoverTaget?.addEventListener('mouseenter', () => {
+        card?.classList.toggle('do-flip');
       });
-      card?.addEventListener('mouseleave', () => {
-        card.classList.toggle('do-flip');
+      hoverTaget?.addEventListener('mouseleave', () => {
+        card?.classList.toggle('do-flip');
       });
     }
     
@@ -115,7 +116,7 @@ export default defineComponent({
 /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
 .flip-card {
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 /* This container is needed to position the front and back side */
