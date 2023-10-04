@@ -189,11 +189,11 @@
       </div>
       <div id="map-column">
       <v-hover v-slot="{isHovering, props}">
-        <v-btn v-bind="props" v-if="!isHovering && !smAndUp" color="blue" :width="'100%'">Tap here to reveal map</v-btn>
+        <v-btn v-bind="props" v-if="false &&!isHovering && !smAndUp" color="blue" :width="'100%'">Tap here to reveal map</v-btn>
         <v-slide-y-transition
           :disabled="smAndUp"
           >
-        <div v-if="isHovering || smAndUp" id="map-container" >
+        <div v-if="!smAndup || smAndUp" id="map-container" >
           <location-selector
             v-if="learnerPath == 'Explore'"
             :model-value="locationDeg"
