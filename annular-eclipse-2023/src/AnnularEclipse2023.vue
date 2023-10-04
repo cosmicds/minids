@@ -45,7 +45,7 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p>Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p v-if="!queryData">Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
@@ -110,7 +110,10 @@
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
-                <p>Select any location you like by double-clicking on the map, and view the eclipse from there.</p>
+                <p v-if="queryData">
+                  Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
+                </p>
+                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
                 <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
@@ -168,7 +171,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'Feature Guide'"
+                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :box-shadow="false"
               ></icon-button>
@@ -334,7 +337,7 @@
           dense
           grow
         >
-          <v-tab tabindex="0"><h3 class="tab-title">Using WWT</h3></v-tab>
+          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"
@@ -347,7 +350,10 @@
         ></font-awesome-icon>
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
-            <v-container>
+            <v-container  id="user-guide">
+              <p style="font-size: larger" class="mb-5">
+                This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
+              </p>
               <v-row align="center">
               <v-col cols="4">
                   <v-chip
@@ -372,6 +378,126 @@
                 </v-col>
                 <v-col cols="8" class="pt-1">
                   <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div
+                      style="min-height: 120px;"
+                  >                   
+                    <h4 class="user-guide-header">Time Controls:</h4>
+                    <p  class="mb-3">(See bottom-left of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="play"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to move time forward at 1000x the real speed.
+                      </li>
+                      <li>
+                        If playing, click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="pause"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to pause time.
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-down"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to decrease speed by 10x.                        
+                      </li>
+                      <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="angle-double-up"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to increase speed by 10x. 
+                      </li>
+                      <li>
+                        You can also control time by dragging <v-icon
+                          class="bullet-icon"
+                          icon="mdi-circle"
+                          size="medium" 
+                        ></v-icon> along the slider.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Viewing Mode:</h4>
+                    <p  class="mb-3">(See upper-right of the screen)</p>
+                    <ul class="text-list">
+                      <li class="mb-1">
+                        The <span 
+                        style="color: blue; background-color: white;
+                        padding-inline: 0.7em;
+                        border-radius: 20px;
+                        font-weight: bold ">selected location</span> is displayed under the map.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-telescope"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image-filter-hdr"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-white-balance-sunny"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
+                      </li>
+                      <li>
+                        <v-icon
+                          class="bullet-icon"
+                          icon="mdi-image"
+                          size="large" 
+                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      </li>
+                    </ul>
+
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+                    
+                    <h4 class="user-guide-header">Display Options:</h4>
+                    <p  class="mb-3">(See bottom-right of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        <span class="user-guide-emphasis-white">Sky Grid:</span> Display altitude/azimuth grid with cardinal directions.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Ecliptic:</span> Display path on sky that Sun appears to travel throughout a year.
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Horizon:</span> Display a virtual "ground" that delineates where the Sun rises and sets.                     
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
+                      </li>
+                      <li>
+                        <span class="user-guide-emphasis-white">Show Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
+                      </li>
+                    </ul>
+
+                  </div>
+                          
+                  <v-divider thickness="2px" class="solid-divider"></v-divider>
+                  
+                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
                 </v-col>
               </v-row>
               <v-row>
@@ -542,25 +668,25 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Choose any location around the world and see how the eclipse would look from there
+                    Choose any location around the world. See and share how the eclipse would look from there.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses 
+                    Learn more about solar eclipses. 
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
                     <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about how to navigate this app 
+                    Learn more about how to navigate this app. 
                 </v-list-item>
               </ul>
             </div>
@@ -607,7 +733,7 @@
             learnerPath = 'Choose'
             }"
         > </v-chip>
-        <v-chip 
+        <v-chip
           prepend-icon="mdi-calendar"
           variant="outlined"
           size="small"
@@ -674,6 +800,16 @@
     </div>
     
     <div class="bottom-content">
+      <div id="eclipse-percent-chip">
+        <v-chip 
+          v-if="showEclipsePercentage"
+          prepend-icon="mdi-sun-angle"
+          variant="outlined"
+          size="medium"
+          elevation="2"
+          :text="percentEclipsedText"
+        > </v-chip>
+      </div>
       <div
         id="controls"
         class="control-icon-wrapper"
@@ -711,13 +847,20 @@
               label="Horizon"
               hide-details
             />
-          <v-checkbox
-              :color="accentColor"
-              v-model="useRegularMoon"
-              @keyup.enter="useRegularMoon = !useRegularMoon"
-              label="Visible Moon"
-              hide-details
+            <v-checkbox
+                :color="accentColor"
+                v-model="useRegularMoon"
+                @keyup.enter="useRegularMoon = !useRegularMoon"
+                label="Visible Moon"
+                hide-details
             />
+            <v-checkbox
+                :color="accentColor"
+                v-model="showEclipsePercentage"
+                @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
+                label="Show Amount Eclipsed"
+                hide-details
+            />            
           </div>
         </transition-expand>
       </div>
@@ -1120,6 +1263,8 @@ export default defineComponent({
         }
       } as Record<string, EclipseLocation>,
 
+      currentPercentEclipsed: 0,
+
       places: [] as (LocationRad & { name: string })[],
         
       placeCircleOptions: {
@@ -1145,6 +1290,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showEcliptic: false, 
+      showTextSheet: false, 
+      showEclipsePercentage: false,  
       
       toggleTrackSun: true,
       
@@ -1153,7 +1300,7 @@ export default defineComponent({
       maxTime: maxTime,
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
-      accentColor: "#ef7e3d",
+      accentColor: "#ff8f00",
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
@@ -1432,6 +1579,11 @@ export default defineComponent({
       }
     },
 
+    percentEclipsedText(): string {
+      const percentEclipsed = Math.abs(this.currentPercentEclipsed * 100).toFixed(0);
+      return `Eclipsed: ${percentEclipsed}%`;
+    },
+
     trackingSun: {
       set(value: boolean) {
         this.toggleTrackSun = value;
@@ -1483,12 +1635,7 @@ export default defineComponent({
       }
     },
 
-    createMoonOverlay() {
-
-      // Don't draw an overlay if we're using the regular WWT moon image
-      if (this.useRegularMoon || this.viewerMode === 'SunScope') {
-        return;
-      }
+    updateIntersection() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -1520,13 +1667,40 @@ export default defineComponent({
 
       // If there's no sun/moon intersection, no need to continue
       if (sunMoonDistance > rMoonPx + rSunPx) {
+        this.currentPercentEclipsed = 0;
+        return;
+      }
+
+      const moonInsideSun = sunMoonDistance < rSunPx - rMoonPx;
+
+      const dSq = sunMoonDistance * sunMoonDistance;
+      const rMoonSq = rMoonPx * rMoonPx;
+      const rSunSq = rSunPx * rSunPx;
+
+      const moonArea = Math.PI * rMoonSq;
+      const sunArea = Math.PI * rSunSq;
+      if (moonInsideSun) {
+        this.currentPercentEclipsed = moonArea / sunArea;
+      } else {
+        // See https://mathworld.wolfram.com/Circle-CircleIntersection.html
+        const intersectionArea =
+          rMoonSq * Math.acos((dSq + rMoonSq - rSunSq) / (2 * sunMoonDistance * rMoonPx)) +
+          rSunSq * Math.acos((dSq + rSunSq - rMoonSq) / (2 * sunMoonDistance * rSunPx)) -
+          0.5 * Math.sqrt(
+            (rSunPx + rMoonPx - sunMoonDistance) * (sunMoonDistance + rMoonPx - rSunPx) * (sunMoonDistance - rMoonPx + rSunPx) * (sunMoonDistance + rSunPx + rMoonPx)
+          );
+        this.currentPercentEclipsed = intersectionArea / sunArea;
+      }
+
+      // If we're using the regular WWT moon, or in sun scope mode, we don't want the overlay but did want the percentage eclipsed
+      if (this.useRegularMoon || this.viewerMode === "SunScope") {
         return;
       }
 
       const n = 50;
       
       // If the moon is completely "inside" of the sun
-      if (sunMoonDistance < rSunPx - rMoonPx) {
+      if (moonInsideSun) {
         for (let i = 0; i <= n; i++) {
           const angle = (i / n) * 2 * Math.PI;
           points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
@@ -1546,6 +1720,7 @@ export default defineComponent({
           }
           x1 = Math.sqrt(rMoonPx * rMoonPx - ysh * ysh);
           if (isNaN(x1)) {
+            this.currentPercentEclipsed = 0;
             return;
           }
           y1 = ysh;
@@ -1567,6 +1742,7 @@ export default defineComponent({
 
           const sqrDisc = Math.sqrt(b * b - 4 * a * c);
           if (isNaN(sqrDisc)) {
+            this.currentPercentEclipsed = 0;
             return;
           }
           x1 = (-b + sqrDisc) / (2 * a);
@@ -2013,7 +2189,7 @@ export default defineComponent({
         this.removeAnnotations();
       }
       finally {
-        this.createMoonOverlay();
+        this.updateIntersection();
         if (this.showHorizon) {
           this.createHorizon(when);
           if (this.showSky) {
@@ -2445,6 +2621,23 @@ body {
   overflow: hidden;
 
   // transition: height 0.1s ease-in-out;
+
+  .v-chip {
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 0.9;
+
+    @media (max-width: 750px) { // SMALL
+      font-size: 1em;
+      padding: 1em;
+    }
+
+    @media (min-width: 751px) { // LARGE
+      font-size: 1.1em;
+      padding: 1.1em;
+    }
+  }
 }
 
 #app {
@@ -2941,6 +3134,7 @@ body {
     height: fit-content;
     width: 100%;
     align-self: center;
+    border-bottom: solid #212121 0.5em;
   }
   
   #tabs {
@@ -2994,6 +3188,36 @@ body {
   // (around 400px or less)
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
+  }
+
+  #user-guide {
+    font-size: ~"max(12px, calc(0.9em + 0.2vw))";
+    line-height: ~"max(18px, calc(1.2em + 0.4vw))";
+
+    .v-chip {
+      font-size: ~"max(16px, calc(0.9em + 0.2vw))";
+    }
+  }
+
+  .user-guide-header {
+    margin-top: 1rem;
+    color: var(--accent-color);
+    font-size: larger;
+  }
+
+  .user-guide-emphasis {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  .user-guide-emphasis-white {
+    font-weight: bold;
+  }
+
+  .solid-divider {
+    margin-top: 1rem;
+    color: var(--sky-color);
+    opacity: 0.7;
   }
 }
 
@@ -3365,13 +3589,23 @@ body {
     padding-block: 0.15em;
     border-radius: 0.3em;
 
-    @media (max-width: 750px){ //SMALL
+    @media (max-width: 750px) { //SMALL
           font-size: 0.9rem;
         }
-    @media (min-width: 751px){ //LARGE
+    @media (min-width: 751px) { //LARGE
           font-size: 1.1rem;
     }
   }  
+
+#eclipse-percent-chip {
+  position: absolute;
+  right: 0.5rem;
+  top: -3rem;
+
+  .v-chip {
+      padding: 0.5em;
+    }  
+}
 
 #top-wwt-content {
   position: absolute;
@@ -3385,22 +3619,6 @@ body {
     flex-wrap: column;
     gap:5px;
 
-    .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 0.9;
-
-      @media (max-width: 750px){ //SMALL
-        font-size: 1em;
-        padding: 1em;
-      }
-
-      @media (min-width: 751px){ //LARGE
-        font-size: 1.1em;
-        padding: 1.1em;
-      }
-    }
   }
     .v-switch__thumb {
       color: #f39d6c;
