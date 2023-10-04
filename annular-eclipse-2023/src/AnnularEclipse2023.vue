@@ -61,6 +61,7 @@
                 row
                 hide-input
                 useAlert
+                :preselected="quizAnswer"
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Hmm...? <br/>Try again!', 'Try Again', '(C) Correct! It passes from Washington through Texas']"
                 :correct-answers="[2]"
@@ -75,8 +76,9 @@
                       width="70px"
                       height="50px"
                       duration="0.8s"
-                      flipBack
+
                       :flipBackAfter="1000" 
+                      :hover="true"
                       >
                       <template v-slot:front>
                       <image-label 
@@ -86,6 +88,7 @@
                         :background-opacity="(selected ? 1 : 0.5)"
                         width="70px"
                         height="50px"
+                        @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
                       {{ text }}
                       </image-label>
@@ -1326,6 +1329,8 @@ export default defineComponent({
       speedIndex: 3,
 
       startPaused: false,
+
+      quizAnswer: null as string | null,
 
       sunPlace,
       moonPlace,
@@ -3293,7 +3298,7 @@ body {
   
   // by default mc-radiogroup has dark background
   background-color: transparent!important;
-  
+
 
   .image-label-container {
     border-radius: 10px;
