@@ -195,7 +195,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="32px"
+          height="clamp(25px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -204,66 +204,79 @@
         >
           <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
         </v-tabs>
-        <font-awesome-icon
+          <font-awesome-icon
+          v-if="!mobile"
           id="close-text-icon"
           class="control-icon"
-          icon="times"
-          size="lg"
+          :icon="`square-xmark`"
+          size="xl"
+          @click="showInfoSheet = false"
+          @keyup.enter="showInfoSheet = false"
+          tabindex="0"
+        ></font-awesome-icon>
+        <font-awesome-icon
+          v-else
+          id="close-text-icon"
+          class="control-icon"
+          :icon="`square-xmark`"
+          size="m"
           @click="showInfoSheet = false"
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
         ></font-awesome-icon>
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
-            <v-row>
-            <v-col cols="6" id="info-text-box">
-              <div id="main-info-text">
-                <p>
-                Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
-                </p>
-                <p>
-                This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
-                </p>
-                <p id="safety-warning">
-                  SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
-                </p>
-              </div>  
-                <div id="FAQ">
-                  <details>
-                    <summary>
-                      What causes Solar Eclipses?
-                    </summary>
+            <v-container id="learn-more-content">
+                <div id="info-text-box">
+
+                  <div id="main-info-text">
                     <p>
-                      A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
+                    Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
                     </p>
-                  </details>
-                  
-                  <details>
-                    <summary> Total vs. Annular Eclipse</summary>
                     <p>
-                      During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
                     </p>
-                  </details>
-                  
-                  <details> 
-                    <summary> Why can only some places see the eclipse?</summary>
-                    <p>
-                      An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                    <p id="safety-warning">
+                      SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
                     </p>
-                    <p> 
-                      The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
-                    </p> 
-                  </details>
+                  </div>  
+                  <div id="FAQ">
+                    <details>
+                      <summary>
+                        What causes Solar Eclipses?
+                      </summary>
+                      <p>
+                        A solar eclipse happens when the Moon passes between the Earth and the Sun and blocks the Sun from our view. Partial eclipses occur about every 6 months, somewhere on the Earth. The U.S. is lucky to be in the path of the next two solar eclipses. 
+                      </p>
+                    </details>
+                    
+                    <details>
+                      <summary> Total vs. Annular Eclipse</summary>
+                      <p>
+                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                      </p>
+                    </details>
+                    
+                    <details> 
+                      <summary> Why can only some places see the eclipse?</summary>
+                      <p>
+                        An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
+                      </p>
+                      <p> 
+                        The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                      </p> 
+                    </details>
+                  </div>
                 </div>
-            </v-col>
-            <v-col cols="6">
-              <figure>
-                <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
-                <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
-              </figure>
-            </v-col>
-          </v-row>
+
+                  <figure>
+                    <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
+                    <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Cartoon of a Solar Eclipse"/>
+                    <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                  </figure>
+
+
+            </v-container>
           </v-card-text>
         </v-card>
       </v-card>
@@ -281,7 +294,7 @@
         class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="32px"
+          height="clamp(25px, min(5vh, 5vw) ,32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -293,8 +306,8 @@
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
-          icon="times"
-          size="lg"
+          :icon="`square-xmark`"
+          size="xl"
           @click="showWWTGuideSheet = false"
           @keyup.enter="showWWTGuideSheet = false"
           tabindex="0"
@@ -302,7 +315,7 @@
         <v-card class="no-bottom-border-radius scrollable">
           <v-card-text class="info-text no-bottom-border-radius">
             <v-container  id="user-guide">
-              <p style="font-size: larger" class="mb-5">
+              <p style="font-size: calc(1.1 * var(--default-font-size))" class="mb-5">
                 This Mini Data Story allows you to display the October 14, 2023 Annular Eclipse from any location. 
               </p>
               <v-row align="center">
@@ -390,7 +403,11 @@
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
                         border-radius: 20px;
-                        font-weight: bold ">selected location</span> is displayed under the map.
+                        font-weight: bold ">selected location</span> and <span 
+                        style="color: blue; background-color: white;
+                        padding-inline: 0.7em;
+                        border-radius: 20px;
+                        font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
                       <li>
                         <v-icon
@@ -431,16 +448,13 @@
                         <span class="user-guide-emphasis-white">Sky Grid:</span> Display altitude/azimuth grid with cardinal directions.
                       </li>
                       <li>
-                        <span class="user-guide-emphasis-white">Ecliptic:</span> Display path on sky that Sun appears to travel throughout a year.
-                      </li>
-                      <li>
                         <span class="user-guide-emphasis-white">Horizon:</span> Display a virtual "ground" that delineates where the Sun rises and sets.                     
                       </li>
                       <li>
                         <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
                       </li>
                       <li>
-                        <span class="user-guide-emphasis-white">Show Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
+                        <span class="user-guide-emphasis-white">Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
                       </li>
                     </ul>
 
@@ -547,6 +561,11 @@
               <font-awesome-icon
                 icon="book-open"
               /> Learn more 
+            </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="computer-mouse"
+              /> User guide 
             </v-col>
         </v-row>
         </div>
@@ -684,13 +703,13 @@
             learnerPath = 'Choose'
             }"
         > </v-chip>
-        <v-chip
-          prepend-icon="mdi-calendar"
-          variant="outlined"
-          size="small"
-          elevation="2"
-          :text="selectedLocalDateString"
-        > </v-chip>
+        <v-chip 
+        prepend-icon="mdi-clock"
+        variant="outlined"
+        size="small"
+        elevation="2"
+        :text="selectedLocaledTimeDateString"
+      > </v-chip>
       </div>
       <div id="top-switches">
         <v-tooltip
@@ -786,13 +805,6 @@
             />
             <v-checkbox
               :color="accentColor"
-              v-model="showEcliptic"
-              @keyup.enter="showEcliptic = !showEcliptic"
-              label="Ecliptic"
-              hide-details
-            />
-            <v-checkbox
-              :color="accentColor"
               v-model="showHorizon"
               @keyup.enter="showHorizon = !showHorizon"
               label="Horizon"
@@ -809,7 +821,7 @@
                 :color="accentColor"
                 v-model="showEclipsePercentage"
                 @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
-                label="Show Amount Eclipsed"
+                label="Amount Eclipsed"
                 hide-details
             />            
           </div>
@@ -908,7 +920,7 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" class="ui-text">
+      <div id="credits" class="ui-text" v-if= "!smallSize">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -1082,7 +1094,7 @@ export default defineComponent({
     };
 
     return {
-      showSplashScreen: false, // FIX later
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
@@ -1091,7 +1103,6 @@ export default defineComponent({
 
       showMapTooltip: false,
       showTextTooltip: false,
-      showControls: true, 
       showMapSelector: false,
       showLocationSelector: false,
 
@@ -1238,9 +1249,9 @@ export default defineComponent({
       playingIntervalId: null as ReturnType<typeof setInterval> | null,
       playingWaitCount: 0,
 
+      showControls: true,
       showAltAzGrid: true,
       showHorizon: true,
-      showEcliptic: false, 
       showTextSheet: false, 
       showEclipsePercentage: false,  
       
@@ -1255,7 +1266,7 @@ export default defineComponent({
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
-      inIntro: true, //FIX
+      inIntro: false,
 
       tab: 0,
       introSlide: 1,
@@ -1322,8 +1333,6 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(true);
       this.wwtSettings.set_showAltAzGrid(this.showAltAzGrid);
       this.wwtSettings.set_showAltAzGridText(this.showAltAzGrid);
-      this.wwtSettings.set_showEcliptic(this.showEcliptic);
-      this.wwtSettings.set_showEclipticOverviewText(false);
 
       // This is kinda horrible, but it works!
 
@@ -1388,6 +1397,7 @@ export default defineComponent({
       this.onResize();
     });
 
+    this.showControls = !this.mobile;
   },
 
   computed: {
@@ -1405,7 +1415,13 @@ export default defineComponent({
     },
     
     selectedLocaledTimeDateString() {
-      return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
+      if (this.smallSize) {
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd, HH:mm (zzz)');
+      } else {
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
+      }
+
+
     },
 
     ready(): boolean {
@@ -1517,7 +1533,6 @@ export default defineComponent({
       return this.sunPosition.altRad > 0;
     },
 
-
     selectedLocationText(): string {
       if (this.selectedLocation !== 'User Selected') {
         return this.selectedLocation;
@@ -1549,7 +1564,6 @@ export default defineComponent({
     defaultRate(): number {
       return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
     },
-
   },
 
   methods: {
@@ -2339,11 +2353,6 @@ export default defineComponent({
       this.wwtSettings.set_showAltAzGridText(show);
     },
 
-    showEcliptic(show: boolean) {
-      this.wwtSettings.set_showEcliptic(show);
-      this.wwtSettings.set_showEclipticOverviewText(false);
-    },
-
     showHorizon(_show: boolean) {
       this.updateFrontAnnotations();
       this.updateMoonTexture();
@@ -2444,7 +2453,7 @@ export default defineComponent({
 
     showSplashScreen(val: boolean) {
       if (!val) {
-        this.inIntro = false; //Set to false for now to make coding other things easier. FIX later
+        this.inIntro = true; 
       }
     },
     
@@ -2537,6 +2546,11 @@ export default defineComponent({
   src: url("../../assets/HighwayGothicNarrow.ttf");
 }
 
+:root {
+  --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
+  --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+}
+
 html {
   height: 100%;
   margin: 0;
@@ -2596,7 +2610,6 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-size: 11pt;
 
   .wwtelescope-component {
     position: relative;
@@ -2795,14 +2808,7 @@ body {
   .v-label {
     color: var(--comet-color);
     opacity: 1;
-
-    @media (max-width: 500px){ //SMALL
-      font-size: 0.8em;
-    }
-
-    @media (min-width: 501px){ //LARGE
-      font-size: 1.1em;
-    }
+    font-size: var(--default-font-size);
   }
 
   #control-checkboxes {
@@ -2810,22 +2816,11 @@ body {
     flex-direction: column;
     justify-content: flex-start;
 
-    @media (max-width: 750px){ //SMALL
-      
-      .v-checkbox .v-selection-control {
-      height: 1.5em !important;
-      min-height: 1em !important;
-      }
-
+    .v-checkbox .v-selection-control {
+      font-size: calc(1.1 * var(--default-font-size));
+      height: calc(1.2 * var(--default-line-height));
+      min-height: calc(1.2 * var(--default-line-height));
     }
-
-    @media (min-width: 751px){ //LARGE
-      .v-checkbox .v-selection-control {
-      height: 2.1em !important;
-      min-height: 1em !important;
-      }
-    }
-
 
     .v-btn {
       align-self: center;
@@ -2841,7 +2836,6 @@ body {
     .v-btn__content {
       color: black;
       font-weight: 900;
-      font-size: 0.75em;
       white-space: break-spaces;
       width: 150px;
     }
@@ -2904,7 +2898,6 @@ body {
 }
 
 #splash-overlay {
-  position: fixed;
   align-items: center;
   justify-content: center;
   font-size: min(8vw, 7vh);
@@ -2918,6 +2911,8 @@ body {
   backdrop-filter: blur(5px);
   justify-content: space-around;
   align-content: center;
+  padding-top: 4rem;
+  padding-bottom: 1rem;
 
   border-radius: 10%;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
@@ -2938,16 +2933,14 @@ body {
   p.highlight {
     color: var(--moon-color);
     -webkit-text-stroke: 0.1px var(--accent-color);
-    filter: drop-shadow(0px 0px 0.25em var(--accent-color));
-
+  
     // make uppercase
-    font-size: 1.15em;
     text-transform: uppercase;
     font-weight: bolder;
   }
   
   p.small {
-    font-size: .75em;
+    font-size: var(--default-font-size);
     font-weight: bold;
   }
 
@@ -2956,10 +2949,11 @@ body {
   }
 
   #close-splash-button {
+    position: absolute;
+    top: 0;
+    right: 2.5rem;
     text-align: end;
-    margin-top: 0%;
-    margin-right: 6%;
-    color: var(--accent-color-2);
+    color: var(--accent-color);
     font-size: min(8vw, 5vh);
 
     &:hover {
@@ -2971,12 +2965,14 @@ body {
     // in the grid, the text is in the 2nd column
     display: flex;
     flex-direction: column;
+    line-height: 130%;
     
   }
 
   #splash-screen-guide {
     margin-block: 1em;
-    font-size: .6em;
+    font-size: min(5vw, 4vh);
+    line-height: 140%;
     width: 75%;
 
     .v-col{
@@ -2990,7 +2986,7 @@ body {
   }
 
   #splash-screen-acknowledgements {
-    font-size: .5em;
+    font-size: calc(2 * var(--default-font-size));
     width: 70%; 
   }
 
@@ -3011,20 +3007,33 @@ body {
   }
 }
 
-#wwt-sheet-card {
-  width: 50%;
-  align-self: center;
-}
-
 .bottom-sheet {
 
   .tab-title {
-    font-size: ~"max(18px, calc(1.1em + 0.3vw))";
+    font-size: calc(1.2 * var(--default-font-size));
+  }
+
+  #learn-more-content{
+    display: flex;
+
+    @media (max-width: 700px ) {
+      flex-direction: column;
+    }
+
+    @media (min-width: 701px ) {
+      flex-direction: row;
+    }
+
   }
 
   #info-text-box {
-    font-size: ~"max(16px, calc(1em + 0.3vw))";
-    line-height: ~"max(20px, calc(1.1em + 0.4vw))";
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
+
+    @media (min-width: 701px ) {
+      min-width: 50%;
+      padding-right: 1em;
+    }
   }
   #main-info-text {
     padding-inline: 0.5em;
@@ -3034,7 +3043,8 @@ body {
     margin-top: 0.4em;
     font-weight: bold;
     color: var(--accent-color);
-    font-size: ~"max(20px, calc(1em + 0.3vw))";
+    font-size: calc(1.2 * var(--default-font-size));
+    line-height: calc(1.2 * var(--default-line-height));
   }
   
   #FAQ{
@@ -3044,16 +3054,14 @@ body {
       padding-block: 0.7em;
       padding-inline: 1.2em;
       height: fit-content;
-      background-color: #486273;
+      background-color: #37474F;
       
       summary {
         font-weight: bold;
-        font-size: ~"max(16px, calc(0.8em + 0.3vw))";
         cursor: pointer;
       }
       
       p {
-
         padding-top: 0.5em;
         padding-inline: 1em;
       }
@@ -3063,14 +3071,25 @@ body {
 
   figure {
     position: sticky;
+
+    @media (max-width: 700px ) {
+      width: 100%;
+    }
+
+    @media (min-width: 701px ) {
+      width: 50%;
+    }
+
+    flex-shrink: 0;
     top: 0;
+    margin-top: 1em;
+
     figcaption{
-      position: absolute;
-      bottom: 0;
+      bottom: -2em;
       right: 0;
-      font-size: 0.5em;
-      background-color: #4a4a4a4a;
-      border-radius: 10px 0 0 0;
+      font-size: calc(0.8 * var(--default-font-size));
+      line-height: calc(0.8 * var(--default-line-height));
+      background-color: #212121;
       padding-inline: 10px 5px;
     }
   }
@@ -3132,7 +3151,7 @@ body {
     position: absolute;
     top: 0.25em;
     right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
-    color: white;
+    color: var(--accent-color);
   }
 
   // This prevents the tabs from having some extra space to the left when the screen is small
@@ -3142,18 +3161,18 @@ body {
   }
 
   #user-guide {
-    font-size: ~"max(12px, calc(0.9em + 0.2vw))";
-    line-height: ~"max(18px, calc(1.2em + 0.4vw))";
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
 
     .v-chip {
-      font-size: ~"max(16px, calc(0.9em + 0.2vw))";
+      font-size: var(--default-font-size);
     }
   }
 
   .user-guide-header {
     margin-top: 1rem;
     color: var(--accent-color);
-    font-size: larger;
+    font-size: calc(1.2 * var(--default-font-size));
   }
 
   .user-guide-emphasis {
@@ -3202,21 +3221,17 @@ body {
   
 
   .v-slider-thumb__label {
+    @media (max-width: 600px) {
+      display: none;
+    }
     min-width: fit-content;
     white-space: nowrap;
     color: black;
     padding-inline: 0.7rem;
     background-color: var(--accent-color);
 
-    @media (max-width: 750px ) { //SMALL
-      font-size: 1rem;
-      padding-block: 0.7rem;
-    } 
-
-    @media (min-width: 751px ) { //LARGE
-      font-size: 1.1rem;
-      padding-block: 1rem;
-    } 
+    font-size: var(--default-font-size);
+    padding-block: calc(0.5 * var(--default-line-height));
   }
   
   .v-slider-thumb__label::before {
@@ -3258,7 +3273,8 @@ body {
   user-select: none;
   border: solid 1.5px var(--accent-color);
   
-  font-size: clamp(8px, 3vmin, 0.9em);
+  font-size: var(--default-font-size);
+  line-height: var(--default-line-height);
   overflow-y: auto;
   
   transition: height 0.5s ease-in-out;
@@ -3311,7 +3327,7 @@ body {
     text-align: right;
     padding-left: 1rem;
     
-    font-size: clamp(0.9rem, 2.1vw, 2rem);
+    font-size: calc(1.3 * var(--default-font-size));
 
   }
     
@@ -3327,8 +3343,6 @@ body {
         border-radius: 5px;
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
-        
-        font-size: clamp(0.6rem, 1.75vw, 1.2rem);
 
         // span
         .description {
@@ -3428,11 +3442,20 @@ body {
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  width: 75%;
   height: fit-content;
   // outline: 5px solid var(--accent-color);
   border-radius: 1em;
-  padding: 2em;
+
+  @media (max-width: 700px) {
+    width: 90%;
+    padding: 1.5em;
+  }
+
+  @media (min-width: 701px) {
+    width: 75%;
+    padding: 2em;
+  }
+
 
   // rotated translucent background gradient
   background: linear-gradient(45deg,
@@ -3441,13 +3464,8 @@ body {
                             rgb(30 70 90));
 
   
-  @media (max-width: 750px){ //SMALL
-    font-size: 1em;    
-    }
-
-  @media (min-width: 751px){ //LARGE
-      font-size: 1.1em;
-  }
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
 
   .v-list-item__prepend {
     margin-right: 0.75em;
@@ -3465,24 +3483,15 @@ body {
     align-items: center;
 
     gap: 1em;
-    margin-top:1em;
+    margin-top:0.5em;
 
     .v-btn.v-btn--density-default {
-        max-height: 8em;
+        max-height: calc(1.6 * var(--default-line-height));
       }  
-        
-    @media (max-width: 750px){ //SMALL
-      .v-btn--size-default {
-      font-size: 0.8em;
-      }  
-    }
 
-    @media (min-width: 751px){ //LARGE
-      .v-btn--size-default {
-      font-size: 0.9em;
-      }    
-    }
-
+    .v-btn--size-default {
+      font-size: calc(0.9 * var(--default-font-size));
+    }    
   
     #intro-reminder {
       outline: 1px solid red;
@@ -3506,38 +3515,48 @@ body {
   margin-left: 10px;
 
   .icon-wrapper {
-    padding-inline: 0.5em;
-    padding-block: 0.6em;
+    padding-inline: calc(0.3 * var(--default-line-height));
+    padding-block: calc(0.4 * var(--default-line-height));
     border: 2px solid var(--accent-color);
   }
 
 }
 
 #speed-text {
-    position: absolute;
+  position: absolute;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-inline: 0.4em;
+  padding-block: 0.15em;
+  border-radius: 0.3em;
+
+  @media (max-width: 959px) {
+    bottom: -0.4rem;
+    left: 7.5rem;
+  }
+  @media (min-width: 960px) {
     bottom: 0.3rem;
     left: 0.3rem;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding-inline: 0.4em;
-    padding-block: 0.15em;
-    border-radius: 0.3em;
+  }
 
-    @media (max-width: 750px) { //SMALL
-          font-size: 0.9rem;
-        }
-    @media (min-width: 751px) { //LARGE
-          font-size: 1.1rem;
-    }
+
+  font-size: var(--default-font-size)
   }  
 
 #eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
-  top: -3rem;
+  top: calc(-2.2 * var(--default-line-height));
 
   .v-chip {
-      padding: 0.5em;
-    }  
+    border: none;
+    color: blue;
+    background-color: white;
+    opacity: 1;
+    padding: 0.5em;
+
+    font-size: calc(1 * var(--default-font-size));
+  }  
 }
 
 #top-wwt-content {
@@ -3552,6 +3571,15 @@ body {
     flex-wrap: column;
     gap:5px;
 
+    .v-chip {
+      border: none;
+      color: blue;
+      background-color: white;
+      opacity: 0.9;
+      padding: calc(0.8 * var(--default-line-height));
+
+      font-size: calc(1.1 * var(--default-font-size));
+    }
   }
     .v-switch__thumb {
       color: #f39d6c;
