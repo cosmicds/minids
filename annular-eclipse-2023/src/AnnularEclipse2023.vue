@@ -83,6 +83,7 @@
                       <template v-slot:front>
                       <image-label 
                         id="front"
+                        :alt-text="longAnswers[index]"
                         :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
@@ -1335,6 +1336,9 @@ export default defineComponent({
       startPaused: false,
 
       quizAnswer: null as string | null,
+      longAnswers: ['Eclipse moves North to South from Bismark, North Dakota and onward past Denver',
+        'Eclipse moves hoizontally East to West from LA to Charlotte',
+        'Eclipse moves from Pacific Northwest (Washington) thru Texas'],
 
       sunPlace,
       moonPlace,
