@@ -541,6 +541,12 @@
                   <v-spacer class="end-spacer"></v-spacer>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col>
+                  <funding-acknowledgment/>
+                </v-col>
+              </v-row>
+
             </v-container>              
           </v-card-text>
         </v-card>

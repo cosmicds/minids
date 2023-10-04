@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import { IconButton } from "@minids/common";
 import { LocationSelector } from "@minids/common";
+import { FundingAcknowledgment } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import GifPlayPause from "./GifPlayPause.vue";
@@ -121,6 +122,7 @@ createApp(AnnularEclipse2023, {
   .component('mc-radiogroup', MCRadiogroup)
   .component('flip-transition', FlipTransition)
   .component('image-label', ImageLabel)
+  .component('funding-acknowledgment', FundingAcknowledgment)
 
   // Mount
   .mount("#app");
