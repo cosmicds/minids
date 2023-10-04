@@ -11,7 +11,6 @@ import MCRadiogroup from "./MCRadiogroup.vue";
 import FlipTransition from "./FlipTransition.vue";
 import ImageLabel from "./ImageLabel.vue";
 
-
 import "./polyfills";
 
 import VueSlider from "vue-slider-component";
