@@ -193,7 +193,7 @@
         <v-slide-y-transition
           :disabled="smAndUp"
           >
-        <div v-if="!smAndup || smAndUp" id="map-container" >
+        <div v-if="!smAndUp || smAndUp" id="map-container" >
           <location-selector
             v-if="learnerPath == 'Explore'"
             :model-value="locationDeg"
