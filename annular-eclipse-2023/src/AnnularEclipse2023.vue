@@ -2844,15 +2844,14 @@ body {
 
 #share-button-wrapper {
   position: absolute;
-  top: 0.7rem;
-  left: 1rem;
-  
+  top: 2.5rem;
+  left: 0.5rem;
+
   .icon-wrapper {
-    padding-inline: 0.5em;
-    padding-block: 0.6em;
+    padding-inline: calc(0.3 * var(--default-line-height));
+    padding-block: calc(0.4 * var(--default-line-height));
     border: 2px solid var(--accent-color);
   }
-
 }
 
 .top-content {
@@ -3668,11 +3667,6 @@ body {
       background-color: rgba(18, 18, 18,.5);
     }
   }
-}
-
-#share-button {
-  margin: auto;
-  width: 2em;
 }
 
 #speed-control {
