@@ -825,6 +825,19 @@
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
           </v-tooltip>
         </div>
+        <div id="change-optout">
+          <icon-button
+            md-icon="mdi-application-cog"
+            @activate="() => showPrivacyDialog = true"
+            :color="accentColor"
+            :focus-color="accentColor"
+            tooltip-text="Change privacy settings"
+            tooltip-location="bottom"
+            tooltip-offset="5px"
+            :show-tooltip="!mobile"
+          >
+          </icon-button>
+        </div>
       </div>
     </div>
     
@@ -2960,8 +2973,8 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 5px 5px;
-  min-width: 30px;
+    padding: 5px 5px;
+    min-width: 30px;
   }
 }
 
@@ -3784,54 +3797,64 @@ body {
       font-size: calc(1.1 * var(--default-font-size));
     }
   }
-    .v-switch__thumb {
-      color: #f39d6c;
-      background-color: black; 
 
-      @media (min-width: 751px) { //LARGE
-        height: 2.1rem;
-        width: 2.2rem;
-      }
-
+  .icon-wrapper {
+    @media (max-width: 750px) { //SMALL
+      margin-top: 0.5rem;
     }
 
-    .v-input--density-default {
-      --v-input-control-height: 0;
+    @media (min-width: 751px) { //LARGE
+      margin-top: 0.7rem;
     }
+  }
 
-    .v-selection-control--density-default {
-      --v-selection-control-size: auto;
-    } 
+  .v-switch__thumb {
+    color: #f39d6c;
+    background-color: black;
 
-    .v-switch--inset .v-switch__track {
-      @media (min-width: 751px) { //LARGE
-        height: 2.5rem;
-        width: 4.2rem;
-      }
+    @media (min-width: 751px) { //LARGE
+      height: 2.1rem;
+      width: 2.2rem;
     }
+  }
 
-    pointer-events: auto;
+  .v-input--density-default {
+    --v-input-control-height: 0;
+  }
+
+  .v-selection-control--density-default {
+    --v-selection-control-size: auto;
+  } 
+
+  .v-switch--inset .v-switch__track {
+    @media (min-width: 751px) { //LARGE
+      height: 2.5rem;
+      width: 4.2rem;
+    }
+  }
+
+  pointer-events: auto;
 
   #top-switches {
     position: absolute;
     right: 0;
 
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
 
   }
  
   #track-sun-switch {
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
   }
