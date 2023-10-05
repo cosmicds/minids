@@ -516,7 +516,8 @@
                           
                   <v-divider thickness="2px" class="solid-divider"></v-divider>
                   
-                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
+                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
+                  <p class="mt-2">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
                 </v-col>
               </v-row>
               <v-row>
