@@ -2700,7 +2700,7 @@ export default defineComponent({
 }
 
 :root {
-  --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
+  --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
 }
 
