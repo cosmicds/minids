@@ -345,15 +345,14 @@
       scrim="false"
       transition="slide-y-transition"
       v-model="showWWTGuideSheet" 
-      class='bottom-sheet'
+      class="bottom-sheet"
       id="wwt-guide-sheet"
       :style="cssVars"
     >
-      <v-card
-        class="bottom-sheet-card">
+      <v-card class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
+          height="clamp(25px, min(5vh, 5vw), 32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -973,6 +972,20 @@
               {{ toTimeString(new Date(item.modelValue)) }}
             </template>
           </v-slider>
+          <div id="change-optout">
+            <icon-button
+              md-icon="mdi-lock"
+              @activate="() => showPrivacyDialog = true"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="Change privacy settings"
+              tooltip-location="bottom"
+              tooltip-offset="5px"
+              :show-tooltip="!mobile"
+              mdSize="0.8em"
+            >
+            </icon-button>
+          </div>
           <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
@@ -1030,7 +1043,49 @@
       </div>
     </div>
 
-    <!-- This contains the informational content that is displayed when the book icon is clicked. -->
+
+    <!-- Data collection opt-out dialog -->
+    <v-dialog
+      scrim="false"
+      v-model="showPrivacyDialog"
+      max-width="400px"
+      id="privacy-popup-dialog"
+    >
+      <v-card>
+        <v-card-text>
+          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses.
+        </v-card-text>
+        <v-card-actions class="pt-3">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="#BDBDBD"
+            href="https://www.cfa.harvard.edu/privacy-statement"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+          Privacy Policy
+          </v-btn>
+          <v-btn
+            color="#ff6666"
+            @click="() => {
+              responseOptOut = true;
+              showPrivacyDialog = false;
+            }"
+          >
+          Opt out
+          </v-btn>
+          <v-btn 
+            color="green"
+            @click="() => {
+              responseOptOut = false;
+              showPrivacyDialog = false;
+            }"
+          >
+            Allow
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   <notifications group="copy-url" position="top right" />
   </div>
@@ -1178,11 +1233,12 @@ export default defineComponent({
     const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
     window.localStorage.setItem(UUID_KEY, uuid);
 
-    const responseOptOut = window.localStorage.getItem(OPT_OUT_KEY) === "true" ?? false;
+    const storedOptOut = window.localStorage.getItem(OPT_OUT_KEY);
+    const responseOptOut = typeof storedOptOut === "string" ? storedOptOut === "true" : null;
 
     return {
       uuid,
-      responseOptOut,
+      responseOptOut: responseOptOut as boolean | null,
       mcResponses: [] as string[],
 
       showSplashScreen: true,
@@ -1358,6 +1414,8 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+
+      showPrivacyDialog: false,
 
       tab: 0,
       introSlide: 1,
@@ -2481,6 +2539,12 @@ export default defineComponent({
       window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
     },
 
+    inIntro(value: boolean) {
+      if (!value && !this.showSplashScreen && this.responseOptOut === null) {
+        this.showPrivacyDialog = true;
+      }
+    },
+
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -2930,8 +2994,8 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 5px 5px;
-  min-width: 30px;
+    padding: 5px 5px;
+    min-width: 30px;
   }
 }
 
@@ -3392,7 +3456,9 @@ body {
 
 #slider {
   width: 100% !important;
-  margin: 5px 30px;
+  margin-block: 30px;
+  margin-left: 5px;
+  margin-right: 0;
 }
 
 .v-container {
@@ -3754,57 +3820,96 @@ body {
       font-size: calc(1.1 * var(--default-font-size));
     }
   }
-    .v-switch__thumb {
-      color: #f39d6c;
-      background-color: black; 
 
-      @media (min-width: 751px) { //LARGE
-        height: 2.1rem;
-        width: 2.2rem;
-      }
-
+  .icon-wrapper {
+    @media (max-width: 750px) { //SMALL
+      margin-top: 0.5rem;
     }
 
-    .v-input--density-default {
-      --v-input-control-height: 0;
+    @media (min-width: 751px) { //LARGE
+      margin-top: 0.7rem;
     }
+  }
 
-    .v-selection-control--density-default {
-      --v-selection-control-size: auto;
-    } 
+  .v-switch__thumb {
+    color: #f39d6c;
+    background-color: black;
 
-    .v-switch--inset .v-switch__track {
-      @media (min-width: 751px) { //LARGE
-        height: 2.5rem;
-        width: 4.2rem;
-      }
+    @media (min-width: 751px) { //LARGE
+      height: 2.1rem;
+      width: 2.2rem;
     }
+  }
 
-    pointer-events: auto;
+  .v-input--density-default {
+    --v-input-control-height: 0;
+  }
+
+  .v-selection-control--density-default {
+    --v-selection-control-size: auto;
+  } 
+
+  .v-switch--inset .v-switch__track {
+    @media (min-width: 751px) { //LARGE
+      height: 2.5rem;
+      width: 4.2rem;
+    }
+  }
+
+  pointer-events: auto;
 
   #top-switches {
     position: absolute;
     right: 0;
 
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
 
   }
  
   #track-sun-switch {
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
   }
 }
 
+#change-optout {
+
+  .icon-wrapper {
+    margin: 0;
+    padding-inline: 0;
+    padding-block: 0;
+    border: none;
+    min-width: 0;
+  }
+}
+
+#privacy-popup-dialog {
+
+  .v-card-text {
+    color: #BDBDBD;
+  }
+
+  .v-overlay__content {
+    font-size: var(--default-font-size);
+    background-color: purple;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .v-btn--size-default {
+      font-size: var(--default-font-size);
+    }  
+}
 </style>
