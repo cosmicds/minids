@@ -1477,6 +1477,14 @@ export default defineComponent({
       
       console.log("selected time", this.selectedTime);
 
+      setInterval(() => {
+        if (this.playing) {
+          const time = this.wwtCurrentTime;
+          this.selectedTime = time.getTime();
+          this.updateFrontAnnotations(time);
+        }
+      }, 500);
+      
     });
 
     this.$nextTick(() => {
@@ -2513,9 +2521,6 @@ export default defineComponent({
         
         return;
       }
-      
-      this.selectedTime = time.getTime();
-      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
