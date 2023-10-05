@@ -340,15 +340,14 @@
       scrim="false"
       transition="slide-y-transition"
       v-model="showWWTGuideSheet" 
-      class='bottom-sheet'
+      class="bottom-sheet"
       id="wwt-guide-sheet"
       :style="cssVars"
     >
-      <v-card
-        class="bottom-sheet-card">
+      <v-card class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
+          height="clamp(25px, min(5vh, 5vw), 32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -1018,7 +1017,41 @@
       </div>
     </div>
 
-    <!-- This contains the informational content that is displayed when the book icon is clicked. -->
+
+    <!-- Data collection opt-out dialog -->
+    <v-dialog
+      scrim="false"
+      id="privacy-popup-dialog"
+      width="fit-content"
+      v-model="showPrivacyDialog"
+    >
+      <v-card>
+        <v-card-text>
+          Whatever privacy text we want to have
+        </v-card-text>
+        <v-card-actions class="pt-3">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="red"
+            @click="() => {
+              responseOptOut = true;
+              showPrivacyDialog = false;
+            }"
+          >
+          Opt out
+          </v-btn>
+          <v-btn 
+            color="green"
+            @click="() => {
+              responseOptOut = false;
+              showPrivacyDialog = false;
+            }"
+          >
+            Allow
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   <notifications group="copy-url" position="top right" />
   </div>
@@ -1166,11 +1199,12 @@ export default defineComponent({
     const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
     window.localStorage.setItem(UUID_KEY, uuid);
 
-    const responseOptOut = window.localStorage.getItem(OPT_OUT_KEY) === "true" ?? false;
+    const storedOptOut = window.localStorage.getItem(OPT_OUT_KEY);
+    const responseOptOut = typeof storedOptOut === "string" ? storedOptOut === "true" : null;
 
     return {
       uuid,
-      responseOptOut,
+      responseOptOut: responseOptOut as boolean | null,
       mcResponses: [] as string[],
 
       showSplashScreen: true,
@@ -1346,6 +1380,8 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+
+      showPrivacyDialog: false,
 
       tab: 0,
       introSlide: 1,
@@ -2467,6 +2503,12 @@ export default defineComponent({
   watch: {
     responseOptOut(optOut: boolean) {
       window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
+    },
+
+    inIntro(value: boolean) {
+      if (!value && !this.showSplashScreen && this.responseOptOut === null) {
+        this.showPrivacyDialog = true;
+      }
     },
 
     showAltAzGrid(show: boolean) {
