@@ -3461,21 +3461,19 @@ body {
 #map-column { // v-col
   position: relative;
   --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
-  // min-height: 200px;
   height: 100%;
   // max-height: var(--map-max-height);
   width: 100%;
+  aspect-ratio: 5/3;
   
-  
-  @media (max-width: 600px) {
+  @media (max-aspect-ratio: 3/5) {
     aspect-ratio: 3 / 5;
   }
 
   #map-container {
-    position: static;
     height: 100%;
     width: 100%;
-
+  
   
     span {
       padding: 0;
