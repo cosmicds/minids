@@ -782,6 +782,7 @@
             location="left"
             :color="accentColor"
             :style="cssVars"
+            :disabled="mobile"
           >
           <template v-slot:activator="{props}">
             <div 
@@ -811,6 +812,7 @@
               location="left"
               :color="accentColor"
               :style="cssVars"
+              :disabled="mobile"
             >
             <template v-slot:activator="{props}">
               <div 
