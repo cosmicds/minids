@@ -948,7 +948,7 @@
               :fa-icon="'rotate'"
               @activate="() => {
                     selectedTime = 1697292380000;
-                    playing = true;
+                    playing = false;
                     toggleTrackSun = true;
                   }"
               :color="accentColor"
