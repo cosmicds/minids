@@ -562,7 +562,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper">
+      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -2863,8 +2863,13 @@ body {
 
 #share-button-wrapper {
   position: absolute;
-  top: 2.5rem;
-  left: 0.5rem;
+  top: 0.7rem;
+  left: 1rem;
+
+  &.budge {
+    top: 2.5rem;
+    left: 0.5rem;
+  }
 
   .icon-wrapper {
     padding-inline: calc(0.3 * var(--default-line-height));
