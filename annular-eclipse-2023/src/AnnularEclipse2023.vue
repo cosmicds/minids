@@ -65,7 +65,7 @@
                 :radio-options="['A', 'B','C']"
                 :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
-                @select="(e: any) => { console.log(e);}"
+                @select="onAnswerSelected"
                 colorWrong="#4a2323"
                 colorRight="green"
                 > 
@@ -542,6 +542,12 @@
                   <v-spacer class="end-spacer"></v-spacer>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col>
+                  <funding-acknowledgment/>
+                </v-col>
+              </v-row>
+
             </v-container>              
           </v-card-text>
         </v-card>
@@ -604,13 +610,13 @@
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="puzzle-piece"
-              /> Identify the path 
+                icon="location-dot"
+              /> Choose any location 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="location-dot"
-              /> Choose any location 
+                icon="puzzle-piece"
+              /> Identify the path 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
@@ -691,15 +697,15 @@
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
-                  </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
-                </v-list-item>
-                <v-list-item>
-                  <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world. See and share how the eclipse would look from there.
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
+                  </template>
+                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
@@ -951,6 +957,7 @@
             thumb-size="14px"
             thumb-label="always"
             :step="millisecondsPerInterval"
+            @mousedown="() => {playing = false;}"
             >
             <template v-slot:thumb-label="item">
               {{ toTimeString(new Date(item.modelValue)) }}
@@ -1020,15 +1027,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
+import { defineComponent, toRaw, PropType } from "vue";
+import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, MINIDS_BASE_URL } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture, CAAMoon } from "@wwtelescope/engine";
 import { Annotation2, Poly2 } from "./Annotation2";
+import { MCSelectionStatus } from "./MCRadiogroup.vue";
 
 import { getTimezoneOffset, formatInTimeZone } from "date-fns-tz";
 import tzlookup from "tz-lookup";
+import { v4 } from "uuid";
 
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
@@ -1098,6 +1107,9 @@ type HorizontalRad = {
 };
 
 let queryData: LocationDeg | null = null;
+const USER_SELECTED = "User Selected" as const;
+const UUID_KEY = "eclipse-mini-uuid" as const;
+const OPT_OUT_KEY = "eclipse-mini-optout" as const;
 
 export default defineComponent({
   extends: MiniDSBase,
@@ -1148,7 +1160,20 @@ export default defineComponent({
       initialZoom: 3
     };
 
+    const selectedLocation = queryData ? USER_SELECTED : "Albuquerque, NM";
+    const presetLocationsVisited = queryData ? [] : [selectedLocation];
+    const userSelectedLocationsVisited = queryData ? [[queryData.latitudeDeg, queryData.longitudeDeg]] : [];
+
+    const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
+    window.localStorage.setItem(UUID_KEY, uuid);
+
+    const responseOptOut = window.localStorage.getItem(OPT_OUT_KEY) === "true" ?? false;
+
     return {
+      uuid,
+      responseOptOut,
+      mcResponses: [] as string[],
+
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
@@ -1179,17 +1204,17 @@ export default defineComponent({
         latitudeRad: D2R * 35.106766,
         longitudeRad: D2R * -106.629181
       } as LocationRad,
-      selectedLocation: queryData ? "User Selected" : "Albuquerque, NM",
+      selectedLocation: queryData ? USER_SELECTED : "Albuquerque, NM",
       locationErrorMessage: "",
       
       syncDateTimeWithWWTCurrentTime: true,
       syncDateTimewithSelectedTime: true,
 
       presetMapOptions: {
-        templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
+        templateUrl: "https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg",
         minZoom: 1,
         maxZoom: 16,
-        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+        attribution: 'Maptiles by Stamen Design, under <a target="_blank" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="https://www.openstreetmap.org/#map=4/38.01/-95.84">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a>',
         ext: 'jpg',
         ...initialView
       },
@@ -1272,8 +1297,8 @@ export default defineComponent({
           longitudeRad: D2R * -80.843124,
           eclipseFraction: .53
         },
-        "User Selected": { // by default, user selected is Albaquerque
-          name: "User Selected",
+        [USER_SELECTED]: { // by default, user selected is Albaquerque
+          name: USER_SELECTED,
           latitudeRad: D2R * 35.106766,
           longitudeRad: D2R * -106.629181,
           eclipseFraction: 0.97
@@ -1355,7 +1380,10 @@ export default defineComponent({
       sunPlace,
       moonPlace,
 
-      queryData
+      queryData,
+
+      presetLocationsVisited,
+      userSelectedLocationsVisited
     };
   },
 
@@ -1370,7 +1398,7 @@ export default defineComponent({
   },
 
   created() {
-    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== "User Selected")
+    this.places = Object.entries(this.eclipsePathLocations).filter(([key, _]) => key !== USER_SELECTED)
       .sort(([_, pl1], [__, pl2]) => pl1.longitudeRad - pl2.longitudeRad)
       .map(([_, pl]) => {
         return {
@@ -1453,6 +1481,14 @@ export default defineComponent({
       
       console.log("selected time", this.selectedTime);
 
+      setInterval(() => {
+        if (this.playing) {
+          const time = this.wwtCurrentTime;
+          this.selectedTime = time.getTime();
+          this.updateFrontAnnotations(time);
+        }
+      }, 500);
+      
     });
 
     this.$nextTick(() => {
@@ -1601,7 +1637,7 @@ export default defineComponent({
     },
 
     selectedLocationText(): string {
-      if (this.selectedLocation !== 'User Selected') {
+      if (this.selectedLocation !== USER_SELECTED) {
         return this.selectedLocation;
       } else {
         const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
@@ -1956,10 +1992,10 @@ export default defineComponent({
         return;
       }
       console.log("updateLocationFromMap", location);
-      this.selectedLocation = 'User Selected';
+      this.selectedLocation = USER_SELECTED;
       this.locationDeg = location;
 
-      this.eclipsePathLocations['User Selected'] = {
+      this.eclipsePathLocations[USER_SELECTED] = {
         name: `User Selected: ${location.latitudeDeg.toFixed(2)}, ${location.longitudeDeg.toFixed(2)}`,
         latitudeRad: D2R * location.latitudeDeg,
         longitudeRad: D2R * location.longitudeDeg,
@@ -1984,6 +2020,27 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateFrontAnnotations(this.dateTime);
       });
+    },
+
+    sendDataToDatabase() {
+      if (this.responseOptOut) {
+        return;
+      }
+      fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          user_uuid: this.uuid, mc_responses: this.mcResponses,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          preset_locations: toRaw(this.presetLocationsVisited), user_selected_locations: toRaw(this.userSelectedLocationsVisited)
+        })
+      });
+    },
+
+    onAnswerSelected(event: MCSelectionStatus) {
+      this.mcResponses.push(event.text);
+      this.sendDataToDatabase();
     },
 
     logLocation() {
@@ -2389,7 +2446,8 @@ export default defineComponent({
     },
   
     copyShareURL() {
-      const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      const baseURL = `${window.location.origin}${window.location.pathname}`;
+      const url = `${baseURL}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
       navigator.clipboard
         .writeText(url)
         .then(() =>
@@ -2417,6 +2475,10 @@ export default defineComponent({
       // console.log(_css);
     },
     
+    responseOptOut(optOut: boolean) {
+      window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
+    },
+
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -2469,9 +2531,6 @@ export default defineComponent({
         
         return;
       }
-      
-      this.selectedTime = time.getTime();
-      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -2507,14 +2566,25 @@ export default defineComponent({
       this.centerSun();
     },
 
+    locationDeg(loc: LocationDeg) {
+      if (this.selectedLocation === USER_SELECTED) {
+        this.userSelectedLocationsVisited.push([loc.latitudeDeg, loc.longitudeDeg]);
+        this.sendDataToDatabase();
+      }
+    },
+
     selectedLocation(locname: string) {
       if (!(locname in this.eclipsePathLocations)) {
         console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
       }
+      if (locname !== USER_SELECTED) {
+        this.presetLocationsVisited.push(locname);
+        this.sendDataToDatabase();
+      }
       console.log("selected location", locname);
     },
-    
+
     playing(play: boolean) {
       console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
       this.setClockSync(play);
@@ -2976,8 +3046,18 @@ body {
 
 #splash-screen {
   color: var(--moon-color);
-  max-height: calc(min(90vh, 2040px));
-  max-width: 90vw;
+
+  @media (max-width: 699px) {
+    max-height: 80vh;
+    max-width: 90vw;
+  }
+
+  @media (min-width: 700px) {
+    max-height: 85vh;
+    max-width: min(70vw, 800px);
+  }
+
+
   background-color: black;
   backdrop-filter: blur(5px);
   justify-content: space-around;

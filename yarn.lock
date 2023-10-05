@@ -522,6 +522,7 @@ __metadata:
     "@fortawesome/vue-fontawesome": ^3.0.3
     "@kyvg/vue3-notification": ^3.0.2
     "@minids/common": "workspace:0.0.0"
+    "@types/uuid": ^9.0.4
     "@typescript-eslint/eslint-plugin": ^6.5.0
     "@typescript-eslint/parser": ^6.5.0
     "@typescript-eslint/typescript-estree": 7.0.0-alpha.0
@@ -535,6 +536,7 @@ __metadata:
     less: ^4.2.0
     less-loader: ^11.1.3
     typescript: latest
+    uuid: ^9.0.1
     vue: ^3.3.4
     vuetify: ^3.3.14
     webpack: ^5.88.2
@@ -1473,6 +1475,13 @@ __metadata:
   version: 6.1.0
   resolution: "@types/tz-lookup@npm:6.1.0"
   checksum: 22f8e6285bc8c1c5c111767de8052ad4586d813f3b36560eddcbb352003e1330190329525328f4a5eb12381971c7ecc1bbd22079b3f4a84e1b19a1a6c56be2c9
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^9.0.4":
+  version: 9.0.4
+  resolution: "@types/uuid@npm:9.0.4"
+  checksum: 356e2504456eaebbc43a5af5ca6c07d71f5ae5520b5767cb1c62cd0ec55475fc4ee3d16a2874f4a5fce78e40e8583025afd3a7d9ba41f82939de310665f53f0e
   languageName: node
   linkType: hard
 
@@ -10978,6 +10987,15 @@ __metadata:
   bin:
     uuid: ./bin/uuid
   checksum: 58de2feed61c59060b40f8203c0e4ed7fd6f99d42534a499f1741218a1dd0c129f4aa1de797bcf822c8ea5da7e4137aa3673431a96dae729047f7aca7b27866f
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 39931f6da74e307f51c0fb463dc2462807531dc80760a9bff1e35af4316131b4fc3203d16da60ae33f07fdca5b56f3f1dd662da0c99fea9aaeab2004780cc5f4
   languageName: node
   linkType: hard
 

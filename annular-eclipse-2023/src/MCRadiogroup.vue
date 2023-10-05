@@ -79,14 +79,13 @@ import { VRadio } from 'vuetify/components/VRadio';
 
 // :border="(index==column ? `10px solid ${color(index)}` : '10px solid transparent')"
 
-// create a select type
-type Status = {
+export interface MCSelectionStatus {
   index: number,
   text: string,
   correct: boolean,
   neutral: boolean,
   tries: number
-};
+}
 
 export default defineComponent({
 
@@ -164,17 +163,13 @@ export default defineComponent({
     
   },
   emits: {
-    select(status: Status) {
+    select(status: MCSelectionStatus) {
       return typeof status.index === 'number' &&
             typeof status.text === 'string' &&
             typeof status.correct === 'boolean' &&
             typeof status.neutral === 'boolean' &&
             typeof status.tries === 'number';
     }
-  },
-  
-  created() {
-    
   },
   
   data: function () {

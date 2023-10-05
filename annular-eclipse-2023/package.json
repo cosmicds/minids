@@ -1,5 +1,4 @@
 {
-  "draft": true,
   "version": "0.0.0",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -7,6 +6,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@kyvg/vue3-notification": "^3.0.2",
     "@minids/common": "workspace:0.0.0",
+    "uuid": "^9.0.1",
     "vue": "^3.3.4",
     "vuetify": "^3.3.14",
     "webpack-plugin-vuetify": "^2.0.1"
@@ -18,6 +18,7 @@
     "serve": "./patch.sh; vue-cli-service serve"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "@typescript-eslint/typescript-estree": "7.0.0-alpha.0",
