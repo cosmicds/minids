@@ -129,13 +129,13 @@
         </div>
       <v-btn
         v-if="!smAndUp"
-        id="toggle-instructution-text"
+        id="toggle-instruction-text"
         :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        :color="accentColor"
+        :color="transparent"
         @click="collapseText = (!collapseText || smAndUp)"
         variant="flat"
         density="compact"
-        size="small"
+        size="x-small"
         />
       <!-- </toggle-content> -->
         <div id="button-row" class="non-map-row">
@@ -3502,10 +3502,11 @@ body {
 
   }
   
-  .v-btn#toggle-instructution-text {
+  .v-btn#toggle-instruction-text {
     position: absolute;
-    right: 0;
-    top: 1rem;
+    right: 1.8em;
+    top: 2.3em;
+    color: var(--accent-color)
     // transform: translate(-25%, 75%);
   }
     
