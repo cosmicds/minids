@@ -439,6 +439,14 @@
                         to increase speed by 10x. 
                       </li>
                       <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="rotate"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to reset time and view. 
+                      </li>
+                      <li>
                         You can also control time by dragging <v-icon
                           class="bullet-icon"
                           icon="mdi-circle"
@@ -945,7 +953,7 @@
                   }"
               :color="accentColor"
               :focus-color="accentColor"
-              tooltip-text="restart"
+              tooltip-text="Reset"
               tooltip-location="top"
               tooltip-offset="5px"
               faSize="md"
