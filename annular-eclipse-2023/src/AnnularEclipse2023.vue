@@ -571,6 +571,7 @@
           :box-shadow="false"
           tooltip-text="Share view of this location"
           @activate="copyShareURL"
+          faSize="md"
         ></icon-button>
       </div>
     </div>
@@ -902,6 +903,7 @@
               tooltip-text="Play/Pause"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
             ></icon-button>
             <icon-button
               id="speed-down"
@@ -916,6 +918,7 @@
               tooltip-text="10x slower"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
             ></icon-button>
             <icon-button
               id="speed-up"
@@ -930,6 +933,22 @@
               tooltip-text="10x faster"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
+            ></icon-button>
+            <icon-button
+              id="reset"
+              :fa-icon="'rotate'"
+              @activate="() => {
+                    selectedTime = 1697292380000;
+                    playing = true;
+                    toggleTrackSun = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="restart"
+              tooltip-location="top"
+              tooltip-offset="5px"
+              faSize="md"
             ></icon-button>
             <div id="speed-text">
               Time rate: 
@@ -3693,7 +3712,7 @@ body {
 
   @media (max-width: 959px) {
     bottom: -0.4rem;
-    left: 7.5rem;
+    left: 9.5rem;
   }
   @media (min-width: 960px) {
     bottom: 0.3rem;
