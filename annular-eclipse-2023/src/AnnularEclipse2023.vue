@@ -2433,7 +2433,8 @@ export default defineComponent({
     },
   
     copyShareURL() {
-      const url = `${window.location.origin}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      const baseURL = `${window.location.origin}${window.location.pathname}`;
+      const url = `${baseURL}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
       navigator.clipboard
         .writeText(url)
         .then(() =>
