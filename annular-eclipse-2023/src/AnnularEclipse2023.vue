@@ -1138,7 +1138,7 @@ export default defineComponent({
     };
 
     return {
-      showSplashScreen: false,
+      showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
