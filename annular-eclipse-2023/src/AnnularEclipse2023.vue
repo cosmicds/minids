@@ -138,6 +138,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'View eclipse from multiple locations'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
@@ -149,6 +150,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Choose any viewing location'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
@@ -160,6 +162,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Identify eclipse path'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
@@ -171,6 +174,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
               ></icon-button>
               <icon-button
@@ -181,6 +185,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
               ></icon-button>
             </div>
@@ -570,6 +575,7 @@
           background-color="transparent"
           :box-shadow="false"
           tooltip-text="Share view of this location"
+          :show-tooltip="!mobile"
           @activate="copyShareURL"
         ></icon-button>
       </div>
@@ -902,6 +908,7 @@
               tooltip-text="Play/Pause"
               tooltip-location="top"
               tooltip-offset="5px"
+              :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
               id="speed-down"
@@ -916,6 +923,7 @@
               tooltip-text="10x slower"
               tooltip-location="top"
               tooltip-offset="5px"
+              :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
               id="speed-up"
@@ -930,6 +938,7 @@
               tooltip-text="10x faster"
               tooltip-location="top"
               tooltip-offset="5px"
+              :show-tooltip="!mobile"
             ></icon-button>
             <div id="speed-text">
               Time rate: 
@@ -974,6 +983,7 @@
             tooltip-text="Go to current time"
             tooltip-location="top"
             tooltip-offset="5px"
+            :show-tooltip="!mobile"
           >
             <template v-slot:button>
               Now
