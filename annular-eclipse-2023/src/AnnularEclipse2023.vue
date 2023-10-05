@@ -1047,7 +1047,7 @@
 
     <!-- This contains the informational content that is displayed when the book icon is clicked. -->
 
-  <notifications group="copy-url" position="top right" />
+  <notifications group="copy-url" position="center top" classes="url-notification"  ignoreDuplicates="true"/>
   </div>
 </v-app>
 </template>
@@ -2468,14 +2468,16 @@ export default defineComponent({
           this.$notify({
             group: "copy-url",
             type: "success",
-            text: "URL successfully copied"
+            text: "URL copied to clipboard. Paste to share with friends!",
+            duration: 5000
           })
         )
         .catch((_err) =>
           this.$notify({
             group: "copy-url",
             type: "error",
-            text: "Failed to copy URL"
+            text: "Failed to copy URL",
+            duration: 5000
           })
         );
     },
@@ -2883,6 +2885,20 @@ body {
     padding-inline: calc(0.3 * var(--default-line-height));
     padding-block: calc(0.4 * var(--default-line-height));
     border: 2px solid var(--accent-color);
+  }
+}
+
+.url-notification {
+  margin-top: 45vh;
+  border-radius: 5px;
+  font-size: calc(1.1 * var(--default-font-size));
+  padding: 1em;
+
+  &.success {
+    background-color: #9a009a;
+  }
+  &.error {
+    background-color: #b30000;
   }
 }
 
