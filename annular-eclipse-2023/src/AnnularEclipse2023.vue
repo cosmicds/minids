@@ -1497,7 +1497,7 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
         '--app-content-height': this.showInfoSheet ? '100%' : '100%',
-        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
+        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
         '--moon-color': this.moonColor,
       };
     },
@@ -2219,7 +2219,7 @@ export default defineComponent({
 
     updateGuidedContentHeight() {
       let guidedContentContainer = null as HTMLElement | null;
-        guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+      guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
       
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
@@ -2398,6 +2398,11 @@ export default defineComponent({
   },
 
   watch: {
+
+    cssVars(_css) {
+      // console.log(_css);
+    },
+    
     showAltAzGrid(show: boolean) {
       this.wwtSettings.set_showAltAzGrid(show);
       this.wwtSettings.set_showAltAzGridText(show);
@@ -2643,6 +2648,7 @@ body {
   width: 100%;
   height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
+  // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
 }
@@ -2652,14 +2658,16 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  position: relative;
 
   .wwtelescope-component {
     position: relative;
     // top: 0;
     width: 100%;
     height: 100%;
-    border-style: none;
-    border-width: 0;
+    // border-style: none;
+    // border-width: 0;
+    // border: 3px solid red;
     margin: 0;
     padding: 0;
   }
@@ -2794,12 +2802,14 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
+  top: auto;
   bottom: 0.5rem;
   right: 0.5rem;
   width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
+  // outline: 1px solid lime;
 }
 
 #tools {
@@ -3303,18 +3313,13 @@ body {
   --top-content-max-height: max(30vmin, 35vh);
   
   @media (max-width: 600px) {
-    --top-content-max-height: max(40vmin, 50vh);
+    --top-content-max-height: max(40vmin, 40vh);
   }
   
   font-size: var(--default-font-size);
   @media (max-width: 350px) and (max-height: 600px) {
       font-size: min(3vw, 1.75vh);
   }
-  
-  // @media (min-aspect-ratio: 1) and (max-width: 600px) {
-  //   font-size: min(3vw, 3vh);
-  //   --top-content-max-height: max(30vmin, 35vh);
-  // }
   
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
@@ -3365,6 +3370,9 @@ body {
 
   #non-map-container { // Keep content away from the x to close
     --padding-left: 0.5rem;
+    @media (max-width: 600px) {
+      --padding-left: 0;
+    }
     padding-left: var(--padding-left);
     padding-right: calc(var(--padding-left) + var(--container-padding));
     
@@ -3459,17 +3467,22 @@ body {
   position: relative;
   --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
   height: 100%;
-  // max-height: var(--map-max-height);
   width: 100%;
-  aspect-ratio: 5/3;
+  // outline: 1px solid red;
+  @media (max-width: 600px) {
+      aspect-ratio: 5/3;
+    }
   
-  // @media (max-aspect-ratio: 3/5) {
-  //   aspect-ratio: 3 / 5;
-  // }
 
   #map-container {
     height: 100%;
     width: 100%;
+    overflow-y: auto;
+    
+    .map-container {
+      height: 100%;
+      width: 100%;
+    }
   
   
     span {
@@ -3481,10 +3494,10 @@ body {
       display: block;
       max-width: 100%;
       max-height: 100%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
+      // position: absolute;
+      // top: 50%;
+      // left: 50%;
+      // transform: translateX(-50%) translateY(-50%);
       
       
     }
