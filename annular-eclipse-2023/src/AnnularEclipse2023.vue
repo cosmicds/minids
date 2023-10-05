@@ -2808,7 +2808,7 @@ body {
   flex-direction: column;
   position: absolute;
   top: auto;
-  bottom: 0.5rem;
+  bottom: 1rem;
   right: 0.5rem;
   width: calc(100% - 1rem);
   pointer-events: none;
