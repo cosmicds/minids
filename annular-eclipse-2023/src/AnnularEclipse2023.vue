@@ -568,7 +568,6 @@
           fa-icon="share-nodes"
           :color="accentColor"
           :focus-color="accentColor"
-          background-color="transparent"
           :box-shadow="false"
           tooltip-text="Share view of this location"
           @activate="copyShareURL"
