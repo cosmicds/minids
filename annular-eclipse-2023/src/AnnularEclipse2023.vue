@@ -226,7 +226,7 @@
       size="lg"
       class="ma-1"
       :color="accentColor"
-      :icon="`gear`"
+      :icon="`circle-info`"
       @click="() => {
         console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;

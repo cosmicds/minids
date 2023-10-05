@@ -51,6 +51,7 @@ import {
   faShareNodes,
   faSquareXmark,
   faToolbox,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -75,6 +76,7 @@ library.add(faMountainSun);
 library.add(faShareNodes);
 library.add(faSquareXmark);
 library.add(faToolbox);
+library.add(faCircleInfo);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
