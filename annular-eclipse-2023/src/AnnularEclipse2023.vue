@@ -3309,6 +3309,16 @@ body {
     --top-content-max-height: max(40vmin, 50vh);
   }
   
+  font-size: var(--default-font-size);
+  @media (max-width: 350px) and (max-height: 600px) {
+      font-size: min(3vw, 1.75vh);
+  }
+  
+  // @media (min-aspect-ratio: 1) and (max-width: 600px) {
+  //   font-size: min(3vw, 3vh);
+  //   --top-content-max-height: max(30vmin, 35vh);
+  // }
+  
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
   --container-padding: 0.5rem;
@@ -3318,6 +3328,7 @@ body {
 
   width: calc(100% - 2*var(--margin));
   max-height: var(--top-content-max-height);
+  min-height: 200px;
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
@@ -3325,14 +3336,19 @@ body {
   user-select: none;
   border: solid 1.5px var(--accent-color);
   
-  font-size: var(--default-font-size);
+  
+  
   line-height: var(--default-line-height);
-  overflow-y: auto;
+  overflow-y: auto ;
   
   transition: height 0.5s ease-in-out;
   
   display: flex;
   flex-direction: row;
+  
+  @media (max-width: 600px) and (max-aspect-ratio: 1) {
+    flex-direction: column;
+  }
   
   #non-map-container {
     flex-basis: 100%;
@@ -3347,9 +3363,7 @@ body {
     align-items: center;
   }
   
-  @media (max-width: 600px) {
-    flex-direction: column;
-  }
+  
 
 
   #non-map-container { // Keep content away from the x to close
@@ -3378,7 +3392,7 @@ body {
     color: var(--accent-color);
     font-weight: bold;
     text-align: right;
-    font-size: calc(1.3 * var(--default-font-size));
+    font-size: 1.3em;
 
   }
     
@@ -3451,7 +3465,11 @@ body {
   height: 100%;
   // max-height: var(--map-max-height);
   width: 100%;
-  aspect-ratio: 5 / 3;
+  
+  
+  @media (max-width: 600px) {
+    aspect-ratio: 3 / 5;
+  }
 
   #map-container {
     position: static;
