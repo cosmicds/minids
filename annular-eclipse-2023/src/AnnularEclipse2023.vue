@@ -310,7 +310,7 @@
                     <details>
                       <summary> Total vs. Annular Eclipse</summary>
                       <p>
-                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an Annular Eclipse.
                       </p>
                     </details>
                     
@@ -320,14 +320,14 @@
                         An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
                       </p>
                       <p> 
-                        The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                        The animated figure shows that the Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience an annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse.
                       </p> 
                     </details>
                   </div>
                 </div>
               <figure>
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth. The Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience the annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse."/>
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
               </figure>
             </v-container>
