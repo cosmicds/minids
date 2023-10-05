@@ -40,7 +40,7 @@
             </div>
 
         </div>
-        <div id="instructions-row" class="non-map-row">
+        <div id="instructions-row" :class='["non-map-row", (collapseText && !smAndUp) ? "non-map-row-collapse" : ""]'>
           <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
@@ -127,6 +127,17 @@
             </div>
           </div>
         </div>
+      <v-btn
+        v-if="!smAndUp"
+        id="toggle-instructution-text"
+        :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
+        :color="accentColor"
+        @click="collapseText = (!collapseText || smAndUp)"
+        variant="flat"
+        density="compact"
+        size="small"
+        />
+      <!-- </toggle-content> -->
         <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
@@ -1315,6 +1326,9 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
 
+      collapseText: false,
+      
+      
       viewerMode: 'SunScope' as ViewerMode,
 
       showSky: true,
@@ -3376,9 +3390,9 @@ body {
 
   #non-map-container { // Keep content away from the x to close
     --padding-left: 0.5rem;
-    @media (max-width: 600px) {
-      --padding-left: 0;
-    }
+    // @media (max-width: 600px) {
+    //   --padding-left: 0;
+    // }
     padding-left: var(--padding-left);
     padding-right: calc(var(--padding-left) + var(--container-padding));
     
@@ -3388,6 +3402,7 @@ body {
     align-items: flex-end;
     gap: 0.5em;
     
+    position: relative;
     
     .non-map-row {
       margin: 0;
@@ -3406,14 +3421,28 @@ body {
     font-size: 1.3em;
 
   }
+  
+  .v-btn#toggle-instructution-text {
+    position: absolute;
+    right: 0;
+    top: 1rem;
+    // transform: translate(-25%, 75%);
+  }
     
     // .v-row.non-map-row#instructions-row
   #instructions-row { 
+    
+    position: relative;
     display: flex;
     flex-grow: 0.5;
     border: 1.5px solid var(--sky-color);
     border-radius: 5px;
     align-items: center;
+
+    &.non-map-row-collapse {
+      height: 5ch;
+      overflow-y: auto;
+    }
     
     // v-col
     #top-container-main-text { 
@@ -3483,11 +3512,11 @@ body {
   #map-container {
     height: 100%;
     width: 100%;
-    overflow-y: auto;
     
     .map-container {
       height: 100%;
       width: 100%;
+      aspect-ratio: 5/3;
     }
   
   
