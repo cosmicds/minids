@@ -2219,17 +2219,14 @@ export default defineComponent({
 
     updateGuidedContentHeight() {
       let guidedContentContainer = null as HTMLElement | null;
-      if (this.showGuidedContent) { 
         guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
-      } else {
-        guidedContentContainer = document.getElementById('closed-top-container') as HTMLElement;
-      }
       
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
         console.log("height", height);
         this.guidedContentHeight = `${height}px`;
-        
+      } else {
+        this.guidedContentHeight = '0px';
       }
     },
     
