@@ -2939,11 +2939,22 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding-left: calc(0.5 * var(--default-line-height));
 
     .v-checkbox .v-selection-control {
       font-size: calc(1.1 * var(--default-font-size));
       height: calc(1.2 * var(--default-line-height));
       min-height: calc(1.2 * var(--default-line-height));
+    }
+
+    .v-checkbox .v-selection-control__input {
+      width: calc(1.2 * var(--default-line-height));
+      height: calc(1.2 * var(--default-line-height));
+    }
+
+    .v-checkbox .v-selection-control__wrapper {
+      width: calc(1.2 * var(--default-line-height));
+      height: calc(1.2 * var(--default-line-height));
     }
 
     .v-btn {
