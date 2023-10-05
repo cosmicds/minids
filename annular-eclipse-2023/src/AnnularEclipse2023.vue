@@ -175,7 +175,7 @@
               ></icon-button>
               <icon-button
                 v-model="showWWTGuideSheet"
-                fa-icon="computer-mouse"
+                fa-icon="toolbox"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -624,7 +624,7 @@
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="computer-mouse"
+                icon="toolbox"
               /> User guide 
             </v-col>
         </v-row>
@@ -714,7 +714,7 @@
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
+                    <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about how to navigate this app. 
                 </v-list-item>
