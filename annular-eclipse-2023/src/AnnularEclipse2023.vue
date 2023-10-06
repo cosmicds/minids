@@ -625,7 +625,7 @@
             @click="closeSplashScreen"
             >&times;</div>
           <div id="splash-screen-text">
-            <p>WATCH the October </p>
+            <p>WATCH the October 14</p>
             <p class="highlight"> Annular Eclipse </p>
           </div>
         </div>
