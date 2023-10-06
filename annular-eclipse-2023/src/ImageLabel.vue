@@ -87,6 +87,16 @@ export default defineComponent({
       default: null
     },
 
+    fontWeight: {
+      type: String,
+      default: null
+    },
+
+    lineHeight: {
+      type: String,
+      default: null
+    },
+
     border: {
       type: String,
       default: null
@@ -141,6 +151,7 @@ export default defineComponent({
         width: `calc(${this.width}-2px)`,
         height: this.height,
         border: this.border,
+        borderRadius: this.borderRadius
       };
 
       if (this.hovered && this.hoveredBorder) {
@@ -164,6 +175,8 @@ export default defineComponent({
 
       let css = {
         fontSize: this.fontSize,
+        fontWeight: this.fontWeight,
+        lineHeight: this.lineHeight
       } as object as Record<string, string>;
 
       if (this.hovered || this.focused) {
@@ -184,7 +197,7 @@ export default defineComponent({
     },
 
     backgroundCSS() {
-      const css = { backgroundColor: this.backgroundColor, opacity: this.backgroundOpacity };
+      const css = { backgroundColor: this.backgroundColor, opacity: this.backgroundOpacity};
       
       return css;
     }

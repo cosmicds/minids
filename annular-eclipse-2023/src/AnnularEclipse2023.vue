@@ -13,7 +13,7 @@
       :color="accentColor"
       :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
       @click="() => {
-        console.log('showGuidedContent = ', showGuidedContent);
+        // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
         onResize();
       }"
@@ -47,7 +47,7 @@
               <span class="description">
                 <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse.</p>
+                <p>Explore until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
@@ -66,19 +66,20 @@
                 :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
                 @select="onAnswerSelected"
-                colorWrong="#4a2323"
-                colorRight="green"
+                colorWrong="transparent"
+                colorRight="transparent"
                 > 
                 <!-- for images width=100px, height=58px for correct aspect ratio -->
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      width="11vw"
-                      height="6vh"
+                      :width="(xSmallSize ? `21vw` : `12vw`)"
+                      height="9vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
                       tabindex="0"
                       role="button"
+                      borderRadius="5px"
                       >
                       <template v-slot:front>
                       <image-label 
@@ -87,10 +88,12 @@
                         :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
-                        fontSize="4vh"
-                        width="11vw"
-                        height="6vh"
-                        :border="selected ? '1px solid white' : null"
+                        fontSize="5vh"
+                        fontWeight="bold"
+                        :width="(xSmallSize ? `21vw` : `12vw`)"
+                        height="9vh"
+                        :border="'1px solid white'"
+                        borderRadius="5px"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
                       {{ text }}
@@ -102,10 +105,13 @@
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          width="12vw"
-                          height="7vh"
-                          fontSize="min(1.5vh,1.5vw)"
-                          :border="selected ? '1px solid white' : null"
+                          :width="(xSmallSize ? `21vw` : `12vw`)"
+                          height="9vh"
+                          :fontSize="(xSmallSize ? `min(2vh,2.5vw)` : `min(1.6vh,1.6vw)`)"
+                          fontWeight="bold"
+                          lineHeight="(xSmallSize ? `min(2.2vh,2.7vw)` : `min(1.8vh,1.8vw)`)"
+                          :border="'1px solid white'"
+                          borderRadius="5px"
                         >
                         <span v-html="feedback"></span>
                         </image-label>
@@ -113,6 +119,9 @@
                   </flip-transition>
                 </template>
               </mc-radiogroup>
+              <div v-if="showLinkToPath" class="my-1">
+                See NASA's map with the October annular eclipse path <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">here.</a>
+              </div>
             </div>
             
             <!-- Choose Path -->
@@ -584,7 +593,7 @@
           tooltip-text="Share view of this location"
           :show-tooltip="!mobile"
           @activate="copyShareURL"
-          faSize="md"
+          faSize="1x"
         ></icon-button>
       </div>
     </div>
@@ -700,33 +709,32 @@
                 In this interactive page you can:
               </p>
               
-              <ul
-              >
-                <v-list-item>
+              <ul>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Explore what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world. See and share how the eclipse would look from there.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about solar eclipses. 
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
@@ -918,7 +926,7 @@
               tooltip-text="Play/Pause"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -934,7 +942,7 @@
               tooltip-text="10x slower"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -950,7 +958,7 @@
               tooltip-text="10x faster"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -966,7 +974,7 @@
               tooltip-text="Reset"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <div id="speed-text">
@@ -1010,7 +1018,7 @@
               tooltip-location="bottom"
               tooltip-offset="5px"
               :show-tooltip="!mobile"
-              mdSize="0.8em"
+              mdSize="1em"
             >
             </icon-button>
           </div>
@@ -1115,7 +1123,7 @@
       </v-card>
     </v-dialog>
 
-  <notifications group="copy-url" position="center top" classes="url-notification"  ignoreDuplicates="true"/>
+  <notifications group="copy-url" position="center top" classes="url-notification"/>
   </div>
 </v-app>
 </template>
@@ -1229,12 +1237,12 @@ export default defineComponent({
   data() {
     const annularEclipseTimeNMTZ = new Date("2023-10-14T10:48");
     const _annularEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
-    console.log("min/max time UTC", minTime, maxTime);
-    const minutc = new Date(minTime);
-    const maxutc = new Date(maxTime);
-    console.log("Date(min/maxTime):", minutc, maxutc);
-    console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
-    console.log("date:", annularEclipseTimeNMTZ);
+    // console.log("min/max time UTC", minTime, maxTime);
+    // const minutc = new Date(minTime);
+    // const maxutc = new Date(maxTime);
+    // console.log("Date(min/maxTime):", minutc, maxutc);
+    // console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
+    // console.log("date:", annularEclipseTimeNMTZ);
 
     const sunPlace = new Place();
     sunPlace.set_names(["Sun"]);
@@ -1428,7 +1436,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false,  
+      showEclipsePercentage: false, 
+      showLinkToPath: false, 
       
       toggleTrackSun: true,
       
@@ -1513,9 +1522,9 @@ export default defineComponent({
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
+      // console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
-      console.log(this);
+      // console.log(this);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -1576,7 +1585,7 @@ export default defineComponent({
 
       this.setTimeforSunAlt(10); // 10 degrees above horizon
       
-      console.log("selected time", this.selectedTime);
+      // console.log("selected time", this.selectedTime);
 
       setInterval(() => {
         if (this.playing) {
@@ -1634,6 +1643,9 @@ export default defineComponent({
     },
     smAndUp(): boolean {
       return this.$vuetify.display.smAndUp;
+    },
+    xSmallSize(): boolean {
+      return this.$vuetify.display.xs;
     },
     
     mobile(): boolean {
@@ -1697,7 +1709,7 @@ export default defineComponent({
 
     maxPlaybackRate(): number {
       const minDuration = 10; //min setInterval on Chrome is ~5ms
-      console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
+      // console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
       return MILLISECONDS_PER_INTERVAL / minDuration;
     },
     
@@ -2075,7 +2087,7 @@ export default defineComponent({
       if (location == null) {
         return;
       }
-      console.log("updateLocation", location);
+      // console.log("updateLocation", location);
       this.selectedLocation = location;
       this.location = {
         latitudeRad: this.eclipsePathLocations[location].latitudeRad,
@@ -2088,7 +2100,7 @@ export default defineComponent({
       if (location == null) {
         return;
       }
-      console.log("updateLocationFromMap", location);
+      // console.log("updateLocationFromMap", location);
       this.selectedLocation = USER_SELECTED;
       this.locationDeg = location;
 
@@ -2136,16 +2148,19 @@ export default defineComponent({
     },
 
     onAnswerSelected(event: MCSelectionStatus) {
+      if(event.text=="C") {
+        this.showLinkToPath = true;
+      }
       this.mcResponses.push(event.text);
       this.sendDataToDatabase();
     },
 
     logLocation() {
-      console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
+      // console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
     },
     
     logPosition() {
-      console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
+      // console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
     printUTCDate(date: Date) {
@@ -2391,7 +2406,7 @@ export default defineComponent({
       
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
-        console.log("height", height);
+        // console.log("height", height);
         this.guidedContentHeight = `${height}px`;
       } else {
         this.guidedContentHeight = '0px';
@@ -2421,7 +2436,7 @@ export default defineComponent({
         trackObject: this.toggleTrackSun
       });
       this.playbackRate = this.horizonRate;
-      console.log('=== startHorizonMode ===');
+      // console.log('=== startHorizonMode ===');
       return;
     },
 
@@ -2442,7 +2457,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: true
       });
-      console.log('=== startSolarScopeMode ===');
+      // console.log('=== startSolarScopeMode ===');
       return;
     },
   
@@ -2482,8 +2497,8 @@ export default defineComponent({
     
     setTimeforSunAlt(altDeg: number) {
       const out = this.getTimeforSunAlt(altDeg);
-      console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
-      console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
+      // console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
+      // console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
       if (out.rising == null && out.setting == null) {
         return;
       }
@@ -2512,7 +2527,7 @@ export default defineComponent({
     },
 
     getplaybackRate(rate: string) {
-      console.log('setplaybackRate', rate);
+      // console.log('setplaybackRate', rate);
       // parse a string that looks like "x [time] per y [time]"
       // e.g. "1 second per 1 minute"
       // returns a number that is the ratio of the two times converted to seconds/seconds
@@ -2552,7 +2567,8 @@ export default defineComponent({
             group: "copy-url",
             type: "success",
             text: "URL copied to clipboard. Paste to share with friends!",
-            duration: 5000
+            duration: 5000,
+            ignoreDuplicates: true
           })
         )
         .catch((_err) =>
@@ -2560,7 +2576,8 @@ export default defineComponent({
             group: "copy-url",
             type: "error",
             text: "Failed to copy URL",
-            duration: 5000
+            duration: 5000,
+            ignoreDuplicates: true
           })
         );
     },
@@ -2680,18 +2697,18 @@ export default defineComponent({
 
     selectedLocation(locname: string) {
       if (!(locname in this.eclipsePathLocations)) {
-        console.log(`location ${locname} not found in eclipsePathLocations`);
+        // console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
       }
       if (locname !== USER_SELECTED) {
         this.presetLocationsVisited.push(locname);
         this.sendDataToDatabase();
       }
-      console.log("selected location", locname);
+      // console.log("selected location", locname);
     },
 
     playing(play: boolean) {
-      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      // console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
       this.setClockSync(play);
     },
 
@@ -2721,7 +2738,7 @@ export default defineComponent({
     },
 
     sunAboveHorizon(isAbove: boolean) {
-      console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
+      // console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
@@ -2743,7 +2760,7 @@ export default defineComponent({
 
     toggleTrackSun(val: boolean) {
       // this turns of sun tracking
-      console.log("toggleTrackSun", val);
+      // console.log("toggleTrackSun", val);
       if (val) {
         this.trackSun();
         return;
@@ -3235,8 +3252,8 @@ body {
 
   #close-splash-button {
     position: absolute;
-    top: 0;
-    right: 2.5rem;
+    top: 0.5rem;
+    right: 1.75rem;
     text-align: end;
     color: var(--accent-color);
     font-size: min(8vw, 5vh);
@@ -3255,7 +3272,7 @@ body {
   }
 
   #splash-screen-guide {
-    margin-block: 1em;
+    margin-block: 1.5em;
     font-size: min(5vw, 4vh);
     line-height: 140%;
     width: 75%;
@@ -3271,7 +3288,8 @@ body {
   }
 
   #splash-screen-acknowledgements {
-    font-size: calc(2 * var(--default-font-size));
+    font-size: calc(1.7 * var(--default-font-size));
+    line-height: calc(1.5 * var(--default-line-height));
     width: 70%; 
   }
 
@@ -3661,11 +3679,16 @@ body {
       overflow-y: auto;
     }
     
+    #mc-radiogroup-container {
+      padding-block: 0.5em;
+    }
     // v-col
     #top-container-main-text { 
     
       // div
       .instructions-text {
+
+        min-width: 40vw;  // so quiz cards don't crash into each other on some screen sizes
         
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
@@ -3681,6 +3704,11 @@ body {
           }
         }
       }
+    }
+    a {
+      color: #ff00ff;
+      text-decoration: none;
+      font-weight: bold;
     }
   }
 
@@ -3804,8 +3832,8 @@ body {
                             rgb(30 70 90));
 
   
-    font-size: calc(1.1 * var(--default-font-size));
-    line-height: var(--default-line-height);
+  font-size: calc(1.1 * var(--default-font-size));
+  line-height: var(--default-line-height);
 
   .v-list-item__prepend {
     margin-right: 0.75em;
@@ -3986,7 +4014,11 @@ body {
   }
 
   .v-btn--size-default {
-      font-size: var(--default-font-size);
+      font-size: calc(0.9 * var(--default-font-size));
     }  
+
+  .v-card-actions .v-btn {
+    padding: 0 4px;
+  }
 }
 </style>
