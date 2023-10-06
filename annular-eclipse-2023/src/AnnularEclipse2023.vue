@@ -337,6 +337,13 @@
                         The animated figure shows that the Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience an annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse.
                       </p> 
                     </details>
+                    
+                    <details>
+                      <summary>Where can I learn more?</summary>
+                      <p>
+                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse.
+                      </p>
+                    </details>
                   </div>
                 </div>
               <figure>
