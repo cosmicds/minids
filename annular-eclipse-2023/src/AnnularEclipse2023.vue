@@ -1603,6 +1603,9 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+
+    this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
+    
   },
 
   computed: {
@@ -2444,7 +2447,7 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(false);
       this.showAltAzGrid = false;
       this.skyColor = this.skyColorNight;
-      this.horizonOpacity = 0.6;
+      this.horizonOpacity = this.sunPosition.altRad > (0 + 0.5 * D2R) ? 1 : 0.6;
       this.updateFrontAnnotations(); // manually update horizon
       this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
@@ -2492,8 +2495,7 @@ export default defineComponent({
         'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : rising,
         'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : setting
       };
-    },
-    
+    }, 
     
     setTimeforSunAlt(altDeg: number) {
       const out = this.getTimeforSunAlt(altDeg);
@@ -2524,6 +2526,19 @@ export default defineComponent({
       }
       
 
+    },
+
+    updateSkyOpacityForSunAlt(altRad: number) {
+      const _civilTwilight = -6 * D2R;
+      // const _nauticalTwilight = 2 * _civilTwilight;
+      const astronomicalTwilight = 3 * _civilTwilight;
+      
+      const sunAlt = altRad;
+      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.updateMoonTexture();
+
+      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.setForegroundOpacity(dssOpacity * 100);
     },
 
     getplaybackRate(rate: string) {
@@ -2745,16 +2760,7 @@ export default defineComponent({
 
     sunPosition(pos: EquatorialRad & HorizontalRad) {
 
-      const _civilTwilight = -6 * D2R;
-      // const _nauticalTwilight = 2 * _civilTwilight;
-      const astronomicalTwilight = 3 * _civilTwilight;
-      
-      const sunAlt = pos.altRad;
-      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
-      this.updateMoonTexture();
-
-      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
-      this.setForegroundOpacity(dssOpacity * 100);
+      this.updateSkyOpacityForSunAlt(pos.altRad);
       return;
     },
 
