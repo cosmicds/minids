@@ -1123,7 +1123,7 @@
       </v-card>
     </v-dialog>
 
-  <notifications group="copy-url" position="center top" classes="url-notification"  ignoreDuplicates="true"/>
+  <notifications group="copy-url" position="center top" classes="url-notification"/>
   </div>
 </v-app>
 </template>
@@ -2567,7 +2567,8 @@ export default defineComponent({
             group: "copy-url",
             type: "success",
             text: "URL copied to clipboard. Paste to share with friends!",
-            duration: 5000
+            duration: 5000,
+            ignoreDuplicates: true
           })
         )
         .catch((_err) =>
@@ -2575,7 +2576,8 @@ export default defineComponent({
             group: "copy-url",
             type: "error",
             text: "Failed to copy URL",
-            duration: 5000
+            duration: 5000,
+            ignoreDuplicates: true
           })
         );
     },
