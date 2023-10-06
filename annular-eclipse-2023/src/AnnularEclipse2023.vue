@@ -5,28 +5,28 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
+  <div id="closed-top-container">
+    <font-awesome-icon
+      v-model="showGuidedContent"
+      :size="showGuidedContent ? 'xl' : 'lg'"
+      class="ma-1"
+      :color="accentColor"
+      :icon="showGuidedContent ? 'square-xmark' : 'gear'"
+      @click="() => {
+        console.log('showGuidedContent = ', showGuidedContent);
+        showGuidedContent = !showGuidedContent;
+        onResize();
+      }"
+      @keyup.enter="showGuidedContent = !showGuidedContent"
+      tabindex="0"
+      tooltip-location="start"
+    /> 
+  </div>
   <v-container id="guided-content-container" v-if="showGuidedContent">
-    <div id="close-guided-content-container">
-      <font-awesome-icon
-        v-model="showGuidedContent"
-        size="xl"
-        class="ma-1"
-        :color="accentColor"
-        :icon="`square-xmark`"
-        @click="() => {
-          console.log('showGuidedContent = ', showGuidedContent);
-          showGuidedContent = !showGuidedContent;
-          onResize();
-        }"
-        @keyup.enter="showGuidedContent = !showGuidedContent"
-        tabindex="0"
-        tooltip-location="start"
-      /> 
-    </div>
-    <v-row>
-      <v-col cols="6" id="non-map-container">
-        <v-row id="title-row" class="non-map-row">
-          <v-col>
+    
+    <div id="non-map-container">
+        <div id="title-row" class="non-map-row">
+
             <div id="title">
               <span v-if="learnerPath=='Explore'"
                 >Watch and Compare
@@ -38,14 +38,14 @@
                 >Choose Any Location
               </span>
             </div>
-          </v-col>
-        </v-row>
-        <v-row id="instructions-row" class="non-map-row">
-          <v-col id="top-container-main-text">
+
+        </div>
+        <div id="instructions-row" :class='["non-map-row", (collapseText && !smAndUp) ? "non-map-row-collapse" : ""]'>
+          <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData">Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
                 <p>Explore until you can identify which locations will see an annular eclipse.</p>
               </span>
@@ -125,9 +125,20 @@
                 <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
               </span>
             </div>
-          </v-col>
-        </v-row>
-        <v-row id="button-row" class="non-map-row">
+          </div>
+        </div>
+      <v-btn
+        v-if="!smAndUp"
+        id="toggle-instruction-text"
+        :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
+        :color="transparent"
+        @click="collapseText = (!collapseText || smAndUp)"
+        variant="flat"
+        density="compact"
+        size="x-small"
+        />
+      <!-- </toggle-content> -->
+        <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
             <div id="top-container-buttons">
               <icon-button
@@ -138,6 +149,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'View eclipse from multiple locations'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
@@ -149,6 +161,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Choose any viewing location'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
@@ -160,6 +173,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="'Identify eclipse path'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
@@ -171,6 +185,7 @@
                 :focus-color="accentColor"
                 :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
               ></icon-button>
               <icon-button
@@ -181,62 +196,53 @@
                 :focus-color="accentColor"
                 :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
                 :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
                 :box-shadow="false"
               ></icon-button>
             </div>
           <!-- </v-col> -->
-        </v-row>
-      </v-col>
-      <v-col cols="6" id="map-column">
-        <div id="map-container" >
-          <location-selector
-            v-if="learnerPath == 'Explore'"
-            :model-value="locationDeg"
-            @place="(place: typeof places[number]) => updateLocation(place.name)"
-            :detect-location="false"
-            :map-options="presetMapOptions"
-            :places="places"
-            :initial-place="places.find(p => p.name === 'selectedLocation')"
-            :place-circle-options="placeCircleOptions"
-            :selected-circle-options="selectedCircleOptions"
-            :selectable="false"
-            class="leaflet-map"
-          ></location-selector>
-
-          <span v-if="learnerPath=='Answer'">
-            <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
-          </span>
-
-          <location-selector
-            v-if="learnerPath == 'Choose'"
-            :model-value="locationDeg"
-            @update:modelValue="updateLocationFromMap"
-            :detect-location="false"
-            :map-options="userSelectedMapOptions"
-            :selected-circle-options="selectedCircleOptions"
-            class="leaflet-map"
-          ></location-selector>
         </div>
-      </v-col>
-    </v-row>
+      </div>
+      <div id="map-column">
+      <v-hover v-slot="{isHovering, props}">
+        <v-btn v-bind="props" v-if="false &&!isHovering && !smAndUp" color="blue" :width="'100%'">Tap here to reveal map</v-btn>
+        <v-slide-y-transition
+          :disabled="smAndUp"
+        >
+          <div v-if="!smAndUp || smAndUp" id="map-container" >
+            <location-selector
+              v-if="learnerPath == 'Explore'"
+              :model-value="locationDeg"
+              @place="(place: typeof places[number]) => updateLocation(place.name)"
+              :detect-location="false"
+              :map-options="presetMapOptions"
+              :places="places"
+              :initial-place="places.find(p => p.name === 'selectedLocation')"
+              :place-circle-options="placeCircleOptions"
+              :selected-circle-options="selectedCircleOptions"
+              :selectable="false"
+              class="leaflet-map"
+            ></location-selector>
+
+            <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
+              <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
+            </span>
+
+            <location-selector
+              v-if="learnerPath == 'Choose'"
+              :model-value="locationDeg"
+              @update:modelValue="updateLocationFromMap"
+              :detect-location="false"
+              :map-options="userSelectedMapOptions"
+              :selected-circle-options="selectedCircleOptions"
+              class="leaflet-map"
+            ></location-selector>
+          </div>
+        </v-slide-y-transition>
+      </v-hover>
+    </div>
   </v-container>
-  <div v-if="!showGuidedContent" id="closed-top-container">
-    <font-awesome-icon
-      v-model="showGuidedContent"
-      size="lg"
-      class="ma-1"
-      :color="accentColor"
-      :icon="`circle-info`"
-      @click="() => {
-        console.log('showGuidedContent = ', showGuidedContent);
-        showGuidedContent = !showGuidedContent;
-        onResize();
-      }"
-      @keyup.enter="showGuidedContent = !showGuidedContent"
-      tabindex="0"
-      tooltip-location="start"
-    /> 
-  </div>
+  
   
   
 
@@ -340,15 +346,14 @@
       scrim="false"
       transition="slide-y-transition"
       v-model="showWWTGuideSheet" 
-      class='bottom-sheet'
+      class="bottom-sheet"
       id="wwt-guide-sheet"
       :style="cssVars"
     >
-      <v-card
-        class="bottom-sheet-card">
+      <v-card class="bottom-sheet-card">
         <v-tabs
           v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
+          height="clamp(25px, min(5vh, 5vw), 32px)"
           :color="accentColor"
           :slider-color="accentColor"
           id="tabs"
@@ -578,6 +583,7 @@
           :focus-color="accentColor"
           :box-shadow="false"
           tooltip-text="Share view of this location"
+          :show-tooltip="!mobile"
           @activate="copyShareURL"
           faSize="md"
         ></icon-button>
@@ -785,6 +791,7 @@
             location="left"
             :color="accentColor"
             :style="cssVars"
+            :disabled="mobile"
           >
           <template v-slot:activator="{props}">
             <div 
@@ -814,6 +821,7 @@
               location="left"
               :color="accentColor"
               :style="cssVars"
+              :disabled="mobile"
             >
             <template v-slot:activator="{props}">
               <div 
@@ -912,6 +920,7 @@
               tooltip-location="top"
               tooltip-offset="5px"
               faSize="md"
+              :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
               id="speed-down"
@@ -927,6 +936,7 @@
               tooltip-location="top"
               tooltip-offset="5px"
               faSize="md"
+              :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
               id="speed-up"
@@ -942,6 +952,7 @@
               tooltip-location="top"
               tooltip-offset="5px"
               faSize="md"
+              :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
               id="reset"
@@ -957,6 +968,7 @@
               tooltip-location="top"
               tooltip-offset="5px"
               faSize="md"
+              :show-tooltip="!mobile"
             ></icon-button>
             <div id="speed-text">
               Time rate: 
@@ -989,6 +1001,20 @@
               {{ toTimeString(new Date(item.modelValue)) }}
             </template>
           </v-slider>
+          <div id="change-optout">
+            <icon-button
+              md-icon="mdi-lock"
+              @activate="() => showPrivacyDialog = true"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="Change privacy settings"
+              tooltip-location="bottom"
+              tooltip-offset="5px"
+              :show-tooltip="!mobile"
+              mdSize="0.8em"
+            >
+            </icon-button>
+          </div>
           <!-- <icon-button
             id="set-time-now-button"
             @activate="() => {
@@ -1001,6 +1027,7 @@
             tooltip-text="Go to current time"
             tooltip-location="top"
             tooltip-offset="5px"
+            :show-tooltip="!mobile"
           >
             <template v-slot:button>
               Now
@@ -1045,7 +1072,49 @@
       </div>
     </div>
 
-    <!-- This contains the informational content that is displayed when the book icon is clicked. -->
+
+    <!-- Data collection opt-out dialog -->
+    <v-dialog
+      scrim="false"
+      v-model="showPrivacyDialog"
+      max-width="400px"
+      id="privacy-popup-dialog"
+    >
+      <v-card>
+        <v-card-text>
+          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses.
+        </v-card-text>
+        <v-card-actions class="pt-3">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="#BDBDBD"
+            href="https://www.cfa.harvard.edu/privacy-statement"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+          Privacy Policy
+          </v-btn>
+          <v-btn
+            color="#ff6666"
+            @click="() => {
+              responseOptOut = true;
+              showPrivacyDialog = false;
+            }"
+          >
+          Opt out
+          </v-btn>
+          <v-btn 
+            color="green"
+            @click="() => {
+              responseOptOut = false;
+              showPrivacyDialog = false;
+            }"
+          >
+            Allow
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   <notifications group="copy-url" position="center top" classes="url-notification"  ignoreDuplicates="true"/>
   </div>
@@ -1193,11 +1262,12 @@ export default defineComponent({
     const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
     window.localStorage.setItem(UUID_KEY, uuid);
 
-    const responseOptOut = window.localStorage.getItem(OPT_OUT_KEY) === "true" ?? false;
+    const storedOptOut = window.localStorage.getItem(OPT_OUT_KEY);
+    const responseOptOut = typeof storedOptOut === "string" ? storedOptOut === "true" : null;
 
     return {
       uuid,
-      responseOptOut,
+      responseOptOut: responseOptOut as boolean | null,
       mcResponses: [] as string[],
 
       showSplashScreen: true,
@@ -1237,10 +1307,10 @@ export default defineComponent({
       syncDateTimewithSelectedTime: true,
 
       presetMapOptions: {
-        templateUrl: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}",
+        templateUrl: "https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg",
         minZoom: 1,
         maxZoom: 16,
-        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+        attribution: 'Maptiles by Stamen Design, under <a target="_blank" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="https://www.openstreetmap.org/#map=4/38.01/-95.84">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/2.0">CC BY-SA 2.0</a>',
         ext: 'jpg',
         ...initialView
       },
@@ -1374,9 +1444,14 @@ export default defineComponent({
       showGuidedContent: true,
       inIntro: false,
 
+      showPrivacyDialog: false,
+
       tab: 0,
       introSlide: 1,
 
+      collapseText: false,
+      
+      
       viewerMode: 'SunScope' as ViewerMode,
 
       showSky: true,
@@ -1504,6 +1579,14 @@ export default defineComponent({
       
       console.log("selected time", this.selectedTime);
 
+      setInterval(() => {
+        if (this.playing) {
+          const time = this.wwtCurrentTime;
+          this.selectedTime = time.getTime();
+          this.updateFrontAnnotations(time);
+        }
+      }, 500);
+      
     });
 
     this.$nextTick(() => {
@@ -1550,6 +1633,10 @@ export default defineComponent({
     smallSize(): boolean {
       return this.$vuetify.display.smAndDown;
     },
+    smAndUp(): boolean {
+      return this.$vuetify.display.smAndUp;
+    },
+    
     mobile(): boolean {
       return this.smallSize && this.touchscreen;
     },
@@ -1558,7 +1645,7 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--sky-color': this.skyColorLight,
         '--app-content-height': this.showInfoSheet ? '100%' : '100%',
-        '--top-content-height': this.inIntro ? '0px' : (this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight),
+        '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
         '--moon-color': this.moonColor,
       };
     },
@@ -2301,17 +2388,14 @@ export default defineComponent({
 
     updateGuidedContentHeight() {
       let guidedContentContainer = null as HTMLElement | null;
-      if (this.showGuidedContent) { 
-        guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
-      } else {
-        guidedContentContainer = document.getElementById('closed-top-container') as HTMLElement;
-      }
+      guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
       
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
         console.log("height", height);
         this.guidedContentHeight = `${height}px`;
-        
+      } else {
+        this.guidedContentHeight = '0px';
       }
     },
     
@@ -2486,8 +2570,19 @@ export default defineComponent({
   },
 
   watch: {
+
+    cssVars(_css) {
+      // console.log(_css);
+    },
+    
     responseOptOut(optOut: boolean) {
       window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
+    },
+
+    inIntro(value: boolean) {
+      if (!value && !this.showSplashScreen && this.responseOptOut === null) {
+        this.showPrivacyDialog = true;
+      }
     },
 
     showAltAzGrid(show: boolean) {
@@ -2542,9 +2637,6 @@ export default defineComponent({
         
         return;
       }
-      
-      this.selectedTime = time.getTime();
-      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -2729,7 +2821,16 @@ body {
   overflow: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: var(--default-font-size);
 }
+
+.v-chip {
+  border: none;
+  color: blue;
+  background-color: white;
+  opacity: 1;
+  padding: 0.5em;
+}  
 
 #main-content {
   position: relative;
@@ -2737,25 +2838,9 @@ body {
   width: 100%;
   height: calc(var(--app-content-height) - var(--top-content-height));
   overflow: hidden;
+  // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
-
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    opacity: 0.9;
-
-    @media (max-width: 750px) { // SMALL
-      font-size: 1em;
-      padding: 1em;
-    }
-
-    @media (min-width: 751px) { // LARGE
-      font-size: 1.1em;
-      padding: 1.1em;
-    }
-  }
 }
 
 #app {
@@ -2763,14 +2848,16 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  position: relative;
 
   .wwtelescope-component {
     position: relative;
     // top: 0;
     width: 100%;
     height: 100%;
-    border-style: none;
-    border-width: 0;
+    // border-style: none;
+    // border-width: 0;
+    // border: 3px solid red;
     margin: 0;
     padding: 0;
   }
@@ -2874,11 +2961,15 @@ body {
 #share-button-wrapper {
   position: absolute;
   top: 0.7rem;
-  left: 1rem;
-
+  
   &.budge {
     top: 2.5rem;
     left: 0.5rem;
+  }
+  
+  .icon-wrapper {
+    padding-inline: 0.5em;
+    padding-block: 0.6em;
   }
 
   .icon-wrapper {
@@ -2923,12 +3014,14 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 0.5rem;
+  top: auto;
+  bottom: 1rem;
   right: 0.5rem;
   width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
+  // outline: 1px solid lime;
 }
 
 #tools {
@@ -2960,8 +3053,8 @@ body {
   pointer-events: auto;
 
   div.icon-wrapper {
-  padding: 5px 5px;
-  min-width: 30px;
+    padding: 5px 5px;
+    min-width: 30px;
   }
 }
 
@@ -3208,11 +3301,11 @@ body {
   #learn-more-content{
     display: flex;
 
-    @media (max-width: 700px ) {
+    @media (max-width: 959px ) {
       flex-direction: column;
     }
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       flex-direction: row;
     }
 
@@ -3222,7 +3315,7 @@ body {
     font-size: var(--default-font-size);
     line-height: var(--default-line-height);
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       min-width: 50%;
       padding-right: 1em;
     }
@@ -3263,6 +3356,7 @@ body {
 
   figure {
     position: sticky;
+    height: 100%;
 
     @media (max-width: 700px ) {
       width: 100%;
@@ -3357,7 +3451,9 @@ body {
     line-height: var(--default-line-height);
 
     .v-chip {
-      font-size: var(--default-font-size);
+      color: unset;
+      background-color: unset;
+      // font-size: var(--default-font-size);
     }
   }
 
@@ -3433,7 +3529,9 @@ body {
 
 #slider {
   width: 100% !important;
-  margin: 5px 30px;
+  margin-block: 30px;
+  margin-left: 5px;
+  margin-right: 0;
 }
 
 .v-container {
@@ -3442,35 +3540,23 @@ body {
 
 #closed-top-container {
     position: absolute;
-    margin-top: 0.5rem;
-    margin-left: 0.5rem;
+    top: 0.5rem;
+    left: 0.5rem;
     z-index: 500;
   }
 
-#mc-radiogroup-container {
-  padding-block: 0.5em;
-  
-  // by default mc-radiogroup has dark background
-  background-color: transparent!important;
-  
-  label {
-    overflow: visible;
-  }
-
-  .image-label-container {
-    border-radius: 10px;
-  }
-  
-  #image-label-front .image-label-text {
-    // filter: drop-shadow(0px 0px 0.1em white);
-    font-size: 2em;
-  }
-  
-  
-}
-
-#guided-content-container {
+#guided-content-container {  
   --top-content-max-height: max(30vmin, 35vh);
+  
+  @media (max-width: 600px) {
+    --top-content-max-height: max(40vmin, 40vh);
+  }
+  
+  font-size: var(--default-font-size);
+  @media (max-width: 350px) and (max-height: 600px) {
+      font-size: min(3vw, 1.75vh);
+  }
+  
   --map-max-height: var(--top-content-max-height); // Keep this about 3 smaller than above // not used any more
   --margin: 0.5rem;
   --container-padding: 0.5rem;
@@ -3480,6 +3566,7 @@ body {
 
   width: calc(100% - 2*var(--margin));
   max-height: var(--top-content-max-height);
+  min-height: 200px;
   align-items: center;
   gap: 0.5rem;
   // border-bottom: 1px solid var(--accent-color);
@@ -3487,74 +3574,99 @@ body {
   user-select: none;
   border: solid 1.5px var(--accent-color);
   
-  font-size: var(--default-font-size);
+  
+  
   line-height: var(--default-line-height);
-  overflow-y: auto;
+  overflow-y: auto ;
   
   transition: height 0.5s ease-in-out;
-
-  > div.v-row {
-    height: 100%;
+  
+  display: flex;
+  flex-direction: row;
+  
+  @media (max-width: 600px) and (max-aspect-ratio: 1) {
+    flex-direction: column;
+  }
+  
+  #non-map-container {
+    flex-basis: 100%;
+  }
+    
+  #map-column {
+    flex-basis: 100%;
+    
     display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
   }
+  
+  
 
-  .v-row {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  .v-col {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  #close-guided-content-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 500;
-  }  
 
   #non-map-container { // Keep content away from the x to close
-    --padding-left: 1rem;
-    
-    @media (max-width: 600px) { //phone-size
-      --padding-left: 0em;
-    }
-    
+    --padding-left: 0.5rem;
+    // @media (max-width: 600px) {
+    //   --padding-left: 0;
+    // }
     padding-left: var(--padding-left);
-    // padding-right: padding+left + container-padding;
     padding-right: calc(var(--padding-left) + var(--container-padding));
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    gap: 0.5em;
+    
+    position: relative;
+    
+    .non-map-row {
+      margin: 0;
+      padding: 0;
+    }
   
   }
 
-  .non-map-row {
-    @media (min-width: 750px) {
-      margin-bottom: 0.5em;
-    }
-  }
+
     
     // .v-row.non-map-row#title-row
   #title-row {
     color: var(--accent-color);
     font-weight: bold;
     text-align: right;
-    padding-left: 1rem;
-    
-    font-size: calc(1.3 * var(--default-font-size));
+    font-size: 1.3em;
 
+  }
+  
+  .v-btn#toggle-instruction-text {
+    position: absolute;
+    right: 1.8em;
+    top: 2.3em;
+    color: var(--accent-color)
+    // transform: translate(-25%, 75%);
   }
     
     // .v-row.non-map-row#instructions-row
   #instructions-row { 
+    
+    position: relative;
+    display: flex;
+    flex-grow: 0.5;
+    border: 1.5px solid var(--sky-color);
+    border-radius: 5px;
+    align-items: center;
+
+    &.non-map-row-collapse {
+      height: 5ch;
+      overflow-y: auto;
+    }
     
     // v-col
     #top-container-main-text { 
     
       // div
       .instructions-text {
-        border: 1.5px solid var(--sky-color);
-        border-radius: 5px;
+        
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
 
@@ -3573,15 +3685,12 @@ body {
   }
 
   #button-row {
-    padding-top: 0.5em;
-    align-self: flex-end;
+    width: 100%;
 
     #top-container-buttons{
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      
-      flex-grow: 1;
+      justify-content: space-evenly;
       gap: 0.5em;
             
       .icon-wrapper {
@@ -3589,11 +3698,10 @@ body {
         border: none;
         border-radius: 5px;
         padding-block: 4px;
-        width: calc(100%/6);
+        // be as large as you can but shrink if needed
+        width: 100%;
+        flex-shrink: 1;
         
-        @media (max-width: 500px) {
-          padding-inline: 0px;
-        }
 
         &.active {
           border: 2px solid var(--sky-color);
@@ -3611,20 +3719,39 @@ body {
   position: relative;
   --map-max-height: calc(var(--top-content-max-height) - 2*var(--margin) - 2*var(--container-padding));
   height: 100%;
-  // max-height: var(--map-max-height);
   width: 100%;
-  aspect-ratio: 5 / 3;
+  // outline: 1px solid red;
+  @media (max-width: 600px) {
+      aspect-ratio: 5/3;
+    }
+  
 
   #map-container {
     height: 100%;
+    width: 100%;
+    
+    .map-container {
+      height: 100%;
+      width: 100%;
+      aspect-ratio: 5/3;
+    }
+  
   
     span {
       padding: 0;
       margin: 0;
     }
     
-    img {
-      width: 100%;
+    #eclipse-path-map > img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      // position: absolute;
+      // top: 50%;
+      // left: 50%;
+      // transform: translateX(-50%) translateY(-50%);
+      
+      
     }
 
     .leaflet-control-zoom-in, .leaflet-control-zoom-out {
@@ -3756,16 +3883,6 @@ body {
   position: absolute;
   right: 0.5rem;
   top: calc(-2.2 * var(--default-line-height));
-
-  .v-chip {
-    border: none;
-    color: blue;
-    background-color: white;
-    opacity: 1;
-    padding: 0.5em;
-
-    font-size: calc(1 * var(--default-font-size));
-  }  
 }
 
 #top-wwt-content {
@@ -3780,67 +3897,97 @@ body {
     flex-wrap: column;
     gap:5px;
 
-    .v-chip {
-      border: none;
-      color: blue;
-      background-color: white;
-      opacity: 0.9;
-      padding: calc(0.8 * var(--default-line-height));
+  }
 
-      font-size: calc(1.1 * var(--default-font-size));
+  .icon-wrapper {
+    @media (max-width: 750px) { //SMALL
+      margin-top: 0.5rem;
+    }
+
+    @media (min-width: 751px) { //LARGE
+      margin-top: 0.7rem;
     }
   }
-    .v-switch__thumb {
-      color: #f39d6c;
-      background-color: black; 
 
-      @media (min-width: 751px) { //LARGE
-        height: 2.1rem;
-        width: 2.2rem;
-      }
+  .v-switch__thumb {
+    color: #f39d6c;
+    background-color: black;
 
+    @media (min-width: 751px) { //LARGE
+      height: 2.1rem;
+      width: 2.2rem;
     }
+  }
 
-    .v-input--density-default {
-      --v-input-control-height: 0;
+  .v-input--density-default {
+    --v-input-control-height: 0;
+  }
+
+  .v-selection-control--density-default {
+    --v-selection-control-size: auto;
+  } 
+
+  .v-switch--inset .v-switch__track {
+    @media (min-width: 751px) { //LARGE
+      height: 2.5rem;
+      width: 4.2rem;
     }
+  }
 
-    .v-selection-control--density-default {
-      --v-selection-control-size: auto;
-    } 
-
-    .v-switch--inset .v-switch__track {
-      @media (min-width: 751px) { //LARGE
-        height: 2.5rem;
-        width: 4.2rem;
-      }
-    }
-
-    pointer-events: auto;
+  pointer-events: auto;
 
   #top-switches {
     position: absolute;
     right: 0;
 
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
 
   }
  
   #track-sun-switch {
-    @media (max-width: 750px ) { //SMALL
+    @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
     } 
 
-    @media (min-width: 751px ) { //LARGE
+    @media (min-width: 751px) { //LARGE
       margin-top: 0.7rem;
     } 
   }
 }
 
+#change-optout {
+
+  .icon-wrapper {
+    margin: 0;
+    padding-inline: 0;
+    padding-block: 0;
+    border: none;
+    min-width: 0;
+  }
+}
+
+#privacy-popup-dialog {
+
+  .v-card-text {
+    color: #BDBDBD;
+  }
+
+  .v-overlay__content {
+    font-size: var(--default-font-size);
+    background-color: purple;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .v-btn--size-default {
+      font-size: var(--default-font-size);
+    }  
+}
 </style>
