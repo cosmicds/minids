@@ -47,7 +47,7 @@
               <span class="description">
                 <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
                 <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse.</p>
+                <p>Explore until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
@@ -119,6 +119,9 @@
                   </flip-transition>
                 </template>
               </mc-radiogroup>
+              <div v-if="showLinkToPath" class="my-1">
+                See NASA's map with the October annular eclipse path <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">here.</a>
+              </div>
             </div>
             
             <!-- Choose Path -->
@@ -1433,7 +1436,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false,  
+      showEclipsePercentage: false, 
+      showLinkToPath: false, 
       
       toggleTrackSun: true,
       
@@ -2144,6 +2148,9 @@ export default defineComponent({
     },
 
     onAnswerSelected(event: MCSelectionStatus) {
+      if(event.text=="C") {
+        this.showLinkToPath = true;
+      }
       this.mcResponses.push(event.text);
       this.sendDataToDatabase();
     },
@@ -3694,6 +3701,11 @@ body {
           }
         }
       }
+    }
+    a {
+      color: #ff00ff;
+      text-decoration: none;
+      font-weight: bold;
     }
   }
 
