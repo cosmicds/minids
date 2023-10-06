@@ -2675,6 +2675,7 @@ export default defineComponent({
         
         return;
       }
+      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
