@@ -10,6 +10,7 @@ import d3Scatter from "./d3-scatter.vue";
 // import PlotDataPlotly from "./PlotDataPlotly.vue";
 import ConstellationIcon from "./ConstellationIcon.vue";
 import { IconButton } from "@minids/common";
+import { FundingAcknowledgment } from "@minids/common";
 
 import { Gallery } from "@minids/common";
 
@@ -130,6 +131,7 @@ createApp(M101SN, {
   .component('constellation-icon', ConstellationIcon)
   .component('gallery', Gallery)
   .component('icon-button', IconButton)
+  .component('funding-acknowledgment', FundingAcknowledgment)
 
   // Mount
   .mount("#app");

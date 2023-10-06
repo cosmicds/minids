@@ -1,6 +1,7 @@
 import Vue, { createApp } from "vue";
 
 import { IconButton } from "@minids/common";
+import { FundingAcknowledgment } from "@minids/common";
 import C2022E3 from "./C2022E3.vue";
 import FolderView from "./FolderView.vue";
 import TransitionExpand from "./TransitionExpand.vue";
@@ -100,6 +101,7 @@ createApp(C2022E3, {
   .component('transition-expand', TransitionExpand)
   .component('date-picker', Datepicker)
   .component('icon-button', IconButton)
+  .component('funding-acknowledgment', FundingAcknowledgment)
 
   // Mount
   .mount("#app");

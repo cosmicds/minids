@@ -1,6 +1,7 @@
 import Vue, { createApp } from "vue";
 
 import { IconButton } from "@minids/common";
+import { FundingAcknowledgment } from "@minids/common";
 import Carina from "./Carina.vue";
 
 import vuetify from "../plugins/vuetify";
@@ -97,6 +98,7 @@ createApp(Carina, {
   .component("WorldWideTelescope", WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
+  .component('funding-acknowledgment', FundingAcknowledgment)
 
   // Mount
   .mount("#app");
