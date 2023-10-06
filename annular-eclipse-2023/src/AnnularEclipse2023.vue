@@ -13,7 +13,7 @@
       :color="accentColor"
       :icon="showGuidedContent ? 'square-xmark' : 'gear'"
       @click="() => {
-        console.log('showGuidedContent = ', showGuidedContent);
+        // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
         onResize();
       }"
@@ -1237,12 +1237,12 @@ export default defineComponent({
   data() {
     const annularEclipseTimeNMTZ = new Date("2023-10-14T10:48");
     const _annularEclipseTimeUTC = new Date("2023-10-14T16:48:00Z");
-    console.log("min/max time UTC", minTime, maxTime);
-    const minutc = new Date(minTime);
-    const maxutc = new Date(maxTime);
-    console.log("Date(min/maxTime):", minutc, maxutc);
-    console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
-    console.log("date:", annularEclipseTimeNMTZ);
+    // console.log("min/max time UTC", minTime, maxTime);
+    // const minutc = new Date(minTime);
+    // const maxutc = new Date(maxTime);
+    // console.log("Date(min/maxTime):", minutc, maxutc);
+    // console.log("min max date", minutc.toUTCString(), maxutc.toUTCString());
+    // console.log("date:", annularEclipseTimeNMTZ);
 
     const sunPlace = new Place();
     sunPlace.set_names(["Sun"]);
@@ -1522,9 +1522,9 @@ export default defineComponent({
 
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
+      // console.log("initial camera params RA, Dec:", R2D * this.initialCameraParams.raRad/15, R2D * this.initialCameraParams.decRad);
 
-      console.log(this);
+      // console.log(this);
       this.setTime(this.dateTime);
 
       this.wwtSettings.set_localHorizonMode(true);
@@ -1585,7 +1585,7 @@ export default defineComponent({
 
       this.setTimeforSunAlt(10); // 10 degrees above horizon
       
-      console.log("selected time", this.selectedTime);
+      // console.log("selected time", this.selectedTime);
 
       setInterval(() => {
         if (this.playing) {
@@ -1709,7 +1709,7 @@ export default defineComponent({
 
     maxPlaybackRate(): number {
       const minDuration = 10; //min setInterval on Chrome is ~5ms
-      console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
+      // console.log('maxPlaybackRate', MILLISECONDS_PER_INTERVAL / minDuration);
       return MILLISECONDS_PER_INTERVAL / minDuration;
     },
     
@@ -2087,7 +2087,7 @@ export default defineComponent({
       if (location == null) {
         return;
       }
-      console.log("updateLocation", location);
+      // console.log("updateLocation", location);
       this.selectedLocation = location;
       this.location = {
         latitudeRad: this.eclipsePathLocations[location].latitudeRad,
@@ -2100,7 +2100,7 @@ export default defineComponent({
       if (location == null) {
         return;
       }
-      console.log("updateLocationFromMap", location);
+      // console.log("updateLocationFromMap", location);
       this.selectedLocation = USER_SELECTED;
       this.locationDeg = location;
 
@@ -2156,11 +2156,11 @@ export default defineComponent({
     },
 
     logLocation() {
-      console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
+      // console.log(this.location.latitudeRad * R2D, this.location.longitudeRad * R2D);
     },
     
     logPosition() {
-      console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
+      // console.log(this.wwtRARad * R2D, this.wwtDecRad * R2D);
     },
 
     printUTCDate(date: Date) {
@@ -2406,7 +2406,7 @@ export default defineComponent({
       
       if (guidedContentContainer) {
         const height = guidedContentContainer.clientHeight;
-        console.log("height", height);
+        // console.log("height", height);
         this.guidedContentHeight = `${height}px`;
       } else {
         this.guidedContentHeight = '0px';
@@ -2436,7 +2436,7 @@ export default defineComponent({
         trackObject: this.toggleTrackSun
       });
       this.playbackRate = this.horizonRate;
-      console.log('=== startHorizonMode ===');
+      // console.log('=== startHorizonMode ===');
       return;
     },
 
@@ -2457,7 +2457,7 @@ export default defineComponent({
         noZoom: false,
         trackObject: true
       });
-      console.log('=== startSolarScopeMode ===');
+      // console.log('=== startSolarScopeMode ===');
       return;
     },
   
@@ -2497,8 +2497,8 @@ export default defineComponent({
     
     setTimeforSunAlt(altDeg: number) {
       const out = this.getTimeforSunAlt(altDeg);
-      console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
-      console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
+      // console.log("rise", this.toLocaleDateString(new Date(out.rising as number)) + " " + this.toLocaleTimeString(new Date(out.rising as number)));
+      // console.log("set", this.toLocaleDateString(new Date(out.setting as number)) + " " + this.toLocaleTimeString(new Date(out.setting as number)));
       if (out.rising == null && out.setting == null) {
         return;
       }
@@ -2527,7 +2527,7 @@ export default defineComponent({
     },
 
     getplaybackRate(rate: string) {
-      console.log('setplaybackRate', rate);
+      // console.log('setplaybackRate', rate);
       // parse a string that looks like "x [time] per y [time]"
       // e.g. "1 second per 1 minute"
       // returns a number that is the ratio of the two times converted to seconds/seconds
@@ -2695,18 +2695,18 @@ export default defineComponent({
 
     selectedLocation(locname: string) {
       if (!(locname in this.eclipsePathLocations)) {
-        console.log(`location ${locname} not found in eclipsePathLocations`);
+        // console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
       }
       if (locname !== USER_SELECTED) {
         this.presetLocationsVisited.push(locname);
         this.sendDataToDatabase();
       }
-      console.log("selected location", locname);
+      // console.log("selected location", locname);
     },
 
     playing(play: boolean) {
-      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      // console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
       this.setClockSync(play);
     },
 
@@ -2736,7 +2736,7 @@ export default defineComponent({
     },
 
     sunAboveHorizon(isAbove: boolean) {
-      console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
+      // console.log(`The sun is ${isAbove ? 'above' : 'below'} the horizon`);
       // this.showSky = isAbove; // just turn it off
       this.horizonOpacity = isAbove ? 1 : 0.85;
     },
@@ -2758,7 +2758,7 @@ export default defineComponent({
 
     toggleTrackSun(val: boolean) {
       // this turns of sun tracking
-      console.log("toggleTrackSun", val);
+      // console.log("toggleTrackSun", val);
       if (val) {
         this.trackSun();
         return;
