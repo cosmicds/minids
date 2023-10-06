@@ -8,10 +8,10 @@
   <div id="closed-top-container">
     <font-awesome-icon
       v-model="showGuidedContent"
-      :size="showGuidedContent ? 'xl' : 'lg'"
+      :size="showGuidedContent ? 'xl' : 'xl'"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'square-xmark' : 'gear'"
+      :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
       @click="() => {
         console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
