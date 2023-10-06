@@ -66,19 +66,20 @@
                 :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
                 @select="onAnswerSelected"
-                colorWrong="#4a2323"
-                colorRight="green"
+                colorWrong="transparent"
+                colorRight="transparent"
                 > 
                 <!-- for images width=100px, height=58px for correct aspect ratio -->
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      :width="cardWidth"
-                      height="7vh"
+                      :width="(xSmallSize ? `21vw` : `12vw`)"
+                      height="9vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
                       tabindex="0"
                       role="button"
+                      borderRadius="5px"
                       >
                       <template v-slot:front>
                       <image-label 
@@ -87,10 +88,12 @@
                         :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
-                        fontSize="4vh"
-                        :width="cardWidth"
-                        height="7vh"
-                        :border="selected ? '1px solid white' : null"
+                        fontSize="5vh"
+                        fontWeight="bold"
+                        :width="(xSmallSize ? `21vw` : `12vw`)"
+                        height="9vh"
+                        :border="'1px solid white'"
+                        borderRadius="5px"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
                       {{ text }}
@@ -102,10 +105,13 @@
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          :width="cardWidth"
-                          height="7vh"
-                          fontSize="min(1.6vh,1.6vw)"
-                          :border="selected ? '1px solid white' : null"
+                          :width="(xSmallSize ? `21vw` : `12vw`)"
+                          height="9vh"
+                          :fontSize="(xSmallSize ? `min(2vh,2.5vw)` : `min(1.6vh,1.6vw)`)"
+                          fontWeight="bold"
+                          lineHeight="(xSmallSize ? `min(2.2vh,2.7vw)` : `min(1.8vh,1.8vw)`)"
+                          :border="'1px solid white'"
+                          borderRadius="5px"
                         >
                         <span v-html="feedback"></span>
                         </image-label>
@@ -1427,8 +1433,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false,
-      cardWidth: "12vw",  
+      showEclipsePercentage: false,  
       
       toggleTrackSun: true,
       
@@ -1594,10 +1599,6 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
-
-    if(this.xSmallSize) {
-      this.cardWidth = "21vw";
-    }
   },
 
   computed: {
@@ -2410,7 +2411,6 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
-      this.cardWidth = this.xSmallSize  ? "21vw" : "12vw"; // use wider cards on narrow screens because content is in column instead of row
     },
 
     startHorizonMode() {
@@ -3669,6 +3669,9 @@ body {
       overflow-y: auto;
     }
     
+    #mc-radiogroup-container {
+      padding-block: 0.5em;
+    }
     // v-col
     #top-container-main-text { 
     
