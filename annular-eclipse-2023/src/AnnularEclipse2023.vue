@@ -8,10 +8,10 @@
   <div id="closed-top-container">
     <font-awesome-icon
       v-model="showGuidedContent"
-      :size="showGuidedContent ? 'xl' : 'lg'"
+      :size="showGuidedContent ? 'xl' : 'xl'"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'square-xmark' : 'gear'"
+      :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
       @click="() => {
         console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
@@ -131,7 +131,6 @@
         v-if="!smAndUp"
         id="toggle-instruction-text"
         :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        :color="transparent"
         @click="collapseText = (!collapseText || smAndUp)"
         variant="flat"
         density="compact"
@@ -190,7 +189,7 @@
               ></icon-button>
               <icon-button
                 v-model="showWWTGuideSheet"
-                fa-icon="computer-mouse"
+                fa-icon="toolbox"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -208,40 +207,40 @@
         <v-btn v-bind="props" v-if="false &&!isHovering && !smAndUp" color="blue" :width="'100%'">Tap here to reveal map</v-btn>
         <v-slide-y-transition
           :disabled="smAndUp"
-          >
-        <div v-if="!smAndUp || smAndUp" id="map-container" >
-          <location-selector
-            v-if="learnerPath == 'Explore'"
-            :model-value="locationDeg"
-            @place="(place: typeof places[number]) => updateLocation(place.name)"
-            :detect-location="false"
-            :map-options="presetMapOptions"
-            :places="places"
-            :initial-place="places.find(p => p.name === 'selectedLocation')"
-            :place-circle-options="placeCircleOptions"
-            :selected-circle-options="selectedCircleOptions"
-            :selectable="false"
-            class="leaflet-map"
-          ></location-selector>
+        >
+          <div v-if="!smAndUp || smAndUp" id="map-container" >
+            <location-selector
+              v-if="learnerPath == 'Explore'"
+              :model-value="locationDeg"
+              @place="(place: typeof places[number]) => updateLocation(place.name)"
+              :detect-location="false"
+              :map-options="presetMapOptions"
+              :places="places"
+              :initial-place="places.find(p => p.name === 'selectedLocation')"
+              :place-circle-options="placeCircleOptions"
+              :selected-circle-options="selectedCircleOptions"
+              :selectable="false"
+              class="leaflet-map"
+            ></location-selector>
 
-          <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
-            <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
-          </span>
+            <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
+              <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
+            </span>
 
-          <location-selector
-            v-if="learnerPath == 'Choose'"
-            :model-value="locationDeg"
-            @update:modelValue="updateLocationFromMap"
-            :detect-location="false"
-            :map-options="userSelectedMapOptions"
-            :selected-circle-options="selectedCircleOptions"
-            class="leaflet-map"
-          ></location-selector>
-        </div>
+            <location-selector
+              v-if="learnerPath == 'Choose'"
+              :model-value="locationDeg"
+              @update:modelValue="updateLocationFromMap"
+              :detect-location="false"
+              :map-options="userSelectedMapOptions"
+              :selected-circle-options="selectedCircleOptions"
+              class="leaflet-map"
+            ></location-selector>
+          </div>
         </v-slide-y-transition>
       </v-hover>
-      </div>
-    </v-container>
+    </div>
+  </v-container>
   
   
   
@@ -316,7 +315,7 @@
                     <details>
                       <summary> Total vs. Annular Eclipse</summary>
                       <p>
-                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon. This is called an Annular Eclipse.
+                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an Annular Eclipse.
                       </p>
                     </details>
                     
@@ -326,14 +325,14 @@
                         An eclipse is caused by the Moon casting a shadow on the Earth. People who are directly behind the Moon will see an annular or total eclipse. As the Moon moves in its orbit around Earth, and as Earth rotates, the location of the shadow will move, sweeping out a path across the surface of the Earth. For a larger number of people who are not directly behind the moon, a smaller amount of the Sun will be blocked, causing a partial eclipse. Even further outside the shadow the Sun will not be blocked at all, and there will be no eclipse visible.
                       </p>
                       <p> 
-                        The figure shows the parts of Earth that are directly behind the Moon (in the darkest shadow) and partially behind the moon (in the lighter shadow).
+                        The animated figure shows that the Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience an annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse.
                       </p> 
                     </details>
                   </div>
                 </div>
               <figure>
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
-                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth. The Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience the annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse."/>
+                <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
               </figure>
             </v-container>
@@ -444,6 +443,14 @@
                         to increase speed by 10x. 
                       </li>
                       <li>
+                        Click <font-awesome-icon
+                              class="bullet-icon"
+                              icon="rotate"
+                              size="lg" 
+                            ></font-awesome-icon>
+                        to reset time and view. 
+                      </li>
+                      <li>
                         You can also control time by dragging <v-icon
                           class="bullet-icon"
                           icon="mdi-circle"
@@ -521,7 +528,8 @@
                           
                   <v-divider thickness="2px" class="solid-divider"></v-divider>
                   
-                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>
+                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
+                  <p class="mt-2">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
                 </v-col>
               </v-row>
               <v-row>
@@ -572,11 +580,11 @@
           fa-icon="share-nodes"
           :color="accentColor"
           :focus-color="accentColor"
-          background-color="transparent"
           :box-shadow="false"
           tooltip-text="Share view of this location"
           :show-tooltip="!mobile"
           @activate="copyShareURL"
+          faSize="md"
         ></icon-button>
       </div>
     </div>
@@ -630,7 +638,7 @@
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
-                icon="computer-mouse"
+                icon="toolbox"
               /> User guide 
             </v-col>
         </v-row>
@@ -720,7 +728,7 @@
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="computer-mouse" size="xl" class="bullet-icon"></font-awesome-icon>
+                    <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about how to navigate this app. 
                 </v-list-item>
@@ -910,6 +918,7 @@
               tooltip-text="Play/Pause"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -925,6 +934,7 @@
               tooltip-text="10x slower"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -940,6 +950,23 @@
               tooltip-text="10x faster"
               tooltip-location="top"
               tooltip-offset="5px"
+              faSize="md"
+              :show-tooltip="!mobile"
+            ></icon-button>
+            <icon-button
+              id="reset"
+              :fa-icon="'rotate'"
+              @activate="() => {
+                    selectedTime = 1697292380000;
+                    playing = false;
+                    toggleTrackSun = true;
+                  }"
+              :color="accentColor"
+              :focus-color="accentColor"
+              tooltip-text="Reset"
+              tooltip-location="top"
+              tooltip-offset="5px"
+              faSize="md"
               :show-tooltip="!mobile"
             ></icon-button>
             <div id="speed-text">
@@ -1088,7 +1115,7 @@
       </v-card>
     </v-dialog>
 
-  <notifications group="copy-url" position="top right" />
+  <notifications group="copy-url" position="center top" classes="url-notification"  ignoreDuplicates="true"/>
   </div>
 </v-app>
 </template>
@@ -2524,14 +2551,16 @@ export default defineComponent({
           this.$notify({
             group: "copy-url",
             type: "success",
-            text: "URL successfully copied"
+            text: "URL copied to clipboard. Paste to share with friends!",
+            duration: 5000
           })
         )
         .catch((_err) =>
           this.$notify({
             group: "copy-url",
             type: "error",
-            text: "Failed to copy URL"
+            text: "Failed to copy URL",
+            duration: 5000
           })
         );
     },
@@ -2762,7 +2791,7 @@ export default defineComponent({
 }
 
 :root {
-  --default-font-size: clamp(0.7rem, min(1.5vh, 1.5vw), 1.1rem);
+  --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
 }
 
@@ -2941,9 +2970,27 @@ body {
   .icon-wrapper {
     padding-inline: 0.5em;
     padding-block: 0.6em;
-    border: 2px solid var(--accent-color);
   }
 
+  .icon-wrapper {
+    padding-inline: calc(0.3 * var(--default-line-height));
+    padding-block: calc(0.4 * var(--default-line-height));
+    border: 2px solid var(--accent-color);
+  }
+}
+
+.url-notification {
+  margin-top: 45vh;
+  border-radius: 5px;
+  font-size: calc(1.1 * var(--default-font-size));
+  padding: 1em;
+
+  &.success {
+    background-color: #9a009a;
+  }
+  &.error {
+    background-color: #b30000;
+  }
 }
 
 .top-content {
@@ -3032,11 +3079,22 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding-left: calc(0.5 * var(--default-line-height));
 
     .v-checkbox .v-selection-control {
       font-size: calc(1.1 * var(--default-font-size));
       height: calc(1.2 * var(--default-line-height));
       min-height: calc(1.2 * var(--default-line-height));
+    }
+
+    .v-checkbox .v-selection-control__input {
+      width: calc(1.2 * var(--default-line-height));
+      height: calc(1.2 * var(--default-line-height));
+    }
+
+    .v-checkbox .v-selection-control__wrapper {
+      width: calc(1.2 * var(--default-line-height));
+      height: calc(1.2 * var(--default-line-height));
     }
 
     .v-btn {
@@ -3739,7 +3797,6 @@ body {
     padding: 2em;
   }
 
-
   // rotated translucent background gradient
   background: linear-gradient(45deg,
                             rgb(14, 30, 40), 
@@ -3747,7 +3804,7 @@ body {
                             rgb(30 70 90));
 
   
-    font-size: var(--default-font-size);
+    font-size: calc(1.1 * var(--default-font-size));
     line-height: var(--default-line-height);
 
   .v-list-item__prepend {
@@ -3786,11 +3843,6 @@ body {
   }
 }
 
-#share-button {
-  margin: auto;
-  width: 2em;
-}
-
 #speed-control {
   display: flex;
   flex-direction: row;
@@ -3815,7 +3867,7 @@ body {
 
   @media (max-width: 959px) {
     bottom: -0.4rem;
-    left: 7.5rem;
+    left: 9.5rem;
   }
   @media (min-width: 960px) {
     bottom: 0.3rem;

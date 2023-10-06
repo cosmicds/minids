@@ -50,7 +50,9 @@ import {
   faMountainSun,
   faShareNodes,
   faSquareXmark,
-  faComputerMouse,
+  faToolbox,
+  faCircleInfo,
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -74,7 +76,9 @@ library.add(faArrowsRotate);
 library.add(faMountainSun);
 library.add(faShareNodes);
 library.add(faSquareXmark);
-library.add(faComputerMouse);
+library.add(faToolbox);
+library.add(faCircleInfo);
+library.add(faRotate);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
