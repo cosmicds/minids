@@ -1009,7 +1009,7 @@
               tooltip-location="bottom"
               tooltip-offset="5px"
               :show-tooltip="!mobile"
-              mdSize="0.8em"
+              mdSize="1em"
             >
             </icon-button>
           </div>
@@ -3985,7 +3985,11 @@ body {
   }
 
   .v-btn--size-default {
-      font-size: var(--default-font-size);
+      font-size: calc(0.9 * var(--default-font-size));
     }  
+
+  .v-card-actions .v-btn {
+    padding: 0 4px;
+  }
 }
 </style>
