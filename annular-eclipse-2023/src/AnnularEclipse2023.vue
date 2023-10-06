@@ -322,9 +322,9 @@
                     </details>
                     
                     <details>
-                      <summary> Total vs. Annular Eclipse</summary>
+                      <summary> Total? Annular? What is the difference?</summary>
                       <p>
-                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an Annular Eclipse.
+                        During a <strong>total eclipse</strong>, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun. During the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an <strong>annular Eclipse</strong>.
                       </p>
                     </details>
                     
