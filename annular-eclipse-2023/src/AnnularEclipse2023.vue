@@ -593,7 +593,7 @@
           tooltip-text="Share view of this location"
           :show-tooltip="!mobile"
           @activate="copyShareURL"
-          faSize="md"
+          faSize="1x"
         ></icon-button>
       </div>
     </div>
@@ -926,7 +926,7 @@
               tooltip-text="Play/Pause"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -942,7 +942,7 @@
               tooltip-text="10x slower"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -958,7 +958,7 @@
               tooltip-text="10x faster"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <icon-button
@@ -974,7 +974,7 @@
               tooltip-text="Reset"
               tooltip-location="top"
               tooltip-offset="5px"
-              faSize="md"
+              faSize="1x"
               :show-tooltip="!mobile"
             ></icon-button>
             <div id="speed-text">
