@@ -3545,6 +3545,28 @@ body {
     z-index: 500;
   }
 
+#mc-radiogroup-container {
+  padding-block: 0.5em;
+  
+  // by default mc-radiogroup has dark background
+  background-color: transparent!important;
+  
+  label {
+    overflow: visible;
+  }
+
+  .image-label-container {
+    border-radius: 10px;
+  }
+  
+  #image-label-front .image-label-text {
+    // filter: drop-shadow(0px 0px 0.1em white);
+    font-size: 2em;
+  }
+  
+  
+}
+
 #guided-content-container {  
   --top-content-max-height: max(30vmin, 35vh);
   
