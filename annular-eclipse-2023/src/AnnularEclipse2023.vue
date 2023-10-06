@@ -131,7 +131,6 @@
         v-if="!smAndUp"
         id="toggle-instruction-text"
         :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        :color="transparent"
         @click="collapseText = (!collapseText || smAndUp)"
         variant="flat"
         density="compact"
@@ -2961,6 +2960,7 @@ body {
 #share-button-wrapper {
   position: absolute;
   top: 0.7rem;
+  left: 1rem;
   
   &.budge {
     top: 2.5rem;
@@ -3797,7 +3797,6 @@ body {
     padding: 2em;
   }
 
-
   // rotated translucent background gradient
   background: linear-gradient(45deg,
                             rgb(14, 30, 40), 
@@ -3805,7 +3804,7 @@ body {
                             rgb(30 70 90));
 
   
-    font-size: var(--default-font-size);
+    font-size: calc(1.1 * var(--default-font-size));
     line-height: var(--default-line-height);
 
   .v-list-item__prepend {
