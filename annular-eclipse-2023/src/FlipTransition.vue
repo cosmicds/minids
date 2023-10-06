@@ -67,6 +67,8 @@ export default defineComponent({
     }
   },
 
+  emits: ['flipToBack', 'flipToFront', 'flip:begin', 'flip:end'],
+
   mounted() {
 
     const id = 'flip-transition-' + `${this.id}`;
@@ -84,14 +86,17 @@ export default defineComponent({
       const hoverTaget = document.querySelector(`#${id}`);
       hoverTaget?.addEventListener('mouseenter', () => {
         card?.classList.toggle('do-flip');
+        this.notifyFlip(card?.classList.contains('do-flip') ? 'back' : 'front');
       });
       hoverTaget?.addEventListener('mouseleave', () => {
         card?.classList.toggle('do-flip');
+        this.notifyFlip(card?.classList.contains('do-flip') ? 'back' : 'front');
       });
     }
     
     card?.addEventListener('click', () => {
       card.classList.toggle('do-flip');
+      this.notifyFlip(card.classList.contains('do-flip') ? 'back' : 'front');
       // toggle aria-hidden
       frontCard?.setAttribute('aria-hidden', 'true');
       backCard?.setAttribute('aria-hidden', 'false');
@@ -100,6 +105,7 @@ export default defineComponent({
         setTimeout(() => {
 
           card.classList.toggle('do-flip');
+          this.notifyFlip(card.classList.contains('do-flip') ? 'back' : 'front');
           // toggle aria-hidden
           frontCard?.setAttribute('aria-hidden', 'false');
           backCard?.setAttribute('aria-hidden', 'true');
@@ -112,15 +118,45 @@ export default defineComponent({
 
   computed: {
     size(): string {
+      console.log('updating size');
       return `width: ${this.width}; height: ${this.height};`;
     },
 
     cssVars(): string {
       return `--duration: ${this.duration};`;
+    },
+
+    durationMS(): number {
+    //  regex parse string like 0.5 or 100s into number
+      const regex = /(\d+\.?\d*)\w+/;
+      const match = this.duration.match(regex);
+      if (match) {
+        return Number(match[1]) * 1000;
+      } else {
+        return 0;
+      }
     }
   },
 
-  
+  methods: {
+
+    notifyFlip(direction: string) {
+      if (direction === 'front') {
+        this.$emit('flipToFront',{});
+        console.log('flip to front');
+      } else if (direction === 'back') {
+        this.$emit('flipToBack',{});
+        console.log('flip to back');
+      }
+
+      this.$emit('flip:begin',{});
+      setTimeout(() => {
+        this.$emit('flip:end',{});
+      }, this.durationMS);
+      
+    }
+    
+  }
 
 });
 
@@ -131,6 +167,9 @@ export default defineComponent({
 .flip-card {
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
   pointer-events: auto;
+  
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 /* This container is needed to position the front and back side */
@@ -156,7 +195,7 @@ export default defineComponent({
 
 /* Position the front and back side */
 .flip-card-front, .flip-card-back {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
   -webkit-backface-visibility: hidden; /* Safari */
@@ -169,6 +208,6 @@ export default defineComponent({
 
 /* Style the back side */
 .flip-card-back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateY(-100%);
 }
 </style>

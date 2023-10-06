@@ -1,6 +1,7 @@
 <template>
   <div
     id="mc-radiogroup-container"
+    :style="cssVars"
   >
     <v-radio-group
       v-if="!complete || !useAlert"
@@ -56,13 +57,19 @@
   color: white;
 }
 
-#mc-radiogroup-container .v-selection-control-group--inline {
+#mc-radiogroup-container .v-selection-control-group {
     justify-content: space-evenly;
+    gap: var(--gap);
+    flex-wrap: nowrap;
   }
   
 
 #mc-radiogroup-container .hidden .v-selection-control__wrapper {
   display: none;
+}
+
+#mc-radiogroup-container .v-selection-control.v-selection-control--inline {
+  flex: 1 1 auto !important;
 }
 
 #mc-radiogroup-container .v-label {
@@ -159,6 +166,11 @@ export default defineComponent({
     preselected: {
       type: Number,
       default: null
+    },
+
+    gap: {
+      type: String,
+      default: '0.5em'
     }
     
   },
@@ -182,6 +194,20 @@ export default defineComponent({
       tries: 0,
       score: null
     };
+  },
+
+  computed: {
+    flexBasis(): string {
+      const n = 100 / (this.radioOptions.length+1);
+      return `${Math.round(n)}%`;
+    },
+
+    cssVars: function () {
+      return {
+        '--flex-basis': this.flexBasis,
+        '--gap': this.gap
+      };
+    }
   },
   
   methods: {

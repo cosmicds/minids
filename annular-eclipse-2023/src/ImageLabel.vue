@@ -74,6 +74,7 @@ export default defineComponent({
 
     width: {
       type: String,
+      default: "100%",
       required: true
     },
 
@@ -138,7 +139,7 @@ export default defineComponent({
     containerCSS() {
       const css = {
         color: this.color,
-        width: `calc(${this.width}-2px)`,
+        width: this.width,
         height: this.height,
         border: this.border,
       };
