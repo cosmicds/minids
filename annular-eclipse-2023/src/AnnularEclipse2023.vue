@@ -863,7 +863,7 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210"
           prepend-icon="mdi-sun-angle"
           variant="outlined"
           size="medium"
@@ -910,6 +910,7 @@
             />
             <v-checkbox
                 :color="accentColor"
+                :disabled="wwtZoomDeg > 210"
                 v-model="showEclipsePercentage"
                 @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
                 label="Amount Eclipsed"
