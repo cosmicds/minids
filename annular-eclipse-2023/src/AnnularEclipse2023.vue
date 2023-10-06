@@ -3250,8 +3250,8 @@ body {
 
   #close-splash-button {
     position: absolute;
-    top: 0;
-    right: 2.5rem;
+    top: 0.5rem;
+    right: 1.75rem;
     text-align: end;
     color: var(--accent-color);
     font-size: min(8vw, 5vh);
@@ -3270,7 +3270,7 @@ body {
   }
 
   #splash-screen-guide {
-    margin-block: 1em;
+    margin-block: 1.5em;
     font-size: min(5vw, 4vh);
     line-height: 140%;
     width: 75%;
@@ -3286,7 +3286,8 @@ body {
   }
 
   #splash-screen-acknowledgements {
-    font-size: calc(2 * var(--default-font-size));
+    font-size: calc(1.7 * var(--default-font-size));
+    line-height: calc(1.5 * var(--default-line-height));
     width: 70%; 
   }
 
