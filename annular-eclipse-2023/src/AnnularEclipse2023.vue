@@ -536,7 +536,7 @@
                         <span class="user-guide-emphasis-white">Visible Moon:</span> Solar Eclipses occur during a New Moon, when the Moon is not normally visible in the sky. This option makes it easier to see the Moon against the sky.                     
                       </li>
                       <li>
-                        <span class="user-guide-emphasis-white">Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon.                     
+                        <span class="user-guide-emphasis-white">Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon. (Disabled when zoomed far out.)                   
                       </li>
                     </ul>
 
@@ -625,7 +625,7 @@
             @click="closeSplashScreen"
             >&times;</div>
           <div id="splash-screen-text">
-            <p>WATCH the October </p>
+            <p>WATCH the October 14</p>
             <p class="highlight"> Annular Eclipse </p>
           </div>
         </div>
@@ -863,7 +863,7 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210"
           prepend-icon="mdi-sun-angle"
           variant="outlined"
           size="medium"
@@ -910,6 +910,7 @@
             />
             <v-checkbox
                 :color="accentColor"
+                :disabled="wwtZoomDeg > 210"
                 v-model="showEclipsePercentage"
                 @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
                 label="Amount Eclipsed"
