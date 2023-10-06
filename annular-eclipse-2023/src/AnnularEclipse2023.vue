@@ -322,9 +322,9 @@
                     </details>
                     
                     <details>
-                      <summary> Total vs. Annular Eclipse</summary>
+                      <summary> Total? Annular? What is the difference?</summary>
                       <p>
-                        During a total eclipse, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun, and during the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an Annular Eclipse.
+                        During a <strong>total eclipse</strong>, the Moon covers the entire face of the Sun. Because the Moon doesn't orbit the Earth in a perfect circle, sometimes it is farther away from Earth and appears smaller. When this happens, the Moon doesn't cover the entire face of the Sun. During the eclipse we can still see a bright ring of light around the Moon, sometimes called the "Ring of Fire." This is called an <strong>annular Eclipse</strong>.
                       </p>
                     </details>
                     
@@ -336,6 +336,13 @@
                       <p> 
                         The animated figure shows that the Moon's shadow on Earth has two distinct regions. The darker part of the shadow is directly behind the Moon, where people will experience an annular or total eclipse. The lighter part of the shadow falls where people on Earth will see a partial solar eclipse.
                       </p> 
+                    </details>
+                    
+                    <details>
+                      <summary>Where can I learn more?</summary>
+                      <p>
+                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse.
+                      </p>
                     </details>
                   </div>
                 </div>
@@ -1563,7 +1570,7 @@ export default defineComponent({
       /* eslint-disable @typescript-eslint/no-var-requires */
       Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
       this.setForegroundImageByName("Digitized Sky Survey (Color)");
-      this.setBackgroundImageByName("Black Sky Background");
+      // this.setBackgroundImageByName("Black Sky Background");
       this.setForegroundOpacity(100);
       this.updateMoonTexture(true);
 
@@ -1603,6 +1610,9 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+
+    this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
+    
   },
 
   computed: {
@@ -2444,7 +2454,7 @@ export default defineComponent({
       this.wwtSettings.set_localHorizonMode(false);
       this.showAltAzGrid = false;
       this.skyColor = this.skyColorNight;
-      this.horizonOpacity = 0.6;
+      this.horizonOpacity = this.sunPosition.altRad > (0 + 0.5 * D2R) ? 1 : 0.6;
       this.updateFrontAnnotations(); // manually update horizon
       this.playbackRate = this.scopeRate;
       // this.setForegroundImageByName("Black Sky Background");
@@ -2492,8 +2502,7 @@ export default defineComponent({
         'rising': (rising !== null && setting !== null) ? Math.min(rising, setting) : rising,
         'setting': (rising !== null && setting !== null) ? Math.max(rising, setting) : setting
       };
-    },
-    
+    }, 
     
     setTimeforSunAlt(altDeg: number) {
       const out = this.getTimeforSunAlt(altDeg);
@@ -2524,6 +2533,19 @@ export default defineComponent({
       }
       
 
+    },
+
+    updateSkyOpacityForSunAlt(altRad: number) {
+      const _civilTwilight = -6 * D2R;
+      // const _nauticalTwilight = 2 * _civilTwilight;
+      const astronomicalTwilight = 3 * _civilTwilight;
+      
+      const sunAlt = altRad;
+      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.updateMoonTexture();
+
+      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.setForegroundOpacity(dssOpacity * 100);
     },
 
     getplaybackRate(rate: string) {
@@ -2653,6 +2675,7 @@ export default defineComponent({
         
         return;
       }
+      this.updateFrontAnnotations(time);
     },
 
     selectedTimezone(newTz: string, oldTz: string) {
@@ -2745,16 +2768,7 @@ export default defineComponent({
 
     sunPosition(pos: EquatorialRad & HorizontalRad) {
 
-      const _civilTwilight = -6 * D2R;
-      // const _nauticalTwilight = 2 * _civilTwilight;
-      const astronomicalTwilight = 3 * _civilTwilight;
-      
-      const sunAlt = pos.altRad;
-      this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
-      this.updateMoonTexture();
-
-      const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
-      this.setForegroundOpacity(dssOpacity * 100);
+      this.updateSkyOpacityForSunAlt(pos.altRad);
       return;
     },
 
