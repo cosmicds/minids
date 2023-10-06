@@ -1563,7 +1563,7 @@ export default defineComponent({
       /* eslint-disable @typescript-eslint/no-var-requires */
       Planets['_planetTextures'][0] = Texture.fromUrl(require("./assets/2023-09-19-SDO-Sun.png"));
       this.setForegroundImageByName("Digitized Sky Survey (Color)");
-      this.setBackgroundImageByName("Black Sky Background");
+      // this.setBackgroundImageByName("Black Sky Background");
       this.setForegroundOpacity(100);
       this.updateMoonTexture(true);
 
