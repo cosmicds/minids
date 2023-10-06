@@ -700,33 +700,32 @@
                 In this interactive page you can:
               </p>
               
-              <ul
-              >
-                <v-list-item>
+              <ul>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Explore what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Choose any location around the world. See and share how the eclipse would look from there.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Learn more about solar eclipses. 
                 </v-list-item>
-                <v-list-item>
+                <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
@@ -3804,8 +3803,8 @@ body {
                             rgb(30 70 90));
 
   
-    font-size: calc(1.1 * var(--default-font-size));
-    line-height: var(--default-line-height);
+  font-size: calc(1.1 * var(--default-font-size));
+  line-height: var(--default-line-height);
 
   .v-list-item__prepend {
     margin-right: 0.75em;
