@@ -61,9 +61,10 @@
                 id = "mc-radiogroup-container"
                 row
                 hide-input
+                :useAlert="!smAndUp"
                 :preselected="quizAnswer"
                 :radio-options="['A', 'B','C']"
-                :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
+                :feedbacks="['Not that one. Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
                 :correct-answers="[2]"
                 @select="onAnswerSelected"
                 colorWrong="#4a2323"
@@ -73,12 +74,14 @@
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      width="11vw"
+                      width="20vw"
                       height="6vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
                       tabindex="0"
                       role="button"
+                      @flipToBack="showingResponse = true"
+                      @flipToFront="showingResponse = false"
                       >
                       <template v-slot:front>
                       <image-label 
@@ -88,7 +91,6 @@
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
                         fontSize="4vh"
-                        width="11vw"
                         height="6vh"
                         :border="selected ? '1px solid white' : null"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
@@ -96,15 +98,14 @@
                       {{ text }}
                       </image-label>
                       </template>
-                      <template v-slot:back>
+                      <template v-slot:back> 
                         <image-label
-                          id="front" 
+                          id="back" 
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          width="12vw"
-                          height="7vh"
-                          fontSize="min(1.5vh,1.5vw)"
+                          height="6vh"
+                          fontSize="min(1vh,2vw)"
                           :border="selected ? '1px solid white' : null"
                         >
                         <span v-html="feedback"></span>
@@ -1282,6 +1283,8 @@ export default defineComponent({
       showLocationSelector: false,
 
       showWWTGuideSheet: false,
+
+      showingResponse: false, 
       
       selectionProximity: 4,
       pointerMoveThreshold: 6,
@@ -3548,6 +3551,7 @@ body {
 #mc-radiogroup-container {
   padding-block: 0.5em;
   
+  
   // by default mc-radiogroup has dark background
   background-color: transparent!important;
   
@@ -3559,9 +3563,19 @@ body {
     border-radius: 10px;
   }
   
-  #image-label-front .image-label-text {
-    // filter: drop-shadow(0px 0px 0.1em white);
-    font-size: 2em;
+  .image-label-text {
+    font-weight: bold !important;
+    text-align: center;
+    
+    span {
+      white-space: pre-line ;
+      padding-inline: 1em;
+      
+      @media (max-width: 600px) {
+        font-size: max(6pt, min(1vh,2vw)) !important ;
+      }
+    }
+    
   }
   
   
