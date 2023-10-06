@@ -73,8 +73,8 @@
                 <template #default="{index, text, selected, color, feedback}">
                     <flip-transition
                       :id="text"
-                      width="11vw"
-                      height="6vh"
+                      :width="cardWidth"
+                      height="7vh"
                       duration="0.8s"
                       :flipBackAfter="3000" 
                       tabindex="0"
@@ -88,8 +88,8 @@
                         :background-color="(selected ? `${color}` : '#F0DCB9')"
                         :background-opacity="1"
                         fontSize="4vh"
-                        width="11vw"
-                        height="6vh"
+                        :width="cardWidth"
+                        height="7vh"
                         :border="selected ? '1px solid white' : null"
                         @click="() => { console.log('clicked'); quizAnswer = index;}"
                       >
@@ -102,9 +102,9 @@
                           :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
                           background-color="black"
                           :background-opacity="1"
-                          width="12vw"
+                          :width="cardWidth"
                           height="7vh"
-                          fontSize="min(1.5vh,1.5vw)"
+                          fontSize="min(1.6vh,1.6vw)"
                           :border="selected ? '1px solid white' : null"
                         >
                         <span v-html="feedback"></span>
@@ -1427,7 +1427,8 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false,  
+      showEclipsePercentage: false,
+      cardWidth: "12vw",  
       
       toggleTrackSun: true,
       
@@ -1593,6 +1594,10 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+
+    if(this.xSmallSize) {
+      this.cardWidth = "21vw";
+    }
   },
 
   computed: {
@@ -1633,6 +1638,9 @@ export default defineComponent({
     },
     smAndUp(): boolean {
       return this.$vuetify.display.smAndUp;
+    },
+    xSmallSize(): boolean {
+      return this.$vuetify.display.xs;
     },
     
     mobile(): boolean {
@@ -2402,6 +2410,7 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
+      this.cardWidth = this.xSmallSize  ? "21vw" : "12vw"; // use wider cards on narrow screens because content is in column instead of row
     },
 
     startHorizonMode() {
@@ -3665,6 +3674,8 @@ body {
     
       // div
       .instructions-text {
+
+        min-width: 40vw;  // so quiz cards don't crash into each other on some screen sizes
         
         padding-inline: 0.7em;
         padding-block: 0.4em; // this plus the margin on p give .7 em on top and bottom
