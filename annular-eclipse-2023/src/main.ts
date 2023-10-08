@@ -10,6 +10,7 @@ import Credits from "./Credits.vue";
 import MCRadiogroup from "./MCRadiogroup.vue";
 import FlipTransition from "./FlipTransition.vue";
 import ImageLabel from "./ImageLabel.vue";
+import GeolocationButton from "./GeolocationButton.vue";
 
 import "./polyfills";
 
@@ -126,6 +127,7 @@ createApp(AnnularEclipse2023, {
   .component('flip-transition', FlipTransition)
   .component('image-label', ImageLabel)
   .component('funding-acknowledgment', FundingAcknowledgment)
+  .component('geolocation-button', GeolocationButton)
 
   // Mount
   .mount("#app");
