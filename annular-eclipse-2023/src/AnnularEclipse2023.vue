@@ -711,31 +711,31 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Explore what the eclipse will look like from different parts of the U.S.
+                    <strong>Explore</strong> what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Choose any location around the world. See and share how the eclipse would look from there.
+                    <strong>Select any location</strong> around the world. See and share how the eclipse would look from there.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
+                    Identify the path of the annular eclipse for the U.S. in our <strong>Map Quiz</strong>.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses. 
+                    <strong>Learn more</strong> about solar eclipses. 
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about how to navigate this app. 
+                    Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
               </ul>
             </div>
