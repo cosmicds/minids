@@ -1,19 +1,24 @@
 <template>
-  <span id="gelocation-wrapper" class="gelocation">
+  <span :id="`gelocation-wrapper+${id}`" class="gelocation">
     <v-btn 
       v-if="!hideButton"
       class="geolocation-button"
-      density="comfortable"
+      :density="density"
       :size="size"
-      :variant="geolocation ? 'flat' : 'outlined'"
+      :variant="geolocation ? (useTextButton ? 'tonal' : 'flat') : 'outlined'"
       :elevation="elevation"
       :loading="loading"
-      icon="mdi-crosshairs-gps"
+      :icon="!useTextButton ? icon : false"
+      :prepend-icon="useTextButton ? icon : ''"
       :color="geolocationError ? 'red' : color"
       @click="getLocation" 
-    />
+    >
+        <slot v-if="useTextButton">
+          {{ label }}
+        </slot>
+    </v-btn>
     
-    <span class="geolocation-text" v-if="!hideText">
+    <span class="geolocation-text" v-if="!hideText && !useTextButton">
       <v-progress-circular
         v-if="loading && showTextProgress"
         :size="progressCircleSize"
@@ -21,7 +26,9 @@
         :color="color"
         indeterminate
       />
-      {{ label }} 
+      <slot>
+      {{ label }}
+      </slot>
     </span>
     
     <span class="geolocation-coords" v-if="showCoords">
@@ -37,8 +44,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { VBtn, } from 'vuetify/components/VBtn';
+import { VBtn } from 'vuetify/components/VBtn';
 import { VProgressCircular } from 'vuetify/lib/components/index.mjs';
+
+type Density = null | 'default' | 'comfortable' | 'compact';
 
 export default defineComponent({
   
@@ -71,6 +80,11 @@ export default defineComponent({
       default: 'small',
     },
 
+    density: {
+      type: String as () => Density,
+      default: 'comfortable',
+    },
+
 
     elevation: {
       type: String,
@@ -101,6 +115,11 @@ export default defineComponent({
       default: false,
     },
 
+    useTextButton: {
+      type: Boolean,
+      default: false,
+    },
+
     progressCircleSize: {
       type: Number,
       default: 12,
@@ -110,6 +129,21 @@ export default defineComponent({
     label: {
       type: String,
       default: 'My Location',
+    },
+
+    id: {
+      type: String,
+      default: null,
+    },
+
+    trueIcon: {
+      type: String,
+      default: 'mdi-crosshairs-gps',
+    },
+
+    falseIcon: {
+      type: String,
+      default: 'mdi-crosshairs',
     },
     
     
@@ -131,6 +165,12 @@ export default defineComponent({
   mounted() {
 
     
+  },
+
+  computed: {
+    icon() {
+      return this.geolocation ? this.trueIcon : this.falseIcon;
+    },
   },
 
   methods: {
