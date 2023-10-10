@@ -340,6 +340,7 @@
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
                 <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                <div class="disclaimer">Not to scale</div>
               </figure>
             </v-container>
           </v-card-text>
@@ -3398,6 +3399,15 @@ body {
       background-color: #212121;
       padding-inline: 10px 5px;
     }
+    
+    .disclaimer {
+      position: absolute;
+      font-size: calc(0.8 * var(--default-font-size));
+      top: 2em;
+      right: 1em;
+      font-weight: bold;
+    }
+    
   }
   
   .v-overlay__content {
