@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
 
-import { IconButton } from "@minids/common";
+import { FundingAcknowledgment, IconButton } from "@minids/common";
 import MainComponent from "./MainComponent.vue";
 
 import vuetify from "../plugins/vuetify";
@@ -52,6 +52,7 @@ createApp(MainComponent, {
   .component("WorldWideTelescope", WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
+  .component('funding-acknowledgement', FundingAcknowledgment)
 
   // Mount
   .mount("#app");
