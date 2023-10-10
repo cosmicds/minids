@@ -2148,7 +2148,11 @@ export default defineComponent({
       }
       fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          "Authorization": process.env.VUE_APP_CDS_API_KEY ?? ""
+        },
         body: JSON.stringify({
           // eslint-disable-next-line @typescript-eslint/naming-convention
           user_uuid: this.uuid, mc_responses: this.mcResponses,
@@ -2159,7 +2163,7 @@ export default defineComponent({
     },
 
     onAnswerSelected(event: MCSelectionStatus) {
-      if(event.text=="C") {
+      if (event.text === "C") {
         this.showLinkToPath = true;
       }
       this.mcResponses.push(event.text);
