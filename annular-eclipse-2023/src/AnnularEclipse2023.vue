@@ -3370,16 +3370,19 @@ body {
     
     }
   }
-
+  
+  
   figure {
+    // make it stick in the viewport
     position: sticky;
     height: 100%;
+    padding-top: 1em;
 
-    @media (max-width: 700px ) {
+    @media (max-width: 960px ) {
       width: 100%;
     }
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       width: 50%;
     }
 
@@ -3406,6 +3409,7 @@ body {
   .bottom-sheet-card {
     height: fit-content;
     width: 100%;
+
     align-self: center;
     border-bottom: solid #212121 0.5em;
   }
@@ -3461,6 +3465,13 @@ body {
     // border-bottom-left-radius: 0px !important;
     // border-bottom-right-radius: 0px !important;
     width: auto;
+    height: fit-content;
+    max-height: 50vh;
+    
+    @media (max-width: 700px ) {
+      max-height: 70vh;
+    }
+    
   }
   
 
