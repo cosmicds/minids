@@ -674,6 +674,20 @@
       >
       <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
         <v-window v-model="introSlide">
+          <template v-slot:additional>
+            <div id="intro-window-close-button">
+            <font-awesome-icon
+              size="xl"
+              class="ma-1"
+              color="#b3d5e6"
+              icon='square-xmark'
+              @click="inIntro = !inIntro"
+              @keyup.enter="inIntro = !inIntro"
+              tabindex="0"
+              tooltip-location="start"
+            /> 
+          </div>
+          </template>
           <v-window-item :value="1">
             <div class="intro-text">
               <p class="mb-5">
@@ -3856,6 +3870,16 @@ body {
 
 .bullet-icon {
   color: var(--accent-color)
+}
+
+#intro-window-close-button {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+
+    &:hover {
+      cursor: pointer;
+    }
 }
 
 #introduction-overlay {
