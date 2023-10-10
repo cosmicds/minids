@@ -808,7 +808,6 @@
           >
             <template v-slot:target>
               <v-switch
-                v-if="!mobile"
                 inset
                 hide-details
                 :ripple="false"
@@ -822,18 +821,6 @@
                 tabindex="0"
               >
               </v-switch>
-              <v-btn
-                v-if="mobile"
-                :style="{'textTransform': 'none'}"
-                :variant="viewerMode === 'SunScope' ? 'tonal' : 'flat'"
-                density="comfortable"
-                @click="viewerMode = viewerMode === 'SunScope' ? 'Horizon' : 'SunScope'"
-                :ripple="false"
-                :color="accentColor"
-                :class="viewerMode === 'SunScope' ? 'sun-tracking' : 'sun-not-tracking'"
-                >
-                Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
-              </v-btn>
             </template>
             Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
         </hover-tooltip>
@@ -845,7 +832,6 @@
             >
               <template v-slot:target>
                 <v-switch
-                  v-if="!mobile"
                   inset
                   hide-details
                   v-model="toggleTrackSun"
@@ -857,19 +843,6 @@
                   tabindex="0"
                 >
                 </v-switch>
-                <v-btn
-                  v-if="mobile"
-                  :style="{'textTransform': 'none'}"
-                  :variant="toggleTrackSun ? 'tonal' : 'flat'"
-                  density="comfortable"
-                  @click="toggleTrackSun = !toggleTrackSun"
-                  :ripple="false"
-                  :color="accentColor"
-                  :class="toggleTrackSun ? 'sun-tracking' : 'sun-not-tracking'"
-                  >
-                  {{ toggleTrackSun ? 'Sun is Centerd' : 'Re-Center Sun' }}
-                </v-btn>                
-
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
           </hover-tooltip>
