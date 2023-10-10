@@ -859,6 +859,7 @@
                 v-bind="props"
               >
                 <v-switch
+                  v-if="!mobile"
                   inset
                   hide-details
                   v-model="toggleTrackSun"
