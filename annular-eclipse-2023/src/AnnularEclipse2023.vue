@@ -964,6 +964,8 @@
               :fa-icon="'rotate'"
               @activate="() => {
                     selectedTime = 1697292380000;
+                    speedIndex = 3;
+                    playbackRate = Math.pow(10, speedIndex);
                     playing = false;
                     toggleTrackSun = true;
                   }"
