@@ -91,10 +91,6 @@ export default defineComponent({
       default: "2",
     },
 
-    variant: {
-      type: String,
-    },
-
     hideButton: {
       type: Boolean,
       default: false,
