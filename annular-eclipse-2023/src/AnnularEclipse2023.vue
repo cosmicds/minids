@@ -836,6 +836,8 @@
                 false-icon="mdi-telescope"
                 true-value="Horizon"
                 true-icon="mdi-image-filter-hdr"
+                @keyup.enter="viewerMode = viewerMode === 'SunScope' ? 'Horizon' : 'SunScope'"
+                tabindex="0"
               >
               </v-switch>
               <v-btn
@@ -869,6 +871,8 @@
                   :color="accentColor"
                   true-icon="mdi-white-balance-sunny"
                   false-icon="mdi-image"
+                  @keyup.enter="toggleTrackSun = !toggleTrackSun"
+                  tabindex="0"
                 >
                 </v-switch>
                 <v-btn
