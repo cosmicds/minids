@@ -3684,7 +3684,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.5em;
     
     position: relative;
@@ -3724,6 +3724,7 @@ body {
     border: 1.5px solid var(--sky-color);
     border-radius: 5px;
     align-items: center;
+    justify-content: space-evenly;
 
     &.non-map-row-collapse {
       height: 5ch;
