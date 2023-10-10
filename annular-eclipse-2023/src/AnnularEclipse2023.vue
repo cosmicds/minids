@@ -853,10 +853,15 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210 && !smallSize"
           prepend-icon="mdi-sun-angle"
           variant="outlined"
-          size="medium"
+          elevation="2"
+          :text="percentEclipsedText"
+        > </v-chip>
+        <v-chip 
+          v-if="showEclipsePercentage && wwtZoomDeg < 210 && smallSize"
+          variant="outlined"
           elevation="2"
           :text="percentEclipsedText"
         > </v-chip>
@@ -1436,7 +1441,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false, 
+      showEclipsePercentage: true, 
       showLinkToPath: false, 
       
       toggleTrackSun: true,
@@ -3917,7 +3922,19 @@ body {
 #eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
-  top: calc(-2.2 * var(--default-line-height));
+  top: calc(-1.5 * var(--default-line-height));
+
+  .v-chip.v-chip--density-default {
+    height: var(--default-line-height);
+    padding-inline: 0.8rem;
+    padding-block: 0.8rem;
+  }
+
+  .v-chip__content {
+    font-size: calc(0.8 * var(--default-font-size));
+}
+
+
 }
 
 #top-wwt-content {
