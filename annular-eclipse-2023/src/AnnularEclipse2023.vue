@@ -2841,11 +2841,11 @@ body {
 }
 
 .leaflet-grab {
-      cursor: pointer;
+      cursor: cell;
     }
     
 .leaflet-dragging .leaflet-grab {
-  cursor: grabbing;
+  cursor: all-scroll;
 }
 
 .v-chip {
