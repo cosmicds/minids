@@ -3808,7 +3808,8 @@ body {
 }
 
 .bullet-icon {
-  color: var(--accent-color)
+  color: var(--accent-color);
+  width: 1.5em;
 }
 
 #introduction-overlay {
