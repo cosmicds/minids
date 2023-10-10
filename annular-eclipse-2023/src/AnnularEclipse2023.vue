@@ -45,15 +45,27 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
-                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse!</p>
+                  <p>
+                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the 
+                  <span class="dot blue">&#11044;</span> highlighted cities on the map
+                  to <strong>view</strong> the eclipse from different locations. 
+                  </p>
+                  <p>
+                    <strong>Press <font-awesome-icon icon="puzzle-piece" class="bullet-icon"/> 
+                  to guess</strong> the path of the eclipse!
+                  </p>
+
+                <p><strong>Press <font-awesome-icon icon="play" class="bullet-icon"/> to 
+                  "watch"</strong> the motion of the 
+                  Sun &amp; Moon for the time around the annular eclipse
+                </p>
+                
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click below to select it.</p>
+                <p><strong style="color:white">Which eclipse path is correct?</strong></p>
                 <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
               <mc-radiogroup
@@ -130,8 +142,8 @@
                 <p v-if="queryData">
                   Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
-                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
-                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
+                <p><strong>Double-{{ touchscreen ? "tap" : "click" }} the map</strong> to select a location to view the eclipse from there.</p>
+                <p>Press <font-awesome-icon icon="share-nodes" class="bullet-icon"/> (below) to copy a link to the current location to your clipboard.</p>
               </span>
             </div>
           </div>
@@ -162,18 +174,6 @@
                 @activate="() => { learnerPath = 'Explore'}"
               ></icon-button>
               <icon-button
-                :model-value="learnerPath == 'Choose'" 
-                fa-icon="location-dot"
-                fa-size="xl"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-text="'Choose any viewing location'"
-                :tooltip-location="'bottom'"
-                :show-tooltip="!mobile"
-                :box-shadow="false"
-                @activate="() => { learnerPath = 'Choose'}"
-              ></icon-button>
-              <icon-button
                 :model-value="learnerPath == 'Answer'"
                 fa-icon="puzzle-piece"
                 fa-size="xl"
@@ -185,6 +185,18 @@
                 :box-shadow="false"
                 @activate="() => { learnerPath = 'Answer'}"
               ></icon-button>   
+              <icon-button
+                :model-value="learnerPath == 'Choose'" 
+                fa-icon="location-dot"
+                fa-size="xl"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="'Choose any viewing location'"
+                :tooltip-location="'bottom'"
+                :show-tooltip="!mobile"
+                :box-shadow="false"
+                @activate="() => { learnerPath = 'Choose'}"
+              ></icon-button>
               <icon-button
                 v-model="showInfoSheet"
                 fa-icon="book-open"
@@ -228,7 +240,7 @@
               :initial-place="places.find(p => p.name === 'selectedLocation')"
               :place-circle-options="placeCircleOptions"
               :selected-circle-options="selectedCircleOptions"
-              :selectable="false"
+              :selectable="true"
               class="leaflet-map"
             ></location-selector>
 
@@ -590,7 +602,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -635,26 +647,31 @@
             <v-col cols="12">
               <font-awesome-icon
                 icon="rocket"
+                @click="() => {learnerPath = 'Explore'; skipIntro = true; showSplashScreen = false; }"
               /> Explore the view 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
                 icon="location-dot"
+                @click="() => { learnerPath = 'Choose', skipIntro = true; showSplashScreen = false;}"
               /> Choose any location 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
                 icon="puzzle-piece"
+                @click="() => { learnerPath = 'Answer', skipIntro = true; showSplashScreen = false;}"
               /> Identify the path 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
                 icon="book-open"
+                @click="() => { skipIntro = true; showSplashScreen = false; showInfoSheet = true; }"
               /> Learn more 
             </v-col>
             <v-col cols="12">
               <font-awesome-icon
                 icon="toolbox"
+                @click="() => { skipIntro = true; showSplashScreen = false; showWWTGuideSheet = true; }"
               /> User guide 
             </v-col>
         </v-row>
@@ -1459,6 +1476,7 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+      skipIntro: false,
 
       showPrivacyDialog: false,
 
@@ -1665,6 +1683,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color-2': "#468cfc",
         '--sky-color': this.skyColorLight,
         '--app-content-height': this.showInfoSheet ? '100%' : '100%',
         '--top-content-height': this.showGuidedContent? this.guidedContentHeight : this.guidedContentHeight,
@@ -2582,7 +2601,7 @@ export default defineComponent({
   
     copyShareURL() {
       const baseURL = `${window.location.origin}${window.location.pathname}`;
-      const url = `${baseURL}?lat=${this.locationDeg.latitudeDeg}&lon=${this.locationDeg.longitudeDeg}`;
+      const url = `${baseURL}?lat=${this.locationDeg.latitudeDeg.toFixed(4)}&lon=${this.locationDeg.longitudeDeg.toFixed(4)}`;
       navigator.clipboard
         .writeText(url)
         .then(() =>
@@ -2738,7 +2757,7 @@ export default defineComponent({
 
     showSplashScreen(val: boolean) {
       if (!val) {
-        this.inIntro = true; 
+        this.inIntro = !this.skipIntro;
       }
     },
     
@@ -2872,6 +2891,15 @@ body {
   // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
+}
+
+span.dot.blue {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(0,0,255,1);
+  text-align: center;
+  
 }
 
 #app {
@@ -3578,8 +3606,15 @@ body {
     z-index: 500;
   }
 
+
 #guided-content-container {  
   --top-content-max-height: max(30vmin, 35vh);
+  
+  strong {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--accent-color-2);
+  }
   
   @media (max-width: 600px) {
     --top-content-max-height: max(40vmin, 40vh);
