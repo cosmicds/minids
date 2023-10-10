@@ -808,7 +808,7 @@
           >
             <template v-slot:target>
               <v-switch
-              v-if="!mobile"
+                v-if="!mobile"
                 inset
                 hide-details
                 :ripple="false"
@@ -845,6 +845,7 @@
             >
               <template v-slot:target>
                 <v-switch
+                  v-if="!mobile"
                   inset
                   hide-details
                   v-model="toggleTrackSun"
@@ -3997,6 +3998,7 @@ body {
   #top-switches {
     position: absolute;
     right: 0;
+    text-align: right;
 
     @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
