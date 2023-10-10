@@ -647,17 +647,7 @@
                 icon="puzzle-piece"
               /> Identify the path 
             </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="book-open"
-              /> Learn more 
-            </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="toolbox"
-              /> User guide 
-            </v-col>
-        </v-row>
+          </v-row>
         </div>
         
         <div id="splash-screen-acknowledgements">
