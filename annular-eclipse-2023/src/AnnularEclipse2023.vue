@@ -802,6 +802,7 @@
       </div>
       <div id="top-switches">
         <v-tooltip
+            v-if="!mobile"
             location="left"
             :color="accentColor"
             :style="cssVars"
@@ -851,7 +852,18 @@
                   false-icon="mdi-image"
                 >
                 </v-switch>
-                
+                <v-btn
+                  v-if="mobile"
+                  :style="{'textTransform': 'none'}"
+                  :variant="toggleTrackSun ? 'tonal' : 'flat'"
+                  density="comfortable"
+                  @click="toggleTrackSun = !toggleTrackSun"
+                  :ripple="false"
+                  :color="accentColor"
+                  :class="toggleTrackSun ? 'sun-tracking' : 'sun-not-tracking'"
+                  >
+                  {{ toggleTrackSun ? 'Sun is Centerd' : 'Re-Center Sun' }}
+                </v-btn>                
               </div>
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
