@@ -2840,6 +2840,14 @@ body {
   font-size: var(--default-font-size);
 }
 
+.leaflet-grab {
+      cursor: pointer;
+    }
+    
+.leaflet-dragging .leaflet-grab {
+  cursor: grabbing;
+}
+
 .v-chip {
   border: none;
   color: blue;
