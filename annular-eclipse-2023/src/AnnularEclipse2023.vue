@@ -264,17 +264,7 @@
     >
       <v-card
         class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">Information</h3></v-card-title>
           <font-awesome-icon
           v-if="!mobile"
           id="close-text-icon"
@@ -366,17 +356,7 @@
       :style="cssVars"
     >
       <v-card class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw), 32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">User Guide</h3></v-card-title>
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
