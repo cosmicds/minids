@@ -819,17 +819,12 @@
       > </v-chip>
       </div>
       <div id="top-switches">
-        <v-tooltip
+        <hover-tooltip
             location="left"
-            :color="accentColor"
-            :style="cssVars"
             :disabled="mobile"
+            id="viewer-mode-switch"
           >
-          <template v-slot:activator="{props}">
-            <div 
-              v-bind="props"
-              id="viewer-mode-switch"
-              >
+            <template v-slot:target>
               <v-switch
               v-if="!mobile"
                 inset
@@ -855,23 +850,16 @@
                 >
                 Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
               </v-btn>
-            
-            </div>
-          </template>
-          
-        </v-tooltip>
+            </template>
+            Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+        </hover-tooltip>
 
         <div id="track-sun-switch"> 
-          <v-tooltip
+          <hover-tooltip
               location="left"
-              :color="accentColor"
-              :style="cssVars"
               :disabled="mobile"
             >
-            <template v-slot:activator="{props}">
-              <div 
-                v-bind="props"
-              >
+              <template v-slot:target>
                 <v-switch
                   v-if="!mobile"
                   inset
@@ -895,10 +883,10 @@
                   >
                   {{ toggleTrackSun ? 'Sun is Centerd' : 'Re-Center Sun' }}
                 </v-btn>                
-              </div>
+
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
-          </v-tooltip>
+          </hover-tooltip>
         </div>
       </div>
     </div>
