@@ -11,7 +11,7 @@
       :size="showGuidedContent ? 'xl' : 'xl'"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
+      :icon="showGuidedContent ? 'chevron-up' : 'circle-info'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
