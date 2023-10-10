@@ -820,7 +820,6 @@
       </div>
       <div id="top-switches">
         <v-tooltip
-            v-if="!mobile"
             location="left"
             :color="accentColor"
             :style="cssVars"
@@ -832,6 +831,7 @@
               id="viewer-mode-switch"
               >
               <v-switch
+              v-if="!mobile"
                 inset
                 hide-details
                 :ripple="false"
@@ -843,10 +843,22 @@
                 true-icon="mdi-image-filter-hdr"
               >
               </v-switch>
+              <v-btn
+                v-if="mobile"
+                :style="{'textTransform': 'none'}"
+                :variant="viewerMode === 'SunScope' ? 'tonal' : 'flat'"
+                density="comfortable"
+                @click="viewerMode = viewerMode === 'SunScope' ? 'Horizon' : 'SunScope'"
+                :ripple="false"
+                :color="accentColor"
+                :class="viewerMode === 'SunScope' ? 'sun-tracking' : 'sun-not-tracking'"
+                >
+                Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+              </v-btn>
             
             </div>
           </template>
-          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
+          
         </v-tooltip>
 
         <div id="track-sun-switch"> 
