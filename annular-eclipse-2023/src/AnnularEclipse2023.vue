@@ -826,7 +826,7 @@
           >
             <template v-slot:target>
               <v-switch
-              v-if="!mobile"
+                v-if="!mobile"
                 inset
                 hide-details
                 :ripple="false"
@@ -4043,6 +4043,7 @@ span.dot.blue {
   #top-switches {
     position: absolute;
     right: 0;
+    text-align: right;
 
     @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
