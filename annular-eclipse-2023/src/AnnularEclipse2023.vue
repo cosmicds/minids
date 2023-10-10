@@ -3414,6 +3414,20 @@ body {
     width: calc(100% - 3em);
     align-self: left;
   }
+  
+  .v-card-title {
+    display: flex;
+    justify-content: center;
+    align-self: stretch;
+    border-bottom: 2px solid var(--accent-color);
+    
+    h3 {
+      color: var(--accent-color);
+      align-self: center;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
 
   .v-card-text {
     height: 40vh;
