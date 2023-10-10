@@ -2857,7 +2857,16 @@ body {
   // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
+  .icon-wrapper {
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    user-select: none;
+  }
+
+  
 }
+
+
 
 #app {
   width: 100%;
