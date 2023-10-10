@@ -191,7 +191,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
+                :tooltip-text="showInfoSheet ? null : 'More on Eclipses'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
