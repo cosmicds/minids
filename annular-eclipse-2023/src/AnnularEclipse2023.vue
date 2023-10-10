@@ -2151,7 +2151,7 @@ export default defineComponent({
         headers: {
           "Content-Type": "application/json",
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          "Authorization": process.env.CDS_API_KEY ?? ""
+          "Authorization": process.env.VUE_APP_CDS_API_KEY ?? ""
         },
         body: JSON.stringify({
           // eslint-disable-next-line @typescript-eslint/naming-convention

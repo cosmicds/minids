@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: yarn build
         env:
-          CDS_API_KEY: ${{ secrets.CDS_API_KEY }}
+          VUE_APP_CDS_API_KEY: ${{ secrets.CDS_API_KEY }}
 
       - name: Get workspaces
         uses: sergeysova/jq-action@v2
