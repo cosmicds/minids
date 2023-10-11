@@ -646,8 +646,8 @@
         <div id="splash-screen-acknowledgements">
           This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
           
-          <div id="splash-screen-icons">
-            <mini-credits/>
+          <div id="splash-screen-logos">
+            <credit-logos/>
           </div>
         </div>
       </div>
@@ -1044,21 +1044,8 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" v-if= "!smallSize">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-            ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-        </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 
@@ -3317,9 +3304,25 @@ body {
     width: 70%; 
   }
 
-  #splash-screen-icons {
-    margin-top: 0.5em;
-    margin-bottom: 0.75em;
+  #splash-screen-logos {
+    margin-block: 0.75em;
+
+    img {
+    height: 5vmin;
+    vertical-align: middle;
+    margin: 2px;
+    }
+
+    @media only screen and (max-width: 600px) {
+      img {
+        height: 24px;
+      }
+    }
+
+    svg {
+      vertical-align: middle;
+      height: 24px;
+    }
   }
   
   a {
@@ -3585,6 +3588,17 @@ body {
       color: var(--sky-color);
       opacity: 0.7;
     }
+  }
+}
+
+#body-logos {
+  margin-left: auto;
+  margin-right: 0;
+
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
   }
 }
 
