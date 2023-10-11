@@ -571,7 +571,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div v-if="learnerPath === 'Choose'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
