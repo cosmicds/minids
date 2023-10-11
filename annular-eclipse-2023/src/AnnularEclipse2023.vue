@@ -45,16 +45,17 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
-                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse!</p>
+                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+
+                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
+                <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click below to select it.</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
+                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it.</p>
+                <p>If you are not sure, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
               <mc-radiogroup
                 v-if="learnerPath=='Answer'"
@@ -128,10 +129,14 @@
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
                 <p v-if="queryData">
-                  Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
+                  <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
-                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
-                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
+                <p>
+                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                </p>
+                <p>
+                  <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
+                </p>
               </span>
             </div>
           </div>
