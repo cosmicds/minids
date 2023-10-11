@@ -8,7 +8,7 @@
   <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
-      :size="showGuidedContent ? 'xl' : 'xl'"
+      size="xl"
       class="ma-1"
       :color="accentColor"
       :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
@@ -1579,6 +1579,7 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+    this.showGuidedContent = !this.xSmallSize;
 
     this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
 
