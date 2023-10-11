@@ -480,7 +480,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li class="mb-3">
+                      <li class="mb-2">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -491,7 +491,7 @@
                         border-radius: 20px;
                         font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
-                      <li>
+                      <li class="switch-bullets">
                         <v-switch
                           class="display-only-switch"
                           v-model="displaySwitchOff"
@@ -505,7 +505,7 @@
                         </v-switch>
                         <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
                       </li>
-                      <li class="mb-3">
+                      <li class="switch-bullets mb-3">
                         <v-switch
                           class="display-only-switch"
                           v-model="displaySwitchOn"
@@ -519,7 +519,7 @@
                         </v-switch>
                         <span class="user-guide-emphasis"> Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
                       </li>
-                      <li>
+                      <li class="switch-bullets">
                         <v-switch
                           class="display-only-switch"
                           v-model="displaySwitchOn"
@@ -533,7 +533,7 @@
                         </v-switch>
                         <span class="user-guide-emphasis"> Track Sun:</span> Always keep camera centered on Sun.
                       </li>
-                      <li class="mb-5">
+                      <li class="switch-bullets mb-5">
                         <v-switch
                           class="display-only-switch"
                           v-model="displaySwitchOff"
@@ -3508,7 +3508,7 @@ body {
 
   #user-guide {
     font-size: var(--default-font-size);
-    line-height: var(--default-line-height);
+    line-height: calc(1.1 * var(--default-line-height));
 
     .v-chip {
       color: unset;
@@ -3531,13 +3531,14 @@ body {
       font-weight: bold;
     }
     
-    li:not(:first-of-type) {
+    li.switch-bullets {
+      margin-top: -1em;
+
       padding-left: 0.5ch;
       .v-switch {
         transform: translateY(15%);
-        
       }
-      
+
       .user-guide-emphasis {
         padding-left: 1ch;
       }
