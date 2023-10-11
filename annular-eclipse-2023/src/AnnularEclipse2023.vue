@@ -11,7 +11,7 @@
       :size="showGuidedContent ? 'xl' : 'xl'"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
+      :icon="showGuidedContent ? 'chevron-down' : 'circle-info'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
@@ -191,7 +191,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
+                :tooltip-text="showInfoSheet ? null : 'More on Eclipses'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
@@ -202,7 +202,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
+                :tooltip-text="showWWTGuideSheet ? null : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
@@ -264,17 +264,7 @@
     >
       <v-card
         class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">Information</h3></v-card-title>
           <font-awesome-icon
           v-if="!mobile"
           id="close-text-icon"
@@ -350,6 +340,7 @@
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
                 <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                <div class="disclaimer">Not to scale</div>
               </figure>
             </v-container>
           </v-card-text>
@@ -366,17 +357,7 @@
       :style="cssVars"
     >
       <v-card class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw), 32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">User Guide</h3></v-card-title>
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
@@ -590,7 +571,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div v-if="learnerPath === 'Choose'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -693,6 +674,20 @@
       >
       <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
         <v-window v-model="introSlide">
+          <template v-slot:additional>
+            <div id="intro-window-close-button">
+            <font-awesome-icon
+              size="xl"
+              class="ma-1"
+              color="#b3d5e6"
+              icon='square-xmark'
+              @click="inIntro = !inIntro"
+              @keyup.enter="inIntro = !inIntro"
+              tabindex="0"
+              tooltip-location="start"
+            /> 
+          </div>
+          </template>
           <v-window-item :value="1">
             <div class="intro-text">
               <p class="mb-5">
@@ -2849,6 +2844,14 @@ body {
   font-size: var(--default-font-size);
 }
 
+.leaflet-grab {
+      cursor: cell;
+    }
+    
+.leaflet-dragging .leaflet-grab {
+  cursor: all-scroll;
+}
+
 .v-chip {
   border: none;
   color: blue;
@@ -2866,7 +2869,16 @@ body {
   // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
+  .icon-wrapper {
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    user-select: none;
+  }
+
+  
 }
+
+
 
 #app {
   width: 100%;
@@ -2989,7 +3001,7 @@ body {
   left: 1rem;
   
   &.budge {
-    top: 2.5rem;
+    top: 2.7rem;
     left: 0.5rem;
   }
   
@@ -3380,16 +3392,19 @@ body {
     
     }
   }
-
+  
+  
   figure {
+    // make it stick in the viewport
     position: sticky;
     height: 100%;
+    padding-top: 1em;
 
-    @media (max-width: 700px ) {
+    @media (max-width: 960px ) {
       width: 100%;
     }
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       width: 50%;
     }
 
@@ -3405,6 +3420,15 @@ body {
       background-color: #212121;
       padding-inline: 10px 5px;
     }
+    
+    .disclaimer {
+      position: absolute;
+      font-size: calc(0.8 * var(--default-font-size));
+      top: 2em;
+      right: 1em;
+      font-weight: bold;
+    }
+    
   }
   
   .v-overlay__content {
@@ -3416,6 +3440,7 @@ body {
   .bottom-sheet-card {
     height: fit-content;
     width: 100%;
+
     align-self: center;
     border-bottom: solid #212121 0.5em;
   }
@@ -3423,6 +3448,20 @@ body {
   #tabs {
     width: calc(100% - 3em);
     align-self: left;
+  }
+  
+  .v-card-title {
+    display: flex;
+    justify-content: center;
+    align-self: stretch;
+    border-bottom: 2px solid var(--accent-color);
+    
+    h3 {
+      color: var(--accent-color);
+      align-self: center;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
   }
 
   .v-card-text {
@@ -3457,6 +3496,13 @@ body {
     // border-bottom-left-radius: 0px !important;
     // border-bottom-right-radius: 0px !important;
     width: auto;
+    height: fit-content;
+    max-height: 50vh;
+    
+    @media (max-width: 700px ) {
+      max-height: 70vh;
+    }
+    
   }
   
 
@@ -3642,7 +3688,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.5em;
     
     position: relative;
@@ -3682,6 +3728,7 @@ body {
     border: 1.5px solid var(--sky-color);
     border-radius: 5px;
     align-items: center;
+    justify-content: space-evenly;
 
     &.non-map-row-collapse {
       height: 5ch;
@@ -3813,6 +3860,16 @@ body {
 
 .bullet-icon {
   color: var(--accent-color)
+}
+
+#intro-window-close-button {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+
+    &:hover {
+      cursor: pointer;
+    }
 }
 
 #introduction-overlay {
