@@ -464,7 +464,7 @@
                               icon="rotate"
                               size="lg" 
                             ></font-awesome-icon>
-                        to reset time and view. 
+                        to reset time, view, and speed. 
                       </li>
                       <li>
                         You can also control time by dragging <v-icon
@@ -480,7 +480,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li class="mb-1">
+                      <li class="mb-3">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -492,32 +492,67 @@
                         font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
                       <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-telescope"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          inset
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-telescope"
+                        >
+                        </v-switch>
+                         <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      </li>
+                      <li class="mb-3">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          inset
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-image-filter-hdr"
+                          size="small"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
                       </li>
                       <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image-filter-hdr"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          inset
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-white-balance-sunny"
+                          size="large"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Track Sun:</span> Always keep camera centered on Sun.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-white-balance-sunny"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
-                      </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      <li class="mb-5">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          inset
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-image"
+                          size="large"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
                       </li>
                     </ul>
 
@@ -1456,6 +1491,8 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+      displaySwitchOn: true,
+      displaySwitchOff: false,
 
       showPrivacyDialog: false,
 
@@ -3485,27 +3522,52 @@ body {
       background-color: unset;
       // font-size: var(--default-font-size);
     }
-  }
 
-  .user-guide-header {
-    margin-top: 1rem;
-    color: var(--accent-color);
-    font-size: calc(1.2 * var(--default-font-size));
-  }
+    .user-guide-header {
+      margin-top: 1rem;
+      color: var(--accent-color);
+      font-size: calc(1.2 * var(--default-font-size));
+    }
 
-  .user-guide-emphasis {
-    color: var(--accent-color);
-    font-weight: bold;
-  }
+    .user-guide-emphasis {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
 
-  .user-guide-emphasis-white {
-    font-weight: bold;
-  }
+    .user-guide-emphasis-white {
+      font-weight: bold;
+    }
 
-  .solid-divider {
-    margin-top: 1rem;
-    color: var(--sky-color);
-    opacity: 0.7;
+    .display-only-switch {
+    
+      display: inline-block;
+      position: relative;
+      bottom: calc(-0.5 * var(--default-line-height));
+
+      .v-selection-control--density-default {
+        --v-selection-control-size:var(--default-line-height);
+      }
+
+      .v-selection-control--disabled {
+      opacity: 100%;
+      pointer-events: none;
+
+        .v-switch__thumb {
+          background-color: black;
+        }
+
+        .v-icon {
+          color: var(--accent-color);
+          background-color: black;
+        }
+      }
+    }
+
+    .solid-divider {
+      margin-top: 1rem;
+      color: var(--sky-color);
+      opacity: 0.7;
+    }
   }
 }
 
@@ -3962,7 +4024,7 @@ body {
   }
 
   .v-switch__thumb {
-    color: #f39d6c;
+    color: var(--accent-color);
     background-color: black;
 
     @media (min-width: 751px) { //LARGE
@@ -3978,6 +4040,10 @@ body {
   .v-selection-control--density-default {
     --v-selection-control-size: auto;
   } 
+
+  .v-switch__track {
+    background-color: #737373 !important;
+  }
 
   .v-switch--inset .v-switch__track {
     @media (min-width: 751px) { //LARGE
