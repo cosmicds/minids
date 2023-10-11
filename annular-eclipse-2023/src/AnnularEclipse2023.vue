@@ -47,14 +47,31 @@
               <span class="description">
                 <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
 
-                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
+                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there. 
+                <span v-if="xSmallSize">
+                  ({{ touchscreen ? "Tap" : "Click" }}
+                  <v-icon
+                    class="inline-icon"
+                    :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
+                    size="small" 
+                  ></v-icon>
+                  to <span>{{ collapseText ? "re-open" : "minimize" }}</span>  this. Scroll up as needed to see the whole map.)</span></p>
                 <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it.</p>
+                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it. 
+                  <span v-if="xSmallSize">
+                  ({{ touchscreen ? "Tap" : "Click" }}
+                  <v-icon
+                    class="inline-icon"
+                    :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
+                    size="small" 
+                  ></v-icon>
+                  to <span>{{ collapseText ? "re-open" : "minimize" }}</span>  this. Scroll up as needed to see the whole map with the path choices.)</span>
+                </p>
                 <p>If you are not sure, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
               <mc-radiogroup
@@ -133,6 +150,14 @@
                 </p>
                 <p>
                   <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                  <span v-if="xSmallSize">
+                  ({{ touchscreen ? "Tap" : "Click" }}
+                  <v-icon
+                    class="inline-icon"
+                    :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
+                    size="small" 
+                  ></v-icon>
+                  to <span>{{ collapseText ? "re-open" : "minimize" }}</span>  this. Scroll up as needed to see the whole map.)</span>
                 </p>
                 <p>
                   <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
@@ -3892,6 +3917,11 @@ body {
 .bullet-icon {
   color: var(--accent-color);
   width: 1.5em;
+}
+
+.inline-icon {
+  color: var(--accent-color);
+  width: 1em;
 }
 
 #intro-window-close-button {
