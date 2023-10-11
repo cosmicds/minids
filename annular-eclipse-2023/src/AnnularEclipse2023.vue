@@ -45,16 +45,17 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
-                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse!</p>
+                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+
+                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
+                <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click below to select it.</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
+                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it.</p>
+                <p>If you are not sure, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
               <mc-radiogroup
                 v-if="learnerPath=='Answer'"
@@ -128,10 +129,14 @@
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
                 <p v-if="queryData">
-                  Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
+                  <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
-                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
-                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
+                <p>
+                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                </p>
+                <p>
+                  <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
+                </p>
               </span>
             </div>
           </div>
@@ -542,37 +547,32 @@
                           
                   <v-divider thickness="2px" class="solid-divider"></v-divider>
                   
-                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
-                  <p class="mt-2">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <div class="credits">
-                  <h3>Credits:</h3>
-                  <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                  Pat Udomprasert<br>
-                  Jon Carifio<br>
-                  John Lewis<br>
-                  Alyssa Goodman<br>
-                  Mary Dussault<br>
-                  Harry Houghton<br>
-                  Anna Nolin<br>
-                  Evaluator: Sue Sunbury<br>
-                  <br>
-                  <h4>WorldWide Telescope Team:</h4>
-                  Peter Williams<br>
-                  A. David Weigel<br>
-                  Jon Carifio<br>
-                  </div>
-                  <v-spacer class="end-spacer"></v-spacer>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <funding-acknowledgment/>
-                </v-col>
-              </v-row>
+              <div id="text-credits">
+                <h3>Credits:</h3>
+
+                <p class="mt-2">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
+                <p class="my-3">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
+
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4> 
+                
+                Pat Udomprasert<br>
+                Jon Carifio<br>
+                John Lewis<br>
+                Alyssa Goodman<br>
+                Mary Dussault<br>
+                Harry Houghton<br>
+                Anna Nolin<br>
+                Evaluator: Sue Sunbury<br>
+                
+                <h4><a href="https://www.worldwidetelescope.org/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a> Team:</h4>
+                Peter Williams<br>
+                A. David Weigel<br>
+                Jon Carifio<br>
+              </div>
+              
+              <funding-acknowledgment/>
 
             </v-container>              
           </v-card-text>
@@ -651,8 +651,8 @@
         <div id="splash-screen-acknowledgements">
           This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
           
-          <div id="splash-screen-icons">
-            <mini-credits/>
+          <div id="splash-screen-logos">
+            <credit-logos/>
           </div>
         </div>
       </div>
@@ -1049,40 +1049,8 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" class="ui-text" v-if= "!smallSize">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-            ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-          <!-- <ShareNetwork
-            v-for="network in networks"
-            :key="network.name"
-            :network="network.name"
-            :class="`${network.name}-button`"
-            :style="{ backgroundColor: network.color, width: 'fit-content' }"
-            :description="description"
-            :url="url"
-            :title="title"
-            :hashtags="hashtagString"
-            :quote="description"
-            twitter-user="WWTelescope"
-          >
-            <font-awesome-icon
-              :class="`${network.name}-icon`"
-              :icon="['fab', network.name]"
-              size="lg"
-            ></font-awesome-icon>
-          </ShareNetwork> -->
-        </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 
@@ -3199,40 +3167,19 @@ body {
   color: var(--accent-color);
 }
 
-#credits {
+#text-credits {
+  margin-block: 1rem;
+  width: 100%;
   color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
+  font-size: calc(1.1 * var(default-font-size));
+  line-height: calc(1.1 * var(default-line-height));
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  text-align: left;
 
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
-
-  img {
-    height: 35px;
-    vertical-align: middle;
-    margin: 2px;
+  h4 {
+    margin-top: 0.6rem;
+    margin-bottom: 0.3rem;
   }
 }
 
@@ -3347,20 +3294,25 @@ body {
     width: 70%; 
   }
 
-  #splash-screen-icons {
-    margin-top: 0.5em;
-    margin-bottom: 0.75em;
-    
-    #credits {
-      background-color: transparent;
-      border: 2px solid transparent;
+  #splash-screen-logos {
+    margin-block: 0.75em;
+
+    img {
+    height: 5vmin;
+    vertical-align: middle;
+    margin: 2px;
     }
-  }
-  
-  a {
-    text-decoration: none;
-    color: var(--accent-color-3);
-    white-space: nowrap;
+
+    @media only screen and (max-width: 600px) {
+      img {
+        height: 24px;
+      }
+    }
+
+    svg {
+      vertical-align: middle;
+      height: 24px;
+    }
   }
 }
 
@@ -3411,7 +3363,7 @@ body {
       padding-block: 0.7em;
       padding-inline: 1.2em;
       height: fit-content;
-      background-color: #37474F;
+      background-color: #38464f;
       
       summary {
         font-weight: bold;
@@ -3499,10 +3451,6 @@ body {
 
   .v-card-text {
     height: 40vh;
-    
-    & a {
-      text-decoration: none;
-    }
   }
 
   .close-icon {
@@ -3620,6 +3568,17 @@ body {
       color: var(--sky-color);
       opacity: 0.7;
     }
+  }
+}
+
+#body-logos {
+  margin-left: auto;
+  margin-right: 0;
+
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
   }
 }
 
@@ -3837,11 +3796,6 @@ body {
           }
         }
       }
-    }
-    a {
-      color: #ff00ff;
-      text-decoration: none;
-      font-weight: bold;
     }
   }
 
@@ -4182,4 +4136,12 @@ body {
     padding: 0 4px;
   }
 }
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #589eef; // lighter variant of sky color
+    pointer-events: auto;
+  }
+
 </style>
