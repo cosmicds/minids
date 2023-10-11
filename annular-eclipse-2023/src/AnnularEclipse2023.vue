@@ -11,7 +11,7 @@
       :size="showGuidedContent ? 'xl' : 'xl'"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'chevron-up' : 'circle-info'"
+      :icon="showGuidedContent ? 'chevron-down' : 'circle-info'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
@@ -3011,7 +3011,7 @@ body {
   left: 1rem;
   
   &.budge {
-    top: 2.5rem;
+    top: 2.7rem;
     left: 0.5rem;
   }
   
