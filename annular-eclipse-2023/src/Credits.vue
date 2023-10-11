@@ -1,5 +1,5 @@
 <template>
-  <div id="logo-credits" class="ui-text">
+  <div id="logo-credits">
     <div id="icons-container">
       <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
         ><img alt="CosmicDS Logo" :src="require('../../assets/cosmicds_logo_for_dark_backgrounds.png')"
@@ -20,8 +20,6 @@
 
 <script lang="ts">
 import { defineComponent, } from "vue";
-
-
 
 export default defineComponent({
 
@@ -60,36 +58,6 @@ export default defineComponent({
 
 <style scoped lang="less">
 
-#logo-credits {
-  color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
-
   img {
     height: 5vmin;
     vertical-align: middle;
@@ -97,14 +65,14 @@ export default defineComponent({
   }
 
   @media only screen and (max-width: 600px) {
-  img {
-    height: 24px;
+    img {
+      height: 24px;
+    }
   }
-}
 
   svg {
     vertical-align: middle;
     height: 24px;
   }
-}
+
 </style>

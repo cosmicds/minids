@@ -3320,11 +3320,6 @@ body {
   #splash-screen-icons {
     margin-top: 0.5em;
     margin-bottom: 0.75em;
-    
-    #credits {
-      background-color: transparent;
-      border: 2px solid transparent;
-    }
   }
   
   a {
