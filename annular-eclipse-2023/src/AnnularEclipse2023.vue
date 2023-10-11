@@ -791,7 +791,7 @@
   <div id="top-wwt-content">
       <div id="location-date-display">
         <v-chip 
-          prepend-icon="mdi-map-marker-radius"
+          :prepend-icon="smallSize ? `` : `mdi-map-marker-radius`"
           variant="outlined"
           size="small"
           elevation="2"
@@ -802,7 +802,7 @@
             }"
         > </v-chip>
         <v-chip 
-        prepend-icon="mdi-clock"
+        :prepend-icon="smallSize ? `` : `mdi-clock`"
         variant="outlined"
         size="small"
         elevation="2"
@@ -862,14 +862,8 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210 && !smallSize"
-          prepend-icon="mdi-sun-angle"
-          variant="outlined"
-          elevation="2"
-          :text="percentEclipsedText"
-        > </v-chip>
-        <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210 && smallSize"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210"
+          :prepend-icon="smallSize ? `` : `mdi-sun-angle`"
           variant="outlined"
           elevation="2"
           :text="percentEclipsedText"
