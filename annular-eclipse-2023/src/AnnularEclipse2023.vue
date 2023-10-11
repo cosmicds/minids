@@ -61,7 +61,7 @@
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse at the location marked by the red dot.</p>
 
                 <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
                 <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
@@ -604,7 +604,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="learnerPath === 'Choose'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -3275,8 +3275,16 @@ body {
   }
     
   p.highlight {
-    color: var(--moon-color);
-    -webkit-text-stroke: 0.1px var(--accent-color);
+    color: #444444;
+
+    @media (max-width: 700px) {
+      -webkit-text-stroke: 0.8px var(--accent-color);
+    }
+
+    @media (min-width: 701px) {
+      -webkit-text-stroke: 0.1px var(--accent-color);
+    }
+
   
     // make uppercase
     text-transform: uppercase;
