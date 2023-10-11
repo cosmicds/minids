@@ -1,5 +1,5 @@
 <template>
-  <div id="credits" class="ui-text">
+  <div id="logo-credits" class="ui-text">
     <div id="icons-container">
       <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank"
         ><img alt="CosmicDS Logo" :src="require('../../assets/cosmicds_logo_for_dark_backgrounds.png')"
@@ -60,7 +60,7 @@ export default defineComponent({
 
 <style scoped lang="less">
 
-#credits {
+#logo-credits {
   color: #ddd;
   font-size: calc(0.7em + 0.2vw);
   justify-self: flex-end;

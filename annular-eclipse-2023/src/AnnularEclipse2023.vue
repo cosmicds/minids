@@ -542,37 +542,32 @@
                           
                   <v-divider thickness="2px" class="solid-divider"></v-divider>
                   
-                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
-                  <p class="mt-2">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <div class="credits">
-                  <h3>Credits:</h3>
-                  <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                  Pat Udomprasert<br>
-                  Jon Carifio<br>
-                  John Lewis<br>
-                  Alyssa Goodman<br>
-                  Mary Dussault<br>
-                  Harry Houghton<br>
-                  Anna Nolin<br>
-                  Evaluator: Sue Sunbury<br>
-                  <br>
-                  <h4>WorldWide Telescope Team:</h4>
-                  Peter Williams<br>
-                  A. David Weigel<br>
-                  Jon Carifio<br>
-                  </div>
-                  <v-spacer class="end-spacer"></v-spacer>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <funding-acknowledgment/>
-                </v-col>
-              </v-row>
+              <div id="text-credits">
+                <h3>Credits:</h3>
+
+                <p class="mt-2">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
+                <p class="my-3">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
+
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4> 
+                
+                Pat Udomprasert<br>
+                Jon Carifio<br>
+                John Lewis<br>
+                Alyssa Goodman<br>
+                Mary Dussault<br>
+                Harry Houghton<br>
+                Anna Nolin<br>
+                Evaluator: Sue Sunbury<br>
+                
+                <h4><a href="https://www.worldwidetelescope.org/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a> Team:</h4>
+                Peter Williams<br>
+                A. David Weigel<br>
+                Jon Carifio<br>
+              </div>
+              
+              <funding-acknowledgment/>
 
             </v-container>              
           </v-card-text>
@@ -1049,7 +1044,7 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" class="ui-text" v-if= "!smallSize">
+      <div id="credits" v-if= "!smallSize">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
             ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
@@ -1063,25 +1058,6 @@
           <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
             ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
           /></a>
-          <!-- <ShareNetwork
-            v-for="network in networks"
-            :key="network.name"
-            :network="network.name"
-            :class="`${network.name}-button`"
-            :style="{ backgroundColor: network.color, width: 'fit-content' }"
-            :description="description"
-            :url="url"
-            :title="title"
-            :hashtags="hashtagString"
-            :quote="description"
-            twitter-user="WWTelescope"
-          >
-            <font-awesome-icon
-              :class="`${network.name}-icon`"
-              :icon="['fab', network.name]"
-              size="lg"
-            ></font-awesome-icon>
-          </ShareNetwork> -->
         </div>
       </div>
     </div>
@@ -3199,24 +3175,24 @@ body {
   color: var(--accent-color);
 }
 
-#credits {
+#text-credits {
+  margin-block: 1rem;
+  width: 100%;
   color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
+  font-size: calc(1.1 * var(default-font-size));
+  line-height: calc(1.1 * var(default-line-height));
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  text-align: left;
 
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
+  h4 {
+    margin-top: 0.6rem;
+    margin-bottom: 0.3rem;
   }
 
   a {
     text-decoration: none;
-    color: #fff;
+    color: var(--sky-color);
     pointer-events: auto;
 
     &:hover {
@@ -3227,12 +3203,6 @@ body {
       text-decoration: none;
       filter: brightness(75%);
     }
-  }
-
-  img {
-    height: 35px;
-    vertical-align: middle;
-    margin: 2px;
   }
 }
 
@@ -3359,7 +3329,7 @@ body {
   
   a {
     text-decoration: none;
-    color: var(--accent-color-3);
+    color: var(--sky-color);
     white-space: nowrap;
   }
 }
