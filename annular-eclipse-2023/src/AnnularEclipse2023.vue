@@ -23,7 +23,23 @@
     /> 
   </div>
   <v-container id="guided-content-container" v-if="showGuidedContent">
-    
+    <hover-tooltip
+      tooltip-text="Scroll to top"
+      :disabled="mobile"
+      id="scrollButton"
+      >
+      <template #target>
+    <v-btn
+      v-if="!smAndUp"
+      icon="mdi-arrow-up"
+      @click="scrollToTop"
+      size="small"
+      density="comfortable"
+      :color="accentColor"
+      variant="flat"
+    />
+      </template>
+    </hover-tooltip>
     <div id="non-map-container">
         <div id="title-row" class="non-map-row">
 
@@ -1759,7 +1775,14 @@ export default defineComponent({
   },
 
   methods: {
-
+    
+    scrollToTop() {
+      const element = document.getElementById("guided-content-container");
+      if (element) {
+        element.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+    
     async trackSun(): Promise<void> {
       return this.gotoTarget({
         place: this.sunPlace,
@@ -2809,6 +2832,11 @@ html {
   overflow: hidden;
   -ms-overflow-style: none;
 
+  // We don't want a scrollbar for the overall canvas
+  scrollbar-width: none;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {
@@ -2854,11 +2882,6 @@ body {
     user-select: none;
   }
 
-  // We don't want a scrollbar for the overall canvas
-  scrollbar-width: none;
-  ::-webkit-scrollbar {
-    display: none;
-  }
   
 }
 
@@ -3695,6 +3718,13 @@ body {
   
   @media (max-width: 600px) and (max-aspect-ratio: 1) {
     flex-direction: column;
+  }
+  
+  #scrollButton-button {
+    position: fixed;
+    top: calc(var(--top-content-height) - 2.5rem);
+    right: 1rem;
+    z-index: 500;
   }
   
   #non-map-container {
