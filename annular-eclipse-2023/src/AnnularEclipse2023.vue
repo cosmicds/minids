@@ -2809,11 +2809,6 @@ html {
   overflow: hidden;
   -ms-overflow-style: none;
 
-  // We don't want a scrollbar for the overall canvas
-  scrollbar-width: none;
-  ::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 body {
@@ -2859,6 +2854,11 @@ body {
     user-select: none;
   }
 
+  // We don't want a scrollbar for the overall canvas
+  scrollbar-width: none;
+  ::-webkit-scrollbar {
+    display: none;
+  }
   
 }
 
