@@ -23,7 +23,23 @@
     /> 
   </div>
   <v-container id="guided-content-container" v-if="showGuidedContent">
-    
+    <hover-tooltip
+      :tooltip-text="scrollUp ? 'Scroll to top' : 'Scroll to bottom'"
+      :disabled="mobile"
+      id="scrollButton"
+      >
+      <template #target>
+    <v-btn
+      v-if="!smAndUp"
+      :icon="scrollUp ? 'mdi-arrow-up' : 'mdi-arrow-down'"
+      @click="scrollToTop"
+      size="small"
+      density="comfortable"
+      :color="accentColor"
+      variant="flat"
+    />
+      </template>
+    </hover-tooltip>
     <div id="non-map-container">
         <div id="title-row" class="non-map-row">
 
@@ -1428,6 +1444,7 @@ export default defineComponent({
       inIntro: false,
       displaySwitchOn: true,
       displaySwitchOff: false,
+      scrollUp: false,
 
       showPrivacyDialog: false,
 
@@ -1582,7 +1599,11 @@ export default defineComponent({
     this.showControls = !this.mobile;
 
     this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
-    
+
+    const element = document.getElementById("guided-content-container");
+    if (element) {
+      element.addEventListener("scroll", () => this.onScroll(element));
+    }
   },
 
   computed: {
@@ -1760,6 +1781,26 @@ export default defineComponent({
 
   methods: {
 
+    onScroll(el: HTMLElement) {
+
+      const scrollUp = el.scrollTop > 0;
+      if (this.scrollUp !== scrollUp) {
+        this.scrollUp = scrollUp;
+      }
+
+    },
+    
+    scrollToTop() {
+      const element = document.getElementById("guided-content-container");
+      if (element) {
+        if (this.scrollUp) {
+          element.scrollTo({ top: 0 });
+        } else {
+          element.scrollTo({ top: element.scrollHeight });
+        }
+      }
+    },
+    
     async trackSun(): Promise<void> {
       return this.gotoTarget({
         place: this.sunPlace,
@@ -3695,6 +3736,13 @@ body {
   
   @media (max-width: 600px) and (max-aspect-ratio: 1) {
     flex-direction: column;
+  }
+  
+  #scrollButton-button {
+    position: fixed;
+    top: calc(var(--top-content-height) - 2.5rem);
+    right: 1rem;
+    z-index: 1000;
   }
   
   #non-map-container {
