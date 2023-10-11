@@ -266,21 +266,10 @@
         class="bottom-sheet-card">
         <v-card-title tabindex="0"><h3 class="v-btn tab-title">Information</h3></v-card-title>
           <font-awesome-icon
-          v-if="!mobile"
           id="close-text-icon"
           class="control-icon"
           :icon="`square-xmark`"
           size="xl"
-          @click="showInfoSheet = false"
-          @keyup.enter="showInfoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <font-awesome-icon
-          v-else
-          id="close-text-icon"
-          class="control-icon"
-          :icon="`square-xmark`"
-          size="m"
           @click="showInfoSheet = false"
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
