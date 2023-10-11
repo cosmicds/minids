@@ -496,7 +496,6 @@
                           class="display-only-switch"
                           v-model="displaySwitchOff"
                           density="compact"
-                          inset
                           hide-details
                           disabled
                           :ripple="false"
@@ -504,20 +503,18 @@
                           false-icon="mdi-telescope"
                         >
                         </v-switch>
-                         <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                        <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
                       </li>
                       <li class="mb-3">
                         <v-switch
                           class="display-only-switch"
                           v-model="displaySwitchOn"
                           density="compact"
-                          inset
                           hide-details
                           disabled
                           :ripple="false"
                           :color="accentColor"
                           true-icon="mdi-image-filter-hdr"
-                          size="small"
                         >
                         </v-switch>
                         <span class="user-guide-emphasis"> Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
@@ -527,13 +524,11 @@
                           class="display-only-switch"
                           v-model="displaySwitchOn"
                           density="compact"
-                          inset
                           hide-details
                           disabled
                           :ripple="false"
                           :color="accentColor"
                           true-icon="mdi-white-balance-sunny"
-                          size="large"
                         >
                         </v-switch>
                         <span class="user-guide-emphasis"> Track Sun:</span> Always keep camera centered on Sun.
@@ -543,13 +538,11 @@
                           class="display-only-switch"
                           v-model="displaySwitchOff"
                           density="compact"
-                          inset
                           hide-details
                           disabled
                           :ripple="false"
                           :color="accentColor"
                           false-icon="mdi-image"
-                          size="large"
                         >
                         </v-switch>
                         <span class="user-guide-emphasis"> Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
@@ -3536,6 +3529,18 @@ body {
 
     .user-guide-emphasis-white {
       font-weight: bold;
+    }
+    
+    li:not(:first-of-type) {
+      padding-left: 0.5ch;
+      .v-switch {
+        transform: translateY(15%);
+        
+      }
+      
+      .user-guide-emphasis {
+        padding-left: 1ch;
+      }
     }
 
     .display-only-switch {
