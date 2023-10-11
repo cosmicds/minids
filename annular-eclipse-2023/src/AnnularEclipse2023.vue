@@ -801,17 +801,12 @@
       > </v-chip>
       </div>
       <div id="top-switches">
-        <v-tooltip
+        <hover-tooltip
             location="left"
-            :color="accentColor"
-            :style="cssVars"
             :disabled="mobile"
+            id="viewer-mode-switch"
           >
-          <template v-slot:activator="{props}">
-            <div 
-              v-bind="props"
-              id="viewer-mode-switch"
-              >
+            <template v-slot:target>
               <v-switch
                 inset
                 hide-details
@@ -822,25 +817,20 @@
                 false-icon="mdi-telescope"
                 true-value="Horizon"
                 true-icon="mdi-image-filter-hdr"
+                @keyup.enter="viewerMode = viewerMode === 'SunScope' ? 'Horizon' : 'SunScope'"
+                tabindex="0"
               >
               </v-switch>
-            
-            </div>
-          </template>
-          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-        </v-tooltip>
+            </template>
+            Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+        </hover-tooltip>
 
         <div id="track-sun-switch"> 
-          <v-tooltip
+          <hover-tooltip
               location="left"
-              :color="accentColor"
-              :style="cssVars"
               :disabled="mobile"
             >
-            <template v-slot:activator="{props}">
-              <div 
-                v-bind="props"
-              >
+              <template v-slot:target>
                 <v-switch
                   inset
                   hide-details
@@ -849,13 +839,13 @@
                   :color="accentColor"
                   true-icon="mdi-white-balance-sunny"
                   false-icon="mdi-image"
+                  @keyup.enter="toggleTrackSun = !toggleTrackSun"
+                  tabindex="0"
                 >
                 </v-switch>
-                
-              </div>
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
-          </v-tooltip>
+          </hover-tooltip>
         </div>
       </div>
     </div>
@@ -3985,6 +3975,7 @@ body {
   #top-switches {
     position: absolute;
     right: 0;
+    text-align: right;
 
     @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
