@@ -5,7 +5,7 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  <div id="closed-top-container">
+  <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
       :size="showGuidedContent ? 'xl' : 'xl'"
@@ -266,21 +266,10 @@
         class="bottom-sheet-card">
         <v-card-title tabindex="0"><h3 class="v-btn tab-title">Information</h3></v-card-title>
           <font-awesome-icon
-          v-if="!mobile"
           id="close-text-icon"
           class="control-icon"
           :icon="`square-xmark`"
           size="xl"
-          @click="showInfoSheet = false"
-          @keyup.enter="showInfoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <font-awesome-icon
-          v-else
-          id="close-text-icon"
-          class="control-icon"
-          :icon="`square-xmark`"
-          size="m"
           @click="showInfoSheet = false"
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
@@ -331,7 +320,7 @@
                     <details>
                       <summary>Where can I learn more?</summary>
                       <p>
-                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse.
+                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse and Fiske Planetarium's <a href="https://www.colorado.edu/fiske/projects/science-through-shadows" target="_blank" rel="noopener noreferrer">Science Through Shadows</a> videos.
                       </p>
                     </details>
                   </div>
@@ -383,7 +372,7 @@
                   </v-chip>
                 </v-col>
                 <v-col cols="8" class="pt-1">
-                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? "" : "or" }}  <strong>{{ touchscreen ? "" : "W-A-S-D" }}</strong> {{ touchscreen ? "" : "keys" }}<br>
                 </v-col>
               </v-row>
               <v-row align="center">
@@ -396,7 +385,7 @@
                   </v-chip>
                 </v-col>
                 <v-col cols="8" class="pt-1">
-                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? "" : "or" }} <strong>{{ touchscreen ? "" : "I-O" }}</strong> {{ touchscreen ? "" : "keys" }}<br>
                 </v-col>
               </v-row>
               <v-row>
@@ -445,7 +434,7 @@
                               icon="rotate"
                               size="lg" 
                             ></font-awesome-icon>
-                        to reset time and view. 
+                        to reset time, view, and speed. 
                       </li>
                       <li>
                         You can also control time by dragging <v-icon
@@ -461,7 +450,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li class="mb-1">
+                      <li class="mb-2">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -472,33 +461,61 @@
                         border-radius: 20px;
                         font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-telescope"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      <li class="switch-bullets">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-telescope"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image-filter-hdr"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                      <li class="switch-bullets mb-3">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-image-filter-hdr"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-white-balance-sunny"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
+                      <li class="switch-bullets">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-white-balance-sunny"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Track Sun:</span> Always keep camera centered on Sun.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      <li class="switch-bullets mb-5">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-image"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
                       </li>
                     </ul>
 
@@ -628,17 +645,7 @@
                 icon="puzzle-piece"
               /> Identify the path 
             </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="book-open"
-              /> Learn more 
-            </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="toolbox"
-              /> User guide 
-            </v-col>
-        </v-row>
+          </v-row>
         </div>
         
         <div id="splash-screen-acknowledgements">
@@ -716,31 +723,31 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Explore what the eclipse will look like from different parts of the U.S.
+                    <strong>Explore</strong> what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Choose any location around the world. See and share how the eclipse would look from there.
+                    <strong>Select any location</strong> around the world. See and share how the eclipse would look from there.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
+                    Identify the path of the annular eclipse for the U.S. in our <strong>Map Quiz</strong>.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses. 
+                    <strong>Learn more</strong> about solar eclipses. 
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about how to navigate this app. 
+                    Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
               </ul>
             </div>
@@ -848,10 +855,15 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210 && !smallSize"
           prepend-icon="mdi-sun-angle"
           variant="outlined"
-          size="medium"
+          elevation="2"
+          :text="percentEclipsedText"
+        > </v-chip>
+        <v-chip 
+          v-if="showEclipsePercentage && wwtZoomDeg < 210 && smallSize"
+          variant="outlined"
           elevation="2"
           :text="percentEclipsedText"
         > </v-chip>
@@ -959,6 +971,8 @@
               :fa-icon="'rotate'"
               @activate="() => {
                     selectedTime = 1697292380000;
+                    speedIndex = 3;
+                    playbackRate = Math.pow(10, speedIndex);
                     playing = false;
                     toggleTrackSun = true;
                   }"
@@ -1429,7 +1443,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false, 
+      showEclipsePercentage: true, 
       showLinkToPath: false, 
       
       toggleTrackSun: true,
@@ -1444,6 +1458,8 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+      displaySwitchOn: true,
+      displaySwitchOff: false,
 
       showPrivacyDialog: false,
 
@@ -2997,12 +3013,29 @@ body {
 
 #share-button-wrapper {
   position: absolute;
-  top: 0.7rem;
   left: 1rem;
   
+  @media (max-width: 599px) {
+    top: 2.5rem;
+  }
+
+  @media (min-width: 600px) {
+    top: 0.7rem;
+  }
+
   &.budge {
     top: 2.7rem;
     left: 0.5rem;
+
+    @media (max-width: 599px) {
+      top: 4.2rem;
+    }
+
+    @media (min-width: 600px) {
+      top: 2.5rem;
+    }
+
+
   }
   
   .icon-wrapper {
@@ -3521,34 +3554,72 @@ body {
 
   #user-guide {
     font-size: var(--default-font-size);
-    line-height: var(--default-line-height);
+    line-height: calc(1.1 * var(--default-line-height));
 
     .v-chip {
       color: unset;
       background-color: unset;
       // font-size: var(--default-font-size);
     }
-  }
 
-  .user-guide-header {
-    margin-top: 1rem;
-    color: var(--accent-color);
-    font-size: calc(1.2 * var(--default-font-size));
-  }
+    .user-guide-header {
+      margin-top: 1rem;
+      color: var(--accent-color);
+      font-size: calc(1.2 * var(--default-font-size));
+    }
 
-  .user-guide-emphasis {
-    color: var(--accent-color);
-    font-weight: bold;
-  }
+    .user-guide-emphasis {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
 
-  .user-guide-emphasis-white {
-    font-weight: bold;
-  }
+    .user-guide-emphasis-white {
+      font-weight: bold;
+    }
+    
+    li.switch-bullets {
+      margin-top: -1em;
 
-  .solid-divider {
-    margin-top: 1rem;
-    color: var(--sky-color);
-    opacity: 0.7;
+      padding-left: 0.5ch;
+      .v-switch {
+        transform: translateY(15%);
+      }
+
+      .user-guide-emphasis {
+        padding-left: 1ch;
+      }
+    }
+
+    .display-only-switch {
+    
+      display: inline-block;
+      position: relative;
+      bottom: calc(-0.5 * var(--default-line-height));
+
+      .v-selection-control--density-default {
+        --v-selection-control-size:var(--default-line-height);
+      }
+
+      .v-selection-control--disabled {
+      opacity: 100%;
+      pointer-events: none;
+
+        .v-switch__thumb {
+          background-color: black;
+        }
+
+        .v-icon {
+          color: var(--accent-color);
+          background-color: black;
+        }
+      }
+    }
+
+    .solid-divider {
+      margin-top: 1rem;
+      color: var(--sky-color);
+      opacity: 0.7;
+    }
   }
 }
 
@@ -3613,9 +3684,15 @@ body {
 
 #closed-top-container {
     position: absolute;
-    top: 0.5rem;
     left: 0.5rem;
     z-index: 500;
+    top: 0.5rem;
+
+    &.budge {
+      @media (max-width: 599px) {
+      top: 2.5rem;
+      }
+    }
   }
 
 #guided-content-container {  
@@ -3859,7 +3936,8 @@ body {
 }
 
 .bullet-icon {
-  color: var(--accent-color)
+  color: var(--accent-color);
+  width: 1.5em;
 }
 
 #intro-window-close-button {
@@ -3975,7 +4053,19 @@ body {
 #eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
-  top: calc(-2.2 * var(--default-line-height));
+  top: calc(-1.5 * var(--default-line-height));
+
+  .v-chip.v-chip--density-default {
+    height: var(--default-line-height);
+    padding-inline: 0.8rem;
+    padding-block: 0.8rem;
+  }
+
+  .v-chip__content {
+    font-size: calc(0.8 * var(--default-font-size));
+}
+
+
 }
 
 #top-wwt-content {
@@ -4003,7 +4093,7 @@ body {
   }
 
   .v-switch__thumb {
-    color: #f39d6c;
+    color: var(--accent-color);
     background-color: black;
 
     @media (min-width: 751px) { //LARGE
@@ -4019,6 +4109,10 @@ body {
   .v-selection-control--density-default {
     --v-selection-control-size: auto;
   } 
+
+  .v-switch__track {
+    background-color: #737373 !important;
+  }
 
   .v-switch--inset .v-switch__track {
     @media (min-width: 751px) { //LARGE
