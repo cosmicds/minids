@@ -3176,21 +3176,6 @@ body {
     margin-top: 0.6rem;
     margin-bottom: 0.3rem;
   }
-
-  a {
-    text-decoration: none;
-    color: var(--sky-color);
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
 }
 
 #left-buttons, #right-buttons {
@@ -3324,12 +3309,6 @@ body {
       height: 24px;
     }
   }
-  
-  a {
-    text-decoration: none;
-    color: var(--sky-color);
-    white-space: nowrap;
-  }
 }
 
 .bottom-sheet {
@@ -3379,7 +3358,7 @@ body {
       padding-block: 0.7em;
       padding-inline: 1.2em;
       height: fit-content;
-      background-color: #37474F;
+      background-color: #38464f;
       
       summary {
         font-weight: bold;
@@ -3467,10 +3446,6 @@ body {
 
   .v-card-text {
     height: 40vh;
-    
-    & a {
-      text-decoration: none;
-    }
   }
 
   .close-icon {
@@ -3817,11 +3792,6 @@ body {
         }
       }
     }
-    a {
-      color: #ff00ff;
-      text-decoration: none;
-      font-weight: bold;
-    }
   }
 
   #button-row {
@@ -4161,4 +4131,12 @@ body {
     padding: 0 4px;
   }
 }
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #589eef; // lighter variant of sky color
+    pointer-events: auto;
+  }
+
 </style>
