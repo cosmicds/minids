@@ -1779,7 +1779,7 @@ export default defineComponent({
     scrollToTop() {
       const element = document.getElementById("guided-content-container");
       if (element) {
-        element.scrollTo({ top: 0, behavior: "smooth" });
+        element.scrollTo({ top: 0});
       }
     },
     
@@ -3724,7 +3724,7 @@ body {
     position: fixed;
     top: calc(var(--top-content-height) - 2.5rem);
     right: 1rem;
-    z-index: 500;
+    z-index: 1000;
   }
   
   #non-map-container {
