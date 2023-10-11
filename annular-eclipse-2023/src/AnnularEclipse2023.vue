@@ -56,7 +56,7 @@
             </div>
 
         </div>
-        <div id="instructions-row" :class='["non-map-row", (collapseText && !smAndUp) ? "non-map-row-collapse" : ""]'>
+        <div id="instructions-row" class="non-map-row">
           <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
@@ -157,15 +157,6 @@
             </div>
           </div>
         </div>
-      <v-btn
-        v-if="!smAndUp"
-        id="toggle-instruction-text"
-        :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        @click="collapseText = (!collapseText || smAndUp)"
-        variant="flat"
-        density="compact"
-        size="x-small"
-        />
       <!-- </toggle-content> -->
         <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
@@ -1450,9 +1441,6 @@ export default defineComponent({
 
       tab: 0,
       introSlide: 1,
-
-      collapseText: false,
-      
       
       viewerMode: 'SunScope' as ViewerMode,
 
@@ -3791,8 +3779,6 @@ body {
     }
   
   }
-
-
     
     // .v-row.non-map-row#title-row
   #title-row {
@@ -3821,11 +3807,6 @@ body {
     border-radius: 5px;
     align-items: center;
     justify-content: space-evenly;
-
-    &.non-map-row-collapse {
-      height: 5ch;
-      overflow-y: auto;
-    }
     
     #mc-radiogroup-container {
       padding-block: 0.5em;
