@@ -1,4 +1,5 @@
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
+const DotenvWebpack = require("dotenv-webpack");
 const { defineConfig } = require("@vue/cli-service")
 
 module.exports = defineConfig({
@@ -6,7 +7,11 @@ module.exports = defineConfig({
   
   configureWebpack: {
     plugins: [
-      new VuetifyPlugin()
+      new VuetifyPlugin(),
+      new DotenvWebpack({
+        path: ".env",
+        systemvars: true
+      })
     ]
   },
 
