@@ -210,7 +210,7 @@
               ></icon-button>
               <icon-button
                 v-model="showWWTGuideSheet"
-                fa-icon="toolbox"
+                fa-icon="circle-info"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -752,7 +752,7 @@
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
+                    <font-awesome-icon icon="circle-info" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
