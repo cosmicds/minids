@@ -202,7 +202,7 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
+                :tooltip-text="showWWTGuideSheet ? null : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
