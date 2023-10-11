@@ -5,7 +5,7 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  <div id="closed-top-container">
+  <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
       :size="showGuidedContent ? 'xl' : 'xl'"
@@ -618,7 +618,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div v-if="learnerPath === 'Choose'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -3018,12 +3018,29 @@ body {
 
 #share-button-wrapper {
   position: absolute;
-  top: 0.7rem;
   left: 1rem;
   
-  &.budge {
+  @media (max-width: 599px) {
     top: 2.5rem;
+  }
+
+  @media (min-width: 600px) {
+    top: 0.7rem;
+  }
+
+  &.budge {
+
     left: 0.5rem;
+
+    @media (max-width: 599px) {
+      top: 4.2rem;
+    }
+
+    @media (min-width: 600px) {
+      top: 2.5rem;
+    }
+
+
   }
   
   .icon-wrapper {
@@ -3638,9 +3655,15 @@ body {
 
 #closed-top-container {
     position: absolute;
-    top: 0.5rem;
     left: 0.5rem;
     z-index: 500;
+    top: 0.5rem;
+
+    &.budge {
+      @media (max-width: 599px) {
+      top: 2.5rem;
+      }
+    }
   }
 
 #guided-content-container {  
