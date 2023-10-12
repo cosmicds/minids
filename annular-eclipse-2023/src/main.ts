@@ -10,6 +10,7 @@ import CreditLogos from "./CreditLogos.vue";
 import MCRadiogroup from "./MCRadiogroup.vue";
 import FlipTransition from "./FlipTransition.vue";
 import ImageLabel from "./ImageLabel.vue";
+import GeolocationButton from "./GeolocationButton.vue";
 import HoverTooltip from "./HoverTooltip.vue";
 
 import "./polyfills";
@@ -130,6 +131,7 @@ createApp(AnnularEclipse2023, {
   .component('flip-transition', FlipTransition)
   .component('image-label', ImageLabel)
   .component('funding-acknowledgment', FundingAcknowledgment)
+  .component('geolocation-button', GeolocationButton)
   .component('hover-tooltip', HoverTooltip)
 
   // Mount

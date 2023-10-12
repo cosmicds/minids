@@ -914,6 +914,46 @@
                 label="Amount Eclipsed"
                 hide-details
             />            
+            <v-checkbox
+              :color="accentColor"
+              v-model="getMyLocation"
+              true-icon="mdi-crosshairs-gps"
+              false-icon="mdi-crosshairs"
+              @update:modelValue="(value: boolean) => { value ? ($refs.geolocation as any).getLocation() : null}"
+              @keyup.enter="getMyLocation = !getMyLocation"
+              label="My Location"
+              hide-details
+            >
+            <template #label>
+              <!-- this basically just gives a nice loading circle w/ text -->
+              <!-- if we didn't want the loading circle. this could be placed anywhere -->
+              <geolocation-button
+                :color="accentColor"
+                :hide-text="false"
+                :hide-button="true"
+                show-text-progress
+                label="My Location"
+                ref="geolocation"
+                @geolocation="(loc: GeolocationCoordinates) => { 
+                  myLocation = {
+                    latitudeDeg: loc.latitude, 
+                    longitudeDeg: loc.longitude
+                  };
+                  locationDeg = myLocation;
+                  }"
+                @error="(error: GeolocationPositionError) => { 
+                  $notify({
+                    group: 'geolocation-error',
+                    title: 'Error',
+                    text: error.message,
+                    type: 'error',
+                  }); 
+                  getMyLocation = false;
+                  console.log(error);
+                  }"
+              />
+            </template>
+            </v-checkbox>           
           </div>
         </transition-expand>
       </div>
@@ -1100,6 +1140,7 @@
     </v-dialog>
 
   <notifications group="copy-url" position="center top" classes="url-notification"/>
+  <notifications group="geolocation-error" position="center top" />
   </div>
 </v-app>
 </template>
@@ -1264,6 +1305,8 @@ export default defineComponent({
       showTextTooltip: false,
       showMapSelector: false,
       showLocationSelector: false,
+      getMyLocation: false,
+      myLocation: null as LocationDeg | null,
 
       showWWTGuideSheet: false,
       
@@ -2734,7 +2777,7 @@ export default defineComponent({
         // console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
       }
-      if (locname !== USER_SELECTED) {
+      if ((locname !== USER_SELECTED) && (locname !== 'My Location') ) {
         this.presetLocationsVisited.push(locname);
         this.sendDataToDatabase();
       }
