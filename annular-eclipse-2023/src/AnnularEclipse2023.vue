@@ -757,6 +757,14 @@
                     Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
               </ul>
+              <p v-if="xSmallSize" class="mt-3">
+                To access all features, {{ touchscreen ? "tap" : "click" }} 
+                <font-awesome-icon  icon="circle-chevron-down" 
+                color="black"
+                id="inline-open-icon"
+                size="lg"
+                /> at top left.
+              </p> 
             </div>
           </v-window-item>
         </v-window>
@@ -3740,7 +3748,6 @@ body {
       top: 2.5rem;
       }
       background-color: var(--accent-color);
-      color: black !important;
       border-radius: 50%;
       border: 2px solid var(--accent-color);
     }
@@ -4006,8 +4013,8 @@ body {
   border-radius: 1em;
 
   @media (max-width: 700px) {
-    width: 90%;
-    padding: 1.5em;
+    width: 95%;
+    padding: 1em;
   }
 
   @media (min-width: 701px) {
@@ -4235,5 +4242,11 @@ a {
     color: #589eef; // lighter variant of sky color
     pointer-events: auto;
   }
+
+#inline-open-icon {
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-color);
+}
 
 </style>
