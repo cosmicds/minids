@@ -8,9 +8,9 @@
   <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
+      :class="showGuidedContent ? 'ma-1' : ''"
       size="xl"
-      class="ma-1"
-      :color="accentColor"
+      :color="showGuidedContent ? 'var(--accent-color)' : 'black'"
       :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
@@ -3739,6 +3739,10 @@ body {
       @media (max-width: 599px) {
       top: 2.5rem;
       }
+      background-color: var(--accent-color);
+      color: black !important;
+      border-radius: 50%;
+      border: 2px solid var(--accent-color);
     }
   }
 
