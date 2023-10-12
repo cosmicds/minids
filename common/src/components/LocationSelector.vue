@@ -207,9 +207,9 @@ export default defineComponent({
 
     setup(initial=false) {
       const mapContainer = this.$el as HTMLDivElement;
-      const location: [number, number] = initial && this.mapOptions.initialLocation ?
-        [this.mapOptions.initialLocation.latitudeDeg, this.mapOptions.initialLocation.longitudeDeg] :
-        [this.modelValue.latitudeDeg, this.modelValue.longitudeDeg];
+      const location: L.LatLngExpression = initial && this.mapOptions.initialLocation ?
+        this.locationToLatLng(this.mapOptions.initialLocation) :
+        this.latLng;
 
       const initialZoom = this.mapOptions.initialZoom ?? 4;
       const zoom = initial ? initialZoom : (this.map?.getZoom() ?? initialZoom);
@@ -244,7 +244,7 @@ export default defineComponent({
 
       map.doubleClickZoom.disable();
       if (this.selectable) {
-        map.on('dblclick', this.onMapSelect);
+        map.on('click', this.onMapSelect);
       }
 
       map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noopener noreferrer" >Leaflet</a>');
@@ -264,6 +264,10 @@ export default defineComponent({
           this.selectedCircle.addTo(this.map as Map); // Not sure why, but TS is cranky w/o the Map cast
         }
       }
+    },
+
+    locationToLatLng(location: LocationDeg): L.LatLngExpression {
+      return [location.latitudeDeg, location.longitudeDeg];
     }
 
   },
@@ -271,12 +275,18 @@ export default defineComponent({
   computed: {
     circleMaker(): (latlng: L.LatLngExpression, options: L.CircleMarkerOptions) => L.CircleMarker {
       return this.worldRadii ? L.circle : L.circleMarker;
+    },
+    latLng(): L.LatLngExpression {
+      return this.locationToLatLng(this.modelValue);
     }
   },
 
   watch: {
     modelValue() {
       this.updateCircle();
+      if (this.map && !this.map.getBounds().contains(this.latLng)) {
+        this.map.setView(this.latLng);
+      }
     },
     places() {
       this.map?.remove();

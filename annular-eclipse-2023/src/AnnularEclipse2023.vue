@@ -8,9 +8,9 @@
   <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
-      size="xl"
-      class="ma-1"
-      :color="accentColor"
+      :class="showGuidedContent ? 'ma-1' : ''"
+      :size="showGuidedContent ? 'xl' : '2xl'"
+      :color="showGuidedContent ? 'var(--accent-color)' : 'black'"
       :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
@@ -148,7 +148,7 @@
                   <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
                 <p>
-                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                  <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
                 </p>
                 <p>
                   <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
@@ -595,7 +595,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div id="left-buttons-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -607,8 +607,74 @@
           @activate="copyShareURL"
           faSize="1x"
         ></icon-button>
+        <icon-button
+          id="my-location"
+          fa-icon="street-view"
+          :color="accentColor"
+          :focus-color="accentColor"
+          :box-shadow="false"
+          tooltip-text="Use my location"
+          :show-tooltip="!mobile"
+          @update:modelValue="(value: boolean) => {
+            if(value) {
+              ($refs.geolocation as any).getLocation();
+              showMyLocationDialog = true;
+              learnerPath = 'Choose';
+            }
+            else {
+              console.log('geolocation button pressed = false');
+            }
+
+          }"
+          faSize="1x"
+        ></icon-button>
       </div>
+      <div id="location-progress" :class="[!showGuidedContent ?'budge' : '']">
+        <geolocation-button
+          :color="accentColor"
+          :show-text-progress = "true"
+          :hide-text = "true"
+          :showCoords = "false"
+          :hide-button = "true"
+          :requirePermission = "false"
+          :hasPermission = "true"
+          ref="geolocation"
+          @geolocation="(loc: GeolocationCoordinates) => { 
+            myLocation = {
+              latitudeDeg: loc.latitude, 
+              longitudeDeg: loc.longitude
+            };
+            selectedLocation = 'My Location';
+            locationDeg = myLocation;
+            showMyLocationDialog = false;
+            }"
+          @error="(error: GeolocationPositionError) => { 
+            $notify({
+              group: 'geolocation-error',
+              title: 'Error',
+              text: error.message,
+              type: 'error',
+            }); 
+            getMyLocation = false;
+            console.log(error);
+            }"
+          />
+      </div>
+        <!-- <v-dialog
+          scrim="false"
+          v-model="showMyLocationDialog"
+          max-width="400px"
+          id="mylocation-popup-dialog"
+        >
+          <v-card>
+            <v-card-text>
+              Fetching your location...
+            </v-card-text>
+          </v-card>
+        </v-dialog> -->
     </div>
+
+
     
     <v-overlay
       :model-value="showSplashScreen"
@@ -757,6 +823,14 @@
                     Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
               </ul>
+              <p v-if="xSmallSize" class="mt-3">
+                To access all features, {{ touchscreen ? "tap" : "click" }} 
+                <font-awesome-icon  icon="circle-chevron-down" 
+                color="black"
+                id="inline-open-icon"
+                size="lg"
+                /> at top left.
+              </p> 
             </div>
           </v-window-item>
         </v-window>
@@ -913,47 +987,7 @@
                 @keyup.enter="showEclipsePercentage = !showEclipsePercentage"
                 label="Amount Eclipsed"
                 hide-details
-            />            
-            <v-checkbox
-              :color="accentColor"
-              v-model="getMyLocation"
-              true-icon="mdi-crosshairs-gps"
-              false-icon="mdi-crosshairs"
-              @update:modelValue="(value: boolean) => { value ? ($refs.geolocation as any).getLocation() : null}"
-              @keyup.enter="getMyLocation = !getMyLocation"
-              label="My Location"
-              hide-details
-            >
-            <template #label>
-              <!-- this basically just gives a nice loading circle w/ text -->
-              <!-- if we didn't want the loading circle. this could be placed anywhere -->
-              <geolocation-button
-                :color="accentColor"
-                :hide-text="false"
-                :hide-button="true"
-                show-text-progress
-                label="My Location"
-                ref="geolocation"
-                @geolocation="(loc: GeolocationCoordinates) => { 
-                  myLocation = {
-                    latitudeDeg: loc.latitude, 
-                    longitudeDeg: loc.longitude
-                  };
-                  locationDeg = myLocation;
-                  }"
-                @error="(error: GeolocationPositionError) => { 
-                  $notify({
-                    group: 'geolocation-error',
-                    title: 'Error',
-                    text: error.message,
-                    type: 'error',
-                  }); 
-                  getMyLocation = false;
-                  console.log(error);
-                  }"
-              />
-            </template>
-            </v-checkbox>           
+            />                      
           </div>
         </transition-expand>
       </div>
@@ -1105,7 +1139,7 @@
     >
       <v-card>
         <v-card-text>
-          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses.
+          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses. "My Location" data is NEVER collected.
         </v-card-text>
         <v-card-actions class="pt-3">
           <v-spacer></v-spacer>
@@ -1475,6 +1509,7 @@ export default defineComponent({
       scrollUp: false,
 
       showPrivacyDialog: false,
+      showMyLocationDialog: false,
 
       tab: 0,
       introSlide: 1,
@@ -1773,7 +1808,7 @@ export default defineComponent({
     },
 
     selectedLocationText(): string {
-      if (this.selectedLocation !== USER_SELECTED) {
+      if ((this.selectedLocation !== USER_SELECTED) && (this.selectedLocation !== 'My Location')) {
         return this.selectedLocation;
       } else {
         const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
@@ -3056,12 +3091,12 @@ body {
 
 // these are now in #top-content
 
-
-
-
-#share-button-wrapper {
+#left-buttons-wrapper {
   position: absolute;
   left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   
   @media (max-width: 599px) {
     top: 2.5rem;
@@ -3072,18 +3107,15 @@ body {
   }
 
   &.budge {
-    top: 2.7rem;
     left: 0.5rem;
 
     @media (max-width: 599px) {
-      top: 4.2rem;
+      top: 4.8rem;
     }
 
     @media (min-width: 600px) {
-      top: 2.5rem;
+      top: 3.1rem;
     }
-
-
   }
   
   .icon-wrapper {
@@ -3095,6 +3127,33 @@ body {
     padding-inline: calc(0.3 * var(--default-line-height));
     padding-block: calc(0.4 * var(--default-line-height));
     border: 2px solid var(--accent-color);
+  }
+}
+
+#location-progress {
+  position: absolute;
+
+
+  @media (max-width: 599px) {
+    left: 1.2rem;
+    top: 7rem;
+  }
+
+  @media (min-width: 600px) {
+    left: 1rem;
+    top: 6.5rem;
+  }
+
+  &.budge {
+    left: 0.7rem;
+
+    @media (max-width: 599px) {
+      top: 9.5rem;
+    }
+
+    @media (min-width: 600px) {
+      top: 8.7rem;
+    }
   }
 }
 
@@ -3737,8 +3796,12 @@ body {
 
     &.budge {
       @media (max-width: 599px) {
-      top: 2.5rem;
+        left: 0.5rem;
+        top: 2.5rem;
       }
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      border: 2px solid var(--accent-color);
     }
   }
 
@@ -4002,8 +4065,8 @@ body {
   border-radius: 1em;
 
   @media (max-width: 700px) {
-    width: 90%;
-    padding: 1.5em;
+    width: 95%;
+    padding: 1em;
   }
 
   @media (min-width: 701px) {
@@ -4231,5 +4294,11 @@ a {
     color: #589eef; // lighter variant of sky color
     pointer-events: auto;
   }
+
+#inline-open-icon {
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-color);
+}
 
 </style>

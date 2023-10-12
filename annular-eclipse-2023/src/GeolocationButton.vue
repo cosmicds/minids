@@ -1,5 +1,5 @@
 <template>
-  <span :id="`gelocation-wrapper+${id}`" class="gelocation">
+  <span :id="`geolocation-wrapper+${id}`" class="geolocation">
     <v-btn 
       v-if="!hideButton"
       class="geolocation-button"
@@ -17,7 +17,16 @@
           {{ label }}
         </slot>
     </v-btn>
-    
+
+    <span v-if="showTextProgress && loading">
+      <v-progress-circular
+        :size="progressCircleSize"
+        :width="2"
+        :color="color"
+        indeterminate
+      /> Fetching location
+    </span>
+
     <span class="geolocation-text" v-if="!hideText && !useTextButton">
       <v-progress-circular
         v-if="loading && showTextProgress"
@@ -25,7 +34,7 @@
         :width="2"
         :color="color"
         indeterminate
-      />
+      /> <span v-if="loading && showTextProgress">Fetching location</span>
       <slot>
       {{ label }}
       </slot>
@@ -185,8 +194,10 @@ export default defineComponent({
     getLocation() {
       // Get the users location, and emit and event with
       // the coordinates or the error
+      console.log(this.showTextProgress, this.hideText, this.useTextButton, this.showCoords, this.hideButton);
       if (this.geolocation) {
         this.$emit('geolocation', this.geolocation);
+        console.log("require permission =", this.requirePermission);
         return;
       }
 
@@ -201,7 +212,6 @@ export default defineComponent({
         this.$emit('askPermission');
         return;
       }
-      console.log('get location');
       if (navigator.geolocation) {
         this.loading = true;  
         navigator.geolocation.getCurrentPosition(
