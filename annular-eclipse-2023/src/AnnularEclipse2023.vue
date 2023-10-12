@@ -22,7 +22,7 @@
       tooltip-location="start"
     /> 
   </div>
-  <v-container id="guided-content-container" v-if="showGuidedContent">
+  <v-container id="guided-content-container" v-show="showGuidedContent">
     <hover-tooltip
       :tooltip-text="scrollUp ? 'Scroll to top' : 'Scroll to bottom'"
       :disabled="mobile"
@@ -1585,7 +1585,7 @@ export default defineComponent({
 
     const element = document.getElementById("guided-content-container");
     if (element) {
-      element.addEventListener("scroll", () => this.onScroll(element));
+      element.addEventListener("scroll", () => this.onScroll());
     }
   },
 
@@ -1764,11 +1764,14 @@ export default defineComponent({
 
   methods: {
 
-    onScroll(el: HTMLElement) {
+    onScroll() {
+      const el = document.getElementById('guided-content-container');
 
-      const scrollUp = el.scrollTop > 0;
-      if (this.scrollUp !== scrollUp) {
-        this.scrollUp = scrollUp;
+      if (el) {
+        const scrollUp = el.scrollTop > 0;
+        if (this.scrollUp !== scrollUp) {
+          this.scrollUp = scrollUp;
+        }
       }
 
     },
@@ -2410,15 +2413,17 @@ export default defineComponent({
 
     updateGuidedContentHeight() {
       let guidedContentContainer = null as HTMLElement | null;
-      guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
-      
-      if (guidedContentContainer) {
-        const height = guidedContentContainer.clientHeight;
-        // console.log("height", height);
-        this.guidedContentHeight = `${height}px`;
-      } else {
-        this.guidedContentHeight = '0px';
-      }
+      this.$nextTick(() => {
+        guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+        
+        if (guidedContentContainer) {
+          const height = guidedContentContainer.clientHeight;
+          // console.log("height", height);
+          this.guidedContentHeight = `${height}px`;
+        } else {
+          this.guidedContentHeight = '0px';
+        }
+      });
     },
     
     onResize() {
@@ -2426,6 +2431,7 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
+      this.updateGuidedContentHeight();
     },
 
     startHorizonMode() {
@@ -2606,6 +2612,13 @@ export default defineComponent({
   },
 
   watch: {
+    showGuidedContent(_val: boolean) {
+      this.onResize();
+      this.$nextTick(() => {
+        this.onScroll();
+      });
+      
+    },
 
     cssVars(_css) {
       // console.log(_css);
