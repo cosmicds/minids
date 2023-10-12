@@ -8,10 +8,10 @@
   <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
-      :size="showGuidedContent ? 'xl' : 'xl'"
+      size="xl"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'chevron-down' : 'circle-info'"
+      :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
@@ -56,12 +56,12 @@
             </div>
 
         </div>
-        <div id="instructions-row" :class='["non-map-row", (collapseText && !smAndUp) ? "non-map-row-collapse" : ""]'>
+        <div id="instructions-row" class="non-map-row">
           <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
+                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse at the location marked by the red dot.</p>
 
                 <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
                 <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
@@ -157,15 +157,6 @@
             </div>
           </div>
         </div>
-      <v-btn
-        v-if="!smAndUp"
-        id="toggle-instruction-text"
-        :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        @click="collapseText = (!collapseText || smAndUp)"
-        variant="flat"
-        density="compact"
-        size="x-small"
-        />
       <!-- </toggle-content> -->
         <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
@@ -219,7 +210,7 @@
               ></icon-button>
               <icon-button
                 v-model="showWWTGuideSheet"
-                fa-icon="toolbox"
+                fa-icon="circle-info"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
@@ -604,7 +595,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="learnerPath === 'Choose'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -761,7 +752,7 @@
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
+                    <font-awesome-icon icon="circle-info" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
@@ -800,7 +791,7 @@
   <div id="top-wwt-content">
       <div id="location-date-display">
         <v-chip 
-          prepend-icon="mdi-map-marker-radius"
+          :prepend-icon="smallSize ? `` : `mdi-map-marker-radius`"
           variant="outlined"
           size="small"
           elevation="2"
@@ -811,7 +802,7 @@
             }"
         > </v-chip>
         <v-chip 
-        prepend-icon="mdi-clock"
+        :prepend-icon="smallSize ? `` : `mdi-clock`"
         variant="outlined"
         size="small"
         elevation="2"
@@ -871,14 +862,8 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210 && !smallSize"
-          prepend-icon="mdi-sun-angle"
-          variant="outlined"
-          elevation="2"
-          :text="percentEclipsedText"
-        > </v-chip>
-        <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210 && smallSize"
+          v-if="showEclipsePercentage && wwtZoomDeg < 210"
+          :prepend-icon="smallSize ? `` : `mdi-sun-angle`"
           variant="outlined"
           elevation="2"
           :text="percentEclipsedText"
@@ -1450,9 +1435,6 @@ export default defineComponent({
 
       tab: 0,
       introSlide: 1,
-
-      collapseText: false,
-      
       
       viewerMode: 'SunScope' as ViewerMode,
 
@@ -1597,6 +1579,7 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+    this.showGuidedContent = !this.xSmallSize;
 
     this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
 
@@ -3275,8 +3258,16 @@ body {
   }
     
   p.highlight {
-    color: var(--moon-color);
-    -webkit-text-stroke: 0.1px var(--accent-color);
+    color: #444444;
+
+    @media (max-width: 700px) {
+      -webkit-text-stroke: 0.8px var(--accent-color);
+    }
+
+    @media (min-width: 701px) {
+      -webkit-text-stroke: 0.1px var(--accent-color);
+    }
+
   
     // make uppercase
     text-transform: uppercase;
@@ -3783,8 +3774,6 @@ body {
     }
   
   }
-
-
     
     // .v-row.non-map-row#title-row
   #title-row {
@@ -3813,11 +3802,6 @@ body {
     border-radius: 5px;
     align-items: center;
     justify-content: space-evenly;
-
-    &.non-map-row-collapse {
-      height: 5ch;
-      overflow-y: auto;
-    }
     
     #mc-radiogroup-container {
       padding-block: 0.5em;
