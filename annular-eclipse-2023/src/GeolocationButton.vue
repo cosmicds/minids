@@ -197,11 +197,9 @@ export default defineComponent({
       };
 
       if (this.requirePermission && !this.hasPermission) {
-        console.log('ask permission');
         this.$emit('askPermission');
         return;
       }
-      console.log('get location');
       if (navigator.geolocation) {
         this.loading = true;  
         navigator.geolocation.getCurrentPosition(
@@ -226,7 +224,6 @@ export default defineComponent({
   watch: {
     hasPermission(val: boolean, _oldVal: boolean) {
       if (val) {
-        console.log("Permission granted");
         this.getLocation();
       }
     },
