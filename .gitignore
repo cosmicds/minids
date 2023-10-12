@@ -22,3 +22,5 @@ tsconfig.tsbuildinfo
 .vscode/settings.json
 
 **/tests_output/**
+
+*.env
