@@ -2631,7 +2631,10 @@ export default defineComponent({
   watch: {
     showGuidedContent(_val: boolean) {
       this.onResize();
-      this.onScroll();
+      this.$nextTick(() => {
+        this.onScroll();
+      });
+      
     },
 
     cssVars(_css) {
