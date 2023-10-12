@@ -2777,7 +2777,7 @@ export default defineComponent({
         // console.log(`location ${locname} not found in eclipsePathLocations`);
         return;
       }
-      if (locname !== USER_SELECTED) {
+      if ((locname !== USER_SELECTED) && (locname !== 'My Location') ) {
         this.presetLocationsVisited.push(locname);
         this.sendDataToDatabase();
       }
