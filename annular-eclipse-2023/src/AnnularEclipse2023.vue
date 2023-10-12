@@ -1263,6 +1263,9 @@ let queryData: LocationDeg | null = null;
 const USER_SELECTED = "User Selected" as const;
 const UUID_KEY = "eclipse-mini-uuid" as const;
 const OPT_OUT_KEY = "eclipse-mini-optout" as const;
+const USER_SELECTED_LOCATIONS_KEY = "user-selected-locations" as const;
+const PRESET_LOCATIONS_KEY = "preset-locations" as const;
+const MC_RESPONSES_KEY = "mc-responses" as const;
 
 export default defineComponent({
   extends: MiniDSBase,
@@ -1313,9 +1316,19 @@ export default defineComponent({
       initialZoom: 3
     };
 
+    const selections = window.localStorage.getItem(USER_SELECTED_LOCATIONS_KEY);
+    const userSelectedLocationsVisited: [number, number][] = selections ? (this.parseJSONString(selections) ?? []) : [];
+    if (queryData) {
+      userSelectedLocationsVisited.push([queryData.latitudeDeg, queryData.longitudeDeg]);
+    }
+
+    const presets = window.localStorage.getItem(PRESET_LOCATIONS_KEY);
+    const presetLocationsVisited: string[] = presets ? (this.parseJSONString(presets) ?? []) : [];
     const selectedLocation = queryData ? USER_SELECTED : "Albuquerque, NM";
-    const presetLocationsVisited = queryData ? [] : [selectedLocation];
-    const userSelectedLocationsVisited = queryData ? [[queryData.latitudeDeg, queryData.longitudeDeg]] : [];
+    presetLocationsVisited.push(selectedLocation);
+
+    const responses = window.localStorage.getItem(MC_RESPONSES_KEY);
+    const mcResponses: string[] = responses ? (this.parseJSONString(responses) ?? []) : [];
 
     const uuid = window.localStorage.getItem(UUID_KEY) ?? v4();
     window.localStorage.setItem(UUID_KEY, uuid);
@@ -1326,7 +1339,7 @@ export default defineComponent({
     return {
       uuid,
       responseOptOut: responseOptOut as boolean | null,
-      mcResponses: [] as string[],
+      mcResponses,
 
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -2241,6 +2254,7 @@ export default defineComponent({
         this.showLinkToPath = true;
       }
       this.mcResponses.push(event.text);
+      window.localStorage.setItem(MC_RESPONSES_KEY, JSON.stringify(this.mcResponses));
       this.sendDataToDatabase();
     },
 
@@ -2686,6 +2700,13 @@ export default defineComponent({
         );
     },
 
+    parseJSONString(json: string): JSON | null {
+      try {
+        return JSON.parse(json);
+      } catch {
+        return null;
+      }
+    },
 
   },
 
@@ -2803,6 +2824,7 @@ export default defineComponent({
     locationDeg(loc: LocationDeg) {
       if (this.selectedLocation === USER_SELECTED) {
         this.userSelectedLocationsVisited.push([loc.latitudeDeg, loc.longitudeDeg]);
+        window.localStorage.setItem(USER_SELECTED_LOCATIONS_KEY, JSON.stringify(this.userSelectedLocationsVisited));
         this.sendDataToDatabase();
       }
     },
@@ -2814,6 +2836,7 @@ export default defineComponent({
       }
       if ((locname !== USER_SELECTED) && (locname !== 'My Location') ) {
         this.presetLocationsVisited.push(locname);
+        window.localStorage.setItem(PRESET_LOCATIONS_KEY, JSON.stringify(this.presetLocationsVisited));
         this.sendDataToDatabase();
       }
       // console.log("selected location", locname);

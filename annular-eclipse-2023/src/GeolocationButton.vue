@@ -208,7 +208,6 @@ export default defineComponent({
       };
 
       if (this.requirePermission && !this.hasPermission) {
-        console.log('ask permission');
         this.$emit('askPermission');
         return;
       }
@@ -236,7 +235,6 @@ export default defineComponent({
   watch: {
     hasPermission(val: boolean, _oldVal: boolean) {
       if (val) {
-        console.log("Permission granted");
         this.getLocation();
       }
     },
