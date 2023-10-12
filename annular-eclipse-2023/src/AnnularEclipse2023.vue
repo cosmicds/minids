@@ -148,7 +148,7 @@
                   <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
                 <p>
-                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                  <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
                 </p>
                 <p>
                   <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.

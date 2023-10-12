@@ -244,7 +244,7 @@ export default defineComponent({
 
       map.doubleClickZoom.disable();
       if (this.selectable) {
-        map.on('dblclick', this.onMapSelect);
+        map.on('click', this.onMapSelect);
       }
 
       map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noopener noreferrer" >Leaflet</a>');
