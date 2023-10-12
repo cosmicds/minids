@@ -644,6 +644,7 @@
               latitudeDeg: loc.latitude, 
               longitudeDeg: loc.longitude
             };
+            selectedLocation = 'My Location';
             locationDeg = myLocation;
             showMyLocationDialog = false;
             }"
