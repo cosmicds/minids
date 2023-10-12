@@ -1138,7 +1138,7 @@
     >
       <v-card>
         <v-card-text>
-          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses.
+          To evaluate usage of this app, <strong>anonymized</strong> data may be collected, including locations viewed and map quiz responses. "My Location" data is NEVER collected.
         </v-card-text>
         <v-card-actions class="pt-3">
           <v-spacer></v-spacer>
