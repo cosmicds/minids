@@ -141,6 +141,17 @@ export default defineComponent({
       type: String,
       default: 'mdi-crosshairs',
     },
+
+    hasPermission: {
+      type: Boolean,
+      default: false,
+    },
+
+    requirePermission: {
+      type: Boolean,
+      default: true,
+    },
+    
     
     
   },
@@ -149,13 +160,14 @@ export default defineComponent({
     // declare emits but w/o any verification. -_- 
     geolocation: (_payload: GeolocationCoordinates) => true,
     error: (_payload: GeolocationPositionError) => true,
+    askPermission: () => true,
   },
   
   data() {
     return {
       geolocation: null as GeolocationCoordinates | null,
       geolocationError: null as GeolocationPositionError | null,
-      loading: false
+      loading: false,
     };
   },
   mounted() {
@@ -183,7 +195,13 @@ export default defineComponent({
         timeout: 60 * 1000, // 1 minute
         maximumAge: 0,
       };
-      
+
+      if (this.requirePermission && !this.hasPermission) {
+        console.log('ask permission');
+        this.$emit('askPermission');
+        return;
+      }
+      console.log('get location');
       if (navigator.geolocation) {
         this.loading = true;  
         navigator.geolocation.getCurrentPosition(
@@ -204,6 +222,15 @@ export default defineComponent({
       }
     },
   },
+
+  watch: {
+    hasPermission(val: boolean, _oldVal: boolean) {
+      if (val) {
+        console.log("Permission granted");
+        this.getLocation();
+      }
+    },
+  }
   
 });
 
