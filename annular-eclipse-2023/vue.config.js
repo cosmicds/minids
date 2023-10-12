@@ -10,7 +10,10 @@ module.exports = defineConfig({
       new VuetifyPlugin(),
       new DotenvWebpack({
         path: ".env",
-        systemvars: true
+        systemvars: true,
+
+        // See https://stackoverflow.com/questions/67431401/conflicting-values-for-process-env-with-webpack-encore-and-dotenv
+        ignoreStub: true
       })
     ]
   },
