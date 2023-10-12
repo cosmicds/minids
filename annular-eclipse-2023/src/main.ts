@@ -6,11 +6,12 @@ import { FundingAcknowledgment } from "@minids/common";
 import AnnularEclipse2023 from "./AnnularEclipse2023.vue";
 import TransitionExpand from "./TransitionExpand.vue";
 import GifPlayPause from "./GifPlayPause.vue";
-import Credits from "./Credits.vue";
+import CreditLogos from "./CreditLogos.vue";
 import MCRadiogroup from "./MCRadiogroup.vue";
 import FlipTransition from "./FlipTransition.vue";
 import ImageLabel from "./ImageLabel.vue";
 import GeolocationButton from "./GeolocationButton.vue";
+import HoverTooltip from "./HoverTooltip.vue";
 
 import "./polyfills";
 
@@ -54,6 +55,8 @@ import {
   faToolbox,
   faCircleInfo,
   faRotate,
+  faCircleChevronDown,
+
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -80,6 +83,7 @@ library.add(faSquareXmark);
 library.add(faToolbox);
 library.add(faCircleInfo);
 library.add(faRotate);
+library.add(faCircleChevronDown);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -121,13 +125,14 @@ createApp(AnnularEclipse2023, {
   .component('vue-slider', VueSlider)  
   .component('transition-expand', TransitionExpand)
   .component('gif-play-pause', GifPlayPause)
-  .component('mini-credits', Credits)
+  .component('credit-logos', CreditLogos)
   .component('date-picker', Datepicker)
   .component('mc-radiogroup', MCRadiogroup)
   .component('flip-transition', FlipTransition)
   .component('image-label', ImageLabel)
   .component('funding-acknowledgment', FundingAcknowledgment)
   .component('geolocation-button', GeolocationButton)
+  .component('hover-tooltip', HoverTooltip)
 
   // Mount
   .mount("#app");

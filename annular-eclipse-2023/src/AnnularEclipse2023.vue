@@ -5,13 +5,13 @@
 >
 
   <!-- Top content box with map, location, time, and option icons -->
-  <div id="closed-top-container">
+  <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
     <font-awesome-icon
       v-model="showGuidedContent"
-      :size="showGuidedContent ? 'xl' : 'xl'"
+      size="xl"
       class="ma-1"
       :color="accentColor"
-      :icon="showGuidedContent ? 'square-xmark' : 'circle-info'"
+      :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
       @click="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
         showGuidedContent = !showGuidedContent;
@@ -22,8 +22,24 @@
       tooltip-location="start"
     /> 
   </div>
-  <v-container id="guided-content-container" v-if="showGuidedContent">
-    
+  <v-container id="guided-content-container" v-show="showGuidedContent">
+    <hover-tooltip
+      :tooltip-text="scrollUp ? 'Scroll to top' : 'Scroll to bottom'"
+      :disabled="mobile"
+      id="scrollButton"
+      >
+      <template #target>
+    <v-btn
+      v-if="!smAndUp"
+      :icon="scrollUp ? 'mdi-arrow-up' : 'mdi-arrow-down'"
+      @click="scrollToTop"
+      size="small"
+      density="comfortable"
+      :color="accentColor"
+      variant="flat"
+    />
+      </template>
+    </hover-tooltip>
     <div id="non-map-container">
         <div id="title-row" class="non-map-row">
 
@@ -40,21 +56,22 @@
             </div>
 
         </div>
-        <div id="instructions-row" :class='["non-map-row", (collapseText && !smAndUp) ? "non-map-row-collapse" : ""]'>
+        <div id="instructions-row" class="non-map-row">
           <div id="top-container-main-text">
             <!-- Learn Path -->
             <div class="instructions-text" v-if="learnerPath=='Explore'">
               <span class="description">
-                <p v-if="!queryData">Click <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse in Albuquerque, NM.</p>
-                <p>Click highlighted cities on the map to switch locations and view the eclipse from there.</p>
-                <p>Explore until you can identify which locations will see an annular eclipse!</p>
+                <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse at the location marked by the red dot.</p>
+
+                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
+                <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
               </span>
             </div>
             
             <div class="instructions-text" v-if="learnerPath=='Answer'">
               <span class="description">
-                <p>Have you determined the eclipse path? Click below to select it.</p>
-                <p>If you are not sure, click <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
+                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it.</p>
+                <p>If you are not sure, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
               </span>
               <mc-radiogroup
                 v-if="learnerPath=='Answer'"
@@ -128,23 +145,18 @@
             <div class="instructions-text" v-if="learnerPath=='Choose'">
               <span class="description">
                 <p v-if="queryData">
-                  Click <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
+                  <strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" size="l" class="bullet-icon"/> to "watch" the eclipse from the location shared in your link.
                 </p>
-                <p>Select any <span v-if="queryData">other</span> location you like by double-{{ touchscreen ? "tapping" : "clicking" }} on the map, and view the eclipse from there.</p>
-                <p>You can create a url that shares the view from a location by clicking <font-awesome-icon icon="share-nodes" class="bullet-icon"/>.</p>
+                <p>
+                  <strong>Double-{{ touchscreen ? "tap" : "click" }}</strong> on the map to select any <span v-if="queryData">other</span> location and view the eclipse from there.
+                </p>
+                <p>
+                  <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
+                </p>
               </span>
             </div>
           </div>
         </div>
-      <v-btn
-        v-if="!smAndUp"
-        id="toggle-instruction-text"
-        :icon="collapseText ? 'mdi-arrow-expand' : 'mdi-close'"
-        @click="collapseText = (!collapseText || smAndUp)"
-        variant="flat"
-        density="compact"
-        size="x-small"
-        />
       <!-- </toggle-content> -->
         <div id="button-row" class="non-map-row">
           <!-- <v-col> -->
@@ -191,18 +203,18 @@
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showInfoSheet ? 'Hide Info' : 'More on Eclipses'"
+                :tooltip-text="showInfoSheet ? null : 'More on Eclipses'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
               ></icon-button>
               <icon-button
                 v-model="showWWTGuideSheet"
-                fa-icon="toolbox"
+                fa-icon="circle-info"
                 fa-size="xl"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showWWTGuideSheet ? 'Hide Info' : 'User Guide'"
+                :tooltip-text="showWWTGuideSheet ? null : 'User Guide'"
                 :tooltip-location="'bottom'"
                 :show-tooltip="!mobile"
                 :box-shadow="false"
@@ -264,33 +276,12 @@
     >
       <v-card
         class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw) ,32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">Information</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">Information</h3></v-card-title>
           <font-awesome-icon
-          v-if="!mobile"
           id="close-text-icon"
           class="control-icon"
           :icon="`square-xmark`"
           size="xl"
-          @click="showInfoSheet = false"
-          @keyup.enter="showInfoSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
-        <font-awesome-icon
-          v-else
-          id="close-text-icon"
-          class="control-icon"
-          :icon="`square-xmark`"
-          size="m"
           @click="showInfoSheet = false"
           @keyup.enter="showInfoSheet = false"
           tabindex="0"
@@ -341,7 +332,7 @@
                     <details>
                       <summary>Where can I learn more?</summary>
                       <p>
-                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse.
+                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse and Fiske Planetarium's <a href="https://www.colorado.edu/fiske/projects/science-through-shadows" target="_blank" rel="noopener noreferrer">Science Through Shadows</a> videos.
                       </p>
                     </details>
                   </div>
@@ -350,6 +341,7 @@
                 <!-- <v-img src="https://www.nasa.gov/sites/default/files/thumbnails/image/tsis_eclipse-1.gif"></v-img> -->
                 <gif-play-pause startPaused :gif='require("./assets/eclipse.gif")' :still='require("./assets/eclipse_static.gif")' alt="Animated schematic of a solar eclipse showing how the Moon moves between the Sun and Earth."/>
                 <figcaption>Image credit: NASA Goddard / Katy Mersmann</figcaption>
+                <div class="disclaimer">Not to scale</div>
               </figure>
             </v-container>
           </v-card-text>
@@ -366,17 +358,7 @@
       :style="cssVars"
     >
       <v-card class="bottom-sheet-card">
-        <v-tabs
-          v-model="tab"
-          height="clamp(25px, min(5vh, 5vw), 32px)"
-          :color="accentColor"
-          :slider-color="accentColor"
-          id="tabs"
-          dense
-          grow
-        >
-          <v-tab tabindex="0"><h3 class="tab-title">User Guide</h3></v-tab>
-        </v-tabs>
+        <v-card-title tabindex="0"><h3 class="v-btn tab-title">User Guide</h3></v-card-title>
         <font-awesome-icon
           id="close-text-icon"
           class="control-icon"
@@ -402,7 +384,7 @@
                   </v-chip>
                 </v-col>
                 <v-col cols="8" class="pt-1">
-                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? ":" : "or" }}  <strong>{{ touchscreen ? ":" : "W-A-S-D" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                  <strong>{{ touchscreen ? "press + drag" : "click + drag" }}</strong>  {{ touchscreen ? "" : "or" }}  <strong>{{ touchscreen ? "" : "W-A-S-D" }}</strong> {{ touchscreen ? "" : "keys" }}<br>
                 </v-col>
               </v-row>
               <v-row align="center">
@@ -415,7 +397,7 @@
                   </v-chip>
                 </v-col>
                 <v-col cols="8" class="pt-1">
-                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? ":" : "or" }} <strong>{{ touchscreen ? ":" : "I-O" }}</strong> {{ touchscreen ? ":" : "keys" }}<br>
+                  <strong>{{ touchscreen ? "pinch in and out" : "scroll in and out" }}</strong> {{ touchscreen ? "" : "or" }} <strong>{{ touchscreen ? "" : "I-O" }}</strong> {{ touchscreen ? "" : "keys" }}<br>
                 </v-col>
               </v-row>
               <v-row>
@@ -464,7 +446,7 @@
                               icon="rotate"
                               size="lg" 
                             ></font-awesome-icon>
-                        to reset time and view. 
+                        to reset time, view, and speed. 
                       </li>
                       <li>
                         You can also control time by dragging <v-icon
@@ -480,7 +462,7 @@
                     <h4 class="user-guide-header">Viewing Mode:</h4>
                     <p  class="mb-3">(See upper-right of the screen)</p>
                     <ul class="text-list">
-                      <li class="mb-1">
+                      <li class="mb-2">
                         The <span 
                         style="color: blue; background-color: white;
                         padding-inline: 0.7em;
@@ -491,33 +473,61 @@
                         border-radius: 20px;
                         font-weight: bold ">date/time</span> are displayed under the map.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-telescope"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
+                      <li class="switch-bullets">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-telescope"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Solar Scope:</span> Display zoomed in Sun and Moon as through a dark solar filter or eclipse glasses.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image-filter-hdr"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
+                      <li class="switch-bullets mb-3">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-image-filter-hdr"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Horizon:</span> Display motion of Sun and Moon as they travel through the sky relative to the ground.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-white-balance-sunny"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Track Sun:</span> Always keep camera centered on Sun.
+                      <li class="switch-bullets">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOn"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          true-icon="mdi-white-balance-sunny"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Track Sun:</span> Always keep camera centered on Sun.
                       </li>
-                      <li>
-                        <v-icon
-                          class="bullet-icon"
-                          icon="mdi-image"
-                          size="large" 
-                        ></v-icon> <span class="user-guide-emphasis">Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
+                      <li class="switch-bullets mb-5">
+                        <v-switch
+                          class="display-only-switch"
+                          v-model="displaySwitchOff"
+                          density="compact"
+                          hide-details
+                          disabled
+                          :ripple="false"
+                          :color="accentColor"
+                          false-icon="mdi-image"
+                        >
+                        </v-switch>
+                        <span class="user-guide-emphasis"> Don't Track Sun:</span> In Horizon View, show motion of Sun (and Moon) against the sky.
                       </li>
                     </ul>
 
@@ -544,37 +554,32 @@
                           
                   <v-divider thickness="2px" class="solid-divider"></v-divider>
                   
-                  <p class="mt-5">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
-                  <p class="mt-2">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <div class="credits">
-                  <h3>Credits:</h3>
-                  <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
-                  Pat Udomprasert<br>
-                  Jon Carifio<br>
-                  John Lewis<br>
-                  Alyssa Goodman<br>
-                  Mary Dussault<br>
-                  Harry Houghton<br>
-                  Anna Nolin<br>
-                  Evaluator: Sue Sunbury<br>
-                  <br>
-                  <h4>WorldWide Telescope Team:</h4>
-                  Peter Williams<br>
-                  A. David Weigel<br>
-                  Jon Carifio<br>
-                  </div>
-                  <v-spacer class="end-spacer"></v-spacer>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <funding-acknowledgment/>
-                </v-col>
-              </v-row>
+              <div id="text-credits">
+                <h3>Credits:</h3>
+
+                <p class="mt-2">This Mini Data Story is powered by WorldWide Telescope (WWT).</p>              
+                <p class="my-3">Image of Sun is courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.</p>
+
+                <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4> 
+                
+                Pat Udomprasert<br>
+                Jon Carifio<br>
+                John Lewis<br>
+                Alyssa Goodman<br>
+                Mary Dussault<br>
+                Harry Houghton<br>
+                Anna Nolin<br>
+                Evaluator: Sue Sunbury<br>
+                
+                <h4><a href="https://www.worldwidetelescope.org/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a> Team:</h4>
+                Peter Williams<br>
+                A. David Weigel<br>
+                Jon Carifio<br>
+              </div>
+              
+              <funding-acknowledgment/>
 
             </v-container>              
           </v-card-text>
@@ -590,7 +595,7 @@
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
     <div>
-      <div v-if="selectedLocation === 'User Selected'" id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
+      <div id="share-button-wrapper" :class="[!showGuidedContent ?'budge' : '']">
         <icon-button
           id="share"
           fa-icon="share-nodes"
@@ -647,24 +652,14 @@
                 icon="puzzle-piece"
               /> Identify the path 
             </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="book-open"
-              /> Learn more 
-            </v-col>
-            <v-col cols="12">
-              <font-awesome-icon
-                icon="toolbox"
-              /> User guide 
-            </v-col>
-        </v-row>
+          </v-row>
         </div>
         
         <div id="splash-screen-acknowledgements">
           This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
           
-          <div id="splash-screen-icons">
-            <mini-credits/>
+          <div id="splash-screen-logos">
+            <credit-logos/>
           </div>
         </div>
       </div>
@@ -693,6 +688,20 @@
       >
       <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
         <v-window v-model="introSlide">
+          <template v-slot:additional>
+            <div id="intro-window-close-button">
+            <font-awesome-icon
+              size="xl"
+              class="ma-1"
+              color="#b3d5e6"
+              icon='square-xmark'
+              @click="inIntro = !inIntro"
+              @keyup.enter="inIntro = !inIntro"
+              tabindex="0"
+              tooltip-location="start"
+            /> 
+          </div>
+          </template>
           <v-window-item :value="1">
             <div class="intro-text">
               <p class="mb-5">
@@ -721,31 +730,31 @@
                   <template v-slot:prepend>
                     <font-awesome-icon icon="rocket" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Explore what the eclipse will look like from different parts of the U.S.
+                    <strong>Explore</strong> what the eclipse will look like from different parts of the U.S.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Choose any location around the world. See and share how the eclipse would look from there.
+                    <strong>Select any location</strong> around the world. See and share how the eclipse would look from there.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Identify the Path of Visibility in the U.S. for the annular eclipse in our map quiz.
+                    Identify the path of the annular eclipse for the U.S. in our <strong>Map Quiz</strong>.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
                     <font-awesome-icon icon="book-open" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about solar eclipses. 
+                    <strong>Learn more</strong> about solar eclipses. 
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
-                    <font-awesome-icon icon="toolbox" size="xl" class="bullet-icon"></font-awesome-icon>
+                    <font-awesome-icon icon="circle-info" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
-                    Learn more about how to navigate this app. 
+                    Access <strong>User Guide</strong> on how to navigate this app. 
                 </v-list-item>
               </ul>
             </div>
@@ -782,7 +791,7 @@
   <div id="top-wwt-content">
       <div id="location-date-display">
         <v-chip 
-          prepend-icon="mdi-map-marker-radius"
+          :prepend-icon="smallSize ? `` : `mdi-map-marker-radius`"
           variant="outlined"
           size="small"
           elevation="2"
@@ -793,7 +802,7 @@
             }"
         > </v-chip>
         <v-chip 
-        prepend-icon="mdi-clock"
+        :prepend-icon="smallSize ? `` : `mdi-clock`"
         variant="outlined"
         size="small"
         elevation="2"
@@ -801,17 +810,12 @@
       > </v-chip>
       </div>
       <div id="top-switches">
-        <v-tooltip
+        <hover-tooltip
             location="left"
-            :color="accentColor"
-            :style="cssVars"
             :disabled="mobile"
+            id="viewer-mode-switch"
           >
-          <template v-slot:activator="{props}">
-            <div 
-              v-bind="props"
-              id="viewer-mode-switch"
-              >
+            <template v-slot:target>
               <v-switch
                 inset
                 hide-details
@@ -822,25 +826,20 @@
                 false-icon="mdi-telescope"
                 true-value="Horizon"
                 true-icon="mdi-image-filter-hdr"
+                @keyup.enter="viewerMode = viewerMode === 'SunScope' ? 'Horizon' : 'SunScope'"
+                tabindex="0"
               >
               </v-switch>
-            
-            </div>
-          </template>
-          Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse Scope' }} View
-        </v-tooltip>
+            </template>
+            Switch to {{ viewerMode === 'SunScope' ? 'Horizon' : 'Eclipse' }} View
+        </hover-tooltip>
 
         <div id="track-sun-switch"> 
-          <v-tooltip
+          <hover-tooltip
               location="left"
-              :color="accentColor"
-              :style="cssVars"
               :disabled="mobile"
             >
-            <template v-slot:activator="{props}">
-              <div 
-                v-bind="props"
-              >
+              <template v-slot:target>
                 <v-switch
                   inset
                   hide-details
@@ -849,13 +848,13 @@
                   :color="accentColor"
                   true-icon="mdi-white-balance-sunny"
                   false-icon="mdi-image"
+                  @keyup.enter="toggleTrackSun = !toggleTrackSun"
+                  tabindex="0"
                 >
                 </v-switch>
-                
-              </div>
             </template>
             {{ toggleTrackSun ? "Don't Track Sun" : 'Center on Sun' }}
-          </v-tooltip>
+          </hover-tooltip>
         </div>
       </div>
     </div>
@@ -864,9 +863,8 @@
       <div id="eclipse-percent-chip">
         <v-chip 
           v-if="showEclipsePercentage && wwtZoomDeg < 210"
-          prepend-icon="mdi-sun-angle"
+          :prepend-icon="smallSize ? `` : `mdi-sun-angle`"
           variant="outlined"
-          size="medium"
           elevation="2"
           :text="percentEclipsedText"
         > </v-chip>
@@ -1014,6 +1012,8 @@
               :fa-icon="'rotate'"
               @activate="() => {
                     selectedTime = 1697292380000;
+                    speedIndex = 3;
+                    playbackRate = Math.pow(10, speedIndex);
                     playing = false;
                     toggleTrackSun = true;
                   }"
@@ -1090,40 +1090,8 @@
           </icon-button> -->
         </span>      
       </div>
-      <div id="credits" class="ui-text" v-if= "!smallSize">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-            ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-          <!-- <ShareNetwork
-            v-for="network in networks"
-            :key="network.name"
-            :network="network.name"
-            :class="`${network.name}-button`"
-            :style="{ backgroundColor: network.color, width: 'fit-content' }"
-            :description="description"
-            :url="url"
-            :title="title"
-            :hashtags="hashtagString"
-            :quote="description"
-            twitter-user="WWTelescope"
-          >
-            <font-awesome-icon
-              :class="`${network.name}-icon`"
-              :icon="['fab', network.name]"
-              size="lg"
-            ></font-awesome-icon>
-          </ShareNetwork> -->
-        </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 
@@ -1487,7 +1455,7 @@ export default defineComponent({
       showAltAzGrid: true,
       showHorizon: true,
       showTextSheet: false, 
-      showEclipsePercentage: false, 
+      showEclipsePercentage: true, 
       showLinkToPath: false, 
       
       toggleTrackSun: true,
@@ -1502,14 +1470,14 @@ export default defineComponent({
       guidedContentHeight: "300px",
       showGuidedContent: true,
       inIntro: false,
+      displaySwitchOn: true,
+      displaySwitchOff: false,
+      scrollUp: false,
 
       showPrivacyDialog: false,
 
       tab: 0,
       introSlide: 1,
-
-      collapseText: false,
-      
       
       viewerMode: 'SunScope' as ViewerMode,
 
@@ -1654,9 +1622,14 @@ export default defineComponent({
     });
 
     this.showControls = !this.mobile;
+    this.showGuidedContent = !this.xSmallSize;
 
     this.updateSkyOpacityForSunAlt(10 * D2R); // 10 degrees above horizon
-    
+
+    const element = document.getElementById("guided-content-container");
+    if (element) {
+      element.addEventListener("scroll", () => this.onScroll());
+    }
   },
 
   computed: {
@@ -1834,6 +1807,29 @@ export default defineComponent({
 
   methods: {
 
+    onScroll() {
+      const el = document.getElementById('guided-content-container');
+
+      if (el) {
+        const scrollUp = el.scrollTop > 0;
+        if (this.scrollUp !== scrollUp) {
+          this.scrollUp = scrollUp;
+        }
+      }
+
+    },
+    
+    scrollToTop() {
+      const element = document.getElementById("guided-content-container");
+      if (element) {
+        if (this.scrollUp) {
+          element.scrollTo({ top: 0 });
+        } else {
+          element.scrollTo({ top: element.scrollHeight });
+        }
+      }
+    },
+    
     async trackSun(): Promise<void> {
       return this.gotoTarget({
         place: this.sunPlace,
@@ -2191,7 +2187,11 @@ export default defineComponent({
       }
       fetch(`${MINIDS_BASE_URL}/annular-eclipse-2023/response`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          "Authorization": process.env.VUE_APP_CDS_API_KEY ?? ""
+        },
         body: JSON.stringify({
           // eslint-disable-next-line @typescript-eslint/naming-convention
           user_uuid: this.uuid, mc_responses: this.mcResponses,
@@ -2202,7 +2202,7 @@ export default defineComponent({
     },
 
     onAnswerSelected(event: MCSelectionStatus) {
-      if(event.text=="C") {
+      if (event.text === "C") {
         this.showLinkToPath = true;
       }
       this.mcResponses.push(event.text);
@@ -2456,15 +2456,17 @@ export default defineComponent({
 
     updateGuidedContentHeight() {
       let guidedContentContainer = null as HTMLElement | null;
-      guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
-      
-      if (guidedContentContainer) {
-        const height = guidedContentContainer.clientHeight;
-        // console.log("height", height);
-        this.guidedContentHeight = `${height}px`;
-      } else {
-        this.guidedContentHeight = '0px';
-      }
+      this.$nextTick(() => {
+        guidedContentContainer = document.getElementById('guided-content-container') as HTMLElement;
+        
+        if (guidedContentContainer) {
+          const height = guidedContentContainer.clientHeight;
+          // console.log("height", height);
+          this.guidedContentHeight = `${height}px`;
+        } else {
+          this.guidedContentHeight = '0px';
+        }
+      });
     },
     
     onResize() {
@@ -2472,6 +2474,7 @@ export default defineComponent({
       this.$nextTick(() => {
         this.updateGuidedContentHeight();
       });
+      this.updateGuidedContentHeight();
     },
 
     startHorizonMode() {
@@ -2652,6 +2655,13 @@ export default defineComponent({
   },
 
   watch: {
+    showGuidedContent(_val: boolean) {
+      this.onResize();
+      this.$nextTick(() => {
+        this.onScroll();
+      });
+      
+    },
 
     cssVars(_css) {
       // console.log(_css);
@@ -2898,6 +2908,14 @@ body {
   font-size: var(--default-font-size);
 }
 
+.leaflet-grab {
+      cursor: cell;
+    }
+    
+.leaflet-dragging .leaflet-grab {
+  cursor: all-scroll;
+}
+
 .v-chip {
   border: none;
   color: blue;
@@ -2915,7 +2933,16 @@ body {
   // border: 2px solid blue;
 
   // transition: height 0.1s ease-in-out;
+  .icon-wrapper {
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    user-select: none;
+  }
+
+  
 }
+
+
 
 #app {
   width: 100%;
@@ -3034,12 +3061,29 @@ body {
 
 #share-button-wrapper {
   position: absolute;
-  top: 0.7rem;
   left: 1rem;
   
-  &.budge {
+  @media (max-width: 599px) {
     top: 2.5rem;
+  }
+
+  @media (min-width: 600px) {
+    top: 0.7rem;
+  }
+
+  &.budge {
+    top: 2.7rem;
     left: 0.5rem;
+
+    @media (max-width: 599px) {
+      top: 4.2rem;
+    }
+
+    @media (min-width: 600px) {
+      top: 2.5rem;
+    }
+
+
   }
   
   .icon-wrapper {
@@ -3203,40 +3247,19 @@ body {
   color: var(--accent-color);
 }
 
-#credits {
+#text-credits {
+  margin-block: 1rem;
+  width: 100%;
   color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
+  font-size: calc(1.1 * var(default-font-size));
+  line-height: calc(1.1 * var(default-line-height));
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  text-align: left;
 
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
-
-  img {
-    height: 35px;
-    vertical-align: middle;
-    margin: 2px;
+  h4 {
+    margin-top: 0.6rem;
+    margin-bottom: 0.3rem;
   }
 }
 
@@ -3291,8 +3314,16 @@ body {
   }
     
   p.highlight {
-    color: var(--moon-color);
-    -webkit-text-stroke: 0.1px var(--accent-color);
+    color: #444444;
+
+    @media (max-width: 700px) {
+      -webkit-text-stroke: 0.8px var(--accent-color);
+    }
+
+    @media (min-width: 701px) {
+      -webkit-text-stroke: 0.1px var(--accent-color);
+    }
+
   
     // make uppercase
     text-transform: uppercase;
@@ -3351,20 +3382,25 @@ body {
     width: 70%; 
   }
 
-  #splash-screen-icons {
-    margin-top: 0.5em;
-    margin-bottom: 0.75em;
-    
-    #credits {
-      background-color: transparent;
-      border: 2px solid transparent;
+  #splash-screen-logos {
+    margin-block: 0.75em;
+
+    img {
+    height: 5vmin;
+    vertical-align: middle;
+    margin: 2px;
     }
-  }
-  
-  a {
-    text-decoration: none;
-    color: var(--accent-color-3);
-    white-space: nowrap;
+
+    @media only screen and (max-width: 600px) {
+      img {
+        height: 24px;
+      }
+    }
+
+    svg {
+      vertical-align: middle;
+      height: 24px;
+    }
   }
 }
 
@@ -3415,7 +3451,7 @@ body {
       padding-block: 0.7em;
       padding-inline: 1.2em;
       height: fit-content;
-      background-color: #37474F;
+      background-color: #38464f;
       
       summary {
         font-weight: bold;
@@ -3429,16 +3465,19 @@ body {
     
     }
   }
-
+  
+  
   figure {
+    // make it stick in the viewport
     position: sticky;
     height: 100%;
+    padding-top: 1em;
 
-    @media (max-width: 700px ) {
+    @media (max-width: 960px ) {
       width: 100%;
     }
 
-    @media (min-width: 701px ) {
+    @media (min-width: 960px ) {
       width: 50%;
     }
 
@@ -3454,6 +3493,15 @@ body {
       background-color: #212121;
       padding-inline: 10px 5px;
     }
+    
+    .disclaimer {
+      position: absolute;
+      font-size: calc(0.8 * var(--default-font-size));
+      top: 2em;
+      right: 1em;
+      font-weight: bold;
+    }
+    
   }
   
   .v-overlay__content {
@@ -3465,6 +3513,7 @@ body {
   .bottom-sheet-card {
     height: fit-content;
     width: 100%;
+
     align-self: center;
     border-bottom: solid #212121 0.5em;
   }
@@ -3473,13 +3522,23 @@ body {
     width: calc(100% - 3em);
     align-self: left;
   }
+  
+  .v-card-title {
+    display: flex;
+    justify-content: center;
+    align-self: stretch;
+    border-bottom: 2px solid var(--accent-color);
+    
+    h3 {
+      color: var(--accent-color);
+      align-self: center;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
 
   .v-card-text {
     height: 40vh;
-    
-    & a {
-      text-decoration: none;
-    }
   }
 
   .close-icon {
@@ -3506,6 +3565,13 @@ body {
     // border-bottom-left-radius: 0px !important;
     // border-bottom-right-radius: 0px !important;
     width: auto;
+    height: fit-content;
+    max-height: 50vh;
+    
+    @media (max-width: 700px ) {
+      max-height: 70vh;
+    }
+    
   }
   
 
@@ -3524,34 +3590,83 @@ body {
 
   #user-guide {
     font-size: var(--default-font-size);
-    line-height: var(--default-line-height);
+    line-height: calc(1.1 * var(--default-line-height));
 
     .v-chip {
       color: unset;
       background-color: unset;
       // font-size: var(--default-font-size);
     }
-  }
 
-  .user-guide-header {
-    margin-top: 1rem;
-    color: var(--accent-color);
-    font-size: calc(1.2 * var(--default-font-size));
-  }
+    .user-guide-header {
+      margin-top: 1rem;
+      color: var(--accent-color);
+      font-size: calc(1.2 * var(--default-font-size));
+    }
 
-  .user-guide-emphasis {
-    color: var(--accent-color);
-    font-weight: bold;
-  }
+    .user-guide-emphasis {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
 
-  .user-guide-emphasis-white {
-    font-weight: bold;
-  }
+    .user-guide-emphasis-white {
+      font-weight: bold;
+    }
+    
+    li.switch-bullets {
+      margin-top: -1em;
 
-  .solid-divider {
-    margin-top: 1rem;
-    color: var(--sky-color);
-    opacity: 0.7;
+      padding-left: 0.5ch;
+      .v-switch {
+        transform: translateY(15%);
+      }
+
+      .user-guide-emphasis {
+        padding-left: 1ch;
+      }
+    }
+
+    .display-only-switch {
+    
+      display: inline-block;
+      position: relative;
+      bottom: calc(-0.5 * var(--default-line-height));
+
+      .v-selection-control--density-default {
+        --v-selection-control-size:var(--default-line-height);
+      }
+
+      .v-selection-control--disabled {
+      opacity: 100%;
+      pointer-events: none;
+
+        .v-switch__thumb {
+          background-color: black;
+        }
+
+        .v-icon {
+          color: var(--accent-color);
+          background-color: black;
+        }
+      }
+    }
+
+    .solid-divider {
+      margin-top: 1rem;
+      color: var(--sky-color);
+      opacity: 0.7;
+    }
+  }
+}
+
+#body-logos {
+  margin-left: auto;
+  margin-right: 0;
+
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
   }
 }
 
@@ -3616,9 +3731,15 @@ body {
 
 #closed-top-container {
     position: absolute;
-    top: 0.5rem;
     left: 0.5rem;
     z-index: 500;
+    top: 0.5rem;
+
+    &.budge {
+      @media (max-width: 599px) {
+      top: 2.5rem;
+      }
+    }
   }
 
 #guided-content-container {  
@@ -3664,6 +3785,13 @@ body {
     flex-direction: column;
   }
   
+  #scrollButton-button {
+    position: fixed;
+    top: calc(var(--top-content-height) - 2.5rem);
+    right: 1rem;
+    z-index: 1000;
+  }
+  
   #non-map-container {
     flex-basis: 100%;
   }
@@ -3691,7 +3819,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.5em;
     
     position: relative;
@@ -3702,8 +3830,6 @@ body {
     }
   
   }
-
-
     
     // .v-row.non-map-row#title-row
   #title-row {
@@ -3731,11 +3857,7 @@ body {
     border: 1.5px solid var(--sky-color);
     border-radius: 5px;
     align-items: center;
-
-    &.non-map-row-collapse {
-      height: 5ch;
-      overflow-y: auto;
-    }
+    justify-content: space-evenly;
     
     #mc-radiogroup-container {
       padding-block: 0.5em;
@@ -3762,11 +3884,6 @@ body {
           }
         }
       }
-    }
-    a {
-      color: #ff00ff;
-      text-decoration: none;
-      font-weight: bold;
     }
   }
 
@@ -3861,7 +3978,18 @@ body {
 }
 
 .bullet-icon {
-  color: var(--accent-color)
+  color: var(--accent-color);
+  width: 1.5em;
+}
+
+#intro-window-close-button {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+
+    &:hover {
+      cursor: pointer;
+    }
 }
 
 #introduction-overlay {
@@ -3967,7 +4095,19 @@ body {
 #eclipse-percent-chip {
   position: absolute;
   right: 0.5rem;
-  top: calc(-2.2 * var(--default-line-height));
+  top: calc(-1.5 * var(--default-line-height));
+
+  .v-chip.v-chip--density-default {
+    height: var(--default-line-height);
+    padding-inline: 0.8rem;
+    padding-block: 0.8rem;
+  }
+
+  .v-chip__content {
+    font-size: calc(0.8 * var(--default-font-size));
+}
+
+
 }
 
 #top-wwt-content {
@@ -3995,7 +4135,7 @@ body {
   }
 
   .v-switch__thumb {
-    color: #f39d6c;
+    color: var(--accent-color);
     background-color: black;
 
     @media (min-width: 751px) { //LARGE
@@ -4012,6 +4152,10 @@ body {
     --v-selection-control-size: auto;
   } 
 
+  .v-switch__track {
+    background-color: #737373 !important;
+  }
+
   .v-switch--inset .v-switch__track {
     @media (min-width: 751px) { //LARGE
       height: 2.5rem;
@@ -4024,6 +4168,7 @@ body {
   #top-switches {
     position: absolute;
     right: 0;
+    text-align: right;
 
     @media (max-width: 750px) { //SMALL
       margin-top: 0.5rem;
@@ -4079,4 +4224,12 @@ body {
     padding: 0 4px;
   }
 }
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #589eef; // lighter variant of sky color
+    pointer-events: auto;
+  }
+
 </style>
