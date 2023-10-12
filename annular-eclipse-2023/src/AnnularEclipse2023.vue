@@ -1808,7 +1808,7 @@ export default defineComponent({
     },
 
     selectedLocationText(): string {
-      if (this.selectedLocation !== USER_SELECTED) {
+      if ((this.selectedLocation !== USER_SELECTED) && (this.selectedLocation !== 'My Location')) {
         return this.selectedLocation;
       } else {
         const ns = this.locationDeg.latitudeDeg >= 0 ? 'N' : 'S';
