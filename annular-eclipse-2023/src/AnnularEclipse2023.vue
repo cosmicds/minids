@@ -153,6 +153,9 @@
                 <p>
                   <strong>Share</strong> the view from a location by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="share-nodes" class="bullet-icon"/> to copy the url.
                 </p>
+                <p>
+                  View the eclipse from <strong>My Location</strong> by {{ touchscreen ? "tapping" : "clicking" }} <font-awesome-icon icon="street-view" class="bullet-icon"/>. (Location services must be enabled on device).
+                </p>
               </span>
             </div>
           </div>
@@ -409,7 +412,7 @@
                     <p  class="mb-3">(See bottom-left of the screen)</p>
                     <ul class="text-list">
                       <li>
-                        Click <font-awesome-icon
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
                               class="bullet-icon"
                               icon="play"
                               size="lg" 
@@ -417,7 +420,7 @@
                         to move time forward at 1000x the real speed.
                       </li>
                       <li>
-                        If playing, click <font-awesome-icon
+                        If playing, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon
                               class="bullet-icon"
                               icon="pause"
                               size="lg" 
@@ -425,7 +428,7 @@
                         to pause time.
                       </li>
                       <li>
-                        Click <font-awesome-icon
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
                               class="bullet-icon"
                               icon="angle-double-down"
                               size="lg" 
@@ -433,7 +436,7 @@
                         to decrease speed by 10x.                        
                       </li>
                       <li>
-                        Click <font-awesome-icon
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
                               class="bullet-icon"
                               icon="angle-double-up"
                               size="lg" 
@@ -441,7 +444,7 @@
                         to increase speed by 10x. 
                       </li>
                       <li>
-                        Click <font-awesome-icon
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
                               class="bullet-icon"
                               icon="rotate"
                               size="lg" 
@@ -547,6 +550,27 @@
                       </li>
                       <li>
                         <span class="user-guide-emphasis-white">Amount Eclipsed:</span> Display percentage of Sun being covered by the Moon. (Disabled when zoomed far out.)                   
+                      </li>
+                    </ul>
+                          
+                    <v-divider thickness="2px" class="solid-divider"></v-divider>
+
+                    <h4 class="user-guide-header">Location Options:</h4>
+                    <p  class="mb-3">(See top-left of the screen)</p>
+                    <ul class="text-list">
+                      <li>
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
+                              class="bullet-icon"
+                              icon="share-nodes"
+                              size="lg" 
+                            ></font-awesome-icon> to copy <strong>share-url</strong> for a specific location.
+                      </li>
+                      <li>
+                        {{ touchscreen ? "Tap" : "Click" }} <font-awesome-icon
+                              class="bullet-icon"
+                              icon="street-view"
+                              size="lg" 
+                            ></font-awesome-icon> to use the view my <strong>My Location</strong>. (Consult your device's user guide to enable location services.)                     
                       </li>
                     </ul>
 
