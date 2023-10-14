@@ -270,6 +270,8 @@
     id="video-container"
     v-model="showVideoSheet"
     transition="slide-y-transition"
+    close-on-back
+    close-on-content-click
     fullscreen
   >
     <div class="video-wrapper">
@@ -1930,12 +1932,12 @@ export default defineComponent({
       get(): boolean {
         return this.sheet === "video";
       },
-      set(value: boolean) {
+      set(_value: boolean) {
         this.selectSheet('video');
-        if (!value) {
-          const video = document.querySelector("#info-video") as HTMLVideoElement;
-          video.pause();
-        }
+        // if (!value) {
+        //   // const video = document.querySelector("#info-video") as HTMLVideoElement;
+        //   // video.pause();
+        // }
       }
     },
   },
