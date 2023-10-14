@@ -271,7 +271,6 @@
     v-model="showVideoSheet"
     transition="slide-y-transition"
     close-on-back
-    close-on-content-click
     fullscreen
   >
     <div class="video-wrapper">
@@ -284,15 +283,12 @@
         @keyup.enter="showVideoSheet = false"
         tabindex="0"
       ></font-awesome-icon>
-      <iframe height="700"
+      <video
+        controls
         id="info-video"
-        src="https://www.youtube.com/embed/KX_bDgOFqPM?&autoplay=1"
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen>
-      </iframe>
-
+      >
+        <source src="./assets/video.mp4" type="video/mp4">
+      </video>
     </div>
   </v-dialog>
   
@@ -3612,7 +3608,8 @@ video, #info-video {
   width: auto;
   max-width: 100%;
   object-fit: contain;
-  aspect-ratio: 9/17;
+  // aspect-ratio: 9/17;
+  border: 5px solid white;
 }
 
 #video-container {
