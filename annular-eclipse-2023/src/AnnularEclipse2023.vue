@@ -282,12 +282,15 @@
         @keyup.enter="showVideoSheet = false"
         tabindex="0"
       ></font-awesome-icon>
-      <video
-        controls
+      <iframe height="700"
         id="info-video"
-      >
-        <source src="./assets/video.mp4" type="video/mp4">
-      </video>
+        src="https://www.youtube.com/embed/KX_bDgOFqPM?&autoplay=1"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+
     </div>
   </v-dialog>
   
@@ -3592,18 +3595,22 @@ body {
   }
 }
 
-.video-wrapper {
+.video-wrapper {  
+  display: flex;
   height: 100%;
-  background: black;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   text-align: center;
   z-index: 1000;
 }
 
-video {
-  height: 100%;
+video, #info-video {
+  margin: auto;
+  height: 85%;
   width: auto;
   max-width: 100%;
   object-fit: contain;
+  aspect-ratio: 9/17;
 }
 
 #video-container {
