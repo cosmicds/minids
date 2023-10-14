@@ -765,6 +765,12 @@
                 icon="puzzle-piece"
               /> Identify the path 
             </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="video"
+              />
+           New! Video guide 
+            </v-col>
           </v-row>
         </div>
         
