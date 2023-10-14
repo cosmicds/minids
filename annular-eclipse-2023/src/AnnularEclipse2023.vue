@@ -270,6 +270,7 @@
     id="video-container"
     v-model="showVideoSheet"
     transition="slide-y-transition"
+    close-on-back
     fullscreen
   >
     <div class="video-wrapper">
@@ -1927,12 +1928,12 @@ export default defineComponent({
       get(): boolean {
         return this.sheet === "video";
       },
-      set(value: boolean) {
+      set(_value: boolean) {
         this.selectSheet('video');
-        if (!value) {
-          const video = document.querySelector("#info-video") as HTMLVideoElement;
-          video.pause();
-        }
+        // if (!value) {
+        //   // const video = document.querySelector("#info-video") as HTMLVideoElement;
+        //   // video.pause();
+        // }
       }
     },
   },
@@ -3592,18 +3593,23 @@ body {
   }
 }
 
-.video-wrapper {
+.video-wrapper {  
+  display: flex;
   height: 100%;
-  background: black;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   text-align: center;
   z-index: 1000;
 }
 
-video {
-  height: 100%;
+video, #info-video {
+  margin: auto;
+  height: 85%;
   width: auto;
   max-width: 100%;
   object-fit: contain;
+  // aspect-ratio: 9/17;
+  border: 5px solid white;
 }
 
 #video-container {
