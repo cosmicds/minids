@@ -266,7 +266,30 @@
     </div>
   </v-container>
   
-  
+  <v-dialog
+    id="video-container"
+    v-model="showVideoSheet"
+    transition="slide-y-transition"
+    fullscreen
+  >
+    <div class="video-wrapper">
+      <font-awesome-icon
+        id="video-close-icon"
+        class="close-icon"
+        icon="times"
+        size="lg"
+        @click="showVideoSheet = false"
+        @keyup.enter="showVideoSheet = false"
+        tabindex="0"
+      ></font-awesome-icon>
+      <video
+        controls
+        id="info-video"
+      >
+        <source src="./assets/video.mp4" type="video/mp4">
+      </video>
+    </div>
+  </v-dialog>
   
 
     <v-dialog
@@ -742,6 +765,12 @@
                 icon="puzzle-piece"
               /> Identify the path 
             </v-col>
+            <v-col cols="12">
+              <font-awesome-icon
+                icon="video"
+              />
+           New! Video guide 
+            </v-col>
           </v-row>
         </div>
         
@@ -1016,6 +1045,18 @@
         </transition-expand>
       </div>
 
+      <div id="video-icon">
+            <icon-button
+            v-model="showVideoSheet"
+            id="video-icon"
+            fa-icon="video"
+            fa-size="lg"
+            :color="accentColor"
+            tooltip-text="Video guide"
+            tooltip-location="start"
+            :tooltip-offset="smallSize ? 0 : '10px'"
+          ></icon-button>
+        </div>
       <div id="tools">
         <span class="tool-container">
           <div id="speed-control">
@@ -1686,6 +1727,12 @@ export default defineComponent({
         }
       }, 500);
       
+      window.addEventListener('keyup', (event: KeyboardEvent) => {
+        if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+          this.showVideoSheet = false;
+        }
+      });
+
     });
 
     this.$nextTick(() => {
@@ -1874,6 +1921,19 @@ export default defineComponent({
     },
     defaultRate(): number {
       return this.viewerMode === 'Horizon' ? this.horizonRate : this.scopeRate;
+    },
+
+    showVideoSheet: {
+      get(): boolean {
+        return this.sheet === "video";
+      },
+      set(value: boolean) {
+        this.selectSheet('video');
+        if (!value) {
+          const video = document.querySelector("#info-video") as HTMLVideoElement;
+          video.pause();
+        }
+      }
     },
   },
 
@@ -3253,6 +3313,7 @@ body {
   z-index: 10;
   color: #fff;
   width: 100%;
+  gap: 5px;
 
   .opacity-range {
     width: 50vw;
@@ -3507,6 +3568,69 @@ body {
       vertical-align: middle;
       height: 24px;
     }
+  }
+}
+
+#video-icon {
+  position: absolute;
+  left: 0.5rem;
+  width: 2.2rem;
+
+  @media (max-width: 699px) {
+    bottom: 3rem;
+  }
+
+  @media (min-width: 700px) {   
+    bottom: 6rem;
+  }
+
+
+  .icon-wrapper {
+    padding-inline: calc(0.3 * var(--default-line-height));
+    padding-block: calc(0.4 * var(--default-line-height));
+    border: 2px solid var(--accent-color);
+  }
+}
+
+.video-wrapper {
+  height: 100%;
+  background: black;
+  text-align: center;
+  z-index: 1000;
+}
+
+video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+#video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0px;
+  z-index: 1000;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    color: white;
+    border: 2px solid white;
   }
 }
 
