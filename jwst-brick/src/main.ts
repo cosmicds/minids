@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import { FundingAcknowledgment, IconButton } from "@minids/common";
 import JwstBrick from "./JwstBrick.vue";
+import CreditLogos from "./CreditLogos.vue";
 
 import vuetify from "../plugins/vuetify";
 
@@ -52,6 +53,7 @@ createApp(JwstBrick, {
   .component("WorldWideTelescope", WWTComponent)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
+  .component('credit-logos', CreditLogos)
   .component('funding-acknowledgement', FundingAcknowledgment)
 
   // Mount

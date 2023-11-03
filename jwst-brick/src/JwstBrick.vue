@@ -25,7 +25,29 @@
         v-click-outside="closeSplashScreen"
         :style="cssVars"
       >
-        Splash Screen
+        <div
+          id="first-splash-row"
+      >
+        <div
+            id="close-splash-button"
+            @click="closeSplashScreen"
+            >&times;</div>
+          <div id="splash-screen-text">
+            <p>Want to see JWST's view of our</p>
+            <p class="highlight"> Galactic Center? </p>
+          </div>
+        </div>
+        
+        <div id="splash-screen-guide">
+        </div>
+        
+        <div id="splash-screen-acknowledgements">
+          This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
+          
+          <div id="splash-screen-logos">
+            <credit-logos/>
+          </div>
+        </div>
       </div>
     </v-overlay>
 
@@ -270,7 +292,7 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#ffffff",
+      accentColor: "#F0AB52",
 
       tab: 0
     };
@@ -379,6 +401,10 @@ export default defineComponent({
   src: url("../../assets/HighwayGothicNarrow.ttf");
 }
 
+:root {
+  --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
+  --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+}
 
 /* Overall page styling */
 html {
@@ -553,24 +579,125 @@ body {
 
 /* Splash screen */
 #splash-overlay {
-  position: fixed;
   align-items: center;
   justify-content: center;
   font-size: min(8vw, 7vh);
 }
 
 #splash-screen {
-  max-height: calc(min(90vh, 2040px));
-  max-width: 90vw;
+  color: var(--accent-color);
+
+  @media (max-width: 699px) {
+    max-height: 80vh;
+    max-width: 90vw;
+  }
+
+  @media (min-width: 700px) {
+    max-height: 85vh;
+    max-width: min(70vw, 800px);
+  }
+
   background-color: black;
   backdrop-filter: blur(5px);
   justify-content: space-around;
   align-content: center;
+  padding-top: 4rem;
+  padding-bottom: 1rem;
 
   border-radius: 10%;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+
+  div {
+    margin-inline: auto;
+    text-align: center;
+  }
+  // make a paragraph inside the div centered horizontally and vertically
+  p {
+    font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+    font-weight: bold;
+    vertical-align: middle;
+  }
+    
+  p.highlight {  
+    // make uppercase
+    text-transform: uppercase;
+    font-weight: bolder;
+  }
+  
+  p.small {
+    font-size: var(--default-font-size);
+    font-weight: bold;
+  }
+
+  #first-splash-row {
+    width: 100%;
+  }
+
+  #close-splash-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 1.75rem;
+    text-align: end;
+    color: var(--accent-color);
+    font-size: min(8vw, 5vh);
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #splash-screen-text {
+    // in the grid, the text is in the 2nd column
+    display: flex;
+    flex-direction: column;
+    line-height: 130%;
+    
+  }
+
+  #splash-screen-guide {
+    margin-block: 1.5em;
+    font-size: min(5vw, 4vh);
+    line-height: 140%;
+    width: 75%;
+
+    .v-col{
+      padding: 0;
+    }
+    
+    .svg-inline--fa {
+      color:var(--accent-color);
+      margin: 0 10px;
+    }
+  }
+
+  #splash-screen-acknowledgements {
+    font-size: calc(1.7 * var(--default-font-size));
+    line-height: calc(1.5 * var(--default-line-height));
+    width: 70%; 
+  }
+
+  #splash-screen-logos {
+    margin-block: 0.75em;
+
+    img {
+    height: 5vmin;
+    vertical-align: middle;
+    margin: 2px;
+    }
+
+    @media only screen and (max-width: 600px) {
+      img {
+        height: 24px;
+      }
+    }
+
+    svg {
+      vertical-align: middle;
+      height: 24px;
+    }
+  }
 }
 
 #project-credits {
@@ -746,4 +873,12 @@ video {
 .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
   display: none;
 }
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #589eef; // lighter variant of sky color
+    pointer-events: auto;
+  }
+
 </style>
