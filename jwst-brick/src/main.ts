@@ -26,7 +26,11 @@ library.add(faVideo);
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 createApp(JwstBrick, {
-  wwtNamespace: "wwt-minids-jwst-brick"
+  wwtNamespace: "wwt-minids-jwst-brick",
+  wtml: {
+    jwst: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick/index.wtml",
+    glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
+  },
 })
  
   // Plugins

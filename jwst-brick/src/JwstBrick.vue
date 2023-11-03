@@ -96,6 +96,42 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
+      <div id="tools" v-if="showLayers">
+        <div class="tool-container">
+          <template v-if="currentTool == 'crossfade'">
+            <span
+              class="ui-text slider-label"
+              @click="crossfadeOpacity = 0"
+              @keyup.enter="crossfadeOpacity = 0"
+              tabindex="0"
+            >GLIMPSE<br><span class="light-type"></span></span>
+            <input
+              class="opacity-range"
+              type="range"
+              v-model="crossfadeOpacity"
+            />
+            <span
+              class="ui-text slider-label"
+              @click="crossfadeOpacity = 100"
+              @keyup.enter="crossfadeOpacity = 100"
+              tabindex="0"
+            >JWST<br><span class="light-type">(Infrared)</span></span>
+          </template>
+          <template v-else-if="currentTool == 'choose-background'">
+            <span>Background imagery:</span>
+            <select v-model="curBackgroundImagesetName">
+              <option
+                v-for="bg in backgroundImagesets"
+                v-bind:value="bg.imagesetName"
+                v-bind:key="bg.imagesetName"
+              >
+                {{ bg.displayName }}
+              </option>
+            </select>
+          </template>
+        </div>
+      </div>
+
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -259,16 +295,23 @@
 </template>
 
 <script lang="ts">
+import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 
+type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
 
 export default defineComponent({
   extends: MiniDSBase,
   
   props: {
+    wtml: {
+      type: Object,
+      required: true
+    },
     wwtNamespace: {
       type: String,
       required: true
@@ -284,13 +327,19 @@ export default defineComponent({
       }
     }
   },
+
   data() {
     return {
+      layers: {} as Record<string,ImageSetLayer>,
+      cfOpacity: 50, // out of 100
+      ready: false,
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
+      showLayers: true,
       layersLoaded: false,
       positionSet: false,
+      currentTool: "crossfade" as ToolType,
       
       accentColor: "#F0AB52",
 
@@ -298,35 +347,85 @@ export default defineComponent({
     };
   },
 
-  mounted() {
+  created() {
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.gotoRADecZoom({
-        ...this.initialCameraParams,
-        instant: true
-      }).then(() => this.positionSet = true);
+      const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
+        this.loadImageCollection({
+          url: value,
+          loadChildFolders: false
+        }).then((folder) => {
+          const children = folder.get_children();
+          if (children == null) { return; }
+          const item = children[0] as Place;
+          const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
+          if (imageset === null) { return; }
+          return this.addImageSetLayer({
+            url: imageset.get_url(),
+            mode: "autodetect",
+            name: key,
+            goto: false
+          });
+        }));
 
-      // If there are layers to set up, do that here!
-      this.layersLoaded = true;
+      Promise.all(layerPromises).then((layers) => {
+        layers.forEach(layer => {
+          if (layer === undefined) { return; }
+          this.layers[layer.get_name()] = layer;
+          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+        });
+        this.layersLoaded = true;
+        // this.resetView();
 
+        const splashScreenListener = (_event: KeyboardEvent) => {
+          this.showSplashScreen = false;
+          window.removeEventListener('keyup', splashScreenListener);
+        };
+        window.addEventListener('keyup', splashScreenListener);
+
+        window.addEventListener('keyup', (event: KeyboardEvent) => {
+          if (["Esc", "Escape"].includes(event.key) && this.showVideoSheet) {
+            this.showVideoSheet = false;
+          }
+        });
+      });
+
+      const splashScreenListener = (_event: KeyboardEvent) => {
+        this.showSplashScreen = false;
+        window.removeEventListener('keypress', splashScreenListener);
+      };
+      window.addEventListener('keypress', splashScreenListener);
     });
   },
 
   computed: {
+    crossfadeOpacity: {
+      get(): number {
+        return this.cfOpacity;
+      },
+      set(o: number) {
+        if (this.layers.hubble) {
+          applyImageSetLayerSetting(this.layers.hubble, ["opacity", 1 - 0.01 * o]);
+        }
+        if (this.layers.jwst) {
+          applyImageSetLayerSetting(this.layers.jwst, ["opacity", 0.01 * o]);
+        }
+        this.cfOpacity = o;
+      }
+    },
 
-    /**
-    These properties relate to the state of the mini.
-    `isLoading` is a bit redundant here, but it could potentially have
-    independent logic.
-    */
-    ready(): boolean {
-      return this.layersLoaded && this.positionSet;
+    curBackgroundImagesetName: {
+      get(): string {
+        if (this.wwtBackgroundImageset == null) return "";
+        return this.wwtBackgroundImageset.get_name();
+      },
+      set(name: string) {
+        this.setBackgroundImageByName(name);
+      }
     },
-    isLoading(): boolean {
-      return !this.ready;
-    },
+
 
     /**
     Properties related to device/screen characteristics
@@ -346,6 +445,10 @@ export default defineComponent({
         '--accent-color': this.accentColor,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
+    },
+
+    isLoading(): boolean {
+      return !this.ready;
     },
 
     /**
@@ -391,7 +494,26 @@ export default defineComponent({
         this.sheet = name;
       }
     }
+  },
+
+  watch: {
+    showLayers(show: boolean) {
+      Object.values(this.layers).forEach(layer => {
+        applyImageSetLayerSetting(layer, ["enabled", show]);
+      });
+    },
+    layersLoaded(loaded: boolean) {
+      if (loaded) {
+        this.ready = true;
+      }
+    },
+    ready(r: boolean) {
+      if (r) {
+        this.showSplashScreen = true;
+      }
+    }
   }
+
 });
 </script>
 
@@ -546,6 +668,34 @@ body {
   }
 }
 
+.ui-text {
+  color: #F0AB52;
+  background: black;
+  padding: 5px 5px;
+  border: 2px solid black;
+  border-radius: 10px;
+  font-size: calc(0.7em + 0.2vw);
+
+  &:focus {
+    color: white;
+  }
+}
+
+.slider-label {
+  font-weight: bold;
+  font-size: calc(0.8em + 0.5vw);
+  padding: 5px 10px;
+  text-align: center;
+  line-height: 20px;
+
+  .light-type {
+    font-size: calc(0.56em + 0.35vw);
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
 
 /* Top and bottom content */
 .top-content {
@@ -563,12 +713,39 @@ body {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: calc(100% - 2rem);
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: calc(100% - 1rem);
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+#tools {
+  z-index: 10;
+  color: #fff;
+
+  .opacity-range {
+    width: 50vw;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  select {
+    background: white;
+    color: black;
+    border-radius: 3px;
+  }
+}
+
+.tool-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  pointer-events: auto;
 }
 
 #left-buttons, #right-buttons {
