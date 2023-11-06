@@ -104,7 +104,7 @@
               @click="crossfadeOpacity = 0"
               @keyup.enter="crossfadeOpacity = 0"
               tabindex="0"
-            >GLIMPSE<br><span class="light-type"></span></span>
+            >Spitzer<br><span class="light-type"></span></span>
             <input
               class="opacity-range"
               type="range"
@@ -115,7 +115,7 @@
               @click="crossfadeOpacity = 100"
               @keyup.enter="crossfadeOpacity = 100"
               tabindex="0"
-            >JWST<br><span class="light-type">(Infrared)</span></span>
+            >JWST<br><span class="light-type"></span></span>
           </template>
           <template v-else-if="currentTool == 'choose-background'">
             <span>Background imagery:</span>
