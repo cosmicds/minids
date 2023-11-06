@@ -304,6 +304,8 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 type ToolType = "crossfade" | "choose-background" | null;
 type SheetType = "text" | "video" | null;
 
+const D2R = Math.PI / 180;
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -342,6 +344,8 @@ export default defineComponent({
       currentTool: "crossfade" as ToolType,
       
       accentColor: "#F0AB52",
+
+      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 1},
 
       tab: 0
     };
@@ -400,14 +404,23 @@ export default defineComponent({
     });
   },
 
+  mounted() {
+    this.gotoRADecZoom({
+      raRad: D2R * this.initialPosition.ra,
+      decRad: D2R * this.initialPosition.dec,
+      zoomDeg: this.initialPosition.zoom,
+      instant: true
+    });
+  },
+
   computed: {
     crossfadeOpacity: {
       get(): number {
         return this.cfOpacity;
       },
       set(o: number) {
-        if (this.layers.hubble) {
-          applyImageSetLayerSetting(this.layers.hubble, ["opacity", 1 - 0.01 * o]);
+        if (this.layers.glimpse) {
+          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", 1 - 0.01 * o]);
         }
         if (this.layers.jwst) {
           applyImageSetLayerSetting(this.layers.jwst, ["opacity", 0.01 * o]);
