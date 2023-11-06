@@ -28,9 +28,11 @@ const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visi
 createApp(JwstBrick, {
   wwtNamespace: "wwt-minids-jwst-brick",
   wtml: {
-    jwst: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick/index.wtml",
-    glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
+    nostars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wostars/index.wtml",
+    stars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wstars/index.wtml",
   },
+  bgWtml: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
+  bgName: "GLIMPSE"
 })
  
   // Plugins

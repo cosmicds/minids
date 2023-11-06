@@ -104,7 +104,7 @@
               @click="crossfadeOpacity = 0"
               @keyup.enter="crossfadeOpacity = 0"
               tabindex="0"
-            >Spitzer<br><span class="light-type"></span></span>
+            >Stars<br><span class="light-type"></span></span>
             <input
               class="opacity-range"
               type="range"
@@ -115,7 +115,7 @@
               @click="crossfadeOpacity = 100"
               @keyup.enter="crossfadeOpacity = 100"
               tabindex="0"
-            >JWST<br><span class="light-type"></span></span>
+            >No Stars<br><span class="light-type"></span></span>
           </template>
           <template v-else-if="currentTool == 'choose-background'">
             <span>Background imagery:</span>
@@ -318,6 +318,14 @@ export default defineComponent({
       type: String,
       required: true
     },
+    bgWtml: {
+      type: String,
+      required: true
+    },
+    bgName: {
+      type: String,
+      required: true
+    },
     initialCameraParams: {
       type: Object as PropType<Omit<GotoRADecZoomParams, 'instant'>>,
       default() {
@@ -396,6 +404,16 @@ export default defineComponent({
         });
       });
 
+      this.loadImageCollection({
+        url: this.bgWtml,
+        loadChildFolders: true,
+      }).then((_folder) => {
+        this.curBackgroundImagesetName = this.bgName;
+        this.backgroundImagesets.unshift(
+          new BackgroundImageset("GLIMPSE", "GLIMPSE")
+        );
+      });
+
       const splashScreenListener = (_event: KeyboardEvent) => {
         this.showSplashScreen = false;
         window.removeEventListener('keypress', splashScreenListener);
@@ -419,11 +437,11 @@ export default defineComponent({
         return this.cfOpacity;
       },
       set(o: number) {
-        if (this.layers.glimpse) {
-          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", 1 - 0.01 * o]);
+        if (this.layers.stars) {
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1 - 0.01 * o]);
         }
-        if (this.layers.jwst) {
-          applyImageSetLayerSetting(this.layers.jwst, ["opacity", 0.01 * o]);
+        if (this.layers.nostars) {
+          applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
         }
         this.cfOpacity = o;
       }
