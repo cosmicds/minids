@@ -30,6 +30,7 @@ createApp(JwstBrick, {
   wtml: {
     nostars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wostars/index.wtml",
     stars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wstars/index.wtml",
+    glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
   },
   bgWtml: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
   bgName: "GLIMPSE"
