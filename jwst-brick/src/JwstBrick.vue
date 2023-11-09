@@ -443,6 +443,7 @@ export default defineComponent({
         if (this.layers.nostars) {
           applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
         }
+        
         this.cfOpacity = o;
       }
     },
