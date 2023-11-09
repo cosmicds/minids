@@ -59,7 +59,7 @@
             class="noselect"
             :src="getImageset(place)?.get_thumbnailUrl() ?? ''"
           />
-          <span class="place-name noselect">{{ place.get_name() }}</span>
+          <span class="place-name noselect">{{ place?.get_name() }}</span>
         </div>
       </div>
       <slot
@@ -111,6 +111,9 @@ export default defineComponent({
       if (this.placesList.length > 0) {
         return;
       }
+      if (this.wtmlUrl === '') {
+        return;
+      }
       this.wtmlPlaces = await this.placesFromWtml(this.wtmlUrl);
     });
   },
@@ -129,6 +132,9 @@ export default defineComponent({
     ...mapActions(engineStore, ["loadImageCollection", "waitForReady"]),
 
     getImageset(place: Place): Imageset | null {
+      if (place == null) {
+        return null;
+      }
       return place.get_backgroundImageset() ?? place.get_studyImageset();
     },
 
@@ -196,6 +202,9 @@ export default defineComponent({
     },
     
     places(): Place[] {
+      if (this.placesList.length === 0 && this.wtmlPlaces.length === 0) {
+        return [];
+      }
       return this.placesList.length > 0 ? this.placesList : this.wtmlPlaces;
     }
   },

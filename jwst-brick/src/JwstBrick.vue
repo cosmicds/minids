@@ -125,7 +125,7 @@
               @click="crossfadeOpacity = 0"
               @keyup.enter="crossfadeOpacity = 0"
               tabindex="0"
-            >Stars<br><span class="light-type"></span></span>
+            >Spitzer<br><span class="light-type"></span></span>
             <input
               class="opacity-range"
               type="range"
@@ -136,7 +136,7 @@
               @click="crossfadeOpacity = 100"
               @keyup.enter="crossfadeOpacity = 100"
               tabindex="0"
-            >No Stars<br><span class="light-type"></span></span>
+            >JWST<br><span class="light-type"></span></span>
           </template>
           <template v-else-if="currentTool == 'choose-background'">
             <span>Background imagery:</span>
@@ -413,7 +413,7 @@ export default defineComponent({
         layers.forEach(layer => {
           if (layer === undefined) { return; }
           this.layers[layer.get_name()] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 1.0]);
+          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
         });
         this.layersLoaded = true;
         // this.resetView();
@@ -431,7 +431,8 @@ export default defineComponent({
         });
       }).then(() => {
         // initialized the selected item to the w/o stars brick
-        this.selectedGalleryItem = this.jwstPlaces[1];
+        // this.selectedGalleryItem = this.jwstPlaces[1];
+        this.crossfadeJWST = 100;
       });
 
       this.loadImageCollection({
@@ -467,8 +468,11 @@ export default defineComponent({
         return this.cfOpacity;
       },
       set(o: number) {
+        
+        const jcfo = this.jwstCfOpacity * 0.01;
+        
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1 - 0.01 * o]);
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
         }
         if (this.layers.nostars) {
           applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
@@ -487,13 +491,12 @@ export default defineComponent({
         
         const cfO = this.cfOpacity * 0.01;
 
-        if (this.layers.brickStars) {
-
-          applyImageSetLayerSetting(this.layers.brickStars, ["opacity", (1 - 0.01 * o) * cfO]);
+        if (this.layers.stars) {
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
         }
         
-        if (this.layers.brickNoStars) {
-          applyImageSetLayerSetting(this.layers.brickNoStars, ["opacity", 0.01 * o * cfO]);
+        if (this.layers.nostars) {
+          applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o * cfO]);
         }
         
         this.jwstCfOpacity = o;
