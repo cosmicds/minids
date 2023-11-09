@@ -3,6 +3,7 @@ import Vue, { createApp } from "vue";
 import { FundingAcknowledgment, IconButton } from "@minids/common";
 import JwstBrick from "./JwstBrick.vue";
 import CreditLogos from "./CreditLogos.vue";
+import PlacesGallery from "./PlacesGallery.vue";
 
 import vuetify from "../plugins/vuetify";
 
@@ -62,6 +63,7 @@ createApp(JwstBrick, {
   .component('icon-button', IconButton)
   .component('credit-logos', CreditLogos)
   .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('places-gallery', PlacesGallery)
 
   // Mount
   .mount("#app");

@@ -90,6 +90,27 @@
       </div>
       <div id="right-buttons">
       </div>
+      <places-gallery
+        :stay-open="true"
+        :places-list="jwstPlaces"
+        @select="onGallerySelect"
+        :incomingItemSelect="selectedGalleryItem"
+        :title="null"
+        columns="2"
+        width="200px"
+      >
+        <div
+          v-if="showJWSTOpacity"
+          id="jwst-crossfade">
+          <span>Stars</span>
+          <input
+            class="opacity-range"
+            type="range"
+            v-model="crossfadeJWST"
+          />
+          <span>No stars</span>
+        </div>
+      </places-gallery>
     </div>
 
 
@@ -350,6 +371,11 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       currentTool: "crossfade" as ToolType,
+      places: [] as Place[],
+      jwstPlaces: [] as Place[],
+      jwstCfOpacity: 50,
+      selectedGalleryItem: null as Place | null,
+      showJWSTOpacity: true,
       
       accentColor: "#F0AB52",
 
@@ -372,6 +398,7 @@ export default defineComponent({
           const children = folder.get_children();
           if (children == null) { return; }
           const item = children[0] as Place;
+          this.places.push(item);
           const imageset = item.get_backgroundImageset() ?? item.get_studyImageset();
           if (imageset === null) { return; }
           return this.addImageSetLayer({
@@ -402,6 +429,9 @@ export default defineComponent({
             this.showVideoSheet = false;
           }
         });
+      }).then(() => {
+        // initialized the selected item to the w/o stars brick
+        this.selectedGalleryItem = this.jwstPlaces[1];
       });
 
       this.loadImageCollection({
@@ -448,6 +478,28 @@ export default defineComponent({
       }
     },
 
+    crossfadeJWST: {
+      get(): number {
+        return this.jwstCfOpacity;
+      },
+      
+      set(o: number) {
+        
+        const cfO = this.cfOpacity * 0.01;
+
+        if (this.layers.brickStars) {
+
+          applyImageSetLayerSetting(this.layers.brickStars, ["opacity", (1 - 0.01 * o) * cfO]);
+        }
+        
+        if (this.layers.brickNoStars) {
+          applyImageSetLayerSetting(this.layers.brickNoStars, ["opacity", 0.01 * o * cfO]);
+        }
+        
+        this.jwstCfOpacity = o;
+      }
+    },
+    
     curBackgroundImagesetName: {
       get(): string {
         if (this.wwtBackgroundImageset == null) return "";
@@ -512,6 +564,14 @@ export default defineComponent({
   },
 
   methods: {
+    
+    onGallerySelect(place: Place) {
+      // show the corresponding brick by setting the opacity of it to 100%
+      const name = place.get_name();
+      const opacity = name.includes('without') ? 100 : 0;
+      this.crossfadeJWST = opacity;
+    },
+    
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },
@@ -529,6 +589,33 @@ export default defineComponent({
   },
 
   watch: {
+    
+    // deep watcher for places to update jwstPlaces
+    places: {
+      handler: function (newPlaces: Place[]) {
+        newPlaces.forEach(place => {
+          const name = place.get_name().toLowerCase();
+          if (name.includes('brick')) {
+            this.jwstPlaces[name.includes('without') ? 1 : 0] = place;
+          }
+        }
+        );
+      },
+      deep: true
+    },
+    
+    crossfadeJWST(val: number) {
+      // return the brick that is the most opaque
+      if (this.jwstPlaces.length == 0) {
+        this.selectedGalleryItem = null;
+      }
+      if (val > 50) {
+        this.selectedGalleryItem = this.jwstPlaces[1];
+      } else {
+        this.selectedGalleryItem = this.jwstPlaces[0];
+      }
+    },
+    
     showLayers(show: boolean) {
       Object.values(this.layers).forEach(layer => {
         applyImageSetLayerSetting(layer, ["enabled", show]);
@@ -784,6 +871,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+#gallery-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  height: 50vh;
+  width: 20vw;
+  border: 1px solid red;
 }
 
 /* Splash screen */
@@ -1089,5 +1185,29 @@ a {
     color: #589eef; // lighter variant of sky color
     pointer-events: auto;
   }
+
+#jwst-crossfade {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  
+  span {
+    flex-grow: 0;
+  }
+  
+  input {
+    flex-grow: .7;
+  }
+}
+
+// apply some styles to th places-gallery
+#main-content {
+  .gallery-root .gallery {
+    border: none;
+  }
+}
+
 
 </style>
