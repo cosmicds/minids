@@ -413,7 +413,7 @@ export default defineComponent({
         layers.forEach(layer => {
           if (layer === undefined) { return; }
           this.layers[layer.get_name()] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          applyImageSetLayerSetting(layer, ["opacity", 1.0]);
         });
         this.layersLoaded = true;
         // this.resetView();
