@@ -375,7 +375,7 @@ export default defineComponent({
       jwstPlaces: [] as Place[],
       jwstCfOpacity: 50,
       selectedGalleryItem: null as Place | null,
-      showJWSTOpacity: false,
+      showJWSTOpacity: true,
       
       accentColor: "#F0AB52",
 
