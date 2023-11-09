@@ -105,8 +105,7 @@ export default defineComponent({
     incomingItemSelect: { type: Place, default: null }
   },
 
-  // use mounted instead of created since places list needs to be generated
-  async mounted() {
+  async created() {
     this.waitForReady().then(async () => {
       if (this.placesList.length > 0) {
         return;
