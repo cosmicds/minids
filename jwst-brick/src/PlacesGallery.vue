@@ -102,7 +102,8 @@ export default defineComponent({
     previewIndex: { type: Number, default: 0 },
     closedText: { type: String, default: "Image Gallery" },
     stayOpen: { type: Boolean, default: false },
-    incomingItemSelect: { type: Place, default: null }
+    incomingItemSelect: { type: Place, default: null },
+    preventDeselect: { type: Boolean, default: false } // only for single-select mode
   },
 
   async created() {
@@ -162,7 +163,7 @@ export default defineComponent({
     selectPlace(place: Place) {
       if (this.singleSelect) {
         // if we're already selected, deselect
-        if (this.selectedPlace === place) {
+        if ((this.selectedPlace === place) && !this.preventDeselect) {
           this.$emit("deselect", place);
           this.selectedPlaces = [];
           this.selectedPlace = null;
