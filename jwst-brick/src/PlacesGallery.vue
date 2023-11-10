@@ -236,7 +236,6 @@ export default defineComponent({
 .gallery-root {
   transition-property: height, width;
   transition: 0.5s ease-out;
-  pointer-events: auto;
 
   .blurred {
     background: transparent;
@@ -252,6 +251,7 @@ export default defineComponent({
     overflow-y: auto;
     max-height: var(--gallery-max-height);
     width: min(calc(var(--gallery-width)), calc(100%));
+    pointer-events: auto;
 
     // Better way to do this?
   position: fixed;
