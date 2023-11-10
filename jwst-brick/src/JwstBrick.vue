@@ -98,6 +98,7 @@
         :title="null"
         columns="2"
         width="200px"
+        prevent-deselect
       >
         <div
           v-if="showJWSTOpacity"
@@ -376,6 +377,7 @@ export default defineComponent({
       jwstCfOpacity: 50,
       selectedGalleryItem: null as Place | null,
       showJWSTOpacity: true,
+      ignoreSelect: false,
       
       accentColor: "#F0AB52",
 
@@ -393,7 +395,7 @@ export default defineComponent({
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
           url: value,
-          loadChildFolders: false
+          loadChildFolders: true
         }).then((folder) => {
           const children = folder.get_children();
           if (children == null) { return; }
@@ -437,13 +439,16 @@ export default defineComponent({
 
       this.loadImageCollection({
         url: this.bgWtml,
-        loadChildFolders: true,
+        loadChildFolders: false,
       }).then((_folder) => {
+        
         this.curBackgroundImagesetName = this.bgName;
+        if (_folder) {return;}
         this.backgroundImagesets.unshift(
-          new BackgroundImageset("GLIMPSE", "GLIMPSE")
+          new BackgroundImageset("GLIMPSE", this.bgName)
         );
       });
+
 
       const splashScreenListener = (_event: KeyboardEvent) => {
         this.showSplashScreen = false;
@@ -468,6 +473,10 @@ export default defineComponent({
         return this.cfOpacity;
       },
       set(o: number) {
+        
+        if (this.layers.glimpse) {
+          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", (1 - 0.01 * o)]);
+        }
         
         const jcfo = this.jwstCfOpacity * 0.01;
         
@@ -570,8 +579,17 @@ export default defineComponent({
     
     onGallerySelect(place: Place) {
       // show the corresponding brick by setting the opacity of it to 100%
-      const name = place.get_name();
-      const opacity = name.includes('without') ? 100 : 0;
+      if (this.ignoreSelect) {
+        return;
+      }
+      let opacity = 0;
+      if (this.selectedGalleryItem == place) {
+        const name = place.get_name();
+        opacity = name.includes('without') ? 100 : 0;
+      } else {
+        this.selectedGalleryItem = place;
+        opacity = 100 - this.jwstCfOpacity;
+      }
       this.crossfadeJWST = opacity;
     },
     
@@ -609,6 +627,7 @@ export default defineComponent({
     
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
+      this.ignoreSelect = true;
       if (this.jwstPlaces.length == 0) {
         this.selectedGalleryItem = null;
       }
@@ -617,7 +636,17 @@ export default defineComponent({
       } else {
         this.selectedGalleryItem = this.jwstPlaces[0];
       }
+      this.$nextTick(() => {
+        this.ignoreSelect = false;
+      });
     },
+    
+    selectedGalleryItem(place: Place | null) {
+      console.log("selectedGalleryItem: ", place);
+    },
+
+    
+    
     
     showLayers(show: boolean) {
       Object.values(this.layers).forEach(layer => {
