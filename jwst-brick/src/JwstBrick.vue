@@ -378,6 +378,7 @@ export default defineComponent({
       selectedGalleryItem: null as Place | null,
       showJWSTOpacity: true,
       ignoreSelect: false,
+      keepCfOpacity: false,
       
       accentColor: "#F0AB52",
 
@@ -582,6 +583,11 @@ export default defineComponent({
       if (this.ignoreSelect) {
         return;
       }
+      
+      if (!this.keepCfOpacity) {
+        this.cfOpacity = 100;
+      }
+      
       let opacity = 0;
       if (this.selectedGalleryItem == place) {
         const name = place.get_name();
@@ -627,6 +633,10 @@ export default defineComponent({
     
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
+      if (!this.keepCfOpacity) {
+        this.cfOpacity = 100;
+      }
+      
       this.ignoreSelect = true;
       if (this.jwstPlaces.length == 0) {
         this.selectedGalleryItem = null;
