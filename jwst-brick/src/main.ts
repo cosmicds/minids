@@ -3,6 +3,7 @@ import Vue, { createApp } from "vue";
 import { FundingAcknowledgment, IconButton } from "@minids/common";
 import JwstBrick from "./JwstBrick.vue";
 import CreditLogos from "./CreditLogos.vue";
+import PlacesGallery from "./PlacesGallery.vue";
 
 import vuetify from "../plugins/vuetify";
 
@@ -30,9 +31,10 @@ createApp(JwstBrick, {
   wtml: {
     nostars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wostars/index.wtml",
     stars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wstars/index.wtml",
+    // glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
   },
   bgWtml: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
-  bgName: "GLIMPSE"
+  bgName: "GLIMPSE Original"
 })
  
   // Plugins
@@ -61,6 +63,7 @@ createApp(JwstBrick, {
   .component('icon-button', IconButton)
   .component('credit-logos', CreditLogos)
   .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('places-gallery', PlacesGallery)
 
   // Mount
   .mount("#app");
