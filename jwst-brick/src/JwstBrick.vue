@@ -956,6 +956,8 @@ body {
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
 
+  box-shadow: 0px 0px 25px black;
+
   div {
     margin-inline: auto;
     text-align: center;
