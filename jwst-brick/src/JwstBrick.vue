@@ -951,7 +951,7 @@ body {
   padding-top: 4rem;
   padding-bottom: 1rem;
 
-  border-radius: 10%;
+  border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
