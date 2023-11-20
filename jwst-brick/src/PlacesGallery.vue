@@ -293,7 +293,7 @@ export default defineComponent({
     grid-template-columns: repeat(var(--column-count), minmax(100px, 1fr));
     column-gap: 10px;
     row-gap: 5px;
-    padding: 5px
+    padding: 5px;
   }
 
   .default-activator {
@@ -317,7 +317,7 @@ export default defineComponent({
   }
 
   .gallery-item {
-    padding: 2px;
+    padding: 2px 10px;
     border-radius: 5px;
     border: 2px solid white;
     display: flex;
