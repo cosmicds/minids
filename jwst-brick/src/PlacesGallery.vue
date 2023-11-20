@@ -199,7 +199,8 @@ export default defineComponent({
   computed: {
     cssVars() {
       return {
-        "background-color": "#20202040",
+        "background-color": "#20202080",
+        "box-shadow": "0px 0px 5px #202020",
         "--column-count": this.columns,
         "--selected-color": this.selectedColor,
         "--gallery-width": this.width,

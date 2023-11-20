@@ -99,6 +99,7 @@
         columns="2"
         width="200px"
         prevent-deselect
+        style="box-shadow: 0px 0px 10px black;"
       >
         <div
           v-if="showJWSTOpacity"
