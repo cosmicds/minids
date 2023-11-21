@@ -1448,6 +1448,7 @@ export default defineComponent({
       },
 
       eclipsePathLocations: {
+        // locations taken from https://science.nasa.gov/eclipses/future-eclipses/eclipse-2024/where-when/
         "Greatest Eclipse": {
           name: "Greatest Eclipse",
           latitudeRad: D2R * 25.2866667,
@@ -1455,83 +1456,102 @@ export default defineComponent({
           eclipseFraction: 1
         },
 
-        "Albuquerque, NM": {
-          name: "Albuquerque, NM",
-          latitudeRad: D2R * 35.106766,
-          longitudeRad: D2R * -106.629181,
-          eclipseFraction: 0.97
+        // "Place": {
+        //   name: "Place",
+        //   latitudeRad: D2R * latitude,
+        //   longitudeRad: D2R * longitude,
+        //   eclipseFraction: 1.0
+        // },
+        
+        "Dallas, Texas":{
+          name: "Dallas, Texas",
+          latitudeRad: D2R * 32.7767,
+          longitudeRad: D2R * -96.7970,
+          eclipseFraction: 1.0
         },
-        "Eugene, OR": {
-          name: "Eugene, OR",
-          latitudeRad: D2R * 44.052069,
-          longitudeRad: D2R * -123.086754,
-          eclipseFraction: .95
+        
+        "Idabel, OK": {
+          name: "Idabel, OK",
+          latitudeRad: D2R * 33.8959,
+          longitudeRad: D2R * -94.8261,
+          eclipseFraction: 1.0
         },
-        "San Antonio, TX": {
-          name: "San Antonio, TX",
-          latitudeRad: D2R * 29.434210,
-          longitudeRad: D2R * -98.486798,
-          eclipseFraction: .96
+        
+        "Little Rock, AR": {
+          name: "Little Rock, AR",
+          latitudeRad: D2R * 34.7465,
+          longitudeRad: D2R * -92.2896,
+          eclipseFraction: 0.99 // appears to be total but too far south for WWT to do the eclipse doohickey
         },
-        "Las Vegas, NV": {
-          name: "Las Vegas, NV",
-          latitudeRad: D2R * 36.169941,
-          longitudeRad: D2R * -115.139830,
-          eclipseFraction: .87
+        
+        "Poplar Bluff, MO": {
+          name: "Poplar Bluff, MO",
+          latitudeRad: D2R * 36.7570,
+          longitudeRad: D2R * -90.3929,
+          eclipseFraction: 1.0
         },
-        "Denver, CO": {
-          name: "Denver, CO",
-          latitudeRad: D2R * 39.739235,
-          longitudeRad: D2R * -104.990250,
-          eclipseFraction: .85
+        
+        "Paducah, KY": {
+          name: "Paducah, KY",
+          latitudeRad: D2R * 37.0834,
+          longitudeRad: D2R * -88.6000,
+          eclipseFraction: .99 // appears to be total but too far south for WWT to do the eclipse doohickey
         },
-        "Bismarck, ND": {
-          name: "Bismarck, ND",
-          latitudeRad: D2R * 46.806673,
-          longitudeRad: D2R * -100.797396,
-          eclipseFraction: .64
+        
+        "Evansville, IN": {
+          name: "Evansville, IN",
+          latitudeRad: D2R * 37.9716,
+          longitudeRad: D2R * -87.5711,
+          eclipseFraction: 1.0
         },
-        "Los Angeles, CA": {
-          name: "Los Angeles, CA",
-          latitudeRad: D2R * 34.05,
-          longitudeRad: D2R * -118.24,
-          eclipseFraction: .78
+        
+        "Cleveland, OH": {
+          name: "Cleveland, OH",
+          latitudeRad: D2R * 41.4993,
+          longitudeRad: D2R * -81.6944,
+          eclipseFraction: 1.0
         },
-        "Omaha, NE": {
-          name: "Omaha, NE",
-          latitudeRad: D2R * 41.256538,
-          longitudeRad: D2R * -95.934502,
-          eclipseFraction: .68
+        
+        "Erie, PA": {
+          name: "Erie, PA",
+          latitudeRad: D2R * 42.1292,
+          longitudeRad: D2R * -80.0851,
+          eclipseFraction: 1.0
         },
-        "Chicago, IL": {
-          name: "Chicago, IL",
-          latitudeRad: D2R * 41.878113,
-          longitudeRad: D2R * -87.629799,
-          eclipseFraction: .54
+        
+        "Buffalo, NY": {
+          name: "Buffalo, NY",
+          latitudeRad: D2R * 42.8864,
+          longitudeRad: D2R * -78.8784,
+          eclipseFraction: 1.0
         },
-        "New York, NY": {
-          name: "New York, NY",
-          latitudeRad: D2R * 40.712776,
-          longitudeRad: D2R * -74.005974,
-          eclipseFraction: .35
+        
+        "Burlington, VT": {
+          name: "Burlington, VT",
+          latitudeRad: D2R * 44.4759,
+          longitudeRad: D2R * -73.2121,
+          eclipseFraction: 1.0
         },
-        "Boston, MA": {
-          name: "Boston, MA",
-          latitudeRad: D2R * 42.360081,
-          longitudeRad: D2R * -71.058884,
-          eclipseFraction: .29
+        
+        "Lancaster, NH": {
+          name: "Lancaster, NH",
+          latitudeRad: D2R * 44.4872,
+          longitudeRad: D2R * -71.5692,
+          eclipseFraction: 0.99
+        }, // appears to be total but too far south for WWT to do the eclipse doohickey
+        
+        "Cariibou, ME": {
+          name: "Cariibou, ME",
+          latitudeRad: D2R * 46.8600,
+          longitudeRad: D2R * -68.0111,
+          eclipseFraction: 1.0
         },
-        "Charlotte, NC": {
-          name: "Charlotte, NC",
-          latitudeRad: D2R * 35.227085,
-          longitudeRad: D2R * -80.843124,
-          eclipseFraction: .53
-        },
-        [USER_SELECTED]: { // by default, user selected is Albaquerque
+        
+        [USER_SELECTED]: { // by default, user selected is Greatest Eclipse
           name: USER_SELECTED,
-          latitudeRad: D2R * 35.106766,
-          longitudeRad: D2R * -106.629181,
-          eclipseFraction: 0.97
+          latitudeRad: D2R * 25.2866667,
+          longitudeRad: D2R * -104.1383333,
+          eclipseFraction: 1.0
         }
       } as Record<string, EclipseLocation>,
 
