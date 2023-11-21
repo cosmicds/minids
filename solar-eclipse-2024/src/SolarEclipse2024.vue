@@ -745,7 +745,7 @@
             >&times;</div>
           <div id="splash-screen-text">
             <p>WATCH the April 8</p>
-            <p class="highlight"> TOTOAL<br /> Solar Eclipse </p>
+            <p class="highlight">TOTAL<br/>Solar Eclipse</p>
           </div>
         </div>
         
@@ -2038,7 +2038,8 @@ export default defineComponent({
           0.5 * Math.sqrt(
             (rSunPx + rMoonPx - sunMoonDistance) * (sunMoonDistance + rMoonPx - rSunPx) * (sunMoonDistance - rMoonPx + rSunPx) * (sunMoonDistance + rSunPx + rMoonPx)
           );
-        this.currentPercentEclipsed = intersectionArea / sunArea;
+        const percentEclipsed = intersectionArea / sunArea;
+        this.currentPercentEclipsed = isNaN(percentEclipsed) ? 1 : percentEclipsed;
       }
 
       // If we're using the regular WWT moon, or in sun scope mode, we don't want the overlay but did want the percentage eclipsed
