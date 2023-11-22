@@ -19,6 +19,11 @@ interface MapOptions extends TileLayerOptions {
   initialZoom?: number;
 }
 
+interface GeoJSONProp {
+  url: string;
+  style: Record<string,any>;
+}
+
 interface Place extends LocationDeg { 
   color?: string;
   fillColor?: string;
@@ -107,6 +112,11 @@ export default defineComponent({
     worldRadii: {
       type: Boolean,
       default: false
+    },
+    
+    geoJsonFiles: {
+      type: Array as PropType<GeoJSONProp[]>,
+      default: () => []
     }
   },
 
@@ -248,6 +258,20 @@ export default defineComponent({
       }
 
       map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noopener noreferrer" >Leaflet</a>');
+      
+      // show the geojson files
+      this.geoJsonFiles.forEach((geojsonrecord) => {
+        const url = geojsonrecord.url;
+        const style = geojsonrecord.style;
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            L.geoJSON(data, {style: style}).addTo(map);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          }); 
+      });
       
       this.map = map;
     },
