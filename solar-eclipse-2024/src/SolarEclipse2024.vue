@@ -137,7 +137,7 @@
                 </template>
               </mc-radiogroup>
               <div v-if="showLinkToPath" class="my-1">
-                See NASA's map with the October annular eclipse path <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">here.</a>
+                See NASA's map with the October annular eclipse path <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2024/where-when/" target="_blank" rel="noopener noreferrer">here.</a>
               </div>
             </div>
             
@@ -249,7 +249,7 @@
             ></location-selector>
 
             <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
-              <img alt="This is a map of the US with three possible paths for the October 2023 annular eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
+              <img alt="This is a map of the US with three possible paths for the April 2024 solar eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
             </span>
 
             <location-selector
@@ -322,10 +322,10 @@
 
                   <div id="main-info-text">
                     <p>
-                    Get ready, North America, for not one, but two solar eclipses! On October 14, 2023, North, Central, and South America will be treated to a beautiful annular eclipse. Only 6 months later, on April 8, 2024, an awe-inspiring total solar eclipse will stretch from coast-to-coast across the United States and Canada.
+                    On April 8, 2024, North America will be treated to an awe-inspiring total eclipse. 
                     </p>
                     <p>
-                    This interactive lets you explore the October "Ring of Fire" eclipse from different locations. 
+                    This interactive lets you explore the April total eclipse from different locations. 
                     </p>
                     <p id="safety-warning">
                       SAFETY FIRST: NEVER look directly at the Sun without proper eye protection.
@@ -361,7 +361,7 @@
                     <details>
                       <summary>Where can I learn more?</summary>
                       <p>
-                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2023/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse and Fiske Planetarium's <a href="https://www.colorado.edu/fiske/projects/science-through-shadows" target="_blank" rel="noopener noreferrer">Science Through Shadows</a> videos.
+                        Check out <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2024/where-when/" target="_blank" rel="noopener noreferrer">NASA's website</a> about the October annular eclipse and Fiske Planetarium's <a href="https://www.colorado.edu/fiske/projects/science-through-shadows" target="_blank" rel="noopener noreferrer">Science Through Shadows</a> videos.
                       </p>
                     </details>
                   </div>
