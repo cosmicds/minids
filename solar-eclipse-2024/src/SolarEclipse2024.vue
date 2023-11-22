@@ -245,6 +245,7 @@
               :selected-circle-options="selectedCircleOptions"
               :selectable="false"
               class="leaflet-map"
+              :geo-json-files="geojson"
             ></location-selector>
 
             <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
@@ -259,6 +260,7 @@
               :map-options="userSelectedMapOptions"
               :selected-circle-options="selectedCircleOptions"
               class="leaflet-map"
+              :geo-json-files="geojson"
             ></location-selector>
           </div>
         </v-slide-y-transition>
@@ -1170,13 +1172,17 @@
             >
             </icon-button>
           </div>
-          <!-- <icon-button
+          <icon-button
             id="set-time-now-button"
             @activate="() => {
-              selectedTime = times.reduce((a, b) => {
-                return Math.abs(b - Date.now()) < Math.abs(a - Date.now()) ? b : a;
-              });
-              playing = !(playing);
+              // selectedTime = times.reduce((a, b) => {
+              //   return Math.abs(b - Date.now()) < Math.abs(a - Date.now()) ? b : a;
+              // });
+              selectedTime = Date.now();
+              speedIndex = 0;
+              playbackRate=1;
+              playing = true;
+              console.log('to now')
             }"
             :color="accentColor"
             tooltip-text="Go to current time"
@@ -1187,7 +1193,7 @@
             <template v-slot:button>
               Now
             </template>
-          </icon-button> -->
+          </icon-button>
         </span>      
       </div>
       <div id="body-logos" v-if= "!smallSize">
@@ -1390,7 +1396,6 @@ export default defineComponent({
 
     const storedOptOut = window.localStorage.getItem(OPT_OUT_KEY);
     const responseOptOut = typeof storedOptOut === "string" ? storedOptOut === "true" : null;
-
     return {
       uuid,
       responseOptOut: responseOptOut as boolean | null,
@@ -1635,6 +1640,16 @@ export default defineComponent({
       moonPlace,
 
       queryData,
+      //  source https://svs.gsfc.nasa.gov/5123/ shapefiles converted to geojson using mapshaper.org/
+      // the order is the layer order form bottom to top
+      geojson: [{
+        url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/upath_hi.json',
+        style: {fillColor: '#333', weight: 1, opacity: 0, fillOpacity: 0.3}
+      },
+      {
+        url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/center.json',
+        style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0}
+      }],
 
       presetLocationsVisited,
       userSelectedLocationsVisited
@@ -1783,9 +1798,9 @@ export default defineComponent({
     
     selectedLocaledTimeDateString() {
       if (this.smallSize) {
-        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd, HH:mm (zzz)');
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd, HH:mm:ss (zzz)');
       } else {
-        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm (zzz)');
+        return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm:ss (zzz)');
       }
 
 
@@ -2924,7 +2939,7 @@ export default defineComponent({
     },
 
     playing(play: boolean) {
-      // console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
+      console.log(`${play ? 'Playing:' : 'Stopping:'} at ${this.playbackRate}x real time`);
       this.setClockSync(play);
     },
 
