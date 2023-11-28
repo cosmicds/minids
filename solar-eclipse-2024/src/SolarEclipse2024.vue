@@ -2895,6 +2895,7 @@ export default defineComponent({
       
       const sunAlt = altRad;
       this.skyOpacity = (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
+      this.skyOpacity = this.skyOpacity * (1 - 0.75 * Math.pow(Math.E,-Math.pow((this.currentPercentEclipsed -1),2)/(0.09)));
       this.updateMoonTexture();
 
       const dssOpacity = sunAlt > 0 ? 0 : 1 - (1 + Math.atan(Math.PI * sunAlt / (-astronomicalTwilight))) / 2;
@@ -3125,6 +3126,11 @@ export default defineComponent({
 
       this.updateSkyOpacityForSunAlt(pos.altRad);
       return;
+    },
+    
+    currentPercentEclipsed(_frac: number) {
+      // this.skyOpacity = 1 - frac;
+      this.updateFrontAnnotations();
     },
 
     toggleTrackSun(val: boolean) {
