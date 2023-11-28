@@ -1020,7 +1020,7 @@
     <div class="bottom-content">
       <div id="eclipse-percent-chip">
         <v-chip 
-          v-if="showEclipsePercentage && wwtZoomDeg < 210"
+          v-if="showEclipsePercentage"
           :prepend-icon="smallSize ? `` : `mdi-sun-angle`"
           variant="outlined"
           elevation="2"
@@ -2170,7 +2170,19 @@ export default defineComponent({
         return test >= lower || test <= upper;
       }
     },
-
+    
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    greatCircleDistance(coord1: { RA: number; dec: number; }, coord2: { RA: number; dec: number; }): number {
+      const ra1 = coord1.RA * 15 * D2R;
+      const dec1 = coord1.dec * D2R;
+      
+      const ra2 = coord2.RA * 15 * D2R;
+      const dec2 = coord2.dec * D2R;
+      
+      const cosD = Math.sin(dec1) * Math.sin(dec2) + Math.cos(dec1) * Math.cos(dec2) * Math.cos(ra1 - ra2);
+      return Math.acos(cosD);
+    },
+    
     updateIntersection() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -2199,7 +2211,8 @@ export default defineComponent({
       const rSunPx = 6 * thetaSun * canvasHeight / (this.wwtZoomDeg * D2R);
 
       const points: { x: number; y: number }[] = [];
-      const sunMoonDistance = Math.sqrt(sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y);
+      const sunMoonAngle = this.greatCircleDistance(sunPosition, moonPosition);
+      const sunMoonDistance = 6 * sunMoonAngle * canvasHeight / (this.wwtZoomDeg * D2R);
 
       // If there's no sun/moon intersection, no need to continue
       if (sunMoonDistance > rMoonPx + rSunPx) {
