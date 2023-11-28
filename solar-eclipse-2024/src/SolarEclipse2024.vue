@@ -1711,7 +1711,7 @@ export default defineComponent({
       maxTime: maxTime,
       millisecondsPerInterval: MILLISECONDS_PER_INTERVAL,
       
-      accentColor: "#ff8f00",
+      accentColor: "#f3de21",
       moonColor: "#CFD8DC",
       guidedContentHeight: "300px",
       showGuidedContent: true,
@@ -1726,7 +1726,7 @@ export default defineComponent({
       tab: 0,
       introSlide: 1,
       
-      viewerMode: 'SunScope' as ViewerMode,
+      viewerMode: 'Horizon' as ViewerMode,
 
       showSky: true,
       skyColorNight: "#1F1F1F",
@@ -3380,7 +3380,7 @@ body {
     }
 
     @media (min-width: 600px) {
-      top: 3.1rem;
+      top: 3.5rem;
     }
   }
   
@@ -3508,14 +3508,14 @@ body {
   padding-block: 0.5em;
   padding-right: 0.5em;
   border-radius: 5px;
-  border: solid 1px var(--comet-color);
+  border: solid 1px var(--accent-color);
   display: flex;
   flex-direction: column;
   align-self: flex-end;
   pointer-events: auto;
 
   .v-label {
-    color: var(--comet-color);
+    color: var(--accent-color);
     opacity: 1;
     font-size: var(--default-font-size);
   }
@@ -3577,8 +3577,8 @@ body {
   margin-block: 1rem;
   width: 100%;
   color: #ddd;
-  font-size: calc(1.1 * var(default-font-size));
-  line-height: calc(1.1 * var(default-line-height));
+  font-size: calc(1.1 * var(--default-font-size));
+  line-height: calc(1.1 * var(--default-line-height));
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -3884,7 +3884,7 @@ video, #info-video {
       right: 0;
       font-size: calc(0.8 * var(--default-font-size));
       line-height: calc(0.8 * var(--default-line-height));
-      background-color: #212121;
+      background-color: rgba(0, 0, 0, .33);
       padding-inline: 10px 5px;
     }
     
@@ -4125,18 +4125,16 @@ video, #info-video {
 
 #closed-top-container {
     position: absolute;
-    left: 0.5rem;
+    left: 1.5rem;
     z-index: 500;
-    top: 0.5rem;
+    top: 0.75rem;
 
     &.budge {
+      left: 0.5rem;
       @media (max-width: 599px) {
         left: 0.5rem;
         top: 2.5rem;
       }
-      background-color: var(--accent-color);
-      border-radius: 50%;
-      border: 2px solid var(--accent-color);
     }
   }
 
