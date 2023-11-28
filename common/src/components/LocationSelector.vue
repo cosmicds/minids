@@ -279,8 +279,14 @@ export default defineComponent({
         } else if (geo) {
           L.geoJSON(geo, {
             style: style,
-            pointToLayer: function (_feature, latlng) {
-              return L.circleMarker(latlng, style);
+            pointToLayer: function (feature, latlng) {
+              if (feature.properties.absoluteRadius) {
+                style.radius = feature.properties.absoluteRadius;
+                return L.circle(latlng, style);
+              } else {
+                return L.circleMarker(latlng, style);
+              }
+              
             },
             onEachFeature: function (feature, layer) {
               if (feature.properties && feature.properties.popupContent) {
