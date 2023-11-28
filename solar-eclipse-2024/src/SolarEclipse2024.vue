@@ -1445,7 +1445,8 @@ const eclipsePathGeoJson = {
       "properties": {
         "utc": d.utc,
         "eclipseDuration": d.eclipseDuration,
-        "popupContent": d.popupContent
+        "popupContent": d.popupContent,
+        "absoluteRadius": d.pathWidth * 1000 / 2
       }
     };
   })
@@ -1763,15 +1764,15 @@ export default defineComponent({
       geojson: [
         {
           url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/upath_hi.json',
-          style: {fillColor: '#333', weight: 1, opacity: 0, fillOpacity: 0.3, pointerEvents: 'none'}
+          style: {fillColor: '#333', weight: 1, opacity: 0, fillOpacity: 0.3, id:"upath"}
         },
         {
           url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/center.json',
-          style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0, pointerEvents: 'none'}
+          style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0}
         },
         {
           'geojson': eclipsePathGeoJson as GeoJSON.FeatureCollection,
-          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
+          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 0, fillOpacity: 0}
         }
       ],
 
@@ -4396,6 +4397,14 @@ video, #info-video {
     
     .leaflet-control-attribution {
       font-size: .75em;
+    }
+    
+    .leaflet-pane.leaflet-overlay-pane > svg > g > path[fill="#333"] {
+      pointer-events: none;
+    }
+    
+    .leaflet-pane.leaflet-overlay-pane > svg > g > path[fill="#ff0000"] {
+      pointer-events: none;
     }
   }
 }
