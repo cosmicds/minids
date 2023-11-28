@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { notify } from "@kyvg/vue3-notification";
