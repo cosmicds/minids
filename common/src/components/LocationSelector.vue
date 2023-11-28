@@ -1,8 +1,10 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="map-container"></div>
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import L, { LeafletMouseEvent, Map, TileLayerOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { notify } from "@kyvg/vue3-notification";
@@ -20,7 +22,8 @@ interface MapOptions extends TileLayerOptions {
 }
 
 interface GeoJSONProp {
-  url: string;
+  url?: string;
+  geojson?: GeoJSON.FeatureCollection | GeoJSON.Feature | GeoJSON.GeometryCollection;
   style: Record<string,any>;
 }
 
@@ -262,15 +265,30 @@ export default defineComponent({
       // show the geojson files
       this.geoJsonFiles.forEach((geojsonrecord) => {
         const url = geojsonrecord.url;
+        const geo = geojsonrecord.geojson;
         const style = geojsonrecord.style;
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            L.geoJSON(data, {style: style}).addTo(map);
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          }); 
+        if (url) {
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+              L.geoJSON(data, {style: style}).addTo(map);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            }); 
+        } else if (geo) {
+          L.geoJSON(geo, {
+            style: style,
+            pointToLayer: function (_feature, latlng) {
+              return L.circleMarker(latlng, style);
+            },
+            onEachFeature: function (feature, layer) {
+              if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+              }
+            }
+          }).addTo(map);
+        }
       });
       
       this.map = map;
