@@ -2208,6 +2208,7 @@ export default defineComponent({
       }
 
       const moonInsideSun = sunMoonDistance < rSunPx - rMoonPx;
+      const sunInsideMoon = sunMoonDistance < rMoonPx - rSunPx;
 
       const dSq = sunMoonDistance * sunMoonDistance;
       const rMoonSq = rMoonPx * rMoonPx;
@@ -2215,7 +2216,7 @@ export default defineComponent({
 
       const moonArea = Math.PI * rMoonSq;
       const sunArea = Math.PI * rSunSq;
-      if (moonInsideSun) {
+      if (moonInsideSun || sunInsideMoon) {
         this.currentPercentEclipsed = moonArea / sunArea;
       } else {
         // See https://mathworld.wolfram.com/Circle-CircleIntersection.html
@@ -2236,8 +2237,8 @@ export default defineComponent({
 
       const n = 50;
       
-      // If the moon is completely "inside" of the sun
-      if (moonInsideSun) {
+      // If the moon/sun is completely "inside" of the sun/moon
+      if (moonInsideSun || sunInsideMoon) {
         for (let i = 0; i <= n; i++) {
           const angle = (i / n) * 2 * Math.PI;
           points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
