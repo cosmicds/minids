@@ -1446,7 +1446,7 @@ const eclipsePathGeoJson = {
         "utc": d.utc,
         "eclipseDuration": d.eclipseDuration,
         "popupContent": d.popupContent,
-        "absoluteRadius": d.pathWidth * 1000 / 2
+        // "absoluteRadius": 5000, //d.pathWidth * 1000 / 2
       }
     };
   })
@@ -1772,7 +1772,7 @@ export default defineComponent({
         },
         {
           'geojson': eclipsePathGeoJson as GeoJSON.FeatureCollection,
-          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 0, fillOpacity: 0}
+          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
         }
       ],
 
