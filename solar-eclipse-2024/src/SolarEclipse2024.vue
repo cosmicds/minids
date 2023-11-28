@@ -6,21 +6,26 @@
 
   <!-- Top content box with map, location, time, and option icons -->
   <div id="closed-top-container" :class="[!showGuidedContent ?'budge' : '']">
-    <font-awesome-icon
+    <icon-button
       v-model="showGuidedContent"
-      :class="showGuidedContent ? 'ma-1' : ''"
-      :size="showGuidedContent ? 'xl' : '2xl'"
-      :color="showGuidedContent ? 'var(--accent-color)' : 'black'"
-      :icon="showGuidedContent ? 'chevron-up' : 'circle-chevron-down'"
-      @click="() => {
+      :fa-icon="showGuidedContent ? 'chevron-up' : 'chevron-down'"
+      :fa-size="showGuidedContent ? 'lg' : 'xl'"
+      :color="accentColor"
+      :focus-color="accentColor"
+      :tooltip-text="showGuidedContent ? 'Hide' : 'Click to learn more'"
+      :tooltip-location="'bottom'"
+      :show-tooltip="!mobile"
+      :box-shadow="false"
+      @activate="() => {
         // console.log('showGuidedContent = ', showGuidedContent);
-        showGuidedContent = !showGuidedContent;
+        // showGuidedContent = !showGuidedContent;
         onResize();
       }"
-      @keyup.enter="showGuidedContent = !showGuidedContent"
-      tabindex="0"
-      tooltip-location="start"
-    /> 
+    >
+    <template v-if="!showGuidedContent" v-slot:button>
+      Learn & Explore <font-awesome-icon icon="chevron-down" class="bullet-icon"/>
+    </template>
+  </icon-button>
   </div>
   <v-container id="guided-content-container" v-show="showGuidedContent">
     <hover-tooltip
