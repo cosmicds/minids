@@ -1,4 +1,3 @@
-<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="map-container"></div>
 </template>
