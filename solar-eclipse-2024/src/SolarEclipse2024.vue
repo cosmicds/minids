@@ -2258,6 +2258,7 @@ export default defineComponent({
           }
           x1 = Math.sqrt(rMoonPx * rMoonPx - ysh * ysh);
           if (isNaN(x1)) {
+            console.error("x1 is NaN");
             this.currentPercentEclipsed = 0;
             return;
           }
@@ -2270,8 +2271,8 @@ export default defineComponent({
           // m is the slope of the line joining the moon and the sun
           // mPerp is the slope of a line perpendicular to the line joining the moon and the sun
           // yInt is the y-intercept of a line passing through the two points of intersection
-          const mPerp = -sunPoint.x / sunPoint.y;
-          const yInt = (sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y - (rSunPx * rSunPx - rMoonPx * rMoonPx)) / (2 * sunPoint.y);
+          const mPerp = -sunPoint.x / (sunPoint.y + 1e-5);
+          const yInt = (sunPoint.x * sunPoint.x + sunPoint.y * sunPoint.y - (rSunPx * rSunPx - rMoonPx * rMoonPx)) / (2 * (sunPoint.y + 1e-5));
 
           // Find the x-coordinates of the edge points of the moon-sun intersection
           const a = (1 + mPerp * mPerp);
@@ -2280,6 +2281,7 @@ export default defineComponent({
 
           const sqrDisc = Math.sqrt(b * b - 4 * a * c);
           if (isNaN(sqrDisc)) {
+            console.error("sqrDisc is NaN");
             this.currentPercentEclipsed = 0;
             return;
           }
