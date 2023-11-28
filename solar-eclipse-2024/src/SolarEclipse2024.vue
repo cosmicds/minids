@@ -1335,6 +1335,94 @@ const USER_SELECTED_LOCATIONS_KEY = "user-selected-locations" as const;
 const PRESET_LOCATIONS_KEY = "preset-locations" as const;
 const MC_RESPONSES_KEY = "mc-responses" as const;
 
+import { dsvFormat } from "d3-dsv";
+import { eclipse } from "./eclipse_path";
+
+function parseLatLon(latD: string, latM: string, lonD: string, lonM: string): LocationDeg {
+
+  const lat = +latD;
+  // split off last character of latM as N/S
+  const latSign = latM.slice(-1) === "N" ? 1 : -1;
+  const latMin = +latM.slice(0, -1);
+  const latDeg = latSign * (lat + latMin / 60);
+  
+  const lon = +lonD;
+  // split off last character of lonM as W/E
+  const lonSign = lonM.slice(-1) === "E" ? 1 : -1;
+  const lonMin = +lonM.slice(0, -1);
+  const lonDeg = lonSign * (lon + lonMin / 60);
+  
+  return {
+    latitudeDeg: latDeg,
+    longitudeDeg: lonDeg
+  };
+}
+
+function parseEclipsePath(csv: string) {
+  const tsv = dsvFormat('|');
+
+  return tsv.parseRows(csv, (d) => {
+    // parse rows based on space delimieted eclipse_path.txt
+
+    const utcString = d[1].split(':');
+    const utc = new Date(eclipseStartTime);
+    utc.setUTCHours(+utcString[0]);
+    utc.setUTCMinutes(+utcString[1]);
+    utc.setUTCSeconds(0);
+    utc.setUTCMilliseconds(0);
+    
+    
+    const northernLimit = parseLatLon(d[2], d[3], d[4], d[5]);
+    const southernLimit = parseLatLon(d[6], d[7], d[8], d[9]);
+    const centerLine = parseLatLon(d[10], d[11], d[12], d[13]);
+    const ratio = +d[14];
+    const sunAlt = +d[15];
+    const sunAz = +d[16];
+    const pathWidth = +d[17];
+    const eclipseDuration = d[18];
+    // content for the popup : eclipse time (UTC) and duration
+    const tz = tzlookup(centerLine.latitudeDeg, centerLine.longitudeDeg);
+    const localTimeString = formatInTimeZone(utc.getTime(), tz, "HH:mm (zzz)");
+    const popupContent = `Eclipse time (local): ${localTimeString} <br/>Eclipse time (UTC): ${d[1]} <br/>Duration: ${eclipseDuration}`;
+    
+    return {
+      'utc': utc.getTime(),
+      'northernLimit': northernLimit,
+      'southernLimit': southernLimit,
+      'centerLine': centerLine,
+      'ratio': ratio,
+      'sunAlt': sunAlt,
+      'sunAz': sunAz,
+      'pathWidth': pathWidth,
+      'eclipseDuration': eclipseDuration,
+      'popupContent': popupContent
+    };
+    
+  });
+}
+
+const eclipsePath = parseEclipsePath(eclipse);
+
+// convert the eclipse path to a GeoJson feature collection
+const eclipsePathGeoJson = {
+  "name": "Eclipse Path",
+  "type": "FeatureCollection",
+  "features": eclipsePath.map((d) => {
+    return {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [d.centerLine.longitudeDeg, d.centerLine.latitudeDeg]
+      },
+      "properties": {
+        "utc": d.utc,
+        "eclipseDuration": d.eclipseDuration,
+        "popupContent": d.popupContent
+      }
+    };
+  })
+};
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -1451,6 +1539,8 @@ export default defineComponent({
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
         ...(queryData ? { ...queryData, initialZoom: 5 } : initialView)
       },
+      
+      eclipseCenterLine: eclipsePath,
 
       eclipsePathLocations: {
         // locations taken from https://science.nasa.gov/eclipses/future-eclipses/eclipse-2024/where-when/
@@ -1642,14 +1732,20 @@ export default defineComponent({
       queryData,
       //  source https://svs.gsfc.nasa.gov/5123/ shapefiles converted to geojson using mapshaper.org/
       // the order is the layer order form bottom to top
-      geojson: [{
-        url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/upath_hi.json',
-        style: {fillColor: '#333', weight: 1, opacity: 0, fillOpacity: 0.3}
-      },
-      {
-        url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/center.json',
-        style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0}
-      }],
+      geojson: [
+        {
+          url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/upath_hi.json',
+          style: {fillColor: '#333', weight: 1, opacity: 0, fillOpacity: 0.3, pointerEvents: 'none'}
+        },
+        {
+          url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/center.json',
+          style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0, pointerEvents: 'none'}
+        },
+        {
+          'geojson': eclipsePathGeoJson as GeoJSON.FeatureCollection,
+          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
+        }
+      ],
 
       presetLocationsVisited,
       userSelectedLocationsVisited
