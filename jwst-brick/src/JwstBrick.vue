@@ -99,6 +99,7 @@
         columns="2"
         width="200px"
         prevent-deselect
+        style="box-shadow: 0px 0px 10px black;"
       >
         <div
           v-if="showJWSTOpacity"
@@ -951,10 +952,12 @@ body {
   padding-top: 4rem;
   padding-bottom: 1rem;
 
-  border-radius: 10%;
+  border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+
+  box-shadow: 0px 0px 25px black;
 
   div {
     margin-inline: auto;
