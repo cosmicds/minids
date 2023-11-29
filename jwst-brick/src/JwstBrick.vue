@@ -376,7 +376,7 @@ export default defineComponent({
   data() {
     return {
       layers: {} as Record<string,ImageSetLayer>,
-      cfOpacity: 50, // out of 100
+      cfOpacity: 100, // out of 100
       ready: false,
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -387,7 +387,7 @@ export default defineComponent({
       currentTool: "crossfade" as ToolType,
       places: [] as Place[],
       jwstPlaces: [] as Place[],
-      jwstCfOpacity: 50,
+      jwstCfOpacity: 100,
       selectedGalleryItem: null as Place | null,
       showJWSTOpacity: true,
       ignoreSelect: false,
