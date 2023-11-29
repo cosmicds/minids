@@ -1285,6 +1285,7 @@ import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, MINIDS_BASE_URL
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { Classification, SolarSystemObjects } from "@wwtelescope/engine-types";
 import { Folder, Grids, LayerManager, Planets, Poly, Settings, WWTControl, Place, Texture, CAAMoon } from "@wwtelescope/engine";
+import { distance } from "@wwtelescope/astro";
 import { Annotation2, Poly2 } from "./Annotation2";
 import { MCSelectionStatus } from "./MCRadiogroup.vue";
 
@@ -2180,8 +2181,7 @@ export default defineComponent({
       const ra2 = coord2.RA * 15 * D2R;
       const dec2 = coord2.dec * D2R;
       
-      const cosD = Math.sin(dec1) * Math.sin(dec2) + Math.cos(dec1) * Math.cos(dec2) * Math.cos(ra1 - ra2);
-      return Math.acos(cosD);
+      return distance(ra1, dec1, ra2, dec2);
     },
     
     updateIntersection() {
