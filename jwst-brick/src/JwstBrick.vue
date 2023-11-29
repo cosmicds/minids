@@ -244,7 +244,7 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
+                JWST has observed an infrared-dark cloud called The Brick with its NIRCam camera. The Brick is possibly the densest, most massive dark cloud in the Galaxy. Dark clouds like this are usually the sites of future star formation, but in The Brick, we so far see very little sign of star formation&#8212;the cloud is still dark and cold. Since The Brick is in the center of the Galaxy, the JWST data mostly show stars in the foreground of the cloud. With some processing, scientists were able to remove the stars and show only the cloud itself, revealing striations and streamers of both the dark, cold gas and the hot, ionized background material. The blue colors in the image show where frozen carbon monoxide, CO ice, is blocking out the background light from the hot plasma of hydrogen that fills the Galactic Center.
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -282,6 +282,19 @@
                     <v-col cols="12">
                       <div class="credits">
                       <h3>Credits:</h3>
+                      <h4><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h4>
+                      Adam Ginsburg<br>
+                      Ashley Barnes<br>
+                      Cara Battersby<br>
+                      Alyssa Bulatek<br>
+                      Savannah Gramze<br>
+                      Jonathan Henshaw<br>
+                      Desmond Jeff<br>
+                      Xing Lu<br>
+                      E. A. C. Mills<br>
+                      Daniel Walker<br>
+                      <br>
+
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                       John Lewis<br>
                       Jon Carifio<br>
