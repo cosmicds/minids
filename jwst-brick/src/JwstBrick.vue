@@ -154,6 +154,18 @@
           </template>
         </div>
       </div>
+      <div id="overlay-button-container">
+        <v-btn
+          style="pointer-events: auto;"
+          id="overlay-button"
+          @click="showOverlay = !showOverlay"
+          @keyup.enter="showOverlay = !showOverlay"
+          tabindex="0"
+          :color="accentColor"
+          large
+        >{{ showOverlay ? `Hide` : `Show` }} annotations
+        </v-btn>
+      </div>
 
       <div id="project-credits">
         <div id="icons-container">
@@ -381,6 +393,8 @@ export default defineComponent({
       ignoreSelect: false,
       keepCfOpacity: false,
       
+      showOverlay: true,
+      
       accentColor: "#F0AB52",
 
       initialPosition: {ra: 266.5375, dec:-28.708, zoom: 1},
@@ -417,7 +431,7 @@ export default defineComponent({
         layers.forEach(layer => {
           if (layer === undefined) { return; }
           this.layers[layer.get_name()] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          applyImageSetLayerSetting(layer, ["opacity", 1]);
         });
         this.layersLoaded = true;
         // this.resetView();
@@ -632,6 +646,10 @@ export default defineComponent({
       deep: true
     },
     
+    showOverlay(value: boolean) {
+      applyImageSetLayerSetting(this.layers.zannotation, ["enabled", value]);
+    },
+    
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
       if (!this.keepCfOpacity) {
@@ -661,7 +679,7 @@ export default defineComponent({
     
     showLayers(show: boolean) {
       Object.values(this.layers).forEach(layer => {
-        applyImageSetLayerSetting(layer, ["enabled", show]);
+        applyImageSetLayerSetting(layer, ["opacity", show ? 1 : 0]);
       });
     },
     layersLoaded(loaded: boolean) {
@@ -881,6 +899,13 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+#overlay-button-container {
+  position:absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 #tools {
