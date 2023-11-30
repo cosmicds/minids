@@ -101,7 +101,7 @@ export default defineComponent({
     width: { type: String, default: "300px" },
     maxHeight: { type: String, default: "500px" },
     title: { type: String, default: "Gallery" },
-    selectedColor: { type: String, default: "dodgerblue" },
+    selectedColor: { type: String, default: "deepskyblue" },
     singleSelect: { type: Boolean, default: true },
     highlightLastOnly: { type: Boolean, default: false },
     previewIndex: { type: Number, default: 0 },
@@ -319,7 +319,7 @@ export default defineComponent({
   .gallery-item {
     padding: 2px 10px;
     border-radius: 5px;
-    border: 2px solid white;
+    border: 2px solid #999;
     display: flex;
     flex-direction: column;
     cursor: pointer;
