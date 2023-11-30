@@ -128,6 +128,19 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
+      <div id="overlay-button-container">
+        <v-btn
+          style="pointer-events: auto;"
+          id="overlay-button"
+          @click="showOverlay = !showOverlay"
+          @keyup.enter="showOverlay = !showOverlay"
+          tabindex="0"
+          :color="accentColor"
+          size="small"
+        >{{ showOverlay ? `Hide` : `Show` }} annotations
+        </v-btn>
+      </div>
+
       <div id="tools" v-if="showLayers">
         <div class="tool-container">
           <template v-if="currentTool == 'crossfade'">
@@ -163,19 +176,7 @@
           </template>
         </div>
       </div>
-      <div id="overlay-button-container">
-        <v-btn
-          style="pointer-events: auto;"
-          id="overlay-button"
-          @click="showOverlay = !showOverlay"
-          @keyup.enter="showOverlay = !showOverlay"
-          tabindex="0"
-          :color="accentColor"
-          large
-        >{{ showOverlay ? `Hide` : `Show` }} annotations
-        </v-btn>
-      </div>
-
+      
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -935,10 +936,12 @@ body {
 }
 
 #overlay-button-container {
-  position:absolute;
-  bottom: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  align-self: flex-start;
+  padding-bottom: 0.5rem;
+  // position:absolute;
+  // bottom: 0.5rem;
+  // left: 50%;
+  // transform: translateX(-50%);
 }
 
 #tools {
