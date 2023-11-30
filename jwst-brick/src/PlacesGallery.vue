@@ -56,7 +56,7 @@
           @click="selectPlace(place)"
         >
           <img
-            class="noselect"
+            class="noselect mobile-off"
             :src="getImageset(place)?.get_thumbnailUrl() ?? ''"
           />
           <span

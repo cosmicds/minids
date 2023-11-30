@@ -104,13 +104,13 @@
         <div
           v-if="showJWSTOpacity"
           id="jwst-crossfade">
-          <span>Stars</span>
+          <span class="mobile-off">Stars</span>
           <input
             class="opacity-range"
             type="range"
             v-model="crossfadeJWST"
           />
-          <span>No stars</span>
+          <span class="mobile-off">No stars</span>
         </div>
       </places-gallery>
     </div>
@@ -1251,6 +1251,16 @@ a {
 #main-content {
   .gallery-root .gallery {
     border: none;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  #icons-container {
+    display: none;
+  }
+
+  .mobile-off {
+    display: none;
   }
 }
 
