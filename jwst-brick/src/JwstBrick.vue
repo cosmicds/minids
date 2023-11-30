@@ -85,6 +85,14 @@
           tooltip-location="start"
         >
         </icon-button>
+        <icon-button
+          md-icon="wall"
+          :color="accentColor"
+          tooltip-text="Center Brick"
+          tooltip-location="start"
+          @activate="goToInitPosition"
+        >
+        </icon-button>
       </div>
       <div id="center-buttons">
       </div>
@@ -330,7 +338,7 @@
 </template>
 
 <script lang="ts">
-import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { ImageSetLayer, Place, Settings } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
@@ -407,6 +415,7 @@ export default defineComponent({
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
+      this.wwtSettings.set_galacticMode(true);
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
@@ -471,7 +480,14 @@ export default defineComponent({
         window.removeEventListener('keypress', splashScreenListener);
       };
       window.addEventListener('keypress', splashScreenListener);
+      
+      setTimeout(() => {
+        this.goToInitPosition();
+      }, 100);
+      
     });
+    
+    
   },
 
   mounted() {
@@ -484,6 +500,13 @@ export default defineComponent({
   },
 
   computed: {
+    
+    wwtSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+    
     crossfadeOpacity: {
       get(): number {
         return this.cfOpacity;
@@ -592,6 +615,15 @@ export default defineComponent({
   },
 
   methods: {
+    
+    async goToInitPosition() {
+      return this.gotoRADecZoom({
+        raRad: D2R * this.initialPosition.ra,
+        decRad: D2R * this.initialPosition.dec,
+        zoomDeg: this.initialPosition.zoom,
+        instant: true
+      });
+    },
     
     onGallerySelect(place: Place) {
       // show the corresponding brick by setting the opacity of it to 100%
