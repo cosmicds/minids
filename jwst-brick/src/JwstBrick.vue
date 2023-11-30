@@ -101,6 +101,7 @@
       <places-gallery
         :stay-open="true"
         :places-list="jwstPlaces"
+        :alt-labels="['w/ stars', 'no stars']"
         @select="onGallerySelect"
         :incomingItemSelect="selectedGalleryItem"
         :title="null"
