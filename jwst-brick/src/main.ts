@@ -32,7 +32,7 @@ createApp(JwstBrick, {
     nostars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wostars/index.wtml",
     stars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wstars/index.wtml",
     // glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
-    zannotation: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/adam/annotation_toast/index.wtml",
+    zannotation: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/adam/annotation/index.wtml",
   },
   bgWtml: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
   bgName: "GLIMPSE Original"
