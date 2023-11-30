@@ -77,6 +77,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent } from 'vue';
 import { Folder, Imageset, Place } from "@wwtelescope/engine";
 import { engineStore } from "@wwtelescope/engine-pinia";
