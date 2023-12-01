@@ -475,10 +475,6 @@ export default defineComponent({
         this.backgroundImagesets.unshift(
           new BackgroundImageset("GLIMPSE", this.bgName)
         );
-        // an essentially equivalent way that would permit a background image to be loaded from a URL
-        // this.setBackgroundImageByName("Black Sky Background");
-        // this.setForegroundImageByName(this.bgName);
-        // this.setForegroundOpacity(100);
         
       });
 
@@ -494,14 +490,6 @@ export default defineComponent({
   },
 
   mounted() {
-    // this move gets cancelled because changing
-    // to galactic mode triggers a view change
-    // this.gotoRADecZoom({
-    //   raRad: D2R * this.initialPosition.ra,
-    //   decRad: D2R * this.initialPosition.dec,
-    //   zoomDeg: this.initialPosition.zoom,
-    //   instant: true
-    // });
   },
 
   computed: {
