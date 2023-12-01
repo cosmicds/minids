@@ -421,6 +421,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
       this.wwtSettings.set_galacticMode(true);
+      this.wwtSettings.set_showSolarSystem(false);
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
