@@ -475,6 +475,11 @@ export default defineComponent({
         this.backgroundImagesets.unshift(
           new BackgroundImageset("GLIMPSE", this.bgName)
         );
+        // an essentially equivalent way that would permit a background image to be loaded from a URL
+        // this.setBackgroundImageByName("Black Sky Background");
+        // this.setForegroundImageByName(this.bgName);
+        // this.setForegroundOpacity(100);
+        
       });
 
 
