@@ -403,7 +403,7 @@ export default defineComponent({
       ignoreSelect: false,
       keepCfOpacity: false,
       
-      showOverlay: true,
+      showOverlay: false,
       
       accentColor: "#F0AB52",
 
@@ -462,6 +462,7 @@ export default defineComponent({
         // initialized the selected item to the w/o stars brick
         // this.selectedGalleryItem = this.jwstPlaces[1];
         this.crossfadeJWST = 100;
+        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", this.showOverlay]);
       });
 
       this.loadImageCollection({
