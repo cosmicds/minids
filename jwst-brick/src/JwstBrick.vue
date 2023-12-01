@@ -90,7 +90,7 @@
           :color="accentColor"
           tooltip-text="Center Brick"
           tooltip-location="start"
-          @activate="goToInitPosition"
+          @activate="goToBrickPosition"
         >
         </icon-button>
       </div>
@@ -407,7 +407,7 @@ export default defineComponent({
       
       accentColor: "#F0AB52",
 
-      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 1},
+      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 120 },
 
       tab: 0
     };
@@ -483,23 +483,20 @@ export default defineComponent({
         window.removeEventListener('keypress', splashScreenListener);
       };
       window.addEventListener('keypress', splashScreenListener);
-      
-      setTimeout(() => {
-        this.goToInitPosition();
-      }, 100);
-      
+
     });
-    
     
   },
 
   mounted() {
-    this.gotoRADecZoom({
-      raRad: D2R * this.initialPosition.ra,
-      decRad: D2R * this.initialPosition.dec,
-      zoomDeg: this.initialPosition.zoom,
-      instant: true
-    });
+    // this move gets cancelled because changing
+    // to galactic mode triggers a view change
+    // this.gotoRADecZoom({
+    //   raRad: D2R * this.initialPosition.ra,
+    //   decRad: D2R * this.initialPosition.dec,
+    //   zoomDeg: this.initialPosition.zoom,
+    //   instant: true
+    // });
   },
 
   computed: {
@@ -614,17 +611,22 @@ export default defineComponent({
           video.pause();
         }
       }
+    },
+    
+    // set brick initial zoom based on screen size
+    initialBrickZoom(): number {
+      return this.mobile ? 1 : 0.7;
     }
   },
 
   methods: {
     
-    async goToInitPosition() {
+    async goToBrickPosition(instant = true) {
       return this.gotoRADecZoom({
         raRad: D2R * this.initialPosition.ra,
         decRad: D2R * this.initialPosition.dec,
-        zoomDeg: this.initialPosition.zoom,
-        instant: true
+        zoomDeg:this.initialBrickZoom,
+        instant: instant
       });
     },
     
@@ -666,6 +668,12 @@ export default defineComponent({
   },
 
   watch: {
+    
+    showSplashScreen(value: boolean) {
+      if (!value) {
+        this.goToBrickPosition(false); // instant = false
+      }
+    },
     
     // deep watcher for places to update jwstPlaces
     places: {
