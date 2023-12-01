@@ -402,8 +402,10 @@ export default defineComponent({
       showJWSTOpacity: true,
       ignoreSelect: false,
       keepCfOpacity: false,
+      imageSetLayerOrder: [ "stars", "nostars", "zannotation"],
       
       showOverlay: false,
+      overlayWasVisible: false,
       
       accentColor: "#F0AB52",
 
@@ -460,9 +462,15 @@ export default defineComponent({
         });
       }).then(() => {
         // initialized the selected item to the w/o stars brick
-        // this.selectedGalleryItem = this.jwstPlaces[1];
+        this.selectedGalleryItem = this.jwstPlaces[1];
         this.crossfadeJWST = 100;
-        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", this.showOverlay]);
+        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", false]);
+        this.imageSetLayerOrder.forEach((name) => {
+          const layer = this.layers[name];
+          this.setImageSetLayerOrder({ 
+            id: layer.id.toString(), 
+            order: this.imageSetLayerOrder.indexOf(name) });
+        });
       });
 
       this.loadImageCollection({
@@ -543,6 +551,7 @@ export default defineComponent({
         this.jwstCfOpacity = o;
       }
     },
+    
     
     curBackgroundImagesetName: {
       get(): string {
@@ -684,6 +693,16 @@ export default defineComponent({
     
     showOverlay(value: boolean) {
       applyImageSetLayerSetting(this.layers.zannotation, ["enabled", value]);
+    },
+    
+    crossfadeOpacity(val: number) {
+      if (val <= 0.05) {
+        this.overlayWasVisible = this.showOverlay;
+        this.showOverlay = false;
+      } else if (this.overlayWasVisible) {
+        this.showOverlay = true;
+        this.overlayWasVisible = false;
+      }
     },
     
     crossfadeJWST(val: number) {
