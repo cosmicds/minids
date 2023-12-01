@@ -93,6 +93,7 @@
           @activate="goToBrickPosition"
         >
         </icon-button>
+
       </div>
       <div id="center-buttons">
       </div>
@@ -402,8 +403,10 @@ export default defineComponent({
       showJWSTOpacity: true,
       ignoreSelect: false,
       keepCfOpacity: false,
+      imageSetLayerOrder: [ "stars", "nostars", "zannotation"],
       
       showOverlay: false,
+      overlayWasVisible: false,
       
       accentColor: "#F0AB52",
 
@@ -418,6 +421,7 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
       this.wwtSettings.set_galacticMode(true);
+      this.wwtSettings.set_showSolarSystem(false);
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
@@ -460,9 +464,15 @@ export default defineComponent({
         });
       }).then(() => {
         // initialized the selected item to the w/o stars brick
-        // this.selectedGalleryItem = this.jwstPlaces[1];
+        this.selectedGalleryItem = this.jwstPlaces[1];
         this.crossfadeJWST = 100;
-        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", this.showOverlay]);
+        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", false]);
+        this.imageSetLayerOrder.forEach((name) => {
+          const layer = this.layers[name];
+          this.setImageSetLayerOrder({ 
+            id: layer.id.toString(), 
+            order: this.imageSetLayerOrder.indexOf(name) });
+        });
       });
 
       this.loadImageCollection({
@@ -505,18 +515,17 @@ export default defineComponent({
         return this.cfOpacity;
       },
       set(o: number) {
-        
-        if (this.layers.glimpse) {
-          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", (1 - 0.01 * o)]);
-        }
-        
         const jcfo = this.jwstCfOpacity * 0.01;
         
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
+          if (jcfo > 0.99) {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0]);
+          } else {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0.01 * o]);
+          }
         }
         if (this.layers.nostars) {
-          applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
+          applyImageSetLayerSetting(this.layers.nostars, ["opacity", jcfo * 0.01 * o]);
         }
         
         this.cfOpacity = o;
@@ -529,11 +538,11 @@ export default defineComponent({
       },
       
       set(o: number) {
-        
-        const cfO = this.cfOpacity * 0.01;
+        const cfO = this.crossfadeOpacity * 0.01;
 
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
+          // keep this at 100% opacity
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1]);
         }
         
         if (this.layers.nostars) {
@@ -543,6 +552,7 @@ export default defineComponent({
         this.jwstCfOpacity = o;
       }
     },
+    
     
     curBackgroundImagesetName: {
       get(): string {
@@ -630,7 +640,7 @@ export default defineComponent({
       }
       
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       let opacity = 0;
@@ -664,7 +674,9 @@ export default defineComponent({
     
     showSplashScreen(value: boolean) {
       if (!value) {
-        this.goToBrickPosition(false); // instant = false
+        this.goToBrickPosition(false).catch(() => {
+          console.log('Move interrupted');
+        });
       }
     },
     
@@ -686,10 +698,20 @@ export default defineComponent({
       applyImageSetLayerSetting(this.layers.zannotation, ["enabled", value]);
     },
     
+    crossfadeOpacity(val: number) {
+      if (val <= 0.05) {
+        this.overlayWasVisible = this.showOverlay;
+        this.showOverlay = false;
+      } else if (this.overlayWasVisible) {
+        this.showOverlay = true;
+        this.overlayWasVisible = false;
+      }
+    },
+    
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       this.ignoreSelect = true;
@@ -706,8 +728,7 @@ export default defineComponent({
       });
     },
     
-    selectedGalleryItem(place: Place | null) {
-      console.log("selectedGalleryItem: ", place);
+    selectedGalleryItem(_place: Place | null) {
     },
 
     
