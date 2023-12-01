@@ -93,11 +93,7 @@
           @activate="goToBrickPosition"
         >
         </icon-button>
-        <div style="background-color: blue;">
-          <p> main Xfade {{ crossfadeOpacity }}% </p>
-          <p> jwst Xfade {{ crossfadeJWST }}% </p>
-          <p> selectedGalleryItem {{ selectedGalleryItem?.get_name() }} </p>
-        </div>
+
       </div>
       <div id="center-buttons">
       </div>
@@ -515,19 +511,15 @@ export default defineComponent({
     
     crossfadeOpacity: {
       get(): number {
-        console.log('get:crosfadeOpacity: ');
         return this.cfOpacity;
       },
       set(o: number) {
-        console.log('set:crosfadeOpacity: ', o);
         const jcfo = this.jwstCfOpacity * 0.01;
         
         if (this.layers.stars) {
-          console.log('crossfadeOpacity: stars', (1 - jcfo) * 0.01 * o);
           applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
         }
         if (this.layers.nostars) {
-          console.log('crossfadeOpacity: nostars', jcfo * 0.01 * o);
           applyImageSetLayerSetting(this.layers.nostars, ["opacity", jcfo * 0.01 * o]);
         }
         
@@ -537,21 +529,17 @@ export default defineComponent({
 
     crossfadeJWST: {
       get(): number {
-        console.log('get:crossfadeJWST: ');
         return this.jwstCfOpacity;
       },
       
       set(o: number) {
-        console.log('set:crossfadeJWST: ', o);
         const cfO = this.crossfadeOpacity * 0.01;
 
         if (this.layers.stars) {
-          console.log('crossfadeJWST: stars', (1 - 0.01 * o) * cfO);
           applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
         }
         
         if (this.layers.nostars) {
-          console.log('crossfadeJWST: nostars', 0.01 * o * cfO);
           applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o * cfO]);
         }
         
@@ -641,23 +629,19 @@ export default defineComponent({
     
     onGallerySelect(place: Place) {
       // show the corresponding brick by setting the opacity of it to 100%
-      console.log('onGallerySelect: ', place);
       if (this.ignoreSelect) {
         return;
       }
       
       if (!this.keepCfOpacity) {
-        console.log('keepCfOpacity: false');
         this.crossfadeOpacity = 100;
       }
       
       let opacity = 0;
       if (this.selectedGalleryItem == place) {
-        console.log('selectedGalleryItem == place');
         const name = place.get_name();
         opacity = name.includes('without') ? 100 : 0;
       } else {
-        console.log('selectedGalleryItem != place');
         this.selectedGalleryItem = place;
         opacity = 100 - this.jwstCfOpacity;
       }
@@ -707,7 +691,6 @@ export default defineComponent({
     },
     
     crossfadeOpacity(val: number) {
-      console.log("crossfadeOpacity: ", val);
       if (val <= 0.05) {
         this.overlayWasVisible = this.showOverlay;
         this.showOverlay = false;
@@ -718,7 +701,6 @@ export default defineComponent({
     },
     
     crossfadeJWST(val: number) {
-      console.log("crossfadeJWST: ", val);
       // return the brick that is the most opaque
       if (!this.keepCfOpacity) {
         this.crossfadeOpacity = 100;
@@ -739,7 +721,6 @@ export default defineComponent({
     },
     
     selectedGalleryItem(place: Place | null) {
-      console.log("selectedGalleryItem: ", place?.get_name());
     },
 
     
