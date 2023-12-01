@@ -517,7 +517,11 @@ export default defineComponent({
         const jcfo = this.jwstCfOpacity * 0.01;
         
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
+          if (jcfo > 0.99) {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0]);
+          } else {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0.01 * o]);
+          }
         }
         if (this.layers.nostars) {
           applyImageSetLayerSetting(this.layers.nostars, ["opacity", jcfo * 0.01 * o]);
@@ -536,7 +540,8 @@ export default defineComponent({
         const cfO = this.crossfadeOpacity * 0.01;
 
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
+          // keep this at 100% opacity
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1]);
         }
         
         if (this.layers.nostars) {
@@ -668,7 +673,9 @@ export default defineComponent({
     
     showSplashScreen(value: boolean) {
       if (!value) {
-        this.goToBrickPosition(false); // instant = false
+        this.goToBrickPosition(false).catch(() => {
+          console.log('Move interrupted');
+        });
       }
     },
     
