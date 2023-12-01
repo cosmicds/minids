@@ -720,7 +720,7 @@ export default defineComponent({
       });
     },
     
-    selectedGalleryItem(place: Place | null) {
+    selectedGalleryItem(_place: Place | null) {
     },
 
     
