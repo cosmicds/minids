@@ -219,7 +219,7 @@
           controls
           id="info-video"
         >
-          <source src="" type="video/mp4">
+          <source src="./assets/brickminidsvideo3_3_1.mp4" type="video/mp4">
         </video>
       </div>
     </v-dialog>
@@ -1232,19 +1232,6 @@ body {
 }
 
 /* Video and text dialogs */
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
 
 #video-container {
   position: absolute;
@@ -1256,6 +1243,43 @@ video {
   overflow: hidden;
   padding: 0px;
   z-index: 1000;
+
+
+  .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 15;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:focus {
+      color: white;
+      border: 2px solid white;
+    }
+  }
+
+  .video-wrapper {  
+    display: flex;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    text-align: center;
+    z-index: 1000;
+  }
+
+  video, #info-video {
+    margin: auto;
+    height: 85%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    // aspect-ratio: 9/17;
+    border: 5px solid white;
+  }
+
 }
 
 .bottom-sheet {
@@ -1419,6 +1443,8 @@ a {
     display: none;
   }
 }
+
+
 
 
 </style>
