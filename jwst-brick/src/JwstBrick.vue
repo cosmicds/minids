@@ -500,6 +500,16 @@ export default defineComponent({
   },
 
   mounted() {
+    // only needed for intro video
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     this.crossfadeJWST = 0;
+    //     this.$nextTick(() => {
+    //       this.crossfadeOpacity = 0;
+    //     });
+    //   }, 1000);
+    // });
+    
   },
 
   computed: {
