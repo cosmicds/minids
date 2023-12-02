@@ -1449,9 +1449,10 @@ a {
 
 img#brick-diagram {
   margin: 1rem auto 0.5rem auto;
-  max-width:50vw;
+  max-width: max(300px, 75vw);
   display: block;
   @media (min-width: 600px) {
+    max-width: min(50vw, 5000px);
     margin: 0rem 1rem 1rem 1rem;
     display: inline;
     float: right;
