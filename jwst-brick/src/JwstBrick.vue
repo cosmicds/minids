@@ -273,11 +273,11 @@
                 <p>Our eyes see visible light, but visible light is only a small part of a broader spectrum of light that has different energies, ranging from gamma rays and x-rays to infrared light and radio waves. Blue light corresponds to shorter wavelength (and higher energy) light, while red corresponds to longer wavelength (and lower energy) light. Images from each part of the spectrum can tell a different part of the story about objects in space.</p>
                     <p>JWST takes pictures in infrared (or IR) light, which is longer than visible light and cannot be seen by our eyes. Astronomers can still assign &ldquo;false&rdquo; colors to help us make sense of the images. In&nbsp; JWST&rsquo;s images of The Brick, the shorter wavelength IR light is displayed in &ldquo;blue,&rdquo; and the longer wavelength IR light is displayed in &ldquo;red.&rdquo; Atoms of hot hydrogen gas in the center of our galaxy emit light at both these IR wavelengths.</p>
                 <v-row>
-                  <v-col cols="5">
-                    <p>The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.</p>
-                  </v-col>
                   <v-col>
-                    <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                    <p>
+                      <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                      The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.
+                    </p>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -1448,8 +1448,15 @@ a {
 }
 
 img#brick-diagram {
-  margin: 0 auto;
-  padding-top: 1em;
+  margin: 1rem auto 0.5rem auto;
+  max-width:50vw;
+  display: block;
+  @media (min-width: 600px) {
+    margin: 1rem;
+    display: inline;
+    float: right;
+  }
+  
 }
 
 
