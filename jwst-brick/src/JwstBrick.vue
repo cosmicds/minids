@@ -1452,7 +1452,7 @@ img#brick-diagram {
   max-width:50vw;
   display: block;
   @media (min-width: 600px) {
-    margin: 1rem;
+    margin: 0rem 1rem 1rem 1rem;
     display: inline;
     float: right;
   }
