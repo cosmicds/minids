@@ -280,7 +280,8 @@
                     <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
                   </v-col>
                 </v-row>
-
+                <v-row>
+                  <v-col>
                 <h3><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
                       Adam Ginsburg<br>
                       Ashley Barnes<br>
@@ -293,6 +294,8 @@
                       E. A. C. Mills<br>
                       Daniel Walker<br>
                       <br>
+                  </v-col>
+                </v-row>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -1444,7 +1447,10 @@ a {
   }
 }
 
-
+img#brick-diagram {
+  margin: 0 auto;
+  padding-top: 1em;
+}
 
 
 </style>
