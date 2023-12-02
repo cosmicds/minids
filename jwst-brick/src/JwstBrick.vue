@@ -85,6 +85,15 @@
           tooltip-location="start"
         >
         </icon-button>
+        <icon-button
+          md-icon="wall"
+          :color="accentColor"
+          tooltip-text="Center Brick"
+          tooltip-location="start"
+          @activate="goToBrickPosition"
+        >
+        </icon-button>
+
       </div>
       <div id="center-buttons">
       </div>
@@ -93,6 +102,7 @@
       <places-gallery
         :stay-open="true"
         :places-list="jwstPlaces"
+        :alt-labels="['w/ stars', 'no stars']"
         @select="onGallerySelect"
         :incomingItemSelect="selectedGalleryItem"
         :title="null"
@@ -104,13 +114,13 @@
         <div
           v-if="showJWSTOpacity"
           id="jwst-crossfade">
-          <span>Stars</span>
+          <span class="mobile-off">Stars</span>
           <input
             class="opacity-range"
             type="range"
             v-model="crossfadeJWST"
           />
-          <span>No stars</span>
+          <span class="mobile-off">No stars</span>
         </div>
       </places-gallery>
     </div>
@@ -119,6 +129,19 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
+      <div id="overlay-button-container">
+        <v-btn
+          style="pointer-events: auto;"
+          id="overlay-button"
+          @click="showOverlay = !showOverlay"
+          @keyup.enter="showOverlay = !showOverlay"
+          tabindex="0"
+          :color="accentColor"
+          size="small"
+        >{{ showOverlay ? `Hide` : `Show` }} annotations
+        </v-btn>
+      </div>
+
       <div id="tools" v-if="showLayers">
         <div class="tool-container">
           <template v-if="currentTool == 'crossfade'">
@@ -154,7 +177,7 @@
           </template>
         </div>
       </div>
-
+      
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -331,7 +354,7 @@
 </template>
 
 <script lang="ts">
-import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { ImageSetLayer, Place, Settings } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
@@ -377,7 +400,7 @@ export default defineComponent({
   data() {
     return {
       layers: {} as Record<string,ImageSetLayer>,
-      cfOpacity: 50, // out of 100
+      cfOpacity: 100, // out of 100
       ready: false,
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -388,15 +411,19 @@ export default defineComponent({
       currentTool: "crossfade" as ToolType,
       places: [] as Place[],
       jwstPlaces: [] as Place[],
-      jwstCfOpacity: 50,
+      jwstCfOpacity: 100,
       selectedGalleryItem: null as Place | null,
       showJWSTOpacity: true,
       ignoreSelect: false,
       keepCfOpacity: false,
+      imageSetLayerOrder: [ "stars", "nostars", "zannotation"],
+      
+      showOverlay: false,
+      overlayWasVisible: false,
       
       accentColor: "#F0AB52",
 
-      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 1},
+      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 120 },
 
       tab: 0
     };
@@ -406,6 +433,8 @@ export default defineComponent({
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
+      this.wwtSettings.set_galacticMode(true);
+      this.wwtSettings.set_showSolarSystem(false);
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
@@ -430,7 +459,7 @@ export default defineComponent({
         layers.forEach(layer => {
           if (layer === undefined) { return; }
           this.layers[layer.get_name()] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          applyImageSetLayerSetting(layer, ["opacity", 1]);
         });
         this.layersLoaded = true;
         // this.resetView();
@@ -448,8 +477,15 @@ export default defineComponent({
         });
       }).then(() => {
         // initialized the selected item to the w/o stars brick
-        // this.selectedGalleryItem = this.jwstPlaces[1];
+        this.selectedGalleryItem = this.jwstPlaces[1];
         this.crossfadeJWST = 100;
+        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", false]);
+        this.imageSetLayerOrder.forEach((name) => {
+          const layer = this.layers[name];
+          this.setImageSetLayerOrder({ 
+            id: layer.id.toString(), 
+            order: this.imageSetLayerOrder.indexOf(name) });
+        });
       });
 
       this.loadImageCollection({
@@ -462,6 +498,7 @@ export default defineComponent({
         this.backgroundImagesets.unshift(
           new BackgroundImageset("GLIMPSE", this.bgName)
         );
+        
       });
 
 
@@ -470,36 +507,48 @@ export default defineComponent({
         window.removeEventListener('keypress', splashScreenListener);
       };
       window.addEventListener('keypress', splashScreenListener);
+
     });
+    
   },
 
   mounted() {
-    this.gotoRADecZoom({
-      raRad: D2R * this.initialPosition.ra,
-      decRad: D2R * this.initialPosition.dec,
-      zoomDeg: this.initialPosition.zoom,
-      instant: true
-    });
+    // only needed for intro video
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     this.crossfadeJWST = 0;
+    //     this.$nextTick(() => {
+    //       this.crossfadeOpacity = 0;
+    //     });
+    //   }, 1000);
+    // });
+    
   },
 
   computed: {
+    
+    wwtSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+    
     crossfadeOpacity: {
       get(): number {
         return this.cfOpacity;
       },
       set(o: number) {
-        
-        if (this.layers.glimpse) {
-          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", (1 - 0.01 * o)]);
-        }
-        
         const jcfo = this.jwstCfOpacity * 0.01;
         
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
+          if (jcfo > 0.99) {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0]);
+          } else {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0.01 * o]);
+          }
         }
         if (this.layers.nostars) {
-          applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
+          applyImageSetLayerSetting(this.layers.nostars, ["opacity", jcfo * 0.01 * o]);
         }
         
         this.cfOpacity = o;
@@ -512,11 +561,11 @@ export default defineComponent({
       },
       
       set(o: number) {
-        
-        const cfO = this.cfOpacity * 0.01;
+        const cfO = this.crossfadeOpacity * 0.01;
 
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
+          // keep this at 100% opacity
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1]);
         }
         
         if (this.layers.nostars) {
@@ -526,6 +575,7 @@ export default defineComponent({
         this.jwstCfOpacity = o;
       }
     },
+    
     
     curBackgroundImagesetName: {
       get(): string {
@@ -587,10 +637,24 @@ export default defineComponent({
           video.pause();
         }
       }
+    },
+    
+    // set brick initial zoom based on screen size
+    initialBrickZoom(): number {
+      return this.mobile ? 1 : 0.7;
     }
   },
 
   methods: {
+    
+    async goToBrickPosition(instant = true) {
+      return this.gotoRADecZoom({
+        raRad: D2R * this.initialPosition.ra,
+        decRad: D2R * this.initialPosition.dec,
+        zoomDeg:this.initialBrickZoom,
+        instant: instant
+      });
+    },
     
     onGallerySelect(place: Place) {
       // show the corresponding brick by setting the opacity of it to 100%
@@ -599,7 +663,7 @@ export default defineComponent({
       }
       
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       let opacity = 0;
@@ -631,6 +695,14 @@ export default defineComponent({
 
   watch: {
     
+    showSplashScreen(value: boolean) {
+      if (!value) {
+        this.goToBrickPosition(false).catch(() => {
+          console.log('Move interrupted');
+        });
+      }
+    },
+    
     // deep watcher for places to update jwstPlaces
     places: {
       handler: function (newPlaces: Place[]) {
@@ -645,10 +717,24 @@ export default defineComponent({
       deep: true
     },
     
+    showOverlay(value: boolean) {
+      applyImageSetLayerSetting(this.layers.zannotation, ["enabled", value]);
+    },
+    
+    crossfadeOpacity(val: number) {
+      if (val <= 0.05) {
+        this.overlayWasVisible = this.showOverlay;
+        this.showOverlay = false;
+      } else if (this.overlayWasVisible) {
+        this.showOverlay = true;
+        this.overlayWasVisible = false;
+      }
+    },
+    
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       this.ignoreSelect = true;
@@ -665,8 +751,7 @@ export default defineComponent({
       });
     },
     
-    selectedGalleryItem(place: Place | null) {
-      console.log("selectedGalleryItem: ", place);
+    selectedGalleryItem(_place: Place | null) {
     },
 
     
@@ -674,7 +759,7 @@ export default defineComponent({
     
     showLayers(show: boolean) {
       Object.values(this.layers).forEach(layer => {
-        applyImageSetLayerSetting(layer, ["enabled", show]);
+        applyImageSetLayerSetting(layer, ["opacity", show ? 1 : 0]);
       });
     },
     layersLoaded(loaded: boolean) {
@@ -894,6 +979,15 @@ body {
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+#overlay-button-container {
+  align-self: flex-start;
+  padding-bottom: 0.5rem;
+  // position:absolute;
+  // bottom: 0.5rem;
+  // left: 50%;
+  // transform: translateX(-50%);
 }
 
 #tools {
@@ -1264,6 +1358,16 @@ a {
 #main-content {
   .gallery-root .gallery {
     border: none;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  #icons-container {
+    display: none;
+  }
+
+  .mobile-off {
+    display: none;
   }
 }
 

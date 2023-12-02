@@ -56,14 +56,14 @@
           @click="selectPlace(place)"
         >
           <img
-            class="noselect"
+            class="noselect mobile-off"
             :src="getImageset(place)?.get_thumbnailUrl() ?? ''"
           />
           <span
             class="place-name noselect"
             style="color: white;"
           >
-            {{ place?.get_name() }}
+            {{ altLabels.length == 0 ? place?.get_name() : altLabels[index] }}
           </span>
         </div>
       </div>
@@ -77,6 +77,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent } from 'vue';
 import { Folder, Imageset, Place } from "@wwtelescope/engine";
 import { engineStore } from "@wwtelescope/engine-pinia";
@@ -97,11 +98,12 @@ export default defineComponent({
   props: {
     wtmlUrl: { type: String, required: false, default: '' },
     placesList: { type: Array<Place>, default: () => [] as Place[], required: false},
+    altLabels: { type: Array<string>, default: () => [] as string[], required: false},
     columns: { type: [Number, String], default: "auto-fit" },
     width: { type: String, default: "300px" },
     maxHeight: { type: String, default: "500px" },
     title: { type: String, default: "Gallery" },
-    selectedColor: { type: String, default: "dodgerblue" },
+    selectedColor: { type: String, default: "deepskyblue" },
     singleSelect: { type: Boolean, default: true },
     highlightLastOnly: { type: Boolean, default: false },
     previewIndex: { type: Number, default: 0 },
@@ -319,7 +321,7 @@ export default defineComponent({
   .gallery-item {
     padding: 2px 10px;
     border-radius: 5px;
-    border: 2px solid white;
+    border: 2px solid #999;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -328,8 +330,10 @@ export default defineComponent({
       margin-left: auto;
       margin-right: auto;
       border-radius: 3px;
-      width: 96px;
-      height: 45px;
+      width: 100%;
+      height: auto;
+      // width: 96px;
+      // height: 45px;
       object-fit: cover;
     }
 
