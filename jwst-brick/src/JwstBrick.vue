@@ -246,9 +246,7 @@
           v-model="tab"
           height="32px"
           :color="accentColor"
-          :slider-color="accentColor"
           id="tabs"
-          dense
           grow
         >
           <v-tab tabindex="0"><h3>Information</h3></v-tab>
@@ -267,7 +265,34 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                JWST has observed an infrared-dark cloud called The Brick with its NIRCam camera. The Brick is possibly the densest, most massive dark cloud in the Galaxy. Dark clouds like this are usually the sites of future star formation, but in The Brick, we so far see very little sign of star formation&#8212;the cloud is still dark and cold. Since The Brick is in the center of the Galaxy, the JWST data mostly show stars in the foreground of the cloud. With some processing, scientists were able to remove the stars and show only the cloud itself, revealing striations and streamers of both the dark, cold gas and the hot, ionized background material. The blue colors in the image show where frozen carbon monoxide, CO ice, is blocking out the background light from the hot plasma of hydrogen that fills the Galactic Center.
+                <h3>About this Image</h3>
+                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (left thumbnail). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (right thumbnail). The &rdquo;blue&rdquo; colors in the image show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
+                <p>The background image shows the Milky Way as observed in infrared light by the Spitzer Space Telescope, a predecessor to JWST.</p>
+
+                <h3>Seeing in Infrared light</h3>
+                <p>Our eyes see visible light, but visible light is only a small part of a broader spectrum of light that has different energies, ranging from gamma rays and x-rays to infrared light and radio waves. Blue light corresponds to shorter wavelength (and higher energy) light, while red corresponds to longer wavelength (and lower energy) light. Images from each part of the spectrum can tell a different part of the story about objects in space.</p>
+                    <p>JWST takes pictures in infrared (or IR) light, which is longer than visible light and cannot be seen by our eyes. Astronomers can still assign &ldquo;false&rdquo; colors to help us make sense of the images. In&nbsp; JWST&rsquo;s images of The Brick, the shorter wavelength IR light is displayed in &ldquo;blue,&rdquo; and the longer wavelength IR light is displayed in &ldquo;red.&rdquo; Atoms of hot hydrogen gas in the center of our galaxy emit light at both these IR wavelengths.</p>
+                <v-row>
+                  <v-col cols="5">
+                    <p>The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.</p>
+                  </v-col>
+                  <v-col>
+                    <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                  </v-col>
+                </v-row>
+
+                <h3><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
+                      Adam Ginsburg<br>
+                      Ashley Barnes<br>
+                      Cara Battersby<br>
+                      Alyssa Bulatek<br>
+                      Savannah Gramze<br>
+                      Jonathan Henshaw<br>
+                      Desmond Jeff<br>
+                      Xing Lu<br>
+                      E. A. C. Mills<br>
+                      Daniel Walker<br>
+                      <br>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -303,29 +328,27 @@
                   </v-row>
                   <v-row>
                     <v-col cols="12">
+                      <ul>
+                        <li>
+                          Use the bottom slider to switch between the Spitzer and JWST images.
+                        </li>
+                        <li>
+                          Use the top slider to switch between the "with stars" and "no stars" version of The Brick as seen by JWST.
+                        </li>
+                      </ul>
+
                       <div class="credits">
-                      <h3>Credits:</h3>
-                      <h4><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h4>
-                      Adam Ginsburg<br>
-                      Ashley Barnes<br>
-                      Cara Battersby<br>
-                      Alyssa Bulatek<br>
-                      Savannah Gramze<br>
-                      Jonathan Henshaw<br>
-                      Desmond Jeff<br>
-                      Xing Lu<br>
-                      E. A. C. Mills<br>
-                      Daniel Walker<br>
-                      <br>
+                      <h3>Credits</h3>
+
 
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                       John Lewis<br>
-                      Jon Carifio<br>
                       Pat Udomprasert<br>
+                      Jon Carifio<br>
                       Alyssa Goodman<br>
-                      Mary Dussault<br>
                       Harry Houghton<br>
                       Anna Nolin<br>
+                      Mary Dussault<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -333,12 +356,12 @@
                       A. David Weigel<br>
                       Jon Carifio<br>
                       </div>
-                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                   <v-row>
                     <v-col>
                       <funding-acknowledgement/>
+                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                 </v-container>              
@@ -422,6 +445,7 @@ export default defineComponent({
       overlayWasVisible: false,
       
       accentColor: "#F0AB52",
+      accentColor2: "#99c8ff",
 
       initialPosition: {ra: 266.5375, dec:-28.708, zoom: 120 },
 
@@ -604,6 +628,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color2': this.accentColor2,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -1248,12 +1273,31 @@ video {
 }
 
 .info-text {
+  font-size: var(--default-font-size);
+  line-height: var(--default-line-height);
+  
   height: 33vh;
   padding-bottom: 25px;
 
-  & a {
-    text-decoration: none;
+  & img {
+    max-width: 100%;
   }
+
+  & h3 {
+    margin-top: calc(var(--default-line-height));
+    margin-bottom: calc(0.3 * var(--default-line-height));
+    color: var(--accent-color2);
+  }
+
+  & p {
+    margin-bottom: calc(0.5 * var(--default-line-height));
+  }
+
+  & a {
+    text-decoration: underline;
+  }
+
+
 }
 
 
@@ -1316,6 +1360,10 @@ video {
     }
   }
 
+}
+
+.v-tabs [aria-selected="false"]:not(.v-slide-group-item--active) {
+  color: #BDBDBD !important;
 }
 
 #close-text-icon {
