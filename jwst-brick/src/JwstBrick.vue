@@ -1083,6 +1083,7 @@ body {
   align-content: center;
   padding-top: 4rem;
   padding-bottom: 1rem;
+  padding-inline: 0.5rem;
 
   border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
