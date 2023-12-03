@@ -219,7 +219,7 @@
           controls
           id="info-video"
         >
-          <source src="" type="video/mp4">
+          <source src="./assets/brickminidsvideo3_3_1.mp4" type="video/mp4">
         </video>
       </div>
     </v-dialog>
@@ -266,21 +266,22 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
                 <h3>About "The Brick"</h3>
-                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (left thumbnail). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (right thumbnail). The &rdquo;blue&rdquo; colors in the image show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
+                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (<a @click="selectedGalleryItem=jwstPlaces[0]">left thumbnail</a>). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (<a @click="selectedGalleryItem=jwstPlaces[1]">right thumbnail</a>). The &rdquo;blue&rdquo; colors in the image show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
                 <p>The background image shows the Milky Way as observed in infrared light by the Spitzer Space Telescope, a predecessor to JWST.</p>
 
                 <h3>Seeing in Infrared light</h3>
                 <p>Our eyes see visible light, but visible light is only a small part of a broader spectrum of light that has different energies, ranging from gamma rays and x-rays to infrared light and radio waves. Blue light corresponds to shorter wavelength (and higher energy) light, while red corresponds to longer wavelength (and lower energy) light. Images from each part of the spectrum can tell a different part of the story about objects in space.</p>
                     <p>JWST takes pictures in infrared (or IR) light, which is longer than visible light and cannot be seen by our eyes. Astronomers can still assign &ldquo;false&rdquo; colors to help us make sense of the images. In&nbsp; JWST&rsquo;s images of The Brick, the shorter wavelength IR light is displayed in &ldquo;blue,&rdquo; and the longer wavelength IR light is displayed in &ldquo;red.&rdquo; Atoms of hot hydrogen gas in the center of our galaxy emit light at both these IR wavelengths.</p>
                 <v-row>
-                  <v-col cols="5">
-                    <p>The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.</p>
-                  </v-col>
                   <v-col>
-                    <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                    <p>
+                      <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                      The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.
+                    </p>
                   </v-col>
                 </v-row>
-
+                <v-row>
+                  <v-col>
                 <h3><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
                       Adam Ginsburg<br>
                       Ashley Barnes<br>
@@ -293,6 +294,8 @@
                       E. A. C. Mills<br>
                       Daniel Walker<br>
                       <br>
+                  </v-col>
+                </v-row>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -1232,19 +1235,6 @@ body {
 }
 
 /* Video and text dialogs */
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
 
 #video-container {
   position: absolute;
@@ -1256,6 +1246,43 @@ video {
   overflow: hidden;
   padding: 0px;
   z-index: 1000;
+
+
+  .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 15;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:focus {
+      color: white;
+      border: 2px solid white;
+    }
+  }
+
+  .video-wrapper {  
+    display: flex;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    text-align: center;
+    z-index: 1000;
+  }
+
+  video, #info-video {
+    margin: auto;
+    height: 85%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    // aspect-ratio: 9/17;
+    border: 5px solid white;
+  }
+
 }
 
 .bottom-sheet {
@@ -1418,6 +1445,19 @@ a {
   .mobile-off {
     display: none;
   }
+}
+
+img#brick-diagram {
+  margin: 1rem auto 0.5rem auto;
+  max-width: max(300px, 75vw);
+  display: block;
+  @media (min-width: 600px) {
+    max-width: min(50vw, 5000px);
+    margin: 0rem 1rem 1rem 1rem;
+    display: inline;
+    float: right;
+  }
+  
 }
 
 
