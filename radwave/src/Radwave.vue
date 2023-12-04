@@ -240,7 +240,17 @@
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, D2R } from "@minids/common";
 import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer } from "@wwtelescope/engine";
+
+// Coordinates isn't exposed to TypeScript, but it IS exported at the JS module level,
+// so it's enough to do this. We just won't get any LSP help from an editor.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { Coordinates } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
+import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
+
+import sunCsv from "../assets/Sun_radec.csv";
+import bestFitCsv from "../assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
 type SheetType = "text" | "video" | null;
 
@@ -285,11 +295,14 @@ export default defineComponent({
       phase: 0,
       altFactor: 1,
       phaseCol: 3,
+      bestFitLayer: new SpreadSheetLayer(),
       bestFitAnnotation: null as PolyLine | null,
       bestFitColor: "#83befb",
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
+      sunColor: "#ffff0a",
+      sunLayer: null as SpreadSheetLayer | null,
       startTime: new Date("2023-10-18 11:55:55Z"),
       endTime: new Date("2025-10-06 11:55:55Z")
     };
@@ -305,6 +318,9 @@ export default defineComponent({
         instant: true
       }).then(() => this.positionSet = true);
 
+      this.setBackgroundImageByName("Solar System");
+      this.setForegroundImageByName("Solar System");
+
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
       this.applySetting(["solarSystemStars", false]);
       this.applySetting(["actualPlanetScale", true]);
@@ -314,6 +330,10 @@ export default defineComponent({
       this.setClockSync(true);
       const timeRate = 120 * SECONDS_PER_DAY;
       this.setClockRate(timeRate);
+
+      this.setupBestFitLayer();
+      const sunProm = this.setupSunLayer();
+      const clustersProm = this.setupClusterLayers();
 
       // If there are layers to set up, do that here!
       this.layersLoaded = true;
@@ -398,6 +418,61 @@ export default defineComponent({
       }
     },
 
+    basicLayerSetup(layer: SpreadSheetLayer, timeSeries=false) {
+      layer.set_lngColumn(0);
+      layer.set_latColumn(1);
+      layer.set_altColumn(2);
+      layer.set_raUnits(RAUnits.degrees);
+      layer.set_altUnit(AltUnits.parsecs);
+      layer.set_altType(AltTypes.distance);
+      layer.set_showFarSide(true);
+      layer.set_markerScale(MarkerScales.screen);
+    
+      if (timeSeries) {
+        layer.set_startDateColumn(4);
+        layer.set_endDateColumn(5);
+        layer.set_timeSeries(true);
+        layer.set_decay(15);
+      }
+    },
+
+    async setupSunLayer(): Promise<void> {
+      this.sunLayer = await this.createTableLayer({
+        referenceFrame: "Sky",
+        name: "Radcliffe Wave Sun",
+        dataCsv: sunCsv
+      }).then(layer => {
+        this.basicLayerSetup(layer);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["color", Color.load(this.sunColor)],
+            ["scaleFactor", 100]
+          ]
+        });
+        return layer;
+      });
+    },
+
+    // Note that we are NOT going to show this layer
+    // (we aren't even going to put it in the layer manager)
+    // But by doing this we can both hijack WWT's CSV-parsing functionality
+    // as well as get the scale factor that we need for scaling the annotation points
+    setupBestFitLayer() {
+      const text = bestFitCsv.replace(/\n/g, "\r\n");
+      // This isn't exposed to TS
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.bestFitLayer.loadFromString(text, false, false, false, true);
+      this.basicLayerSetup(this.bestFitLayer, true);
+
+      // Another method that's not exposed to TS
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.altFactor = this.bestFitLayer.getScaleFactor(this.bestFitLayer.get_altUnit(), 1);
+      this.altFactor = this.altFactor / (1000 * 149598000);
+    },
+
     addLayerPointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotation, rowFilter: (row: Row) => boolean) {
       const lngCol = layer.get_lngColumn();
       const latCol = layer.get_latColumn();
@@ -413,12 +488,15 @@ export default defineComponent({
         }
     
         // The API for annotations seem to assume that we're in 2D sky mode - there's no option for distance
-        // so we have to calculate our positions in 3D and just directly insert them into the array of points
+        // so we have to calculate our positions in 3D and just directly insert them into the array of points.
+        // This of course necessitates some TypeScript hackery.
         // These calculations are stolen from around here: https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/esm/layers/spreadsheet_layer.js#L706
         let alt = row[dCol];
         alt = (this.altFactor * alt);
         const pos = Coordinates.getTo3dRad(row[latCol], row[lngCol], alt);
         pos.rotateX(ecliptic);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         annotation._points$1.push(pos);
       }
     },
@@ -448,7 +526,7 @@ export default defineComponent({
         const prom = fetch(`RW_cluster_oscillation_${phase}_updated_radec.csv`)
           .then(response => response.text())
           .then(text => text.replace(/\n/g, "\r\n"))  // WWT CRLF stuff
-          .then(text => {
+          .then(async (text) => {
             return this.createTableLayer({
               referenceFrame: "Sky",
               name: `Radcliffe Wave Clusters Phase ${phase}`,
