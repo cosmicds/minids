@@ -266,7 +266,7 @@
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
                 <h3>About "The Brick"</h3>
-                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (<a @click="selectedGalleryItem=jwstPlaces[0]">left thumbnail</a>). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (<a @click="selectedGalleryItem=jwstPlaces[1]">right thumbnail</a>). The &rdquo;blue&rdquo; colors in the image show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
+                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (<a @click="selectedGalleryItem=jwstPlaces[0]">left thumbnail</a>). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (<a @click="selectedGalleryItem=jwstPlaces[1]">right thumbnail</a>). The &rdquo;blue&rdquo; colors in the image (<a @click="goToIcePosition()">zoom in</a>) show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
                 <p>The background image shows the Milky Way as observed in infrared light by the Spitzer Space Telescope, a predecessor to JWST.</p>
 
                 <h3>Seeing in Infrared light</h3>
@@ -680,6 +680,17 @@ export default defineComponent({
         raRad: D2R * this.initialPosition.ra,
         decRad: D2R * this.initialPosition.dec,
         zoomDeg:this.initialBrickZoom,
+        instant: instant
+      });
+    },
+    
+    async goToIcePosition(instant = false) {
+      const rdz = [  266.54273053260596, -28.698575486822428, 0.22296663819992943 ];
+      this.showOverlay = true;
+      return this.gotoRADecZoom({
+        raRad: D2R * rdz[0],
+        decRad: D2R * rdz[1],
+        zoomDeg:rdz[2],
         instant: instant
       });
     },
