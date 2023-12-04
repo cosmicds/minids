@@ -277,7 +277,7 @@
                 </v-row>
                 <v-row>
                   <v-col>
-                <h3><a href="https://ui.adsabs.harvard.edu/abs/2023arXiv230816050G/abstract" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
+                <h3><a href="https://news.clas.ufl.edu/the-brick-milky-way/" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
                       Adam Ginsburg<br>
                       Ashley Barnes<br>
                       Cara Battersby<br>
