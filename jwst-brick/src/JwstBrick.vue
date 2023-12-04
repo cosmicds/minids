@@ -246,8 +246,8 @@
           :color="accentColor"
           id="tabs"
         >
-          <v-tab class="px-8" tabindex="0"><h3>Information</h3></v-tab>
-          <v-tab class="px-8" tabindex="0"><h3>Using WWT</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Information</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Using WWT</h3></v-tab>
           <font-awesome-icon
             id="close-text-icon"
             class="control-icon"
@@ -1305,6 +1305,16 @@ body {
   align-self: left;
 }
 
+.info-tabs {
+  @media (max-width: 599px) {
+    padding-inline: 0.75rem;
+    font-size: calc(1.15 * var(--default-font-size));
+  }
+  @media (min-width: 600px) {
+    padding-inline: 2rem;
+  }
+}
+
 .info-text {
   font-size: var(--default-font-size);
   line-height: var(--default-line-height);
@@ -1402,8 +1412,16 @@ body {
 #close-text-icon {
   position: absolute;
   top: 0.25em;
-  right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
   color: white;
+
+  @media (max-width: 599px) {
+    right: 0.5em;
+  }
+
+  @media (min-width: 600px) {
+    right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
+  }
+
 }
 
 // This prevents the tabs from having some extra space to the left when the screen is small
