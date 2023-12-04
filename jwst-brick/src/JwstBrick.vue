@@ -85,6 +85,15 @@
           tooltip-location="start"
         >
         </icon-button>
+        <icon-button
+          md-icon="wall"
+          :color="accentColor"
+          tooltip-text="Center Brick"
+          tooltip-location="start"
+          @activate="goToBrickPosition"
+        >
+        </icon-button>
+
       </div>
       <div id="center-buttons">
       </div>
@@ -93,23 +102,23 @@
       <places-gallery
         :stay-open="true"
         :places-list="jwstPlaces"
+        :alt-labels="['with stars', 'no stars']"
         @select="onGallerySelect"
         :incomingItemSelect="selectedGalleryItem"
         :title="null"
         columns="2"
         width="200px"
         prevent-deselect
+        style="box-shadow: 0px 0px 10px black;"
       >
         <div
           v-if="showJWSTOpacity"
           id="jwst-crossfade">
-          <span>Stars</span>
           <input
             class="opacity-range"
             type="range"
             v-model="crossfadeJWST"
           />
-          <span>No stars</span>
         </div>
       </places-gallery>
     </div>
@@ -118,6 +127,19 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
+      <div id="overlay-button-container">
+        <v-btn
+          style="pointer-events: auto;"
+          id="overlay-button"
+          @click="showOverlay = !showOverlay"
+          @keyup.enter="showOverlay = !showOverlay"
+          tabindex="0"
+          :color="accentColor"
+          size="small"
+        >{{ showOverlay ? `Hide` : `Show` }} annotations
+        </v-btn>
+      </div>
+
       <div id="tools" v-if="showLayers">
         <div class="tool-container">
           <template v-if="currentTool == 'crossfade'">
@@ -153,7 +175,7 @@
           </template>
         </div>
       </div>
-
+      
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -195,7 +217,7 @@
           controls
           id="info-video"
         >
-          <source src="" type="video/mp4">
+          <source src="./assets/brickminidsvideo3_3_1.mp4" type="video/mp4">
         </video>
       </div>
     </v-dialog>
@@ -222,28 +244,53 @@
           v-model="tab"
           height="32px"
           :color="accentColor"
-          :slider-color="accentColor"
           id="tabs"
-          dense
-          grow
         >
-          <v-tab tabindex="0"><h3>Information</h3></v-tab>
-          <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Information</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Using WWT</h3></v-tab>
+          <font-awesome-icon
+            id="close-text-icon"
+            class="control-icon"
+            icon="times"
+            size="lg"
+            @click="showTextSheet = false"
+            @keyup.enter="showTextSheet = false"
+            tabindex="0"
+          ></font-awesome-icon>
         </v-tabs>
-        <font-awesome-icon
-          id="close-text-icon"
-          class="control-icon"
-          icon="times"
-          size="lg"
-          @click="showTextSheet = false"
-          @keyup.enter="showTextSheet = false"
-          tabindex="0"
-        ></font-awesome-icon>
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
+                <h3>About "The Brick"</h3>
+                <p>Our Milky Way galaxy is full of cold, dark clouds of gas and dust where new stars like our Sun are born. A cloud near the center of the galaxy, called &ldquo;The Brick,&rdquo; is possibly the <strong><em>densest, most massive</em></strong> dark cloud in the entire Galaxy! Despite its large amount of mass, The Brick does not seem to be actively forming many new stars, so it remains dark and cold. A team of astronomers led by Adam Ginsburg observed The Brick using one of JWST&rsquo;s near-infrared cameras. In the image, you can see many, many of the Milky Way&rsquo;s stars in front of The Brick (<a @click="selectedGalleryItem=jwstPlaces[0]">left thumbnail</a>). With some processing, the astronomers were able to remove the stars from the image and show only the cloud itself, revealing stripey structures and wisps in both the dark, cold gas and the hot, glowing background material (<a @click="selectedGalleryItem=jwstPlaces[1]">right thumbnail</a>). The &rdquo;blue&rdquo; colors in the image (<a @click="goToIcePosition()">zoom in</a>) show where frozen carbon monoxide, CO ice, is blocking out some of the light emitted by the hot glowing hydrogen that fills the Galactic Center.</p>
+                <p>The background image shows the Milky Way as observed in infrared light by the Spitzer Space Telescope, a predecessor to JWST.</p>
+
+                <h3>Seeing in Infrared light</h3>
+                <v-row>
+                  <v-col>
+                    <img id="brick-diagram" alt="This is a schematic of The Brick as imaged by JWST, separated into layers. The bottom layer depicts light from hot background gas that emits at both longer and shorter IR wavelengths, depicted with red and blue arrows. Above that is The Brick layer. In the middle of The Brick, red and blue arrows from the bottom layer are stopped by The Brick layer. Near the edge of the Brick, the red arrow is stopped, but the blue arrow can pass. Outside of The Brick region, both red and blue arrows can pass. The top of the schematic shows the direction the light moves towards JWST. " src="./assets/BrickDiagram.png"/>
+                    <p>Our eyes see visible light, but visible light is only a small part of a broader spectrum of light that has different energies, ranging from gamma rays and x-rays to infrared light and radio waves. Blue light corresponds to shorter wavelength (and higher energy) light, while red corresponds to longer wavelength (and lower energy) light. Images from each part of the spectrum can tell a different part of the story about objects in space.</p>
+                    <p>JWST takes pictures in infrared (or IR) light, which is longer than visible light and cannot be seen by our eyes. Astronomers can still assign &ldquo;false&rdquo; colors to help us make sense of the images. In&nbsp; JWST&rsquo;s images of The Brick, the shorter wavelength IR light is displayed in &ldquo;blue,&rdquo; and the longer wavelength IR light is displayed in &ldquo;red.&rdquo; Atoms of hot hydrogen gas in the center of our galaxy emit light at both these IR wavelengths.</p>
+                    <p>The dense cloud that makes up &ldquo;The Brick&rdquo; is mostly cold hydrogen, dust, and carbon monoxide (CO). The Brick is so dense that it blocks the infrared light emitted by the surrounding hot hydrogen, creating the dark jelly bean shape we see at the center of the JWST images. In the center of the cloud, the dust blocks both the shorter (&ldquo;blue&rdquo;) and longer (&ldquo;red&rdquo;) IR wavelengths. Towards the edge of the cloud where it is less dense, frozen CO ice does most of the blocking. CO ice tends to block more of the &ldquo;red&rdquo; and less of the &ldquo;blue&rdquo; IR light, so the edge of the cloud glows &ldquo;blue&rdquo;in these images.</p>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                <h3><a href="https://news.clas.ufl.edu/the-brick-milky-way/" target="_blank" rel="noopener noreferrer">Science</a> Team</h3>
+                      Adam Ginsburg<br>
+                      Ashley Barnes<br>
+                      Cara Battersby<br>
+                      Alyssa Bulatek<br>
+                      Savannah Gramze<br>
+                      Jonathan Henshaw<br>
+                      Desmond Jeff<br>
+                      Xing Lu<br>
+                      E. A. C. Mills<br>
+                      Daniel Walker<br>
+                      <br>
+                  </v-col>
+                </v-row>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -279,16 +326,27 @@
                   </v-row>
                   <v-row>
                     <v-col cols="12">
+                      <ul>
+                        <li>
+                          Use the bottom slider to switch between the Spitzer and JWST images.
+                        </li>
+                        <li>
+                          Use the top slider to switch between the "with stars" and "no stars" version of The Brick as seen by JWST.
+                        </li>
+                      </ul>
+
                       <div class="credits">
-                      <h3>Credits:</h3>
+                      <h3>Credits</h3>
+
+
                       <h4><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Mini Stories Team:</h4>
                       John Lewis<br>
-                      Jon Carifio<br>
                       Pat Udomprasert<br>
+                      Jon Carifio<br>
                       Alyssa Goodman<br>
-                      Mary Dussault<br>
                       Harry Houghton<br>
                       Anna Nolin<br>
+                      Mary Dussault<br>
                       Evaluator: Sue Sunbury<br>
                       <br>
                       <h4>WorldWide Telescope Team:</h4>
@@ -296,12 +354,12 @@
                       A. David Weigel<br>
                       Jon Carifio<br>
                       </div>
-                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                   <v-row>
                     <v-col>
                       <funding-acknowledgement/>
+                      <v-spacer class="end-spacer"></v-spacer>
                     </v-col>
                   </v-row>
                 </v-container>              
@@ -317,7 +375,7 @@
 </template>
 
 <script lang="ts">
-import { ImageSetLayer, Place } from "@wwtelescope/engine";
+import { ImageSetLayer, Place, Settings } from "@wwtelescope/engine";
 import { applyImageSetLayerSetting } from "@wwtelescope/engine-helpers";
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@minids/common";
@@ -363,7 +421,7 @@ export default defineComponent({
   data() {
     return {
       layers: {} as Record<string,ImageSetLayer>,
-      cfOpacity: 50, // out of 100
+      cfOpacity: 100, // out of 100
       ready: false,
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -374,15 +432,20 @@ export default defineComponent({
       currentTool: "crossfade" as ToolType,
       places: [] as Place[],
       jwstPlaces: [] as Place[],
-      jwstCfOpacity: 50,
+      jwstCfOpacity: 100,
       selectedGalleryItem: null as Place | null,
       showJWSTOpacity: true,
       ignoreSelect: false,
       keepCfOpacity: false,
+      imageSetLayerOrder: [ "stars", "nostars", "zannotation"],
+      
+      showOverlay: false,
+      overlayWasVisible: false,
       
       accentColor: "#F0AB52",
+      accentColor2: "#99c8ff",
 
-      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 1},
+      initialPosition: {ra: 266.5375, dec:-28.708, zoom: 120 },
 
       tab: 0
     };
@@ -392,6 +455,8 @@ export default defineComponent({
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
+      this.wwtSettings.set_galacticMode(true);
+      this.wwtSettings.set_showSolarSystem(false);
 
       const layerPromises = Object.entries(this.wtml).map(([key, value]) =>
         this.loadImageCollection({
@@ -416,7 +481,7 @@ export default defineComponent({
         layers.forEach(layer => {
           if (layer === undefined) { return; }
           this.layers[layer.get_name()] = layer;
-          applyImageSetLayerSetting(layer, ["opacity", 0.5]);
+          applyImageSetLayerSetting(layer, ["opacity", 1]);
         });
         this.layersLoaded = true;
         // this.resetView();
@@ -434,8 +499,15 @@ export default defineComponent({
         });
       }).then(() => {
         // initialized the selected item to the w/o stars brick
-        // this.selectedGalleryItem = this.jwstPlaces[1];
+        this.selectedGalleryItem = this.jwstPlaces[1];
         this.crossfadeJWST = 100;
+        applyImageSetLayerSetting(this.layers.zannotation, ["enabled", false]);
+        this.imageSetLayerOrder.forEach((name) => {
+          const layer = this.layers[name];
+          this.setImageSetLayerOrder({ 
+            id: layer.id.toString(), 
+            order: this.imageSetLayerOrder.indexOf(name) });
+        });
       });
 
       this.loadImageCollection({
@@ -448,6 +520,7 @@ export default defineComponent({
         this.backgroundImagesets.unshift(
           new BackgroundImageset("GLIMPSE", this.bgName)
         );
+        
       });
 
 
@@ -456,36 +529,48 @@ export default defineComponent({
         window.removeEventListener('keypress', splashScreenListener);
       };
       window.addEventListener('keypress', splashScreenListener);
+
     });
+    
   },
 
   mounted() {
-    this.gotoRADecZoom({
-      raRad: D2R * this.initialPosition.ra,
-      decRad: D2R * this.initialPosition.dec,
-      zoomDeg: this.initialPosition.zoom,
-      instant: true
-    });
+    // only needed for intro video
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     this.crossfadeJWST = 0;
+    //     this.$nextTick(() => {
+    //       this.crossfadeOpacity = 0;
+    //     });
+    //   }, 1000);
+    // });
+    
   },
 
   computed: {
+    
+    wwtSettings(): Settings {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return Settings.get_active();
+    },
+    
     crossfadeOpacity: {
       get(): number {
         return this.cfOpacity;
       },
       set(o: number) {
-        
-        if (this.layers.glimpse) {
-          applyImageSetLayerSetting(this.layers.glimpse, ["opacity", (1 - 0.01 * o)]);
-        }
-        
         const jcfo = this.jwstCfOpacity * 0.01;
         
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - jcfo) * 0.01 * o]);
+          if (jcfo > 0.99) {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0]);
+          } else {
+            applyImageSetLayerSetting(this.layers.stars, ["opacity", 0.01 * o]);
+          }
         }
         if (this.layers.nostars) {
-          applyImageSetLayerSetting(this.layers.nostars, ["opacity", 0.01 * o]);
+          applyImageSetLayerSetting(this.layers.nostars, ["opacity", jcfo * 0.01 * o]);
         }
         
         this.cfOpacity = o;
@@ -498,11 +583,11 @@ export default defineComponent({
       },
       
       set(o: number) {
-        
-        const cfO = this.cfOpacity * 0.01;
+        const cfO = this.crossfadeOpacity * 0.01;
 
         if (this.layers.stars) {
-          applyImageSetLayerSetting(this.layers.stars, ["opacity", (1 - 0.01 * o) * cfO]);
+          // keep this at 100% opacity
+          applyImageSetLayerSetting(this.layers.stars, ["opacity", 1]);
         }
         
         if (this.layers.nostars) {
@@ -512,6 +597,7 @@ export default defineComponent({
         this.jwstCfOpacity = o;
       }
     },
+    
     
     curBackgroundImagesetName: {
       get(): string {
@@ -540,6 +626,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color2': this.accentColor2,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -573,10 +660,35 @@ export default defineComponent({
           video.pause();
         }
       }
+    },
+    
+    // set brick initial zoom based on screen size
+    initialBrickZoom(): number {
+      return this.mobile ? 1 : 0.7;
     }
   },
 
   methods: {
+    
+    async goToBrickPosition(instant = true) {
+      return this.gotoRADecZoom({
+        raRad: D2R * this.initialPosition.ra,
+        decRad: D2R * this.initialPosition.dec,
+        zoomDeg:this.initialBrickZoom,
+        instant: instant
+      });
+    },
+    
+    async goToIcePosition(instant = false) {
+      const rdz = [  266.54273053260596, -28.698575486822428, 0.22296663819992943 ];
+      this.showOverlay = true;
+      return this.gotoRADecZoom({
+        raRad: D2R * rdz[0],
+        decRad: D2R * rdz[1],
+        zoomDeg:rdz[2],
+        instant: instant
+      });
+    },
     
     onGallerySelect(place: Place) {
       // show the corresponding brick by setting the opacity of it to 100%
@@ -585,7 +697,7 @@ export default defineComponent({
       }
       
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       let opacity = 0;
@@ -617,6 +729,14 @@ export default defineComponent({
 
   watch: {
     
+    showSplashScreen(value: boolean) {
+      if (!value) {
+        this.goToBrickPosition(false).catch(() => {
+          console.log('Move interrupted');
+        });
+      }
+    },
+    
     // deep watcher for places to update jwstPlaces
     places: {
       handler: function (newPlaces: Place[]) {
@@ -631,10 +751,24 @@ export default defineComponent({
       deep: true
     },
     
+    showOverlay(value: boolean) {
+      applyImageSetLayerSetting(this.layers.zannotation, ["enabled", value]);
+    },
+    
+    crossfadeOpacity(val: number) {
+      if (val <= 0.05) {
+        this.overlayWasVisible = this.showOverlay;
+        this.showOverlay = false;
+      } else if (this.overlayWasVisible) {
+        this.showOverlay = true;
+        this.overlayWasVisible = false;
+      }
+    },
+    
     crossfadeJWST(val: number) {
       // return the brick that is the most opaque
       if (!this.keepCfOpacity) {
-        this.cfOpacity = 100;
+        this.crossfadeOpacity = 100;
       }
       
       this.ignoreSelect = true;
@@ -651,8 +785,7 @@ export default defineComponent({
       });
     },
     
-    selectedGalleryItem(place: Place | null) {
-      console.log("selectedGalleryItem: ", place);
+    selectedGalleryItem(_place: Place | null) {
     },
 
     
@@ -660,7 +793,7 @@ export default defineComponent({
     
     showLayers(show: boolean) {
       Object.values(this.layers).forEach(layer => {
-        applyImageSetLayerSetting(layer, ["enabled", show]);
+        applyImageSetLayerSetting(layer, ["opacity", show ? 1 : 0]);
       });
     },
     layersLoaded(loaded: boolean) {
@@ -882,6 +1015,15 @@ body {
   gap: 5px;
 }
 
+#overlay-button-container {
+  align-self: flex-start;
+  padding-bottom: 0.5rem;
+  // position:absolute;
+  // bottom: 0.5rem;
+  // left: 50%;
+  // transform: translateX(-50%);
+}
+
 #tools {
   z-index: 10;
   color: #fff;
@@ -950,11 +1092,14 @@ body {
   align-content: center;
   padding-top: 4rem;
   padding-bottom: 1rem;
+  padding-inline: 0.5rem;
 
-  border-radius: 10%;
+  border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
+
+  box-shadow: 0px 0px 25px black;
 
   div {
     margin-inline: auto;
@@ -1096,19 +1241,6 @@ body {
 }
 
 /* Video and text dialogs */
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
 
 #video-container {
   position: absolute;
@@ -1120,6 +1252,43 @@ video {
   overflow: hidden;
   padding: 0px;
   z-index: 1000;
+
+
+  .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 15;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:focus {
+      color: white;
+      border: 2px solid white;
+    }
+  }
+
+  .video-wrapper {  
+    display: flex;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    text-align: center;
+    z-index: 1000;
+  }
+
+  video, #info-video {
+    margin: auto;
+    height: 85%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    // aspect-ratio: 9/17;
+    border: 5px solid white;
+  }
+
 }
 
 .bottom-sheet {
@@ -1133,17 +1302,45 @@ video {
 }
 
 #tabs {
-  width: calc(100% - 3em);
   align-self: left;
 }
 
+.info-tabs {
+  @media (max-width: 599px) {
+    padding-inline: 0.75rem;
+    font-size: calc(1.15 * var(--default-font-size));
+  }
+  @media (min-width: 600px) {
+    padding-inline: 2rem;
+  }
+}
+
 .info-text {
+  font-size: var(--default-font-size);
+  line-height: var(--default-line-height);
+  
   height: 33vh;
   padding-bottom: 25px;
 
-  & a {
-    text-decoration: none;
+  & img {
+    max-width: 100%;
   }
+
+  & h3 {
+    margin-top: calc(var(--default-line-height));
+    margin-bottom: calc(0.3 * var(--default-line-height));
+    color: var(--accent-color2);
+  }
+
+  & p {
+    margin-bottom: calc(0.5 * var(--default-line-height));
+  }
+
+  & a {
+    text-decoration: underline;
+  }
+
+
 }
 
 
@@ -1208,11 +1405,23 @@ video {
 
 }
 
+.v-tabs [aria-selected="false"]:not(.v-slide-group-item--active) {
+  color: #DDD !important;
+}
+
 #close-text-icon {
   position: absolute;
   top: 0.25em;
-  right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
   color: white;
+
+  @media (max-width: 599px) {
+    right: 0.5em;
+  }
+
+  @media (min-width: 600px) {
+    right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
+  }
+
 }
 
 // This prevents the tabs from having some extra space to the left when the screen is small
@@ -1249,6 +1458,29 @@ a {
   .gallery-root .gallery {
     border: none;
   }
+}
+
+@media only screen and (max-width: 600px) {
+  #icons-container {
+    display: none;
+  }
+
+  .mobile-off {
+    display: none;
+  }
+}
+
+img#brick-diagram {
+  margin: 1rem auto 0.5rem;
+  max-width: min(300px, 75vw);
+  display: block;
+  @media (min-width: 600px) {
+    max-width: min(50vw, 500px);
+    margin: 0rem 1rem 1rem;
+    display: inline;
+    float: right;
+  }
+  
 }
 
 

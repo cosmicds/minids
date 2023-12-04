@@ -16,11 +16,13 @@ import {
   faBookOpen,
   faTimes,
   faVideo,
+  faLocationCrosshairs,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
 library.add(faTimes);
 library.add(faVideo);
+library.add(faLocationCrosshairs);
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */
 // Extract the function out, up here, so I'm not writing it twice
@@ -32,6 +34,7 @@ createApp(JwstBrick, {
     nostars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wostars/index.wtml",
     stars: "https://cosmicds.github.io/cds-website/wwt-content/JWST-Brick-wstars/index.wtml",
     // glimpse: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
+    zannotation: "https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/adam/annotation/index.wtml",
   },
   bgWtml: "https://cosmicds.github.io/cds-website/wwt-content/glimpse_original.wtml",
   bgName: "GLIMPSE Original"
