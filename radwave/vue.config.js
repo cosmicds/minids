@@ -7,7 +7,15 @@ module.exports = defineConfig({
   configureWebpack: {
     plugins: [
       new VuetifyPlugin()
-    ]
+    ],
+    module: {
+      rules: [
+        {
+          test: /\.csv/,
+          type: "asset/source"
+        }
+      ]
+    }
   },
 
   // Needed for BrowserStack/Safari testing as of 2023 March. This makes the

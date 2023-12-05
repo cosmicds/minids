@@ -249,8 +249,8 @@ import { Coordinates } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
-import sunCsv from "../assets/Sun_radec.csv";
-import bestFitCsv from "../assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
+import sunCsv from "./assets/Sun_radec.csv";
+import bestFitCsv from "./assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
 type SheetType = "text" | "video" | null;
 
