@@ -359,6 +359,7 @@ export default defineComponent({
         this.sunLayer = sunLayer;
         this.clusterLayers = clusterLayers;
         this.setTime(this.startTime);
+        this.updateSlider(this.phase);
         window.requestAnimationFrame(this.onAnimationFrame);
 
         this.layersLoaded = true;
