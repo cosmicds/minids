@@ -74,6 +74,21 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
+      <icon-button
+        v-model="playing"
+        :fa-icon="playing ? 'pause' : 'play'"
+        :color="accentColor"
+        tooltip-text="Play/Pause"
+        tooltip-location="top"
+        tooltip-offset="5px"
+      ></icon-button>
+      <input
+        type="range"
+        id="time-slider"
+        min="0"
+        max="720"
+        :oninput="onInputChange"
+      />
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -291,18 +306,25 @@ export default defineComponent({
       accentColor: "#ffffff",
 
       tab: 0,
+      playing: false,
+      timeRate: 120 * SECONDS_PER_DAY,
 
       phase: 0,
       altFactor: 1,
       phaseCol: 3,
+
       bestFitLayer: new SpreadSheetLayer(),
       bestFitAnnotation: null as PolyLine | null,
       bestFitColor: "#83befb",
+
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
+      clusterLayers: [] as SpreadSheetLayer[],
+
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
+
       startTime: new Date("2023-10-18 11:55:55Z"),
       endTime: new Date("2025-10-06 11:55:55Z")
     };
@@ -313,13 +335,13 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
+      this.setBackgroundImageByName("Solar System");
+      this.setForegroundImageByName("Solar System");
+
       this.gotoRADecZoom({
         ...this.initialCameraParams,
         instant: true
       }).then(() => this.positionSet = true);
-
-      this.setBackgroundImageByName("Solar System");
-      this.setForegroundImageByName("Solar System");
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
       this.applySetting(["solarSystemStars", false]);
@@ -327,16 +349,19 @@ export default defineComponent({
       this.applySetting(["showConstellationFigures", false]);
       this.applySetting(["showCrosshairs", false]);
 
-      this.setClockSync(true);
-      const timeRate = 120 * SECONDS_PER_DAY;
-      this.setClockRate(timeRate);
-
       this.setupBestFitLayer();
-      const sunProm = this.setupSunLayer();
-      const clustersProm = this.setupClusterLayers();
+      const sunPromise = this.setupSunLayer();
+      const clustersPromise = this.setupClusterLayers();
 
-      // If there are layers to set up, do that here!
-      this.layersLoaded = true;
+      Promise.all([sunPromise, clustersPromise]).then(([sunLayer, clusterLayers]) => {
+        this.sunLayer = sunLayer;
+        this.clusterLayers = clusterLayers;
+        this.setTime(this.startTime);
+        window.requestAnimationFrame(this.onAnimationFrame);
+
+        this.layersLoaded = true;
+      });
+
     });
   },
 
@@ -418,6 +443,33 @@ export default defineComponent({
       }
     },
 
+    // WWT isn't actually using the phase -
+    // it's using the start/end times that were constructed from it.
+    // This means that to get the current phase, we need to extract it
+    // from the WWT clock.
+    getCurrentPhaseInfo(): [number, number] {
+      const start = this.startTime.getTime();
+      // Call this rather than using wwtCurrentTime since the changes there take time to propagate
+      const now = SpaceTimeController.get_now().getTime();
+      const interval = 8.64e7;  // 1 day in ms
+      const intervals = Math.floor((now - start) / interval);
+      return [Math.floor(intervals / 360), intervals % 360];
+    },
+
+    onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
+      if (this.playing) {
+        if (this.wwtCurrentTime >= this.endTime) {
+          this.setTime(this.startTime);
+        }
+        const [period, phase] = this.getCurrentPhaseInfo();
+        this.updateBestFitAnnotation(phase);
+        this.phase = period * 360 + phase;
+      } else {
+        this.updateBestFitAnnotation(this.phase % 360);
+      }
+      window.requestAnimationFrame(this.onAnimationFrame);
+    },
+
     basicLayerSetup(layer: SpreadSheetLayer, timeSeries=false) {
       layer.set_lngColumn(0);
       layer.set_latColumn(1);
@@ -436,8 +488,8 @@ export default defineComponent({
       }
     },
 
-    async setupSunLayer(): Promise<void> {
-      this.sunLayer = await this.createTableLayer({
+    async setupSunLayer(): Promise<SpreadSheetLayer> {
+      return this.createTableLayer({
         referenceFrame: "Sky",
         name: "Radcliffe Wave Sun",
         dataCsv: sunCsv
@@ -493,7 +545,7 @@ export default defineComponent({
         // These calculations are stolen from around here: https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/esm/layers/spreadsheet_layer.js#L706
         let alt = row[dCol];
         alt = (this.altFactor * alt);
-        const pos = Coordinates.getTo3dRad(row[latCol], row[lngCol], alt);
+        const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
         pos.rotateX(ecliptic);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -522,25 +574,56 @@ export default defineComponent({
     async setupClusterLayers(): Promise<SpreadSheetLayer[]> {
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
-      for (let phase = 0; phase <= 360; phase++) {
-        const prom = fetch(`RW_cluster_oscillation_${phase}_updated_radec.csv`)
-          .then(response => response.text())
-          .then(text => text.replace(/\n/g, "\r\n"))  // WWT CRLF stuff
-          .then(async (text) => {
-            return this.createTableLayer({
-              referenceFrame: "Sky",
-              name: `Radcliffe Wave Clusters Phase ${phase}`,
-              dataCsv: text
-            }).then(layer => {
-              layer.set_opacity(this.opacityForPhase(phase));
-              layer.set_color(color);
-              layer.set_scaleFactor(70);
-              return layer;
-            });
-          });
+      for (let phase = 0; phase < 360; phase++) {
+        let text = (await import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`)).default;
+        text = text.replace(/\n/g, "\r\n");
+        const prom = this.createTableLayer({
+          referenceFrame: "Sky",
+          name: `Radcliffe Wave Clusters Phase ${phase}`,
+          dataCsv: text
+        }).then(layer => {
+          this.basicLayerSetup(layer, true);
+          layer.set_opacity(this.opacityForPhase(phase));
+          layer.set_color(color);
+          layer.set_scaleFactor(70);
+          return layer;
+        });
         promises.push(prom); 
       }
       return Promise.all(promises);
+    },
+
+    onInputChange(event: InputEvent) {
+      this.playing = false;
+      const target = event.target as HTMLInputElement;
+      const value = Number(target.value);
+      if (!isNaN(value)) {
+        this.phase = Math.max(0, Math.min(value, 720)); 
+      }
+    },
+
+    updateSlider(value: number) {
+      const input = document.querySelector("#time-slider");
+      if (input) {
+        const slider = input as HTMLInputElement;
+        slider.value = String(value);
+      }
+    },
+
+  },
+
+  watch: {
+    phase(value: number) {
+      const start = this.startTime.getTime();
+      const end = this.endTime.getTime();
+      const time = start + (value / 720) * (end - start);
+      this.setTime(new Date(time));
+      this.updateSlider(value);
+    },
+
+    playing(play: boolean) {
+      this.setClockSync(play);
+      this.setClockRate(play ? this.timeRate : 0);
     }
   }
 });
@@ -920,7 +1003,7 @@ video {
   display: none;
 }
 
-.v-slider {
+#time-slider {
   width: 80%;
   pointer-events: auto;
 }
