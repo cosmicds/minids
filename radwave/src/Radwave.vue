@@ -74,21 +74,23 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
-      <icon-button
-        v-model="playing"
-        :fa-icon="playing ? 'pause' : 'play'"
-        :color="accentColor"
-        tooltip-text="Play/Pause"
-        tooltip-location="top"
-        tooltip-offset="5px"
-      ></icon-button>
-      <input
-        type="range"
-        id="time-slider"
-        min="0"
-        max="720"
-        :oninput="onInputChange"
-      />
+      <div id="time-controls">
+        <icon-button
+          v-model="playing"
+          :fa-icon="playing ? 'pause' : 'play'"
+          :color="accentColor"
+          tooltip-text="Play/Pause"
+          tooltip-location="top"
+          tooltip-offset="5px"
+        ></icon-button>
+        <input
+          type="range"
+          id="time-slider"
+          min="0"
+          max="720"
+          :oninput="onInputChange"
+        />
+      </div>
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -1003,8 +1005,13 @@ video {
   display: none;
 }
 
+#time-controls {
+  width: 100%;
+  display: flex;
+}
+
 #time-slider {
-  width: 80%;
+  width: 100%;
   pointer-events: auto;
 }
 </style>
