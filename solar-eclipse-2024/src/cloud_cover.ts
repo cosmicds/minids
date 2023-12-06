@@ -37,3 +37,17 @@ export const cloudCover = `9999,-130.50,-129.50,-128.50,-127.50,-126.50,-125.50,
 48.50,0.80,0.82,0.83,0.78,0.82,0.77,0.75,0.71,0.73,0.82,0.77,0.68,0.67,0.66,0.72,0.69,0.73,0.74,0.66,0.65,0.60,0.64,0.65,0.65,0.57,0.54,0.47,0.48,0.53,0.54,0.55,0.56,0.62,0.69,0.66,0.62,0.60,0.62,0.62,0.64,0.71,0.76,0.67,0.70,0.73,0.78,0.78,0.81,0.77,0.76,0.74,0.77,0.74,0.76,0.79,0.80,0.82,0.82,0.78,0.75,0.77,0.73,0.70,0.75,0.80,0.76,0.70,0.69,0.73,0.73
 49.50,0.81,0.84,0.84,0.79,0.76,0.73,0.72,0.76,0.80,0.80,0.78,0.73,0.76,0.73,0.67,0.63,0.69,0.62,0.69,0.66,0.65,0.63,0.55,0.56,0.53,0.48,0.43,0.48,0.59,0.57,0.60,0.56,0.57,0.62,0.65,0.65,0.57,0.60,0.64,0.69,0.70,0.74,0.67,0.70,0.75,0.77,0.81,0.80,0.75,0.75,0.73,0.73,0.76,0.79,0.77,0.81,0.83,0.79,0.79,0.81,0.75,0.74,0.74,0.74,0.69,0.75,0.74,0.69,0.75,0.75
 50.50,0.83,0.84,0.81,0.80,0.78,0.75,0.77,0.74,0.77,0.78,0.78,0.77,0.80,0.76,0.71,0.70,0.63,0.60,0.64,0.62,0.54,0.44,0.45,0.48,0.49,0.47,0.49,0.54,0.58,0.68,0.68,0.66,0.58,0.58,0.60,0.65,0.61,0.63,0.65,0.70,0.67,0.65,0.69,0.73,0.72,0.74,0.79,0.72,0.68,0.69,0.70,0.73,0.77,0.77,0.81,0.77,0.79,0.75,0.73,0.73,0.72,0.74,0.78,0.75,0.70,0.66,0.67,0.70,0.72,0.75`;
+
+
+// modis acknoledgements:
+/** 
+ * MODIS Atmosphere Science Team. (2015). MOD08_M3 MODIS/Terra Aerosol Cloud Water Vapor Ozone Monthly L3 Global 1Deg CMG [dataset]. NASA Level 1 and Atmosphere Archive and Distribution System Distributed Active Archive Center. Accessed: Dec 6, 2023  https://doi.org/10.5067/MODIS/MOD08_M3.006
+DOI: Platnick, S., P. Hubanks, K. Meyer, and M. D. King, 2015: MODIS Atmosphere L3 Monthly Product (08_L3). NASA MODIS Adaptive Processing System, Goddard Space Flight Center
+  http://dx.doi.org/10.5067/MODIS/MOD08_M3.006 (Terra)
+
+for giovanni need:
+“Analyses and visualizations used in this [study/paper/presentation] were produced with the Giovanni online data system, developed and maintained by the NASA GES DISC."
+// don't neetd to include the paper citation for giovanni
+// J. G. Acker and G. Leptoukh, “Online Analysis Enhances Use of NASA Earth Science Data”, Eos, Trans. AGU, Vol. 88, No. 2 (9 January 2007), pages 14 and 17, doi: 10.1029/2007EO020003
+
+**/
