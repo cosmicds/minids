@@ -1462,8 +1462,7 @@ const eclipsePathGeoJson = {
 
 
 /** PARSE CLOUD COVERAGE DATA **/
-import {cloudCover} from "./cloud_cover";
-// import cloudCover from "./assets/cloud_cover.csv";
+import cloudCover from "./assets/cloud_cover.csv";
 import { csvParseRows } from "d3-dsv";
 
 // the first row is the longitude values

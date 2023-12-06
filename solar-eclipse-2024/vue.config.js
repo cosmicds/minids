@@ -15,7 +15,15 @@ module.exports = defineConfig({
         // See https://stackoverflow.com/questions/67431401/conflicting-values-for-process-env-with-webpack-encore-and-dotenv
         ignoreStub: true
       })
-    ]
+    ],
+    module: {
+      rules: [
+        {
+          test: /\.csv/,
+          type: 'asset/source',
+        },
+      ]
+    }
   },
 
   // Needed for BrowserStack/Safari testing as of 2023 March. This makes the
