@@ -960,6 +960,13 @@
             }"
         > </v-chip>
         <v-chip 
+          :prepend-icon="smallSize ? `` : `mdi-clouds`"
+          variant="outlined"
+          size="small"
+          elevation="2"
+          :text="selectedLocationCloudCover"
+        > </v-chip>
+        <v-chip 
         :prepend-icon="smallSize ? `` : `mdi-clock`"
         variant="outlined"
         size="small"
@@ -1453,6 +1460,25 @@ const eclipsePathGeoJson = {
   })
 };
 
+
+/** PARSE CLOUD COVERAGE DATA **/
+import {cloudCover} from "./cloud_cover";
+// import cloudCover from "./assets/cloud_cover.csv";
+import { csvParseRows } from "d3-dsv";
+
+// the first row is the longitude values
+// the first column is the latitude values
+// the data lies in the interior of the matrix
+const cloudData = csvParseRows(cloudCover, (d, _i) => {
+  // loop over the row and convert each value to a number ("+v")
+  return d.map((v) => +v);
+});
+
+const minLat = Math.min(...cloudData.map((d) => d[0]));
+const minLon = Math.min(...cloudData[0]);
+
+console.log("cloud cover data loaded");
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -1776,6 +1802,7 @@ export default defineComponent({
           'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
         }
       ],
+      
 
       presetLocationsVisited,
       userSelectedLocationsVisited
@@ -1929,6 +1956,19 @@ export default defineComponent({
         return formatInTimeZone(this.dateTime, this.selectedTimezone, 'MM/dd/yyyy HH:mm:ss (zzz)');
       }
 
+
+    },
+    
+    selectedLocationCloudCover():string {
+      if (this.locationDeg) {
+        const lat = this.locationDeg.latitudeDeg;
+        const lon = this.locationDeg.longitudeDeg;
+        const cc = this.getCloudCover(lat, lon);
+        if (cc) {
+          return `Cloud Cover: ${(cc * 100).toFixed(0)}%`;
+        }
+      }
+      return "Cloud Cover: N/A";
 
     },
 
@@ -2986,6 +3026,16 @@ export default defineComponent({
       } catch {
         return null;
       }
+    },
+    
+    getCloudCover(lat: number, lon: number): number | null {
+      // convert lat/lon to row/col
+      const row = Math.floor(lat + 0.5 - minLat);
+      const col = Math.floor(lon + 0.5 - minLon);
+      if (row < 0 || row >= cloudData.length || col < 0 || col >= cloudData[0].length) {
+        return null;
+      }
+      return cloudData[row][col];
     },
 
   },
