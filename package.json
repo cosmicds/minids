@@ -8,6 +8,7 @@
     "green-comet",
     "jwst-brick",
     "pinwheel-supernova",
+    "radwave",
     "tests"
   ],
   "scripts": {
