@@ -2,6 +2,7 @@
   "name": "minids-monorepo",
   "private": true,
   "workspaces": [
+    "solar-eclipse-2024",
     "annular-eclipse-2023",
     "carina",
     "common",

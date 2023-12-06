@@ -19,6 +19,12 @@ interface MapOptions extends TileLayerOptions {
   initialZoom?: number;
 }
 
+interface GeoJSONProp {
+  url?: string;
+  geojson?: GeoJSON.FeatureCollection | GeoJSON.Feature | GeoJSON.GeometryCollection;
+  style: Record<string,any>;
+}
+
 interface Place extends LocationDeg { 
   color?: string;
   fillColor?: string;
@@ -107,6 +113,11 @@ export default defineComponent({
     worldRadii: {
       type: Boolean,
       default: false
+    },
+    
+    geoJsonFiles: {
+      type: Array as PropType<GeoJSONProp[]>,
+      default: () => []
     }
   },
 
@@ -248,6 +259,41 @@ export default defineComponent({
       }
 
       map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps" target="_blank" rel="noopener noreferrer" >Leaflet</a>');
+      
+      // show the geojson files
+      this.geoJsonFiles.forEach((geojsonrecord) => {
+        const url = geojsonrecord.url;
+        const geo = geojsonrecord.geojson;
+        const style = geojsonrecord.style;
+        if (url) {
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+              L.geoJSON(data, {style: style}).addTo(map);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            }); 
+        } else if (geo) {
+          L.geoJSON(geo, {
+            style: style,
+            pointToLayer: function (feature, latlng) {
+              if (feature.properties.absoluteRadius) {
+                style.radius = feature.properties.absoluteRadius;
+                return L.circle(latlng, style);
+              } else {
+                return L.circleMarker(latlng, style);
+              }
+              
+            },
+            onEachFeature: function (feature, layer) {
+              if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+              }
+            }
+          }).addTo(map);
+        }
+      });
       
       this.map = map;
     },
