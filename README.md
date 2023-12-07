@@ -7,9 +7,18 @@ Mini Cosmic Data Stories built using WorldWide Telescope.
 1. Check out the repository to your machine
 2. If necessary, install [Node.js](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/)
 3. `yarn` to install dependencies
-4. `yarn build` to build the packages (in particular, the actual stories rely on the common package)
-5. To run the development server for a particular story:
+
+4. Build the common package:
     ```
-    cd <story-name>
+    cd common
+    yarn build
+    ```
+5. Build the story you want to run:
+    ```
+    cd ../<story-folder-name>
+    yarn build
+    ```
+6. Run the development server for a particular story (within the folder for that story):
+    ```
     yarn serve
     ```
