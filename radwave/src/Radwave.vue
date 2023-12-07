@@ -278,6 +278,8 @@ type Row = Record<string, number>;
 
 const SECONDS_PER_DAY = 86400;
 
+let bestFitAnnotations: PolyLine[] = [];
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -319,8 +321,9 @@ export default defineComponent({
       phaseCol: 3,
 
       bestFitLayer: new SpreadSheetLayer(),
-      bestFitAnnotation: null as PolyLine | null,
+      bestFitAnnotations: [] as PolyLine[],
       bestFitColor: "#83befb",
+      bestFitOffsets: [-2, -1, 0, 1, 2],
 
       phaseOpacitySlope,
       phaseOpacityIntercept,
@@ -564,13 +567,16 @@ export default defineComponent({
     },
 
     updateBestFitAnnotation(phase: number): void {
-      if (this.bestFitAnnotation !== null) {
-        this.removeAnnotation(this.bestFitAnnotation);
-      }
-      this.bestFitAnnotation = new PolyLine();
-      this.bestFitAnnotation.set_lineColor(this.bestFitColor);
-      this.addLayerPointsToAnnotation(this.bestFitLayer, this.bestFitAnnotation, (row: Row) => row[this.phaseCol] == phase);
-      this.addAnnotation(this.bestFitAnnotation);
+      bestFitAnnotations.forEach(ann => this.removeAnnotation(ann));
+      bestFitAnnotations = [];
+      this.bestFitOffsets.forEach(offset => {
+        const offsetPhase = (phase + offset) % 360;
+        const ann = new PolyLine();
+        ann.set_lineColor("#83befb");
+        this.addLayerPointsToAnnotation(this.bestFitLayer, ann, (row: Row) => row[this.phaseCol] == offsetPhase);
+        this.addAnnotation(ann);
+        bestFitAnnotations.push(ann);
+      });
     },
 
     opacityForPhase(phase: number): number {
