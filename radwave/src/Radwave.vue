@@ -82,6 +82,7 @@
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
+          :class="[layersLoaded ? '' : 'disabled']"
         ></icon-button>
         <input
           type="range"
@@ -303,6 +304,7 @@ export default defineComponent({
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
+      firstLayerLoaded: false,
       layersLoaded: false,
       positionSet: false,
       
@@ -361,13 +363,13 @@ export default defineComponent({
         this.setTime(this.startTime);
         this.updateSlider(this.phase);
         window.requestAnimationFrame(this.onAnimationFrame);
-
-        this.layersLoaded = true;
+        this.firstLayerLoaded = true;
       });
 
       Promise.all(clusterPromises).then((_layers) => {
         const timeSlider = document.querySelector("#time-slider") as HTMLInputElement;
         timeSlider.disabled = false;
+        this.layersLoaded = true;
       });
 
     });
@@ -381,7 +383,7 @@ export default defineComponent({
     independent logic.
     */
     ready(): boolean {
-      return this.layersLoaded && this.positionSet;
+      return this.firstLayerLoaded && this.positionSet;
     },
     isLoading(): boolean {
       return !this.ready;
@@ -1021,5 +1023,9 @@ video {
 #time-slider {
   width: 100%;
   pointer-events: auto;
+}
+
+.disabled {
+  pointer-events: none;
 }
 </style>
