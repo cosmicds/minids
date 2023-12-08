@@ -82,12 +82,14 @@
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
+          :class="[layersLoaded ? '' : 'disabled']"
         ></icon-button>
         <input
           type="range"
           id="time-slider"
           min="0"
           max="720"
+          disabled
           :oninput="onInputChange"
         />
       </div>
@@ -302,6 +304,7 @@ export default defineComponent({
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
+      firstLayerLoaded: false,
       layersLoaded: false,
       positionSet: false,
       
@@ -322,7 +325,6 @@ export default defineComponent({
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
-      clusterLayers: [] as SpreadSheetLayer[],
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
@@ -353,15 +355,20 @@ export default defineComponent({
 
       this.setupBestFitLayer();
       const sunPromise = this.setupSunLayer();
-      const clustersPromise = this.setupClusterLayers();
+      const clusterPromises = this.setupClusterLayers();
 
-      Promise.all([sunPromise, clustersPromise]).then(([sunLayer, clusterLayers]) => {
+      // Only wait for the first cluster layer to load
+      Promise.all([sunPromise, clusterPromises[0]]).then(([sunLayer, _firstClusterLayer]) => {
         this.sunLayer = sunLayer;
-        this.clusterLayers = clusterLayers;
         this.setTime(this.startTime);
         this.updateSlider(this.phase);
         window.requestAnimationFrame(this.onAnimationFrame);
+        this.firstLayerLoaded = true;
+      });
 
+      Promise.all(clusterPromises).then((_layers) => {
+        const timeSlider = document.querySelector("#time-slider") as HTMLInputElement;
+        timeSlider.disabled = false;
         this.layersLoaded = true;
       });
 
@@ -376,7 +383,7 @@ export default defineComponent({
     independent logic.
     */
     ready(): boolean {
-      return this.layersLoaded && this.positionSet;
+      return this.firstLayerLoaded && this.positionSet;
     },
     isLoading(): boolean {
       return !this.ready;
@@ -574,26 +581,28 @@ export default defineComponent({
       return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), 1);
     },
 
-    async setupClusterLayers(): Promise<SpreadSheetLayer[]> {
+    setupClusterLayers(): Promise<SpreadSheetLayer>[] {
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
       for (let phase = 0; phase < 360; phase++) {
-        let text = (await import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`)).default;
-        text = text.replace(/\n/g, "\r\n");
-        const prom = this.createTableLayer({
-          referenceFrame: "Sky",
-          name: `Radcliffe Wave Clusters Phase ${phase}`,
-          dataCsv: text
-        }).then(layer => {
-          this.basicLayerSetup(layer, true);
-          layer.set_opacity(this.opacityForPhase(phase));
-          layer.set_color(color);
-          layer.set_scaleFactor(70);
-          return layer;
+        const prom = import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
+          let text = res.default;
+          text = text.replace(/\n/g, "\r\n");
+          return this.createTableLayer({
+            referenceFrame: "Sky",
+            name: `Radcliffe Wave Clusters Phase ${phase}`,
+            dataCsv: text
+          }).then(layer => {
+            this.basicLayerSetup(layer, true);
+            layer.set_opacity(this.opacityForPhase(phase));
+            layer.set_color(color);
+            layer.set_scaleFactor(70);
+            return layer;
+          });
         });
-        promises.push(prom); 
+        promises.push(prom);
       }
-      return Promise.all(promises);
+      return promises;
     },
 
     onInputChange(event: InputEvent) {
@@ -1014,5 +1023,9 @@ video {
 #time-slider {
   width: 100%;
   pointer-events: auto;
+}
+
+.disabled {
+  pointer-events: none;
 }
 </style>
