@@ -83,6 +83,13 @@
           <span class="no-select">3D</span>
         </template>
         </icon-button>
+        <icon-button
+          md-icon="mdi-refresh"
+          @activate="positionReset"
+          :color="accentColor"
+          tooltip-text="Reset this view"
+          tooltip-location="start"
+          ></icon-button>
       </div>
       <div id="center-buttons">
       </div>
