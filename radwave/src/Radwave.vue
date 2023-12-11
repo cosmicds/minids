@@ -83,7 +83,6 @@
           <span class="no-select">3D</span>
         </template>
         </icon-button>
-        <p> {{ wwtRARad.toFixed(2) }} {{ wwtDecRad.toFixed(2) }} {{ wwtZoomDeg.toFixed(2) }} </p>
       </div>
       <div id="center-buttons">
       </div>
