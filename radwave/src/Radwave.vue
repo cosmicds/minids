@@ -63,6 +63,27 @@
           tooltip-location="start"
         >
         </icon-button>
+        <icon-button
+          @activate="set2DMode"
+          :color="accentColor"
+          tooltip-text="2D mode"
+          tooltip-location="start"
+        >
+        <template v-slot:button>
+          <span class="no-select">2D</span>
+        </template>
+        </icon-button>
+        <icon-button
+          @activate="set3DMode"
+          :color="accentColor"
+          tooltip-text="3D mode"
+          tooltip-location="start"
+        >
+        <template v-slot:button>
+          <span class="no-select">3D</span>
+        </template>
+        </icon-button>
+        <p> {{ wwtRARad.toFixed(2) }} {{ wwtDecRad.toFixed(2) }} {{ wwtZoomDeg.toFixed(2) }} </p>
       </div>
       <div id="center-buttons">
       </div>
@@ -300,6 +321,11 @@ export default defineComponent({
   data() {
     const phaseOpacitySlope = -1 / 80;
     const phaseOpacityIntercept = 1 - phaseOpacitySlope * 100;
+    const initial2DPosition = {
+      raRad: 6,
+      decRad: 1,
+      zoomDeg: 360
+    } as Omit<GotoRADecZoomParams,'instant'>;
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -330,7 +356,13 @@ export default defineComponent({
       sunLayer: null as SpreadSheetLayer | null,
 
       startTime: new Date("2023-10-18 11:55:55Z"),
-      endTime: new Date("2025-10-06 11:55:55Z")
+      endTime: new Date("2025-10-06 11:55:55Z"),
+      
+      background2DImageset: "Mellinger color optical survey",
+      mode: null as "2D" | "3D" | null,
+      position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
+      position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
+      initial2DPosition,
     };
   },
 
@@ -339,12 +371,11 @@ export default defineComponent({
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
 
-      this.setBackgroundImageByName("Solar System");
-      this.setForegroundImageByName("Solar System");
-
-      this.gotoRADecZoom({
-        ...this.initialCameraParams,
-        instant: true
+      // initialize the view to black so that we don't flicker DSS
+      this.setBackgroundImageByName("Black sky background");
+      this.loadHipsWTML().then(() => {
+        console.log('init set2DMode');
+        return this.set2DMode();
       }).then(() => this.positionSet = true);
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
@@ -434,12 +465,94 @@ export default defineComponent({
           video.pause();
         }
       }
+    },
+    
+    wwtPosition(): Omit<GotoRADecZoomParams,'instant'> {
+      return {
+        raRad: this.wwtRARad,
+        decRad: this.wwtDecRad,
+        zoomDeg: this.wwtZoomDeg
+      };
     }
   },
 
   methods: {
     closeSplashScreen() {
       this.showSplashScreen = false; 
+    },
+    
+    async loadHipsWTML () {
+      return this.loadImageCollection({
+        url: "https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
+        loadChildFolders: true,
+      });
+    },
+
+    set2DMode() {
+      
+      if (this.mode == '2D') {
+        return;
+      }
+      
+      console.log('set2DMode');
+      if (this.mode == "3D") {
+        this.position3D = this.wwtPosition;
+      }
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.phase = 0;
+      this.mode = "2D";
+      
+      return this.gotoRADecZoom({
+        ...this.position2D,
+        instant: true
+      });
+
+    },
+    
+    set3DMode() {
+      if (this.mode == "3D") {
+        return;
+      }
+      
+      console.log('set3DMode');
+      if (this.mode == "2D") {
+        this.position2D = this.wwtPosition;
+      }
+
+      this.setBackgroundImageByName("Solar System");
+      this.setForegroundImageByName("Solar System");
+      this.mode = "3D";
+
+      this.gotoRADecZoom({
+        ...this.position3D,
+        instant: true
+      });
+
+      
+    },
+    
+    positionReset() {
+      // since we aren't changing modes, 
+      // we don't need to use set2DMode or set3DMode
+      // also those are locked to only work if the mode is chaning
+      // so we let's do this manually. 
+      
+      // only reset the current mode
+      if (this.mode == "2D") {
+        this.position2D = this.initial2DPosition;
+      } else if (this.mode == "3D") {
+        this.position3D = this.initialCameraParams;
+      } else {
+        // don't reset anything if mode is null
+        return;
+      }
+      // grab the mode correct position
+      const pos = this.mode == "2D" ? this.position2D : this.position3D;
+      // we will move nicely. 
+      this.gotoRADecZoom({
+        ...pos,
+        instant: false
+      });
     },
 
     selectSheet(name: SheetType) {
@@ -676,6 +789,16 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+.no-select {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.pointer-events {
+  pointer-events: auto;
+}
 
 /*
   The main content of the mini.
