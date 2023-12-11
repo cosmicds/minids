@@ -392,8 +392,8 @@ export default defineComponent({
       // initialize the view to black so that we don't flicker DSS
       this.setBackgroundImageByName("Black sky background");
       this.loadHipsWTML().then(() => {
-        console.log('init set2DMode');
-        return this.set2DMode();
+        console.log('init set3DMode');
+        return this.set3DMode();
       }).then(() => this.positionSet = true);
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
