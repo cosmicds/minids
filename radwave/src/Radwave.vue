@@ -91,11 +91,27 @@
           tooltip-location="start"
           ></icon-button>
       </div>
-      <div id="center-buttons">
+      <div id="center-buttons" class="d-flex">
+        <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
+        <icon-button
+          md-icon="mdi-sine-wave"
+          @activate="mode = 'fullwave'"
+          :color="accentColor"
+          tooltip-text="Full Wave Mode"
+          tooltip-location="bottom"
+        >
+        <template v-slot:button>
+          <span class="no-select">View the Full Radcliffe Wave</span>
+        </template>
+      </icon-button>
+        
+
+        
       </div>
       <div id="right-buttons">
         <!-- add a menu selector for background2DImageset -->
         <v-select
+          v-if="mode == '2D' || mode == 'fullwave'"
           v-model="background2DImageset"
           :items="allSkyImagesets"
           label="Background"
@@ -375,6 +391,7 @@ export default defineComponent({
       startTime: new Date("2023-10-18 11:55:55Z"),
       endTime: new Date("2025-10-06 11:55:55Z"),
       
+      resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Mellinger color optical survey",
       mode: null as "2D" | "3D" | "fullwave" | null,
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
@@ -429,6 +446,11 @@ export default defineComponent({
       });
 
     });
+    
+    this.resizeObserver = new ResizeObserver((entries) => {
+      this.shinkWWT();
+    });
+    
   },
 
   computed: {
@@ -522,16 +544,16 @@ export default defineComponent({
       this.applySetting(["galacticMode", true]);
       this.applySetting(["showSolarSystem", false]);
       this.phase = 0;
-      
+
       setTimeout(() => {
         
         this.gotoRADecZoom({
-        ...this.position2D,
-        instant: true
+          ...this.position2D,
+          instant: true
         }).catch((err) => {
           console.log(err);
         
-      });
+        }); 
       }, 100);
 
     },
@@ -578,10 +600,20 @@ export default defineComponent({
         
           
       }, 100);
-        instant: true
-      });
-
       
+      this.shinkWWT();
+      
+    },
+    
+    toggleUI() {
+      // toggle visibility of class .bottom-content using opacity
+      const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
+      const op = bottomContent.style.opacity;
+      if (op == "0") {
+        bottomContent.style.opacity = "1";
+      } else {
+        bottomContent.style.opacity = "0";
+      }
     },
     
     positionReset() {
@@ -611,6 +643,26 @@ export default defineComponent({
       
       
     },
+    
+    shinkWWT(aspect: number = null as unknown as number) {
+      // default aspect = 5.7
+      if (aspect == null) {
+        aspect = 5.7;
+      }
+      console.log('shinkWWT');
+      
+      const mainContent = document.querySelector(".wwtelescope-component") as HTMLElement;
+      const width = mainContent.clientWidth;
+      const height = width / aspect;
+      mainContent.style.height = `${height}px`;
+    },
+    
+    growWWT() {
+      const mainContent = document.querySelector(".wwtelescope-component") as HTMLElement;
+      mainContent.style.height = `100%`;
+      this.resizeObserver?.unobserve(document.body as HTMLElement);
+    },
+
     
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
@@ -811,7 +863,7 @@ export default defineComponent({
     background2DImageset(name: string) {
       
       if (this.mode == "2D" || this.mode == "fullwave") {
-      this.setBackgroundImageByName(name);
+        this.setBackgroundImageByName(name);
         return;
       }
       
@@ -927,6 +979,8 @@ body {
     border-width: 0;
     margin: 0;
     padding: 0;
+    
+    transition: height .25s ease;
   }
 }
 
