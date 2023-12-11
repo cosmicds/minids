@@ -64,7 +64,7 @@
         >
         </icon-button>
         <icon-button
-          @activate="set2DMode"
+          @activate="mode = '2D'"
           :color="accentColor"
           tooltip-text="2D mode"
           tooltip-location="start"
@@ -74,7 +74,7 @@
         </template>
         </icon-button>
         <icon-button
-          @activate="set3DMode"
+          @activate="mode = '3D'"
           :color="accentColor"
           tooltip-text="3D mode"
           tooltip-location="start"
@@ -376,7 +376,7 @@ export default defineComponent({
       endTime: new Date("2025-10-06 11:55:55Z"),
       
       background2DImageset: "Mellinger color optical survey",
-      mode: null as "2D" | "3D" | null,
+      mode: null as "2D" | "3D" | "fullwave" | null,
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
@@ -496,7 +496,8 @@ export default defineComponent({
       return {
         raRad: this.wwtRARad,
         decRad: this.wwtDecRad,
-        zoomDeg: this.wwtZoomDeg
+        rollRad: this.wwtRollRad,
+        zoomDeg: this.wwtZoomDeg,
       };
     }
   },
@@ -515,41 +516,68 @@ export default defineComponent({
 
     set2DMode() {
       
-      if (this.mode == '2D') {
-        return;
-      }
-      
       console.log('set2DMode');
-      if (this.mode == "3D") {
-        this.position3D = this.wwtPosition;
-      }
-      this.setBackgroundImageByName(this.background2DImageset);
-      this.phase = 0;
-      this.mode = "2D";
       
-      return this.gotoRADecZoom({
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.applySetting(["galacticMode", true]);
+      this.applySetting(["showSolarSystem", false]);
+      this.phase = 0;
+      
+      setTimeout(() => {
+        
+        this.gotoRADecZoom({
         ...this.position2D,
         instant: true
+        }).catch((err) => {
+          console.log(err);
+        
       });
+      }, 100);
 
     },
     
     set3DMode() {
-      if (this.mode == "3D") {
-        return;
-      }
+
       
       console.log('set3DMode');
-      if (this.mode == "2D") {
-        this.position2D = this.wwtPosition;
-      }
+      
 
       this.setBackgroundImageByName("Solar System");
       this.setForegroundImageByName("Solar System");
-      this.mode = "3D";
 
-      this.gotoRADecZoom({
+
+      return this.gotoRADecZoom({
         ...this.position3D,
+        instant: true,
+      }).catch((err) => {
+        console.log(err);
+      });
+
+      
+    },
+    
+    fullwaveMode() {
+      // to view in the full wave you need to adjust the height
+      // of the window/canvas to have an W:H ration of 5.7
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.applySetting(["galacticMode", true]);
+
+      this.phase=3;
+      const cameraParams = { 
+        raRad: 0.6984155220905679, 
+        decRad: 0.7132099678793872, 
+        rollRad: 0.183,
+        zoomDeg: 360};
+      setTimeout(() => {
+        
+        this.gotoRADecZoom({
+          ...cameraParams, 
+          instant: false}).catch((err) => {
+          console.log(err);
+        });
+        
+          
+      }, 100);
         instant: true
       });
 
@@ -577,7 +605,11 @@ export default defineComponent({
       this.gotoRADecZoom({
         ...pos,
         instant: false
+      }).catch((err) => {
+        console.log(err);
       });
+      
+      
     },
     
     selectSheet(name: SheetType) {
@@ -777,8 +809,45 @@ export default defineComponent({
     },
     
     background2DImageset(name: string) {
+      
+      if (this.mode == "2D" || this.mode == "fullwave") {
       this.setBackgroundImageByName(name);
+        return;
+      }
+      
     },
+    
+    mode(newVal, oldVal) {
+      console.log(oldVal, newVal);
+      if (oldVal == newVal) {
+        return;
+      }
+      
+      if (oldVal == "2D") {
+        this.position2D = this.wwtPosition;
+      } else if (oldVal == "3D") {
+        this.position3D = this.wwtPosition;
+      } else if (oldVal == "fullwave") {
+        this.resizeObserver?.disconnect();
+        this.growWWT();
+      }
+      
+      
+      
+      if (newVal == "2D") {
+        this.set2DMode();
+      } else if (newVal == "3D") {
+        this.set3DMode();
+      } else if (newVal == "fullwave") {
+        this.fullwaveMode();
+        this.resizeObserver?.observe(document.body);
+      } else {
+        // don't do anything if mode is null
+        return;
+      }
+      
+    }
+    
   }
 });
 </script>
