@@ -88,6 +88,17 @@
       <div id="center-buttons">
       </div>
       <div id="right-buttons">
+        <!-- add a menu selector for background2DImageset -->
+        <v-select
+          v-model="background2DImageset"
+          :items="allSkyImagesets"
+          label="Background"
+          dense
+          outlined
+          hide-details
+          :color="accentColor"
+          class="pointer-events"
+          />
       </div>
     </div>
 
@@ -363,6 +374,14 @@ export default defineComponent({
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
+      allSkyImagesets: [
+        'Mellinger color optical survey', 
+        'Digitized Sky Survey (Color)',
+        'WISE All Sky (Infrared)',
+        'unWISE color, from W2 and W1 bands',
+        "Gaia DR2",
+        "Deep Star Maps 2020",
+      ]
     };
   },
 
@@ -370,7 +389,7 @@ export default defineComponent({
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
-
+      
       // initialize the view to black so that we don't flicker DSS
       this.setBackgroundImageByName("Black sky background");
       this.loadHipsWTML().then(() => {
@@ -554,7 +573,7 @@ export default defineComponent({
         instant: false
       });
     },
-
+    
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
         this.sheet = null;
@@ -749,7 +768,11 @@ export default defineComponent({
     playing(play: boolean) {
       this.setClockSync(play);
       this.setClockRate(play ? this.timeRate : 0);
-    }
+    },
+    
+    background2DImageset(name: string) {
+      this.setBackgroundImageByName(name);
+    },
   }
 });
 </script>
