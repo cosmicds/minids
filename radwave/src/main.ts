@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
 
-import { FundingAcknowledgment, IconButton } from "@minids/common";
+import { FundingAcknowledgment, IconButton, wwtHUD } from "@minids/common";
 import Radwave from "./Radwave.vue";
 
 import vuetify from "../plugins/vuetify";
@@ -57,6 +57,7 @@ createApp(Radwave, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
   .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('wwt-hud', wwtHUD)
 
   // Mount
   .mount("#app");

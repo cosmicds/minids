@@ -11,6 +11,15 @@
     ></WorldWideTelescope>
 
 
+    <wwt-hud
+      :wwt-namespace="wwtNamespace"
+      :location="{top: '5rem', right: '1rem'}"
+      :offset-center="{x: 0, y: 0}"
+      :other-variables="{'phase': phase}"
+      text-shadow="none"
+      font-size="0.8em"
+    ></wwt-hud>
+
     <!-- This contains the splash screen content -->
 
     <v-overlay
