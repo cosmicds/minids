@@ -393,7 +393,7 @@ export default defineComponent({
       
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Mellinger color optical survey",
-      mode: null as "2D" | "3D" | "fullwave" | null,
+      mode: "3D" as "2D" | "3D" | "fullwave" | null,
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
