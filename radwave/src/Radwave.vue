@@ -128,7 +128,7 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
-      <div id="time-controls">
+      <div v-if="mode != '2D'" id="time-controls">
         <icon-button
           v-model="playing"
           :fa-icon="playing ? 'pause' : 'play'"
