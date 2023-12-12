@@ -730,10 +730,11 @@ export default defineComponent({
     },
 
     async setupSunLayer(): Promise<SpreadSheetLayer> {
+      const text = sunCsv.replace(/\n/g, "\r\n");
       return this.createTableLayer({
         referenceFrame: "Sky",
         name: "Radcliffe Wave Sun",
-        dataCsv: sunCsv
+        dataCsv: text
       }).then(layer => {
         this.basicLayerSetup(layer);
         this.applyTableLayerSettings({
