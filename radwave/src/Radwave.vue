@@ -788,7 +788,9 @@ export default defineComponent({
         let alt = row[dCol];
         alt = (this.altFactor * alt);
         const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
+        if (this.mode == "3D") {
         pos.rotateX(ecliptic);
+        }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         annotation._points$1.push(pos);
