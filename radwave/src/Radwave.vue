@@ -9,13 +9,13 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-
-
+    
+    
     <wwt-hud
       :wwt-namespace="wwtNamespace"
       :location="{top: '5rem', right: '1rem'}"
       :offset-center="{x: 0, y: 0}"
-      :other-variables="{'phase': phase}"
+      :other-variables="{'phase': phase, position3D: position3D, position2D: position2D, mode: mode}"
       text-shadow="none"
       font-size="0.8em"
     ></wwt-hud>
@@ -99,12 +99,12 @@
           tooltip-text="Reset this view"
           tooltip-location="start"
           ></icon-button>
-      </div>
+              </div>
       <div id="center-buttons" class="d-flex">
-        <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
+<!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
           md-icon="mdi-sine-wave"
-          @activate="mode = 'fullwave'"
+          @activate="fullwaveMode()"
           :color="accentColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
@@ -112,15 +112,15 @@
         <template v-slot:button>
           <span class="no-select">View the Full Radcliffe Wave</span>
         </template>
-      </icon-button>
+        </icon-button>
         
-
+        
         
       </div>
       <div id="right-buttons">
-        <!-- add a menu selector for background2DImageset -->
+                <!-- add a menu selector for background2DImageset -->
         <v-select
-          v-if="mode == '2D' || mode == 'fullwave'"
+          v-if="mode == '2D'"
           v-model="background2DImageset"
           :items="allSkyImagesets"
           label="Background"
@@ -402,7 +402,7 @@ export default defineComponent({
       
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Mellinger color optical survey",
-      mode: "3D" as "2D" | "3D" | "fullwave" | null,
+      mode: "3D" as "2D" | "3D" | null,
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
@@ -424,6 +424,7 @@ export default defineComponent({
       
       // initialize the view to black so that we don't flicker DSS
       this.setBackgroundImageByName("Black sky background");
+      this.applySetting(["galacticMode", true]);
       this.loadHipsWTML().then(() => {
         console.log('init set3DMode');
         return this.set3DMode();
@@ -455,7 +456,7 @@ export default defineComponent({
         timeSlider.disabled = false;
         this.layersLoaded = true;
       });
-
+      
     });
     
     this.resizeObserver = new ResizeObserver((_entries) => {
@@ -546,17 +547,22 @@ export default defineComponent({
         loadChildFolders: true,
       });
     },
+    
+    asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(func()), ms);
+      });
+    },
 
     set2DMode() {
       
       console.log('set2DMode');
       
       this.setBackgroundImageByName(this.background2DImageset);
-      this.applySetting(["galacticMode", true]);
       this.applySetting(["showSolarSystem", false]);
       this.phase = 0;
 
-      setTimeout(() => {
+      return this.asyncSetTimeout(() => {
         
         this.gotoRADecZoom({
           ...this.position2D,
@@ -589,32 +595,30 @@ export default defineComponent({
       
     },
     
-    fullwaveMode() {
+    async fullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
-      this.setBackgroundImageByName(this.background2DImageset);
-      this.applySetting(["galacticMode", true]);
+      return this.set2DMode().then(() => {
 
-      this.phase=3;
-      const cameraParams = { 
-        raRad: 0.6984155220905679, 
-        decRad: 0.7132099678793872, 
-        rollRad: 0.183,
-        zoomDeg: 360};
-      setTimeout(() => {
+        this.mode = null;
+        this.phase=3;
+        const cameraParams = { 
+          raRad: 0.6984155220905679, 
+          decRad: 0.7132099678793872, 
+          rollRad: 0.183,
+          zoomDeg: 360};
         
-        this.gotoRADecZoom({
+        this.shinkWWT();
+        this.resizeObserver?.observe(document.body);
+        
+        return this.gotoRADecZoom({
           ...cameraParams, 
           instant: false}).catch((err) => {
           console.log(err);
         });
-        
-          
-      }, 100);
+      });
       
-      this.shinkWWT();
-      
-    },
+    }, 
     
     toggleUI() {
       // toggle visibility of class .bottom-content using opacity
@@ -791,7 +795,7 @@ export default defineComponent({
         alt = (this.altFactor * alt);
         const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
         if (this.mode == "3D") {
-        pos.rotateX(ecliptic);
+          pos.rotateX(ecliptic);
         }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -876,26 +880,63 @@ export default defineComponent({
     
     background2DImageset(name: string) {
       
-      if (this.mode == "2D" || this.mode == "fullwave") {
+      if (this.mode == "2D") {
         this.setBackgroundImageByName(name);
         return;
       }
       
     },
     
+    // // positin3d deep
+    // position3D: {
+    //   handler(newVal) {        
+    //     if (this.mode == "3D") {
+    //       console.log('moving');
+    //       this.gotoRADecZoom({
+    //         ...newVal,
+    //         instant: true
+    //       }).catch((err) => {
+    //         console.log(err);
+    //       });
+    //     }
+    //   },
+    //   deep: true
+    // },
+    
+    // // positin2d deep
+    // position2D: {
+    //   handler(newVal) {
+    //     if (this.mode == "2D") {
+    //       this.gotoRADecZoom({
+    //         ...newVal,
+    //         instant: true
+    //       }).catch((err) => {
+    //         console.log(err);
+    //       });
+    //     }
+    //   },
+    //   deep: true
+    // },
+    
     mode(newVal, oldVal) {
       console.log(oldVal, newVal);
       if (oldVal == newVal) {
-        return;
-      }
+        if (newVal == "2D") {
+          this.set2DMode();
+        }
+        if (newVal == "3D") {
+          this.set3DMode();
+        }
+      } else {
       
-      if (oldVal == "2D") {
-        this.position2D = this.wwtPosition;
-      } else if (oldVal == "3D") {
-        this.position3D = this.wwtPosition;
-      } else if (oldVal == "fullwave") {
-        this.resizeObserver?.disconnect();
-        this.growWWT();
+        if (oldVal == "2D") {
+          this.position2D = this.wwtPosition;
+        } else if (oldVal == "3D") {
+          this.position3D = this.wwtPosition;
+        } else if (oldVal == null) {
+          this.resizeObserver?.disconnect();
+          this.growWWT();
+        }
       }
       
       
@@ -904,9 +945,6 @@ export default defineComponent({
         this.set2DMode();
       } else if (newVal == "3D") {
         this.set3DMode();
-      } else if (newVal == "fullwave") {
-        this.fullwaveMode();
-        this.resizeObserver?.observe(document.body);
       } else {
         // don't do anything if mode is null
         return;
