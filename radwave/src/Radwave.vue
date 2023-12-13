@@ -456,7 +456,7 @@ export default defineComponent({
 
     });
     
-    this.resizeObserver = new ResizeObserver((entries) => {
+    this.resizeObserver = new ResizeObserver((_entries) => {
       this.shinkWWT();
     });
     
