@@ -258,7 +258,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, D2R } from "@minids/common";
-import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer } from "@wwtelescope/engine";
+import { Annotation, Color, PolyLine, ScriptInterface, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 
 // Coordinates isn't exposed to TypeScript, but it IS exported at the JS module level,
 // so it's enough to do this. We just won't get any LSP help from an editor.
@@ -279,6 +279,89 @@ type Row = Record<string, number>;
 const SECONDS_PER_DAY = 86400;
 
 let bestFitAnnotations: PolyLine[] = [];
+const bestFitOffsets = [-2, -1, 0, 1, 2] as const;
+const bestFitLayer = new SpreadSheetLayer();
+const startTime = new Date("2023-10-18 11:55:55Z");
+const endTime = new Date("2025-10-06 11:55:55Z");
+
+let phase = 0;
+let altFactor = 1;
+
+const phaseRowCount = 300;
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const scriptInterface: ScriptInterface = WWTControl.scriptInterface;
+
+function getCurrentPhaseInfo(): number {
+  const start = startTime.getTime();
+  const now = SpaceTimeController.get_now().getTime();
+  const interval = 8.64e7;  // 1 day in ms
+  const intervals = Math.floor((now - start) / interval);
+  return intervals % 360;
+}
+
+function updateBestFitAnnotation(phase: number): void {
+  bestFitAnnotations.forEach(ann => scriptInterface.removeAnnotation(ann));
+  bestFitAnnotations = [];
+  bestFitOffsets.forEach(offset => {
+    const offsetPhase = (phase + offset) % 360;
+    const ann = new PolyLine();
+    ann.set_lineColor("#83befb");
+    addPhasePointsToAnnotation(bestFitLayer, ann, offsetPhase);
+    scriptInterface.addAnnotation(ann);
+    bestFitAnnotations.push(ann);
+  });
+}
+
+
+function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotation, phase: number) {
+  const lngCol = layer.get_lngColumn();
+  const latCol = layer.get_latColumn();
+  const dCol = layer.get_altColumn();
+  const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const rows: Row[] = layer.get__table().rows.slice(phase * phaseRowCount, (phase + 1) * phaseRowCount);
+  for (const row of rows) {
+    // The API for annotations seem to assume that we're in 2D sky mode - there's no option for distance
+    // so we have to calculate our positions in 3D and just directly insert them into the array of points.
+    // This of course necessitates some TypeScript hackery.
+    // These calculations are stolen from around here: https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/esm/layers/spreadsheet_layer.js#L706
+    let alt = row[dCol];
+    alt = (altFactor * alt);
+    const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
+    pos.rotateX(ecliptic);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    annotation._points$1.push(pos);
+  }
+}
+
+function onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
+  let newPhase = phase;
+  if (SpaceTimeController.get_syncToClock()) {
+    if (SpaceTimeController.get_now() >= endTime) {
+      SpaceTimeController.set_now(startTime);
+    }
+    newPhase = getCurrentPhaseInfo();
+  }
+  if (newPhase !== phase) {
+    phase = newPhase;
+    updateBestFitAnnotation(phase);
+    updateSlider(phase);
+  }
+  window.requestAnimationFrame(onAnimationFrame);
+}
+
+function updateSlider(value: number) {
+  const input = document.querySelector("#time-slider");
+  if (input) {
+    const slider = input as HTMLInputElement;
+    slider.value = String(value);
+  }
+}
 
 export default defineComponent({
   extends: MiniDSBase,
@@ -316,14 +399,8 @@ export default defineComponent({
       playing: false,
       timeRate: 120 * SECONDS_PER_DAY,
 
-      phase: 0,
-      altFactor: 1,
       phaseCol: 3,
-
-      bestFitLayer: new SpreadSheetLayer(),
-      bestFitAnnotations: [] as PolyLine[],
-      bestFitColor: "#83befb",
-      bestFitOffsets: [-2, -1, 0, 1, 2],
+      clusterLayers: [] as SpreadSheetLayer[],
 
       phaseOpacitySlope,
       phaseOpacityIntercept,
@@ -331,9 +408,6 @@ export default defineComponent({
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
-
-      startTime: new Date("2023-10-18 11:55:55Z"),
-      endTime: new Date("2025-10-06 11:55:55Z")
     };
   },
 
@@ -358,20 +432,14 @@ export default defineComponent({
 
       this.setupBestFitLayer();
       const sunPromise = this.setupSunLayer();
-      const clusterPromises = this.setupClusterLayers();
+      const clusterPromise = this.setupClusterLayers();
 
-      // Only wait for the first cluster layer to load
-      Promise.all([sunPromise, clusterPromises[0]]).then(([sunLayer, _firstClusterLayer]) => {
+      Promise.all([sunPromise, clusterPromise]).then(([sunLayer, clusterLayers]) => {
         this.sunLayer = sunLayer;
-        this.setTime(this.startTime);
-        this.updateSlider(this.phase);
-        window.requestAnimationFrame(this.onAnimationFrame);
-        this.firstLayerLoaded = true;
-      });
-
-      Promise.all(clusterPromises).then((_layers) => {
-        const timeSlider = document.querySelector("#time-slider") as HTMLInputElement;
-        timeSlider.disabled = false;
+        this.clusterLayers = clusterLayers;
+        this.setTime(startTime);
+        updateSlider(phase);
+        window.requestAnimationFrame(onAnimationFrame);
         this.layersLoaded = true;
       });
 
@@ -456,33 +524,6 @@ export default defineComponent({
       }
     },
 
-    // WWT isn't actually using the phase -
-    // it's using the start/end times that were constructed from it.
-    // This means that to get the current phase, we need to extract it
-    // from the WWT clock.
-    getCurrentPhaseInfo(): [number, number] {
-      const start = this.startTime.getTime();
-      // Call this rather than using wwtCurrentTime since the changes there take time to propagate
-      const now = SpaceTimeController.get_now().getTime();
-      const interval = 8.64e7;  // 1 day in ms
-      const intervals = Math.floor((now - start) / interval);
-      return [Math.floor(intervals / 360), intervals % 360];
-    },
-
-    onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
-      if (this.playing) {
-        if (this.wwtCurrentTime >= this.endTime) {
-          this.setTime(this.startTime);
-        }
-        const [period, phase] = this.getCurrentPhaseInfo();
-        this.updateBestFitAnnotation(phase);
-        this.phase = period * 360 + phase;
-      } else {
-        this.updateBestFitAnnotation(this.phase % 360);
-      }
-      window.requestAnimationFrame(this.onAnimationFrame);
-    },
-
     basicLayerSetup(layer: SpreadSheetLayer, timeSeries=false) {
       layer.set_lngColumn(0);
       layer.set_latColumn(1);
@@ -528,55 +569,14 @@ export default defineComponent({
       // This isn't exposed to TS
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.bestFitLayer.loadFromString(text, false, false, false, true);
-      this.basicLayerSetup(this.bestFitLayer, true);
+      bestFitLayer.loadFromString(text, false, false, false, true);
+      this.basicLayerSetup(bestFitLayer, true);
 
       // Another method that's not exposed to TS
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.altFactor = this.bestFitLayer.getScaleFactor(this.bestFitLayer.get_altUnit(), 1);
-      this.altFactor = this.altFactor / (1000 * 149598000);
-    },
-
-    addLayerPointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotation, rowFilter: (row: Row) => boolean) {
-      const lngCol = layer.get_lngColumn();
-      const latCol = layer.get_latColumn();
-      const dCol = layer.get_altColumn();
-      const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const rows: Row[] = layer.get__table().rows;
-      for (const row of rows) {
-        if (!rowFilter(row)) {
-          continue;
-        }
-    
-        // The API for annotations seem to assume that we're in 2D sky mode - there's no option for distance
-        // so we have to calculate our positions in 3D and just directly insert them into the array of points.
-        // This of course necessitates some TypeScript hackery.
-        // These calculations are stolen from around here: https://github.com/Carifio24/wwt-webgl-engine/blob/master/engine/esm/layers/spreadsheet_layer.js#L706
-        let alt = row[dCol];
-        alt = (this.altFactor * alt);
-        const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
-        pos.rotateX(ecliptic);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        annotation._points$1.push(pos);
-      }
-    },
-
-    updateBestFitAnnotation(phase: number): void {
-      bestFitAnnotations.forEach(ann => this.removeAnnotation(ann));
-      bestFitAnnotations = [];
-      this.bestFitOffsets.forEach(offset => {
-        const offsetPhase = (phase + offset) % 360;
-        const ann = new PolyLine();
-        ann.set_lineColor("#83befb");
-        this.addLayerPointsToAnnotation(this.bestFitLayer, ann, (row: Row) => row[this.phaseCol] == offsetPhase);
-        this.addAnnotation(ann);
-        bestFitAnnotations.push(ann);
-      });
+      altFactor = this.bestFitLayer.getScaleFactor(this.bestFitLayer.get_altUnit(), 1);
+      altFactor = altFactor / (1000 * 149598000);
     },
 
     opacityForPhase(phase: number): number {
@@ -587,7 +587,7 @@ export default defineComponent({
       return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), 1);
     },
 
-    setupClusterLayers(): Promise<SpreadSheetLayer>[] {
+    setupClusterLayers(): Promise<SpreadSheetLayer[]> {
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
       for (let phase = 0; phase < 360; phase++) {
@@ -608,7 +608,7 @@ export default defineComponent({
         });
         promises.push(prom);
       }
-      return promises;
+      return Promise.all(promises);
     },
 
     onInputChange(event: InputEvent) {
@@ -616,29 +616,13 @@ export default defineComponent({
       const target = event.target as HTMLInputElement;
       const value = Number(target.value);
       if (!isNaN(value)) {
-        this.phase = Math.max(0, Math.min(value, 720)); 
-      }
-    },
-
-    updateSlider(value: number) {
-      const input = document.querySelector("#time-slider");
-      if (input) {
-        const slider = input as HTMLInputElement;
-        slider.value = String(value);
+        phase = Math.max(0, Math.min(value, 720)); 
       }
     },
 
   },
 
   watch: {
-    phase(value: number) {
-      const start = this.startTime.getTime();
-      const end = this.endTime.getTime();
-      const time = start + (value / 720) * (end - start);
-      this.setTime(new Date(time));
-      this.updateSlider(value);
-    },
-
     playing(play: boolean) {
       this.setClockSync(play);
       this.setClockRate(play ? this.timeRate : 0);
