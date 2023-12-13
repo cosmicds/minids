@@ -15,7 +15,7 @@
       :wwt-namespace="wwtNamespace"
       :location="{top: '5rem', right: '1rem'}"
       :offset-center="{x: 0, y: 0}"
-      :other-variables="{'phase': phase, position3D: position3D, position2D: position2D, mode: mode}"
+      :other-variables="{position3D: position3D, position2D: position2D, mode: modeReactive}"
       text-shadow="none"
       font-size="0.8em"
     ></wwt-hud>
@@ -73,7 +73,7 @@
         >
         </icon-button>
         <icon-button
-          @activate="mode = '2D'"
+          @activate="modeReactive = '2D'"
           :color="accentColor"
           tooltip-text="2D mode"
           tooltip-location="start"
@@ -83,7 +83,7 @@
         </template>
         </icon-button>
         <icon-button
-          @activate="mode = '3D'"
+          @activate="modeReactive = '3D'"
           :color="accentColor"
           tooltip-text="3D mode"
           tooltip-location="start"
@@ -120,7 +120,7 @@
       <div id="right-buttons">
                 <!-- add a menu selector for background2DImageset -->
         <v-select
-          v-if="mode == '2D'"
+          v-if="modeReactive == '2D'"
           v-model="background2DImageset"
           :items="allSkyImagesets"
           label="Background"
@@ -137,7 +137,7 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
-      <div v-if="mode != '2D'" id="time-controls">
+      <div v-if="modeReactive != '2D'" id="time-controls">
         <icon-button
           v-model="playing"
           :fa-icon="playing ? 'pause' : 'play'"
@@ -349,6 +349,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
+let mode = "3D" as "2D" | "3D" | null;
 
 const phaseRowCount = 300;
 
@@ -394,7 +395,9 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
     let alt = row[dCol];
     alt = (altFactor * alt);
     const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
-    pos.rotateX(ecliptic);
+    if (mode == "3D") {
+      pos.rotateX(ecliptic);
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     annotation._points$1.push(pos);
@@ -476,9 +479,9 @@ export default defineComponent({
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
+      modeReactive: null as "2D" | "3D" | null,
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Mellinger color optical survey",
-      mode: "3D" as "2D" | "3D" | null,
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
@@ -631,7 +634,7 @@ export default defineComponent({
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
-      this.phase = 0;
+      phase = 0;
 
       return this.asyncSetTimeout(() => {
         
@@ -671,8 +674,8 @@ export default defineComponent({
       // of the window/canvas to have an W:H ration of 5.7
       return this.set2DMode().then(() => {
 
-        this.mode = null;
-        this.phase=3;
+        this.modeReactive = null;
+        phase=3;
         const cameraParams = { 
           raRad: 0.6984155220905679, 
           decRad: 0.7132099678793872, 
@@ -709,16 +712,16 @@ export default defineComponent({
       // so we let's do this manually. 
       
       // only reset the current mode
-      if (this.mode == "2D") {
+      if (this.modeReactive == "2D") {
         this.position2D = this.initial2DPosition;
-      } else if (this.mode == "3D") {
+      } else if (this.modeReactive == "3D") {
         this.position3D = this.initialCameraParams;
       } else {
         // don't reset anything if mode is null
         return;
       }
       // grab the mode correct position
-      const pos = this.mode == "2D" ? this.position2D : this.position3D;
+      const pos = this.modeReactive == "2D" ? this.position2D : this.position3D;
       // we will move nicely. 
       this.gotoRADecZoom({
         ...pos,
@@ -872,7 +875,7 @@ export default defineComponent({
     
     background2DImageset(name: string) {
       
-      if (this.mode == "2D") {
+      if (this.modeReactive == "2D") {
         this.setBackgroundImageByName(name);
         return;
       }
@@ -910,8 +913,8 @@ export default defineComponent({
     //   deep: true
     // },
     
-    mode(newVal, oldVal) {
-      console.log(oldVal, newVal);
+    modeReactive(newVal, oldVal) {
+      mode = newVal;
       if (oldVal == newVal) {
         if (newVal == "2D") {
           this.set2DMode();
