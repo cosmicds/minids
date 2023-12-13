@@ -82,14 +82,12 @@
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
-          :class="[layersLoaded ? '' : 'disabled']"
         ></icon-button>
         <input
           type="range"
           id="time-slider"
           min="0"
           max="720"
-          disabled
           :oninput="onInputChange"
         />
       </div>
@@ -258,7 +256,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, D2R } from "@minids/common";
-import { Annotation, Color, PolyLine, ScriptInterface, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 
 // Coordinates isn't exposed to TypeScript, but it IS exported at the JS module level,
 // so it's enough to do this. We just won't get any LSP help from an editor.
@@ -281,35 +279,36 @@ const SECONDS_PER_DAY = 86400;
 let bestFitAnnotations: PolyLine[] = [];
 const bestFitOffsets = [-2, -1, 0, 1, 2] as const;
 const bestFitLayer = new SpreadSheetLayer();
-const startTime = new Date("2023-10-18 11:55:55Z");
-const endTime = new Date("2025-10-06 11:55:55Z");
+const startDate = new Date("2023-10-18 11:55:55Z");
+const endDate = new Date("2025-10-06 11:55:55Z");
+const startTime = startDate.getTime();
+const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
 
 const phaseRowCount = 300;
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const scriptInterface: ScriptInterface = WWTControl.scriptInterface;
-
-function getCurrentPhaseInfo(): number {
-  const start = startTime.getTime();
+function getCurrentPhaseInfo(): [number, number] {
   const now = SpaceTimeController.get_now().getTime();
   const interval = 8.64e7;  // 1 day in ms
-  const intervals = Math.floor((now - start) / interval);
-  return intervals % 360;
+  const intervals = Math.floor((now - startTime) / interval);
+  return [Math.floor(intervals / 360), intervals % 360];
 }
 
-function updateBestFitAnnotation(phase: number): void {
-  bestFitAnnotations.forEach(ann => scriptInterface.removeAnnotation(ann));
+function updateBestFitAnnotations(phase: number): void {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  bestFitAnnotations.forEach(ann => WWTControl.scriptInterface.removeAnnotation(ann));
   bestFitAnnotations = [];
   bestFitOffsets.forEach(offset => {
     const offsetPhase = (phase + offset) % 360;
     const ann = new PolyLine();
     ann.set_lineColor("#83befb");
     addPhasePointsToAnnotation(bestFitLayer, ann, offsetPhase);
-    scriptInterface.addAnnotation(ann);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    WWTControl.scriptInterface.addAnnotation(ann);
     bestFitAnnotations.push(ann);
   });
 }
@@ -342,14 +341,15 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
 function onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
   let newPhase = phase;
   if (SpaceTimeController.get_syncToClock()) {
-    if (SpaceTimeController.get_now() >= endTime) {
-      SpaceTimeController.set_now(startTime);
+    if (SpaceTimeController.get_now() >= endDate) {
+      SpaceTimeController.set_now(startDate);
     }
-    newPhase = getCurrentPhaseInfo();
+    const [currPeriod, currPhase] = getCurrentPhaseInfo();
+    newPhase = currPeriod * 360 + currPhase;
   }
   if (newPhase !== phase) {
     phase = newPhase;
-    updateBestFitAnnotation(phase);
+    updateBestFitAnnotations(phase);
     updateSlider(phase);
   }
   window.requestAnimationFrame(onAnimationFrame);
@@ -389,7 +389,6 @@ export default defineComponent({
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
-      firstLayerLoaded: false,
       layersLoaded: false,
       positionSet: false,
       
@@ -437,7 +436,7 @@ export default defineComponent({
       Promise.all([sunPromise, clusterPromise]).then(([sunLayer, clusterLayers]) => {
         this.sunLayer = sunLayer;
         this.clusterLayers = clusterLayers;
-        this.setTime(startTime);
+        this.setTime(startDate);
         updateSlider(phase);
         window.requestAnimationFrame(onAnimationFrame);
         this.layersLoaded = true;
@@ -454,7 +453,7 @@ export default defineComponent({
     independent logic.
     */
     ready(): boolean {
-      return this.firstLayerLoaded && this.positionSet;
+      return this.layersLoaded && this.positionSet;
     },
     isLoading(): boolean {
       return !this.ready;
@@ -575,7 +574,7 @@ export default defineComponent({
       // Another method that's not exposed to TS
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      altFactor = this.bestFitLayer.getScaleFactor(this.bestFitLayer.get_altUnit(), 1);
+      altFactor = bestFitLayer.getScaleFactor(bestFitLayer.get_altUnit(), 1);
       altFactor = altFactor / (1000 * 149598000);
     },
 
@@ -617,6 +616,9 @@ export default defineComponent({
       const value = Number(target.value);
       if (!isNaN(value)) {
         phase = Math.max(0, Math.min(value, 720)); 
+        const time = startTime + (value / 720) * (endTime - startTime);
+        updateBestFitAnnotations(phase);
+        this.setTime(new Date(time)); 
       }
     },
 
