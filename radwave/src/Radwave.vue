@@ -434,6 +434,7 @@ export default defineComponent({
       this.applySetting(["actualPlanetScale", true]);
       this.applySetting(["showConstellationFigures", false]);
       this.applySetting(["showCrosshairs", false]);
+      // this.applySetting(["solarSystemPlanets", false]);
       this.setClockSync(false);
 
       this.setupBestFitLayer();
