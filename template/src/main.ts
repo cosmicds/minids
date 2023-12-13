@@ -2,6 +2,7 @@ import Vue, { createApp } from "vue";
 
 import { FundingAcknowledgment, IconButton } from "@minids/common";
 import MainComponent from "./MainComponent.vue";
+import "../../assets/common.css";
 
 import vuetify from "../plugins/vuetify";
 
