@@ -12,6 +12,7 @@
     
     
     <wwt-hud
+      v-if="false"
       :wwt-namespace="wwtNamespace"
       :location="{top: '5rem', right: '1rem'}"
       :offset-center="{x: 0, y: 0}"
@@ -112,6 +113,18 @@
         >
         <template v-slot:button>
           <span class="no-select">View the Full Radcliffe Wave</span>
+        </template>
+        </icon-button>
+        
+        <icon-button
+          v-if="playCount > 0"
+          @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
+          :color="accentColor"
+          tooltip-text="Switch modes"
+          tooltip-location="start"
+        >
+        <template v-slot:button>
+          <span class="no-select">See this in {{ modeReactive == '3D' ? '2D' : '3D' }}</span>
         </template>
         </icon-button>
         
@@ -483,7 +496,7 @@ export default defineComponent({
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
-      modeReactive: null as "2D" | "3D" | null,
+      modeReactive: mode as "2D" | "3D" | null,
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Mellinger color optical survey",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
