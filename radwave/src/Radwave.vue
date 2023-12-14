@@ -73,28 +73,8 @@
           tooltip-location="start"
         >
         </icon-button>
-        <icon-button
-          @activate="modeReactive = '2D'"
-          :color="accentColor"
-          tooltip-text="2D mode"
-          tooltip-location="start"
-        >
-        <template v-slot:button>
-          <span class="no-select">2D</span>
-        </template>
-        </icon-button>
-        <icon-button
-          @activate="modeReactive = '3D'"
-          :color="accentColor"
-          tooltip-text="3D mode"
-          tooltip-location="start"
-        >
-        <template v-slot:button>
-          <span class="no-select">3D</span>
-        </template>
-        </icon-button>
         
-              </div>
+      </div>
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
