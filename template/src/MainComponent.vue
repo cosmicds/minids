@@ -25,7 +25,21 @@
         v-click-outside="closeSplashScreen"
         :style="cssVars"
       >
-        Splash Screen
+        <div
+          id="close-splash-button"
+          @click="closeSplashScreen"
+          >&times;
+        </div>
+      </div>
+      <div id="splash-screen-text">
+          Splash Screen text
+      </div>
+      <div id="splash-screen-acknowledgements">
+        This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
+        
+        <div id="splash-screen-logos">
+          <credit-logos/>
+        </div>
       </div>
     </v-overlay>
 
