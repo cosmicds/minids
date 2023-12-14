@@ -59,12 +59,29 @@
       <div
         class="modal"
         id="modal-loading"
-        v-show="isLoading"
+        v-show="isLoading || userNotReady"
       >
-        <div class="container">
-          <div class="spinner"></div>
+        <div v-if="isLoading" class="container">
+          <div  class="spinner"></div>
           <p>Loading …</p>
         </div>
+        <div v-else>
+          <v-btn
+            id="loading-button"
+            :disabled="isLoading"
+            :color="accentColor"
+            @click="userNotReady = false"
+            @keyup.enter="userNotReady = false"
+            elevation="10"
+            size="x-large"
+            rounded="lg"
+          >
+            Ready
+          </v-btn>
+        </div>
+        
+      
+        
       </div>
     </transition>
 
@@ -481,6 +498,9 @@ export default defineComponent({
       sheet: null as SheetType,
       layersLoaded: false,
       positionSet: false,
+      
+      userNotReady: true,
+
       
       accentColor: "#427cff",
       accentColor2: "#FF0000",
@@ -999,6 +1019,32 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+
+#modal-loading {
+  background-image: url("./assets/landing.png");
+  background-position: center;
+  background-size: 95%;
+  background-repeat: no-repeat;
+  
+  
+  > div {
+    align-self: flex-end;
+    margin-bottom: 20%;
+  }
+  
+  .container {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 2rem;
+    padding-block: 1rem;
+    border-radius: 1rem;
+    .spinner {
+      background-image: none !important;
+      display: none;
+    }
+  }
+}
+
+
 /* Top and bottom content */
 .top-content {
   position: absolute;
