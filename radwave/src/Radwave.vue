@@ -655,7 +655,11 @@ export default defineComponent({
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
+      this.playing = false;
       phase = 0;
+      updateSlider(phase);
+      updateBestFitAnnotations(phase);    
+      this.setTime(startDate);
 
       return asyncSetTimeout(() => {
         
@@ -678,6 +682,8 @@ export default defineComponent({
 
       this.setBackgroundImageByName("Solar System");
       this.setForegroundImageByName("Solar System");
+      
+      updateBestFitAnnotations(phase);
 
 
       return this.gotoRADecZoom({
