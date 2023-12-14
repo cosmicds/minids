@@ -66,7 +66,7 @@
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
-          :color="accentColor"
+          :color="buttonColor"
           :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
           tooltip-location="start"
         >
@@ -74,7 +74,7 @@
         <icon-button
           v-model="showVideoSheet"
           fa-icon="video"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Watch video"
           tooltip-location="start"
         >
@@ -94,7 +94,7 @@
         <icon-button
           v-model="playing"
           :fa-icon="playing ? 'pause' : 'play'"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
@@ -408,8 +408,9 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#286aff",
+      accentColor: "#427cff",
       accentColor2: "#FF0000",
+      buttonColor: "#ffffff",
 
       tab: 0,
       playing: false,

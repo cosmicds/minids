@@ -64,7 +64,7 @@
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
-          :color="accentColor"
+          :color="buttonColor"
           :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
           tooltip-location="start"
         >
@@ -72,7 +72,7 @@
         <icon-button
           v-model="showVideoSheet"
           fa-icon="video"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Watch video"
           tooltip-location="start"
         >
@@ -285,6 +285,7 @@ export default defineComponent({
       positionSet: false,
       
       accentColor: "#ffffff",
+      buttonColor: "#ffffff",
 
       tab: 0
     };
