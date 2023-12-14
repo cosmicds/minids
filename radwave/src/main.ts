@@ -1,7 +1,8 @@
 import Vue, { createApp } from "vue";
 
-import { FundingAcknowledgment, IconButton } from "@minids/common";
+import { FundingAcknowledgment, IconButton, CreditLogos } from "@minids/common";
 import Radwave from "./Radwave.vue";
+import "../../assets/common.less";
 
 import vuetify from "../plugins/vuetify";
 
@@ -57,6 +58,7 @@ createApp(Radwave, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
   .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('credit-logos', CreditLogos)
 
   // Mount
   .mount("#app");
