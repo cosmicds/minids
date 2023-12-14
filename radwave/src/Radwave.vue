@@ -1028,6 +1028,12 @@ export default defineComponent({
   gap: 10px;
 }
 
+#center-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 #splash-screen {
   color: #ffffff;
 }
