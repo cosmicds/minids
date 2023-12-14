@@ -93,13 +93,7 @@
           <span class="no-select">3D</span>
         </template>
         </icon-button>
-        <icon-button
-          md-icon="mdi-refresh"
-          @activate="positionReset"
-          :color="accentColor"
-          tooltip-text="Reset this view"
-          tooltip-location="start"
-          ></icon-button>
+        
               </div>
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
@@ -127,6 +121,13 @@
           <span class="no-select">See this in {{ modeReactive == '3D' ? '2D' : '3D' }}</span>
         </template>
         </icon-button>
+        <icon-button
+          md-icon="mdi-refresh"
+          @activate="positionReset"
+          :color="accentColor"
+          tooltip-text="Reset this view"
+          tooltip-location="start"
+        ></icon-button>
         
         
         
@@ -159,7 +160,11 @@
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
-        ></icon-button>
+        >
+        <template v-slot:button>
+          <span class="no-select">{{ playing ? 'Pause' : 'Replay' }} the Wave!</span>
+        </template>
+      </icon-button>
         <input
           type="range"
           id="time-slider"
@@ -1176,6 +1181,12 @@ body {
   gap: 10px;
 }
 
+#center-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 /* Splash screen */
 #splash-overlay {
   position: fixed;
@@ -1375,6 +1386,49 @@ video {
 #time-controls {
   width: 100%;
   display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .icon-wrapper {
+    white-space: nowrap;
+  }
+  
+  // style input slider
+  #time-slider[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 1rem;
+    border-radius: .5rem;
+    background: rgba(255, 255, 255, 50%);
+    pointer-events: auto;
+  }
+  
+  
+  
+  .thumb-style {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  // LESS allows mixins https://lesscss.org/features/#mixins-feature
+  // this will put the content of .thumb-style into the following selectors
+  #time-slider[type=range]::-webkit-slider-thumb {
+    .thumb-style();
+  }
+  #time-slider[type=range]::-moz-range-thumb {
+    .thumb-style();
+  }
+  
+  
 }
 
 #time-slider {
