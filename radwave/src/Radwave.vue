@@ -100,9 +100,10 @@
           tooltip-location="start"
           ></icon-button>
               </div>
-      <div id="center-buttons" class="d-flex">
+      <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
+          v-if="false"
           md-icon="mdi-sine-wave"
           @activate="fullwaveMode()"
           :color="accentColor"
