@@ -470,6 +470,7 @@ export default defineComponent({
       tab: 0,
       playing: false,
       timeRate: 120 * SECONDS_PER_DAY,
+      playCount: 0,
 
       phaseCol: 3,
       clusterLayers: [] as SpreadSheetLayer[],
@@ -872,6 +873,7 @@ export default defineComponent({
         if (SpaceTimeController.get_now() >= endDate) {
           SpaceTimeController.set_now(startDate);
           this.playing = false;
+          this.playCount += 1;
         } 
         const [currPeriod, currPhase] = getCurrentPhaseInfo();
         newPhase = currPeriod * 360 + currPhase;
