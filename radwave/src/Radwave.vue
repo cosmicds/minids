@@ -404,22 +404,7 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
   }
 }
 
-function onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
-  let newPhase = phase;
-  if (SpaceTimeController.get_syncToClock()) {
-    if (SpaceTimeController.get_now() >= endDate) {
-      SpaceTimeController.set_now(startDate);
-    }
-    const [currPeriod, currPhase] = getCurrentPhaseInfo();
-    newPhase = currPeriod * 360 + currPhase;
-  }
-  if (newPhase !== phase) {
-    phase = newPhase;
-    updateBestFitAnnotations(phase);
-    updateSlider(phase);
-  }
-  window.requestAnimationFrame(onAnimationFrame);
-}
+
 
 function updateSlider(value: number) {
   const input = document.querySelector("#time-slider");
@@ -527,7 +512,7 @@ export default defineComponent({
         this.clusterLayers = clusterLayers;
         this.setTime(startDate);
         updateSlider(phase);
-        window.requestAnimationFrame(onAnimationFrame);
+        window.requestAnimationFrame(this.onAnimationFrame);
         this.layersLoaded = true;
       });
       
@@ -864,6 +849,24 @@ export default defineComponent({
         this.setTime(new Date(time)); 
       }
     },
+    
+    onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
+      let newPhase = phase;
+      if (SpaceTimeController.get_syncToClock()) {
+        if (SpaceTimeController.get_now() >= endDate) {
+          SpaceTimeController.set_now(startDate);
+          this.playing = false;
+        } 
+        const [currPeriod, currPhase] = getCurrentPhaseInfo();
+        newPhase = currPeriod * 360 + currPhase;
+      }
+      if (newPhase !== phase) {
+        phase = newPhase;
+        updateBestFitAnnotations(phase);
+        updateSlider(phase);
+      }
+      window.requestAnimationFrame(this.onAnimationFrame);
+    }
 
   },
 
