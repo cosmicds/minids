@@ -134,17 +134,6 @@
       </div>
       <div id="right-buttons">
                 <!-- add a menu selector for background2DImageset -->
-        <v-select
-          v-if="modeReactive == '2D'"
-          v-model="background2DImageset"
-          :items="allSkyImagesets"
-          label="Background"
-          dense
-          outlined
-          hide-details
-          :color="accentColor"
-          class="pointer-events"
-          />
       </div>
     </div>
 
@@ -173,6 +162,18 @@
           :oninput="onInputChange"
         />
       </div>
+      <div v-else id="time-controls" style="width:50%">
+        <v-select
+          v-if="modeReactive == '2D'"
+          v-model="background2DImageset"
+          :items="allSkyImagesets"
+          label="Background"
+          outlined
+          hide-details
+          :color="accentColor"
+          class="pointer-events"
+          />
+    </div>
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
