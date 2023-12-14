@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
 
-import { FundingAcknowledgment, IconButton } from "@minids/common";
+import { FundingAcknowledgment, IconButton, CreditLogos } from "@minids/common";
 import MainComponent from "./MainComponent.vue";
 import "../../assets/common.less";
 
@@ -54,6 +54,7 @@ createApp(MainComponent, {
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
   .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('credit-logos', CreditLogos)
 
   // Mount
   .mount("#app");
