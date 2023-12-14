@@ -332,6 +332,23 @@ import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-t
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
+function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(func()), ms);
+  });
+}
+
+function asyncWaitForCondition(func: () => boolean, ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (func()) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, ms);
+  });
+}
+
 type SheetType = "text" | "video" | null;
 
 // A hack, but we don't need anything more than this
@@ -598,18 +615,17 @@ export default defineComponent({
   methods: {
     closeSplashScreen() {
       this.showSplashScreen = false; 
+      // Promise based wait for isLoading to be false
+      asyncWaitForCondition(() => !this.isLoading, 100).then(() => {
+        this.playing = true;
+      });
+      
     },
     
     async loadHipsWTML () {
       return this.loadImageCollection({
         url: "https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
         loadChildFolders: true,
-      });
-    },
-    
-    asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(func()), ms);
       });
     },
 
@@ -621,7 +637,7 @@ export default defineComponent({
       this.applySetting(["showSolarSystem", false]);
       phase = 0;
 
-      return this.asyncSetTimeout(() => {
+      return asyncSetTimeout(() => {
         
         this.gotoRADecZoom({
           ...this.position2D,
