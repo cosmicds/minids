@@ -32,7 +32,7 @@
         </div>
       </div>
       <div id="splash-screen-text">
-          Splash Screen text
+        <p>Splash Screen text</p>
       </div>
       <div id="splash-screen-acknowledgements">
         This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
@@ -388,4 +388,7 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+#splash-screen {
+  color: #FFFFFF;
+}
 </style>

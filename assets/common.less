@@ -188,7 +188,6 @@ body {
 }
 
 #splash-screen {
-  color: var(--accent-color);
 
   @media (max-width: 699px) {
     max-height: 80vh;
@@ -206,7 +205,7 @@ body {
   align-content: center;
   padding-top: 4rem;
   padding-bottom: 1rem;
-  padding-inline: 0.5rem;
+  padding-inline: 1rem;
 
   border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
@@ -222,7 +221,6 @@ body {
   // make a paragraph inside the div centered horizontally and vertically
   p {
     font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-    font-weight: bold;
     vertical-align: middle;
   }
     
@@ -279,6 +277,7 @@ body {
   }
 
   #splash-screen-acknowledgements {
+    padding-top: 1rem;
     font-size: calc(1.7 * var(--default-font-size));
     line-height: calc(1.5 * var(--default-line-height));
     width: 70%; 

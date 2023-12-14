@@ -31,7 +31,9 @@
           >&times;
         </div>
         <div id="splash-screen-text">
-            Splash Screen text
+          <p>
+            Want to see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy?
+          </p>
         </div>
         <div id="splash-screen-acknowledgements">
           This Mini Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
@@ -406,7 +408,8 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#ffffff",
+      accentColor: "#286aff",
+      accentColor2: "#FF0000",
 
       tab: 0,
       playing: false,
@@ -648,6 +651,14 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+#splash-screen {
+  color: #ffffff;
+}
+
+.color-span {
+  color:var(--accent-color);
+}
+
 #time-controls {
   width: 100%;
   display: flex;
