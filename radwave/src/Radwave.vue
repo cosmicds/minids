@@ -97,7 +97,7 @@
           v-if="false"
           md-icon="mdi-sine-wave"
           @activate="fullwaveMode()"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
         >
@@ -109,7 +109,7 @@
         <icon-button
           v-if="playCount > 0"
           @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Switch modes"
           tooltip-location="start"
         >
@@ -120,7 +120,7 @@
         <icon-button
           md-icon="mdi-refresh"
           @activate="positionReset"
-          :color="accentColor"
+          :color="buttonColor"
           tooltip-text="Reset this view"
           tooltip-location="start"
         ></icon-button>
