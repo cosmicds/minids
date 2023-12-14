@@ -651,6 +651,36 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+/* Top and bottom content */
+.top-content {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: calc(100% - 2rem);
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bottom-content {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: calc(100% - 2rem);
+  pointer-events: none;
+  align-items: center;
+  gap: 5px;
+}
+
+#left-buttons, #right-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 #splash-screen {
   color: #ffffff;
 }
