@@ -9,7 +9,17 @@
     <WorldWideTelescope
       :wwt-namespace="wwtNamespace"
     ></WorldWideTelescope>
-
+    
+    
+    <wwt-hud
+      v-if="false"
+      :wwt-namespace="wwtNamespace"
+      :location="{top: '5rem', right: '1rem'}"
+      :offset-center="{x: 0, y: 0}"
+      :other-variables="{position3D: position3D, position2D: position2D, mode: modeReactive}"
+      text-shadow="none"
+      font-size="0.8em"
+    ></wwt-hud>
 
     <!-- This contains the splash screen content -->
 
@@ -79,10 +89,47 @@
           tooltip-location="start"
         >
         </icon-button>
+        
       </div>
       <div id="center-buttons">
+<!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
+        <icon-button
+          v-if="false"
+          md-icon="mdi-sine-wave"
+          @activate="fullwaveMode()"
+          :color="buttonColor"
+          tooltip-text="Full Wave Mode"
+          tooltip-location="bottom"
+        >
+        <template v-slot:button>
+          <span class="no-select">View the Full Radcliffe Wave</span>
+        </template>
+        </icon-button>
+        
+        <icon-button
+          v-if="playCount > 0"
+          @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
+          :color="buttonColor"
+          tooltip-text="Switch modes"
+          tooltip-location="start"
+        >
+        <template v-slot:button>
+          <span class="no-select">See this in {{ modeReactive == '3D' ? '2D' : '3D' }}</span>
+        </template>
+        </icon-button>
+        <icon-button
+          md-icon="mdi-refresh"
+          @activate="positionReset"
+          :color="buttonColor"
+          tooltip-text="Reset this view"
+          tooltip-location="start"
+        ></icon-button>
+        
+        
+        
       </div>
       <div id="right-buttons">
+                <!-- add a menu selector for background2DImageset -->
       </div>
     </div>
 
@@ -90,7 +137,7 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
-      <div id="time-controls">
+      <div v-if="modeReactive != '2D'" id="time-controls">
         <icon-button
           v-model="playing"
           :fa-icon="playing ? 'pause' : 'play'"
@@ -98,7 +145,11 @@
           tooltip-text="Play/Pause"
           tooltip-location="top"
           tooltip-offset="5px"
-        ></icon-button>
+        >
+        <template v-slot:button>
+          <span class="no-select">{{ playing ? 'Pause' : 'Replay' }} the Wave!</span>
+        </template>
+      </icon-button>
         <input
           type="range"
           id="time-slider"
@@ -107,6 +158,18 @@
           :oninput="onInputChange"
         />
       </div>
+      <div v-else id="time-controls" style="width:50%">
+        <v-select
+          v-if="modeReactive == '2D'"
+          v-model="background2DImageset"
+          :items="allSkyImagesets"
+          label="Background"
+          outlined
+          hide-details
+          :color="accentColor"
+          class="pointer-events"
+          />
+    </div>
       <div id="project-credits">
         <div id="icons-container">
           <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
@@ -284,6 +347,23 @@ import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-t
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
+function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(func()), ms);
+  });
+}
+
+function asyncWaitForCondition(func: () => boolean, ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (func()) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, ms);
+  });
+}
+
 type SheetType = "text" | "video" | null;
 
 // A hack, but we don't need anything more than this
@@ -292,7 +372,9 @@ type Row = Record<string, number>;
 const SECONDS_PER_DAY = 86400;
 
 let bestFitAnnotations: PolyLine[] = [];
-const bestFitOffsets = [-2, -1, 0, 1, 2] as const;
+const bestFitOffsets3D = [-2, -1, 0, 1, 2];
+const bestFitOffsets2D = [0];
+let bestFitOffsets = bestFitOffsets3D ;
 const bestFitLayer = new SpreadSheetLayer();
 const startDate = new Date("2023-10-18 11:55:55Z");
 const endDate = new Date("2025-10-06 11:55:55Z");
@@ -301,6 +383,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
+let mode = "3D" as "2D" | "3D" | null;
 
 const phaseRowCount = 300;
 
@@ -346,29 +429,16 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
     let alt = row[dCol];
     alt = (altFactor * alt);
     const pos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
-    pos.rotateX(ecliptic);
+    if (mode == "3D") {
+      pos.rotateX(ecliptic);
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     annotation._points$1.push(pos);
   }
 }
 
-function onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
-  let newPhase = phase;
-  if (SpaceTimeController.get_syncToClock()) {
-    if (SpaceTimeController.get_now() >= endDate) {
-      SpaceTimeController.set_now(startDate);
-    }
-    const [currPeriod, currPhase] = getCurrentPhaseInfo();
-    newPhase = currPeriod * 360 + currPhase;
-  }
-  if (newPhase !== phase) {
-    phase = newPhase;
-    updateBestFitAnnotations(phase);
-    updateSlider(phase);
-  }
-  window.requestAnimationFrame(onAnimationFrame);
-}
+
 
 function updateSlider(value: number) {
   const input = document.querySelector("#time-slider");
@@ -400,6 +470,11 @@ export default defineComponent({
   data() {
     const phaseOpacitySlope = -1 / 80;
     const phaseOpacityIntercept = 1 - phaseOpacitySlope * 100;
+    const initial2DPosition = {
+      raRad: 6,
+      decRad: 1,
+      zoomDeg: 360
+    } as Omit<GotoRADecZoomParams,'instant'>;
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -414,6 +489,7 @@ export default defineComponent({
       tab: 0,
       playing: false,
       timeRate: 120 * SECONDS_PER_DAY,
+      playCount: 0,
 
       phaseCol: 3,
       clusterLayers: [] as SpreadSheetLayer[],
@@ -424,6 +500,22 @@ export default defineComponent({
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
+      
+      modeReactive: mode as "2D" | "3D" | null,
+      resizeObserver: null as ResizeObserver | null,
+      background2DImageset: "Mellinger color optical survey",
+      position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
+      position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
+      initial2DPosition,
+      allSkyImagesets: [
+        'Mellinger color optical survey', 
+        'Digitized Sky Survey (Color)',
+        'WISE All Sky (Infrared)',
+        'unWISE color, from W2 and W1 bands',
+        "Gaia DR2",
+        "Deep Star Maps 2020",
+      ]
+
     };
   },
 
@@ -431,13 +523,13 @@ export default defineComponent({
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
-
-      this.setBackgroundImageByName("Solar System");
-      this.setForegroundImageByName("Solar System");
-
-      this.gotoRADecZoom({
-        ...this.initialCameraParams,
-        instant: true
+      
+      // initialize the view to black so that we don't flicker DSS
+      this.setBackgroundImageByName("Black sky background");
+      this.applySetting(["galacticMode", true]);
+      this.loadHipsWTML().then(() => {
+        console.log('init set3DMode');
+        return this.set3DMode();
       }).then(() => this.positionSet = true);
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
@@ -445,6 +537,8 @@ export default defineComponent({
       this.applySetting(["actualPlanetScale", true]);
       this.applySetting(["showConstellationFigures", false]);
       this.applySetting(["showCrosshairs", false]);
+      // this.applySetting(["solarSystemPlanets", false]);
+      this.setClockSync(false);
 
       this.setupBestFitLayer();
       const sunPromise = this.setupSunLayer();
@@ -455,11 +549,16 @@ export default defineComponent({
         this.clusterLayers = clusterLayers;
         this.setTime(startDate);
         updateSlider(phase);
-        window.requestAnimationFrame(onAnimationFrame);
+        window.requestAnimationFrame(this.onAnimationFrame);
         this.layersLoaded = true;
       });
-
+      
     });
+    
+    this.resizeObserver = new ResizeObserver((_entries) => {
+      this.shinkWWT();
+    });
+    
   },
 
   computed: {
@@ -521,14 +620,167 @@ export default defineComponent({
           video.pause();
         }
       }
+    },
+    
+    wwtPosition(): Omit<GotoRADecZoomParams,'instant'> {
+      return {
+        raRad: this.wwtRARad,
+        decRad: this.wwtDecRad,
+        rollRad: this.wwtRollRad,
+        zoomDeg: this.wwtZoomDeg,
+      };
     }
   },
 
   methods: {
     closeSplashScreen() {
       this.showSplashScreen = false; 
+      // Promise based wait for isLoading to be false
+      asyncWaitForCondition(() => !this.isLoading, 100).then(() => {
+        this.playing = true;
+      });
+      
+    },
+    
+    async loadHipsWTML () {
+      return this.loadImageCollection({
+        url: "https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
+        loadChildFolders: true,
+      });
     },
 
+    set2DMode() {
+      
+      bestFitOffsets = bestFitOffsets2D;
+      
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.applySetting(["showSolarSystem", false]);
+      this.sunLayer?.set_opacity(0);
+      this.playing = false;
+      phase = 0;
+      updateSlider(phase);
+      updateBestFitAnnotations(phase);    
+      this.setTime(startDate);
+
+      return asyncSetTimeout(() => {
+        
+        this.gotoRADecZoom({
+          ...this.position2D,
+          instant: true
+        }).catch((err) => {
+          console.log(err);
+        
+        }); 
+      }, 100);
+
+    },
+    
+    set3DMode() {
+
+      
+      bestFitOffsets = bestFitOffsets3D;
+      
+
+      this.setBackgroundImageByName("Solar System");
+      this.setForegroundImageByName("Solar System");
+      this.sunLayer?.set_opacity(1);
+      updateBestFitAnnotations(phase);
+
+
+      return this.gotoRADecZoom({
+        ...this.position3D,
+        instant: true,
+      }).catch((err) => {
+        console.log(err);
+      });
+
+      
+    },
+    
+    async fullwaveMode() {
+      // to view in the full wave you need to adjust the height
+      // of the window/canvas to have an W:H ration of 5.7
+      return this.set2DMode().then(() => {
+
+        this.modeReactive = null;
+        phase=3;
+        const cameraParams = { 
+          raRad: 0.6984155220905679, 
+          decRad: 0.7132099678793872, 
+          rollRad: 0.183,
+          zoomDeg: 360};
+        
+        this.shinkWWT();
+        this.resizeObserver?.observe(document.body);
+        
+        return this.gotoRADecZoom({
+          ...cameraParams, 
+          instant: false}).catch((err) => {
+          console.log(err);
+        });
+      });
+      
+    }, 
+    
+    toggleUI() {
+      // toggle visibility of class .bottom-content using opacity
+      const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
+      const op = bottomContent.style.opacity;
+      if (op == "0") {
+        bottomContent.style.opacity = "1";
+      } else {
+        bottomContent.style.opacity = "0";
+      }
+    },
+    
+    positionReset() {
+      // since we aren't changing modes, 
+      // we don't need to use set2DMode or set3DMode
+      // also those are locked to only work if the mode is chaning
+      // so we let's do this manually. 
+      
+      // only reset the current mode
+      if (this.modeReactive == "2D") {
+        this.position2D = this.initial2DPosition;
+      } else if (this.modeReactive == "3D") {
+        this.position3D = this.initialCameraParams;
+      } else {
+        // don't reset anything if mode is null
+        return;
+      }
+      // grab the mode correct position
+      const pos = this.modeReactive == "2D" ? this.position2D : this.position3D;
+      // we will move nicely. 
+      this.gotoRADecZoom({
+        ...pos,
+        instant: false
+      }).catch((err) => {
+        console.log(err);
+      });
+      
+      
+    },
+    
+    shinkWWT(aspect: number = null as unknown as number) {
+      // default aspect = 5.7
+      if (aspect == null) {
+        aspect = 5.7;
+      }
+      console.log('shinkWWT');
+      
+      const mainContent = document.querySelector(".wwtelescope-component") as HTMLElement;
+      const width = mainContent.clientWidth;
+      const height = width / aspect;
+      mainContent.style.height = `${height}px`;
+    },
+    
+    growWWT() {
+      const mainContent = document.querySelector(".wwtelescope-component") as HTMLElement;
+      mainContent.style.height = `100%`;
+      this.resizeObserver?.unobserve(document.body as HTMLElement);
+    },
+
+    
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
         this.sheet = null;
@@ -559,10 +811,11 @@ export default defineComponent({
     },
 
     async setupSunLayer(): Promise<SpreadSheetLayer> {
+      const text = sunCsv.replace(/\n/g, "\r\n");
       return this.createTableLayer({
         referenceFrame: "Sky",
         name: "Radcliffe Wave Sun",
-        dataCsv: sunCsv
+        dataCsv: text
       }).then(layer => {
         this.basicLayerSetup(layer);
         this.applyTableLayerSettings({
@@ -591,6 +844,7 @@ export default defineComponent({
       // Another method that's not exposed to TS
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+
       altFactor = bestFitLayer.getScaleFactor(bestFitLayer.get_altUnit(), 1);
       altFactor = altFactor / (1000 * 149598000);
     },
@@ -606,7 +860,7 @@ export default defineComponent({
     setupClusterLayers(): Promise<SpreadSheetLayer[]> {
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
-      for (let phase = 0; phase < 360; phase++) {
+      for (let phase = 0; phase < 180; phase++) {
         const prom = import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
           let text = res.default;
           text = text.replace(/\n/g, "\r\n");
@@ -638,6 +892,25 @@ export default defineComponent({
         this.setTime(new Date(time)); 
       }
     },
+    
+    onAnimationFrame(_timestamp: DOMHighResTimeStamp) {
+      let newPhase = phase;
+      if (SpaceTimeController.get_syncToClock()) {
+        if (SpaceTimeController.get_now() >= endDate) {
+          SpaceTimeController.set_now(startDate);
+          this.playing = false;
+          this.playCount += 1;
+        } 
+        const [currPeriod, currPhase] = getCurrentPhaseInfo();
+        newPhase = currPeriod * 360 + currPhase;
+      }
+      if (newPhase !== phase) {
+        phase = newPhase;
+        updateBestFitAnnotations(phase);
+        updateSlider(phase);
+      }
+      window.requestAnimationFrame(this.onAnimationFrame);
+    }
 
   },
 
@@ -645,7 +918,82 @@ export default defineComponent({
     playing(play: boolean) {
       this.setClockSync(play);
       this.setClockRate(play ? this.timeRate : 0);
+    },
+    
+    background2DImageset(name: string) {
+      
+      if (this.modeReactive == "2D") {
+        this.setBackgroundImageByName(name);
+        return;
+      }
+      
+    },
+    
+    // // positin3d deep
+    // position3D: {
+    //   handler(newVal) {        
+    //     if (this.mode == "3D") {
+    //       console.log('moving');
+    //       this.gotoRADecZoom({
+    //         ...newVal,
+    //         instant: true
+    //       }).catch((err) => {
+    //         console.log(err);
+    //       });
+    //     }
+    //   },
+    //   deep: true
+    // },
+    
+    // // positin2d deep
+    // position2D: {
+    //   handler(newVal) {
+    //     if (this.mode == "2D") {
+    //       this.gotoRADecZoom({
+    //         ...newVal,
+    //         instant: true
+    //       }).catch((err) => {
+    //         console.log(err);
+    //       });
+    //     }
+    //   },
+    //   deep: true
+    // },
+    
+    modeReactive(newVal, oldVal) {
+      mode = newVal;
+      if (oldVal == newVal) {
+        if (newVal == "2D") {
+          this.set2DMode();
+        }
+        if (newVal == "3D") {
+          this.set3DMode();
+        }
+      } else {
+      
+        if (oldVal == "2D") {
+          this.position2D = this.wwtPosition;
+        } else if (oldVal == "3D") {
+          this.position3D = this.wwtPosition;
+        } else if (oldVal == null) {
+          this.resizeObserver?.disconnect();
+          this.growWWT();
+        }
+      }
+      
+      
+      
+      if (newVal == "2D") {
+        this.set2DMode();
+      } else if (newVal == "3D") {
+        this.set3DMode();
+      } else {
+        // don't do anything if mode is null
+        return;
+      }
+      
     }
+    
   }
 });
 </script>
@@ -681,6 +1029,12 @@ export default defineComponent({
   gap: 10px;
 }
 
+#center-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 #splash-screen {
   color: #ffffff;
 }
@@ -692,6 +1046,49 @@ export default defineComponent({
 #time-controls {
   width: 100%;
   display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .icon-wrapper {
+    white-space: nowrap;
+  }
+  
+  // style input slider
+  #time-slider[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 1rem;
+    border-radius: .5rem;
+    background: rgba(255, 255, 255, 50%);
+    pointer-events: auto;
+  }
+  
+  
+  
+  .thumb-style {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  // LESS allows mixins https://lesscss.org/features/#mixins-feature
+  // this will put the content of .thumb-style into the following selectors
+  #time-slider[type=range]::-webkit-slider-thumb {
+    .thumb-style();
+  }
+  #time-slider[type=range]::-moz-range-thumb {
+    .thumb-style();
+  }
+  
+  
 }
 
 #time-slider {
