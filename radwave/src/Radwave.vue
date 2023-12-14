@@ -178,10 +178,9 @@
           :slider-color="accentColor"
           id="tabs"
           dense
-          grow
         >
-          <v-tab tabindex="0"><h3>Information</h3></v-tab>
-          <v-tab tabindex="0"><h3>Using WWT</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Information</h3></v-tab>
+          <v-tab class="info-tabs" tabindex="0"><h3>Using WWT</h3></v-tab>
         </v-tabs>
         <font-awesome-icon
           id="close-text-icon"

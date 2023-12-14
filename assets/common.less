@@ -244,7 +244,7 @@ body {
     top: 0rem;
     right: 1.75rem;
     text-align: end;
-    color: var(--accent-color);
+    color: var(--accent-color2);
     font-size: min(8vw, 5vh);
 
     &:hover {
@@ -391,17 +391,45 @@ video {
 }
 
 #tabs {
-  width: calc(100% - 3em);
   align-self: left;
 }
 
+.info-tabs {
+  @media (max-width: 599px) {
+    padding-inline: 0.75rem;
+    font-size: calc(1.1 * var(--default-font-size));
+  }
+  @media (min-width: 600px) {
+    padding-inline: 4rem;
+  }
+}
+
 .info-text {
+  font-size: var(--default-font-size);
+  line-height: var(--default-line-height);
+  
   height: 33vh;
   padding-bottom: 25px;
 
-  & a {
-    text-decoration: none;
+  & img {
+    max-width: 100%;
   }
+
+  & h3 {
+    margin-top: calc(var(--default-line-height));
+    margin-bottom: calc(0.3 * var(--default-line-height));
+    color: var(--accent-color2);
+  }
+
+  & p {
+    margin-bottom: calc(0.5 * var(--default-line-height));
+  }
+
+  & a {
+    text-decoration: underline;
+  }
+
+
 }
 
 
@@ -464,6 +492,10 @@ video {
     }
   }
 
+}
+
+.v-tabs [aria-selected="false"]:not(.v-slide-group-item--active) {
+  color: #DDD !important;
 }
 
 #close-text-icon {
