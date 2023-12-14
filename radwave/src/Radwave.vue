@@ -357,7 +357,9 @@ type Row = Record<string, number>;
 const SECONDS_PER_DAY = 86400;
 
 let bestFitAnnotations: PolyLine[] = [];
-const bestFitOffsets = [-2, -1, 0, 1, 2] as const;
+const bestFitOffsets3D = [-2, -1, 0, 1, 2];
+const bestFitOffsets2D = [0];
+let bestFitOffsets = bestFitOffsets3D ;
 const bestFitLayer = new SpreadSheetLayer();
 const startDate = new Date("2023-10-18 11:55:55Z");
 const endDate = new Date("2025-10-06 11:55:55Z");
@@ -632,7 +634,7 @@ export default defineComponent({
 
     set2DMode() {
       
-      console.log('set2DMode');
+      bestFitOffsets = bestFitOffsets2D;
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
@@ -658,7 +660,7 @@ export default defineComponent({
     set3DMode() {
 
       
-      console.log('set3DMode');
+      bestFitOffsets = bestFitOffsets3D;
       
 
       this.setBackgroundImageByName("Solar System");
