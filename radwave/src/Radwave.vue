@@ -655,6 +655,7 @@ export default defineComponent({
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
+      this.sunLayer?.set_opacity(0);
       this.playing = false;
       phase = 0;
       updateSlider(phase);
@@ -682,7 +683,7 @@ export default defineComponent({
 
       this.setBackgroundImageByName("Solar System");
       this.setForegroundImageByName("Solar System");
-      
+      this.sunLayer?.set_opacity(1);
       updateBestFitAnnotations(phase);
 
 
