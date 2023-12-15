@@ -79,7 +79,7 @@
             @click="userNotReady = false"
             @keyup.enter="userNotReady = false"
             elevation="10"
-            size="x-large"
+            :size="smallSize ? 'large' : 'x-large'"
             rounded="lg"
             prepend-icon="mdi-check-circle-outline"
           >
@@ -1019,14 +1019,14 @@ export default defineComponent({
 #modal-loading {
   background-image: url("./assets/radwave_landing.png");
   background-position: center;
-  background-size: 95%;
-  object-fit: contain;
+  background-size: 100%;
   background-repeat: no-repeat;
   
   
   > div {
-    align-self: flex-end;
-    margin-bottom: 10%;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
   }
   
   .container {
