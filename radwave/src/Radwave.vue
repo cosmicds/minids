@@ -345,7 +345,7 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
 import sunCsv from "./assets/Sun_radec.csv";
-import bestFitCsv from "./assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
+import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
 function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
   return new Promise((resolve) => {
@@ -861,7 +861,7 @@ export default defineComponent({
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
       for (let phase = 0; phase < 180; phase++) {
-        const prom = import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
+        const prom = import(`./assets/radwave/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
           let text = res.default;
           text = text.replace(/\n/g, "\r\n");
           return this.createTableLayer({
