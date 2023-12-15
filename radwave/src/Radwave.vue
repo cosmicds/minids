@@ -55,8 +55,13 @@
       </div>
     </v-overlay>
 
-    <transition name="fade">
+    <transition>
       <div
+        v-if="showSplashScreen"
+        class="no-background">
+      </div>
+      <div
+        v-else
         class="modal"
         id="modal-loading"
         v-show="isLoading || userNotReady"
@@ -78,13 +83,9 @@
           >
             Ready
           </v-btn>
-        </div>
-        
-      
-        
+        </div>  
       </div>
     </transition>
-
 
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
@@ -1022,8 +1023,12 @@ export default defineComponent({
 
 <style lang="less">
 
+.no-background {
+  background-image: none;
+}
+
 #modal-loading {
-  background-image: url("./assets/landing.png");
+  background-image: url("./assets/radwave_landing.png");
   background-position: center;
   background-size: 95%;
   background-repeat: no-repeat;
@@ -1146,5 +1151,13 @@ export default defineComponent({
 
 .disabled {
   pointer-events: none;
+}
+
+.v-leave-active {
+  transition: opacity 1s ease;
+}
+
+.v-leave-to {
+  opacity: 0;
 }
 </style>
