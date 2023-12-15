@@ -657,6 +657,9 @@ export default defineComponent({
       this.showSplashScreen = false; 
       // Promise based wait for isLoading to be false
       asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
+        setTimeout(() => {
+          this.playing = true;
+        }, 500);
       });
       
     },
