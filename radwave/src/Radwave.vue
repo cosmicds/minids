@@ -525,7 +525,6 @@ export default defineComponent({
       this.backgroundImagesets = [...skyBackgroundImagesets];
       
       // initialize the view to black so that we don't flicker DSS
-      this.setBackgroundImageByName("Black sky background");
       this.applySetting(["galacticMode", true]);
       this.loadHipsWTML().then(() => {
         console.log('init set3DMode');
@@ -537,6 +536,7 @@ export default defineComponent({
       this.applySetting(["actualPlanetScale", true]);
       this.applySetting(["showConstellationFigures", false]);
       this.applySetting(["showCrosshairs", false]);
+      this.applySetting(["solarSystemCosmos", false]);
       // this.applySetting(["solarSystemPlanets", false]);
       this.setClockSync(false);
 
