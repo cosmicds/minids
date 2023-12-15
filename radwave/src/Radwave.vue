@@ -258,7 +258,28 @@
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
               <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
+                <h2>General</h2>
+                <p>
+                  The night sky is littered with stars; however, for thousands of years we did not know how far these stars were. 
+                  It wasn&rsquo;t until the 20th century that we developed the tools to measure the distances to stars. 
+                  By studying the distances to stars astronomers have learned a great deal about the structure of our galaxy. 
+                  In and amongst the stars are star forming regions - clouds of gas and dust where stars form. 
+                  Because dust is between us and the stars we can also measure the distance to these star forming regions. 
+                  It was by looking at the distances to nearby star forming regions that astronomers discovered that large structure which they called 
+                    the <a href="https://sites.google.com/cfa.harvard.edu/radcliffewave/">Radcliffe Wave</a>. 
+                  However, at this point the question remained - Was the wave actually waving?
+                </p>
+                <p>After a great deal of work, the answer is yes. 
+                  By analyzing the velocities of young star clusters associated with the star forming regions,
+                  they determined that their motions match what one would expect if they were riding on a wave as it travels through the galaxy.
+                  The wave goes up and down every 95 million years or so! This is actually commensurate with the lifetime of star forming cloud, 
+                    so these clouds will likely dissipate before the wave completes a full cycle.&nbsp;</p>
+                <h2>The Radcliffe Wave</h2>
+                <p>The Radcliffe Wave is a structure 1000+ lightyears away with a length of about 9000 lightyears. 
+                  The wave is composed of ~100 star forming regions. 
+                  Star forming regions are regions filled with dense gas and dust where stars are forming. 
+                  On the sky, the Radcliffe wave spans from the constellation of Cygnus to just past Orion (approximately 100&deg;).
+                </p>
               </v-card-text>
             </v-card>
           </v-window-item>
