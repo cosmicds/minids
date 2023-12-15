@@ -42,7 +42,8 @@
         </div>
         <div id="splash-screen-text">
           <p>
-            Want to see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy?
+            Want to surf a <span style="color: red;">giant wave</span> in the Milky Way Galaxy? 
+            <!-- see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy? -->
           </p>
         </div>
         <div id="splash-screen-acknowledgements">
@@ -188,22 +189,9 @@
           :color="accentColor"
           class="pointer-events"
           />
-    </div>
-      <div id="project-credits">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-          ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-        </div>
+      </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 
@@ -1032,6 +1020,7 @@ export default defineComponent({
   background-image: url("./assets/radwave_landing.png");
   background-position: center;
   background-size: 95%;
+  object-fit: contain;
   background-repeat: no-repeat;
   
   

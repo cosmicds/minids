@@ -46,6 +46,20 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+a {
+  text-decoration: none;
+  color: #aec2fd;
+  pointer-events: auto;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &[class^="share-network"]:hover {
+    text-decoration: none;
+    filter: brightness(75%);
+  }
+}
 
 /*
   The main content of the mini.
@@ -174,22 +188,23 @@ body {
   @media (max-width: 699px) {
     max-height: 80vh;
     max-width: 90vw;
+    border-radius: 25px;
   }
 
   @media (min-width: 700px) {
     max-height: 85vh;
     max-width: min(70vw, 800px);
+    border-radius: 50px;
   }
 
   background-color: black;
   backdrop-filter: blur(5px);
   justify-content: space-around;
   align-content: center;
-  padding-top: 4rem;
+  padding-top: 3rem;
   padding-bottom: 1rem;
   padding-inline: 1rem;
 
-  border-radius: 50px;
   border: min(1.2vw, 0.9vh) solid var(--accent-color);
   overflow: auto;
   font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
@@ -223,8 +238,17 @@ body {
 
   #close-splash-button {
     position: absolute;
-    top: 0rem;
-    right: 1.75rem;
+
+    @media (max-width: 699px) {
+      top: 0.5rem;
+      right: 1rem;
+    }
+  
+    @media (min-width: 700px) {
+      top: 0rem;
+      right: 1.75rem;
+    }
+
     text-align: end;
     color: var(--accent-color2);
     font-size: min(8vw, 5vh);
@@ -287,53 +311,17 @@ body {
   }
 }
 
-#project-credits {
-  color: #ddd;
-  font-size: calc(0.7em + 0.2vw);
-  justify-self: flex-end;
-  align-self: flex-end;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  p {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-  }
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    pointer-events: auto;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &[class^="share-network"]:hover {
-      text-decoration: none;
-      filter: brightness(75%);
-    }
-  }
+#body-logos {
+  margin-left: auto;
+  margin-right: 0;
 
   img {
     height: 35px;
     vertical-align: middle;
     margin: 2px;
   }
-
-  @media only screen and (max-width: 600px) {
-  img {
-    height: 24px;
-  }
 }
 
-  svg {
-    vertical-align: middle;
-    height: 24px;
-  }
-}
 
 /* Video and text dialogs */
 .video-wrapper {
