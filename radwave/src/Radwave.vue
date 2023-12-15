@@ -80,8 +80,9 @@
             elevation="10"
             size="x-large"
             rounded="lg"
+            prepend-icon="mdi-check-circle-outline"
           >
-            Ready
+            <strong>Ready</strong>
           </v-btn>
         </div>  
       </div>
@@ -1036,7 +1037,7 @@ export default defineComponent({
   
   > div {
     align-self: flex-end;
-    margin-bottom: 20%;
+    margin-bottom: 10%;
   }
   
   .container {
@@ -1050,7 +1051,6 @@ export default defineComponent({
     }
   }
 }
-
 
 /* Top and bottom content */
 .top-content {
