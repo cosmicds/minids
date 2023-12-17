@@ -14,6 +14,9 @@ module.exports = defineConfig({
   // dev server insecure, but that's OK since we only use it in controlled
   // circumstances. https://stackoverflow.com/questions/43619644
   devServer: {
-    allowedHosts: 'all'
+    allowedHosts: 'all',
+    client: {
+      overlay: false
+    }
   }
 });
