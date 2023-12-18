@@ -817,7 +817,7 @@ export default defineComponent({
         name: "Radcliffe Wave Sun",
         dataCsv: text
       }).then(layer => {
-        this.basicLayerSetup(layer);
+        this.basicLayerSetup(layer, true);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
