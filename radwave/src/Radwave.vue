@@ -195,6 +195,8 @@
       id="video-container"
       v-model="showVideoSheet"
       transition="slide-y-transition"
+      close-on-back
+      close-on-content-click
       fullscreen
     >
       <div class="video-wrapper">
@@ -202,7 +204,7 @@
           id="video-close-icon"
           class="close-icon"
           icon="times"
-          size="lg"
+          size="xlg"
           @click="showVideoSheet = false"
           @keyup.enter="showVideoSheet = false"
           tabindex="0"
