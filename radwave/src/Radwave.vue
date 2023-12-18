@@ -818,6 +818,7 @@ export default defineComponent({
         dataCsv: text
       }).then(layer => {
         this.basicLayerSetup(layer, true);
+        layer.set_decay(1);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
