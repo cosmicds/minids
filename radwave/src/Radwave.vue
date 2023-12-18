@@ -84,7 +84,7 @@
             rounded="lg"
             prepend-icon="mdi-check-circle-outline"
           >
-            <strong>Ready</strong>
+            <strong>Start</strong>
           </v-btn>
         </div>  
       </div>
@@ -135,7 +135,7 @@
           tooltip-location="start"
         >
         <template v-slot:button>
-          <span class="no-select">See this in {{ modeReactive == '3D' ? '2D' : '3D' }}</span>
+          <span class="no-select">See this {{ modeReactive == '3D' ? ' on the Sky (2D)' : 'in the Galaxy (3D)' }}</span>
         </template>
         </icon-button>
         <icon-button
@@ -875,7 +875,7 @@ export default defineComponent({
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
       for (let phase = -10; phase < 180; phase++) {
-        const prom = import(`./assets/radwave/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
+        const prom = import(`./assets/radwave/RW_cluster_oscillation_${Math.max(phase,0)}_updated_radec.csv`).then(res => {
           let text = res.default;
           text = text.replace(/\n/g, "\r\n");
           return this.createTableLayer({
