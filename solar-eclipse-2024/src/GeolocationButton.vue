@@ -179,10 +179,6 @@ export default defineComponent({
       loading: false,
     };
   },
-  mounted() {
-
-    
-  },
 
   computed: {
     icon() {
