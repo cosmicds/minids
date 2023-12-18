@@ -88,21 +88,8 @@
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
     <div class="bottom-content">
-      <div id="project-credits">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-          ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-        </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 

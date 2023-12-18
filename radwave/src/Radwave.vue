@@ -42,7 +42,8 @@
         </div>
         <div id="splash-screen-text">
           <p>
-            Want to see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy?
+            Want to surf a <span style="color: red;">giant wave</span> in the Milky Way Galaxy? 
+            <!-- see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy? -->
           </p>
         </div>
         <div id="splash-screen-acknowledgements">
@@ -55,19 +56,39 @@
       </div>
     </v-overlay>
 
-    <transition name="fade">
+    <transition>
       <div
-        class="modal"
+        v-if="false"
+        class="no-background">
+      </div>
+      <div
+        v-else
+        :class="['modal', showSplashScreen ? 'no-background' : '']"
         id="modal-loading"
-        v-show="isLoading"
+        v-show="isLoading || userNotReady"
       >
-        <div class="container">
-          <div class="spinner"></div>
+        <div v-if="isLoading" class="container">
+          <div  class="spinner"></div>
           <p>Loading …</p>
         </div>
+        <div v-else>
+          <v-btn
+            v-if="!showSplashScreen"
+            id="loading-button"
+            :disabled="isLoading"
+            :color="accentColor"
+            @click="userNotReady = false"
+            @keyup.enter="userNotReady = false"
+            elevation="10"
+            :size="smallSize ? 'large' : 'x-large'"
+            rounded="lg"
+            prepend-icon="mdi-check-circle-outline"
+          >
+            <strong>Ready</strong>
+          </v-btn>
+        </div>  
       </div>
     </transition>
-
 
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
@@ -169,22 +190,9 @@
           :color="accentColor"
           class="pointer-events"
           />
-    </div>
-      <div id="project-credits">
-        <div id="icons-container">
-          <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer"
-          ><img alt="CosmicDS Logo" src="../../assets/cosmicds_logo_for_dark_backgrounds.png"
-          /></a>
-          <a href="https://worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer"
-            ><img alt="WWT Logo" src="../../assets/logo_wwt.png"
-          /></a>
-          <a href="https://science.nasa.gov/learners" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/logo_sciact.png"
-          /></a>
-          <a href="https://nasa.gov/" target="_blank" rel="noopener noreferrer" class="pl-1"
-            ><img alt="SciAct Logo" src="../../assets/NASA_Partner_color_300_no_outline.png"
-          /></a>
-        </div>
+      </div>
+      <div id="body-logos" v-if= "!smallSize">
+        <credit-logos/>
       </div>
     </div>
 
@@ -482,6 +490,9 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
+      userNotReady: true,
+
+      
       accentColor: "#427cff",
       accentColor2: "#FF0000",
       buttonColor: "#ffffff",
@@ -636,8 +647,10 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
       // Promise based wait for isLoading to be false
-      asyncWaitForCondition(() => !this.isLoading, 100).then(() => {
-        this.playing = true;
+      asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
+        setTimeout(() => {
+          this.playing = true;
+        }, 500);
       });
       
     },
@@ -999,6 +1012,36 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+
+.no-background {
+  background-image: none!important;
+}
+
+#modal-loading {
+  background-image: url("./assets/radwave_landing.png");
+  background-position: center;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  
+  
+  > div {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+  }
+  
+  .container {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-inline: 2rem;
+    padding-block: 1rem;
+    border-radius: 1rem;
+    .spinner {
+      background-image: none !important;
+      display: none;
+    }
+  }
+}
+
 /* Top and bottom content */
 .top-content {
   position: absolute;
@@ -1098,5 +1141,13 @@ export default defineComponent({
 
 .disabled {
   pointer-events: none;
+}
+
+.v-leave-active {
+  transition: opacity 1s ease;
+}
+
+.v-leave-to {
+  opacity: 0;
 }
 </style>
