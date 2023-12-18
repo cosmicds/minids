@@ -58,12 +58,12 @@
 
     <transition>
       <div
-        v-if="showSplashScreen"
+        v-if="false"
         class="no-background">
       </div>
       <div
         v-else
-        class="modal"
+        :class="['modal', showSplashScreen ? 'no-background' : '']"
         id="modal-loading"
         v-show="isLoading || userNotReady"
       >
@@ -73,6 +73,7 @@
         </div>
         <div v-else>
           <v-btn
+            v-if="!showSplashScreen"
             id="loading-button"
             :disabled="isLoading"
             :color="accentColor"
@@ -1013,7 +1014,7 @@ export default defineComponent({
 <style lang="less">
 
 .no-background {
-  background-image: none;
+  background-image: none!important;
 }
 
 #modal-loading {
