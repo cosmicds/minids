@@ -503,7 +503,7 @@ export default defineComponent({
       
       modeReactive: mode as "2D" | "3D" | null,
       resizeObserver: null as ResizeObserver | null,
-      background2DImageset: "Mellinger color optical survey",
+      background2DImageset: "Deep Star Maps 2020",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
