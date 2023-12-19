@@ -1131,6 +1131,10 @@ export default defineComponent({
   color: #ffffff;
 }
 
+#loading-button {
+  background-color: black;
+}
+
 .color-span {
   color:var(--accent-color);
 }
