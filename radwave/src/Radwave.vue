@@ -477,8 +477,11 @@ export default defineComponent({
     }
   },
   data() {
-    const phaseOpacitySlope = -1 / 80;
-    const phaseOpacityIntercept = 1 - phaseOpacitySlope * 100;
+    const initialOpacity = 0.5;
+    const fadeStartPhase = 100;
+    const fadeEndPhase = 180;
+    const phaseOpacitySlope = -initialOpacity / (fadeEndPhase - fadeStartPhase);
+    const phaseOpacityIntercept = initialOpacity * fadeEndPhase / (fadeEndPhase - fadeStartPhase);
     const initial2DPosition = {
       raRad: 6,
       decRad: 1,
@@ -515,10 +518,13 @@ export default defineComponent({
       phaseCol: 3,
       clusterLayers: [] as SpreadSheetLayer[],
 
+      initialOpacity,
+      fadeStartPhase,
+      fadeEndPhase,
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
-      defaultClusterDecay: 15,
+      defaultClusterDecay: 5,
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
@@ -900,10 +906,7 @@ export default defineComponent({
 
     opacityForPhase(phase: number): number {
       const adjustedPhase = 180 - Math.abs(180 - phase);
-      if (adjustedPhase <= 100) {
-        return 1;
-      }
-      return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), 1);
+      return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), this.initialOpacity);
     },
 
     setupClusterLayers(): Promise<SpreadSheetLayer[]> {
@@ -922,6 +925,7 @@ export default defineComponent({
             layer.set_opacity(this.opacityForPhase(phase));
             layer.set_color(color);
             layer.set_scaleFactor(70);
+            //console.log(layer);
             return layer;
           });
         });
