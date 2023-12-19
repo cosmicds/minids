@@ -67,7 +67,7 @@
         v-else
         :class="['modal', showSplashScreen ? 'no-background' : '']"
         id="modal-loading"
-        v-show="isLoading || userNotReady"
+        v-show="(isLoading || userNotReady) && (modeReactive != 'full')"
       >
         <div v-if="isLoading" class="container">
           <div  class="spinner"></div>
@@ -95,7 +95,8 @@
 
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
-    <div class="top-content">
+    <div 
+    :class="['top-content',modeReactive=='full' ? 'hidden' : '']">
       <div v-if="modeReactive != null" id="left-buttons">
         <icon-button
           v-model="showTextSheet"
@@ -118,9 +119,9 @@
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
-          v-if="false"
+          v-if="true"
           md-icon="mdi-sine-wave"
-          @activate="toggleFullwaveMode()"
+          @activate="setFullwaveMode()"
           :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
@@ -161,7 +162,7 @@
 
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
-    <div class="bottom-content">
+    <div :class="['bottom-content',modeReactive=='full' ? 'hidden' : '']">
       <div v-if="modeReactive != '2D'" id="time-controls">
         <icon-button
           v-model="playing"
@@ -209,7 +210,7 @@
       transition="slide-y-transition"
       fullscreen
     >
-      <div class="video-wrapper">
+      <div class="video-wrapper" :class="[modeReactive=='full' ? 'hidden' : '']">
         <font-awesome-icon
           id="video-close-icon"
           class="close-icon"
@@ -377,9 +378,12 @@ function asyncWaitForCondition(func: () => boolean, ms: number): Promise<void> {
 }
 
 type SheetType = "text" | "video" | null;
+type ModeType = "2D" | "3D" | "full" | null;
 
 // A hack, but we don't need anything more than this
 type Row = Record<string, number>;
+
+let queryMode: ModeType = null;
 
 const SECONDS_PER_DAY = 86400;
 
@@ -395,7 +399,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
-let mode = "3D" as "2D" | "3D" | "full" | null;
+let mode = "3D" as ModeType;
 
 const phaseRowCount = 300;
 
@@ -496,6 +500,10 @@ export default defineComponent({
       instant: true
     }  as GotoRADecZoomParams;
     
+    if (queryMode) {
+      mode = queryMode;
+    }
+    
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -526,7 +534,7 @@ export default defineComponent({
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
-      modeReactive: mode as "2D" | "3D" | "full" | null,
+      modeReactive: mode as ModeType,
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Deep Star Maps 2020",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
@@ -543,13 +551,24 @@ export default defineComponent({
         'Hydrogen Alpha Full Sky Map',
         "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
-      previousMode: mode as "2D" | "3D" | "full" | null,
+      previousMode: mode as  ModeType,
       fullwavePosition: fullwavePosition,
 
     };
   },
+  
+  beforeCreate() {
+    const searchParams = new URLSearchParams(window.location.search);
+    // check for mode
+    queryMode = searchParams.get('mode') as ModeType;
+    
+  },
 
   mounted() {
+    this.resizeObserver = new ResizeObserver((_entries) => {
+      this.shinkWWT();
+    });
+    
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -557,8 +576,19 @@ export default defineComponent({
       // initialize the view to black so that we don't flicker DSS
       this.applySetting(["galacticMode", true]);
       this.loadHipsWTML().then(() => {
-        console.log('init set3DMode');
-        return this.set3DMode();
+        if (this.modeReactive == '3D') {
+          console.log('init set3DMode');
+          return this.set3DMode();
+        } else if (this.modeReactive == '2D') {
+          console.log('init set2DMode');
+          return this.set2DMode();
+        } else if (this.modeReactive == 'full') {
+          console.log('init setFullwaveMode');
+          return this.setFullwaveMode();
+        } else {
+          return;
+        }
+        
       }).then(() => this.positionSet = true);
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
@@ -581,11 +611,13 @@ export default defineComponent({
         updateSlider(phase);
         window.requestAnimationFrame(this.onAnimationFrame);
         this.layersLoaded = true;
+      }).then(() => {
+        if (this.modeReactive == 'full') {
+          console.log('init Full Wave Mode');
+          this.setFullwaveMode();
+        }
       });
       
-    });
-    this.resizeObserver = new ResizeObserver((_entries) => {
-      this.shinkWWT();
     });
     
   },
@@ -665,11 +697,13 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
       // Promise based wait for isLoading to be false
-      asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
-        setTimeout(() => {
-          this.playing = true;
-        }, 500);
-      });
+      if (this.modeReactive == '3D') {
+        asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
+          setTimeout(() => {
+            this.playing = true;
+          }, 500);
+        });
+      }
       
     },
     
@@ -734,42 +768,32 @@ export default defineComponent({
       
     },
     
-    async toggleFullwaveMode() {
+    async setFullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
-      let old3D = null as unknown as Omit<GotoRADecZoomParams,'instant'>;
-      if (this.modeReactive == 'full') {
-        this.modeReactive = this.previousMode;
-        this.positionReset();
-        return;
-      } else if (this.modeReactive == '3D') {
-        old3D = this.wwtPosition;
-      }
-      
       return this.set2DMode().then(() => {
         this.previousMode = this.modeReactive;
         this.modeReactive = "full";
         phase=0;
         
+        this.closeSplashScreen();
         this.shinkWWT();
+        this.toggleUI('off');
         this.resizeObserver?.observe(document.body);
-        
         return this.gotoRADecZoom({
           ...this.fullwavePosition, 
-          instant: false}).catch((err) => {
+          instant: true}).catch((err) => {
           console.log(err);
-        }).then(() => {
-          if (old3D) {this.position3D = old3D;}
         });
       });
       
     }, 
     
-    toggleUI() {
+    toggleUI(val='off') {
       // toggle visibility of class .bottom-content using opacity
       const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
       const op = bottomContent.style.opacity;
-      if (op == "0") {
+      if (op == "0" || val == 'on') {
         bottomContent.style.opacity = "1";
       } else {
         bottomContent.style.opacity = "0";
@@ -778,7 +802,7 @@ export default defineComponent({
       // now for top-content
       const topContent = document.querySelector(".top-content") as HTMLElement;
       const op2 = topContent.style.opacity;
-      if (op2 == "0") {
+      if (op2 == "0" || val == 'on') {
         topContent.style.opacity = "1";
       } else {
         topContent.style.opacity = "0";
@@ -1028,7 +1052,7 @@ export default defineComponent({
           this.set3DMode();
         }
         if (newVal == "full") {
-          this.toggleFullwaveMode();
+          this.setFullwaveMode();
         }
       } else {
       
@@ -1039,7 +1063,7 @@ export default defineComponent({
         } else if (oldVal == "full") {
           this.resizeObserver?.disconnect();
           this.growWWT();
-          this.toggleUI();
+          this.toggleUI('on');
         }
       }
       
@@ -1061,6 +1085,10 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+
+.hidden {
+  display: none !important;
+}
 
 .no-background {
   background-image: none!important;
