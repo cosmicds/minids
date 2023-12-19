@@ -1,0 +1,25 @@
+<!-- from https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips -->
+<Folder Browseable="True" Group="Explorer" MSRCommunityId="0" MSRComponentId="0" Name="Visible" Permission="0" Searchable="True" Type="Sky">
+    <ImageSet BandPass="Visible" BaseDegreesPerTile="180.0" BaseTileLevel="0" BottomsUp="False" CenterX="0.0" CenterY="0.0" DataSetType="Sky" ElevationModel="False" FileType="jpeg" Generic="False" MeanRadius="1.0" MSRCommunityId="0" MSRComponentId="0" Name="Mellinger color optical survey" OffsetX="0.0" OffsetY="0.0" Permission="0" Projection="Healpix" QuadTreeMap="0123" ReferenceFrame="Sky" Rotation="0.0" Sparse="True" StockSet="False" TileLevels="4" Url="http://alasky.u-strasbg.fr/MellingerRGB/Norder{0}/Dir{1}/Npix{2}" WidthFactor="1">
+        <Credits>Copyright 2000-2017 Axel Mellinger. All rights reserved.</Credits>
+        <CreditsUrl>http://www.milkywaysky.com/</CreditsUrl>
+        <Description>HiPS List ID: CDS/P/Mellinger/color</Description>
+        <ThumbnailUrl>http://alasky.u-strasbg.fr/MellingerRGB/preview.jpg</ThumbnailUrl>
+      </ImageSet>
+    <ImageSet BandPass="Visible" BaseDegreesPerTile="180.0" BaseTileLevel="0" BottomsUp="False" CenterX="0.0" CenterY="0.0" DataSetType="Sky" ElevationModel="False" FileType="jpeg fits" Generic="False" MeanRadius="1.0" MSRCommunityId="0" MSRComponentId="0" Name="Finkbeiner Halpha composite survey" OffsetX="0.0" OffsetY="0.0" Permission="0" Projection="Healpix" QuadTreeMap="0123" ReferenceFrame="Sky" Rotation="0.0" Sparse="True" StockSet="False" TileLevels="3" Url="http://alasky.u-strasbg.fr/FinkbeinerHalpha/Norder{0}/Dir{1}/Npix{2}" WidthFactor="1">
+        <Credits>Composite map by Douglas Finkbeiner (2004).</Credits>
+        <Description>HiPS List ID: CDS/P/Finkbeiner</Description>
+        <ThumbnailUrl>http://alasky.u-strasbg.fr/FinkbeinerHalpha/preview.jpg</ThumbnailUrl>
+      </ImageSet>
+      <ImageSet BandPass="Radio" BaseDegreesPerTile="180.0" BaseTileLevel="0" BottomsUp="False" CenterX="0.0" CenterY="0.0" DataSetType="Sky" ElevationModel="False" FileType="jpeg" Generic="False" MeanRadius="1.0" MSRCommunityId="0" MSRComponentId="0" Name="PLANCK R2 HFI color composition 353-545-857 GHz" OffsetX="0.0" OffsetY="0.0" Permission="0" Projection="Healpix" QuadTreeMap="0123" ReferenceFrame="Sky" Rotation="0.0" Sparse="True" StockSet="False" TileLevels="3" Url="http://alasky.u-strasbg.fr/PLANCK/R2/HFI_Color_353_545_857/Norder{0}/Dir{1}/Npix{2}" WidthFactor="1">
+        <Credits>Planck Legacy Archive</Credits>
+        <CreditsUrl>http://pla.esac.esa.int/pla</CreditsUrl>
+        <Description>HiPS List ID: CDS/P/PLANCK/R2/HFI/color</Description>
+        <ThumbnailUrl>http://alasky.u-strasbg.fr/PLANCK/R2/HFI_Color_353_545_857/preview.jpg</ThumbnailUrl>
+      </ImageSet>
+      <ImageSet BandPass="IR" BaseDegreesPerTile="180.0" BaseTileLevel="0" BottomsUp="False" CenterX="0.0" CenterY="0.0" DataSetType="Sky" ElevationModel="False" FileType="jpeg" Generic="False" MeanRadius="1.0" MSRCommunityId="0" MSRComponentId="0" Name="unWISE color, from W2 and W1 bands" OffsetX="0.0" OffsetY="0.0" Permission="0" Projection="Healpix" QuadTreeMap="0123" ReferenceFrame="Sky" Rotation="0.0" Sparse="True" StockSet="False" TileLevels="8" Url="http://alasky.u-strasbg.fr/unWISE/color-W2-W1W2-W1/Norder{0}/Dir{1}/Npix{2}" WidthFactor="1">
+        <Credits>IPAC/NASA - D. Lang for the reprocessing</Credits>
+        <Description>HiPS List ID: CDS/P/unWISE/color-W2-W1W2-W1</Description>
+        <ThumbnailUrl>http://alasky.u-strasbg.fr/unWISE/color-W2-W1W2-W1/preview.jpg</ThumbnailUrl>
+      </ImageSet>
+</Folder>

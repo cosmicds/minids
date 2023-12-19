@@ -533,12 +533,15 @@ export default defineComponent({
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
       allSkyImagesets: [
-        'Mellinger color optical survey', 
-        'Digitized Sky Survey (Color)',
-        'WISE All Sky (Infrared)',
-        'unWISE color, from W2 and W1 bands',
+        'Deep Star Maps 2020', 
+        'Mellinger color optical survey',  // HIPS
         "Gaia DR2",
-        "Deep Star Maps 2020",
+        'Digitized Sky Survey (Color)',
+        'unWISE color, from W2 and W1 bands', // HIPS
+        'WISE All Sky (Infrared)',
+        'Planck Thermal Dust',
+        'Hydrogen Alpha Full Sky Map',
+        "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
       previousMode: mode as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
