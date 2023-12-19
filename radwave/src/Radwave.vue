@@ -84,7 +84,7 @@
             rounded="lg"
             prepend-icon="mdi-check-circle-outline"
           >
-            <strong>Ready</strong>
+            <strong>Start</strong>
           </v-btn>
         </div>  
       </div>
@@ -93,7 +93,7 @@
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
     <div class="top-content">
-      <div id="left-buttons">
+      <div v-if="modeReactive != null" id="left-buttons">
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
@@ -117,25 +117,26 @@
         <icon-button
           v-if="false"
           md-icon="mdi-sine-wave"
-          @activate="fullwaveMode()"
+          @activate="toggleFullwaveMode()"
           :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
         >
         <template v-slot:button>
-          <span class="no-select">View the Full Radcliffe Wave</span>
+          <span v-if="modeReactive != 'full'" class="no-select">View the Full Radcliffe Wave</span>
+          <v-icon v-if="modeReactive == 'full'">mdi-arrow-left</v-icon>
         </template>
         </icon-button>
         
         <icon-button
-          v-if="playCount > 0"
+          v-if="(playCount > 0) ?? (modeReactive == 'full')"
           @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
           :color="buttonColor"
           tooltip-text="Switch modes"
           tooltip-location="start"
         >
         <template v-slot:button>
-          <span class="no-select">See this in {{ modeReactive == '3D' ? '2D' : '3D' }}</span>
+          <span class="no-select">See this {{ modeReactive == '3D' ? ' on the Sky (2D)' : 'in the Galaxy (3D)' }}</span>
         </template>
         </icon-button>
         <icon-button
@@ -353,7 +354,7 @@ import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
 import sunCsv from "./assets/Sun_radec.csv";
-import bestFitCsv from "./assets/RW_best_fit_oscillation_phase_radec_downsampled.csv";
+import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
 function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
   return new Promise((resolve) => {
@@ -391,7 +392,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
-let mode = "3D" as "2D" | "3D" | null;
+let mode = "3D" as "2D" | "3D" | "full" | null;
 
 const phaseRowCount = 300;
 
@@ -483,6 +484,15 @@ export default defineComponent({
       decRad: 1,
       zoomDeg: 360
     } as Omit<GotoRADecZoomParams,'instant'>;
+    
+    const fullwavePosition = {
+      raRad: 0.6984155220905679, 
+      decRad: 0.7132099678793872, 
+      rollRad: 0.183,
+      zoomDeg: 360,
+      instant: true
+    }  as GotoRADecZoomParams;
+    
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -508,13 +518,14 @@ export default defineComponent({
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
+      defaultClusterDecay: 15,
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
-      modeReactive: mode as "2D" | "3D" | null,
+      modeReactive: mode as "2D" | "3D" | "full" | null,
       resizeObserver: null as ResizeObserver | null,
-      background2DImageset: "Mellinger color optical survey",
+      background2DImageset: "Deep Star Maps 2020",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
@@ -525,7 +536,9 @@ export default defineComponent({
         'unWISE color, from W2 and W1 bands',
         "Gaia DR2",
         "Deep Star Maps 2020",
-      ]
+      ],
+      previousMode: mode as "2D" | "3D" | "full" | null,
+      fullwavePosition: fullwavePosition,
 
     };
   },
@@ -536,7 +549,6 @@ export default defineComponent({
       this.backgroundImagesets = [...skyBackgroundImagesets];
       
       // initialize the view to black so that we don't flicker DSS
-      this.setBackgroundImageByName("Black sky background");
       this.applySetting(["galacticMode", true]);
       this.loadHipsWTML().then(() => {
         console.log('init set3DMode');
@@ -548,6 +560,7 @@ export default defineComponent({
       this.applySetting(["actualPlanetScale", true]);
       this.applySetting(["showConstellationFigures", false]);
       this.applySetting(["showCrosshairs", false]);
+      this.applySetting(["solarSystemCosmos", false]);
       // this.applySetting(["solarSystemPlanets", false]);
       this.setClockSync(false);
 
@@ -565,7 +578,6 @@ export default defineComponent({
       });
       
     });
-    
     this.resizeObserver = new ResizeObserver((_entries) => {
       this.shinkWWT();
     });
@@ -665,6 +677,9 @@ export default defineComponent({
     set2DMode() {
       
       bestFitOffsets = bestFitOffsets2D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(1);
+      });
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
@@ -692,6 +707,9 @@ export default defineComponent({
 
       
       bestFitOffsets = bestFitOffsets3D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(this.defaultClusterDecay);
+      });
       
 
       this.setBackgroundImageByName("Solar System");
@@ -710,26 +728,32 @@ export default defineComponent({
       
     },
     
-    async fullwaveMode() {
+    async toggleFullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
+      let old3D = null as unknown as Omit<GotoRADecZoomParams,'instant'>;
+      if (this.modeReactive == 'full') {
+        this.modeReactive = this.previousMode;
+        this.positionReset();
+        return;
+      } else if (this.modeReactive == '3D') {
+        old3D = this.wwtPosition;
+      }
+      
       return this.set2DMode().then(() => {
-
-        this.modeReactive = null;
-        phase=3;
-        const cameraParams = { 
-          raRad: 0.6984155220905679, 
-          decRad: 0.7132099678793872, 
-          rollRad: 0.183,
-          zoomDeg: 360};
+        this.previousMode = this.modeReactive;
+        this.modeReactive = "full";
+        phase=0;
         
         this.shinkWWT();
         this.resizeObserver?.observe(document.body);
         
         return this.gotoRADecZoom({
-          ...cameraParams, 
+          ...this.fullwavePosition, 
           instant: false}).catch((err) => {
           console.log(err);
+        }).then(() => {
+          if (old3D) {this.position3D = old3D;}
         });
       });
       
@@ -744,6 +768,15 @@ export default defineComponent({
       } else {
         bottomContent.style.opacity = "0";
       }
+      
+      // now for top-content
+      const topContent = document.querySelector(".top-content") as HTMLElement;
+      const op2 = topContent.style.opacity;
+      if (op2 == "0") {
+        topContent.style.opacity = "1";
+      } else {
+        topContent.style.opacity = "0";
+      }
     },
     
     positionReset() {
@@ -753,16 +786,18 @@ export default defineComponent({
       // so we let's do this manually. 
       
       // only reset the current mode
+      let pos = null as unknown as Omit<GotoRADecZoomParams, "instant">;
       if (this.modeReactive == "2D") {
         this.position2D = this.initial2DPosition;
+        pos = this.position2D;
+        
       } else if (this.modeReactive == "3D") {
         this.position3D = this.initialCameraParams;
-      } else {
-        // don't reset anything if mode is null
-        return;
+        pos = this.position3D;
+      } else if (this.modeReactive == 'full') {
+        pos = this.fullwavePosition;
       }
-      // grab the mode correct position
-      const pos = this.modeReactive == "2D" ? this.position2D : this.position3D;
+      
       // we will move nicely. 
       this.gotoRADecZoom({
         ...pos,
@@ -819,7 +854,7 @@ export default defineComponent({
         layer.set_startDateColumn(4);
         layer.set_endDateColumn(5);
         layer.set_timeSeries(true);
-        layer.set_decay(15);
+        layer.set_decay(this.defaultClusterDecay);
       }
     },
 
@@ -830,7 +865,8 @@ export default defineComponent({
         name: "Radcliffe Wave Sun",
         dataCsv: text
       }).then(layer => {
-        this.basicLayerSetup(layer);
+        this.basicLayerSetup(layer, true);
+        layer.set_decay(1);
         this.applyTableLayerSettings({
           id: layer.id.toString(),
           settings: [
@@ -873,8 +909,8 @@ export default defineComponent({
     setupClusterLayers(): Promise<SpreadSheetLayer[]> {
       const color = Color.load(this.clusterColor);
       const promises: Promise<SpreadSheetLayer>[] = [];
-      for (let phase = 0; phase < 180; phase++) {
-        const prom = import(`./assets/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
+      for (let phase = -15; phase < 180; phase++) {
+        const prom = import(`./assets/radwave/RW_cluster_oscillation_${phase}_updated_radec.csv`).then(res => {
           let text = res.default;
           text = text.replace(/\n/g, "\r\n");
           return this.createTableLayer({
@@ -982,15 +1018,19 @@ export default defineComponent({
         if (newVal == "3D") {
           this.set3DMode();
         }
+        if (newVal == "full") {
+          this.toggleFullwaveMode();
+        }
       } else {
       
         if (oldVal == "2D") {
           this.position2D = this.wwtPosition;
         } else if (oldVal == "3D") {
           this.position3D = this.wwtPosition;
-        } else if (oldVal == null) {
+        } else if (oldVal == "full") {
           this.resizeObserver?.disconnect();
           this.growWWT();
+          this.toggleUI();
         }
       }
       
