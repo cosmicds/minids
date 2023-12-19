@@ -675,7 +675,7 @@ export default defineComponent({
     
     async loadHipsWTML () {
       return this.loadImageCollection({
-        url: "https://raw.githubusercontent.com/johnarban/cds-website/add-short-hips-list-for-radwave/public/wwt-content/radwave-wtml/hips.wtml",
+        url: "https://raw.githubusercontent.com/cosmicds/cds-website/main/public/wwt-content/radwave-wtml/hips.wtml",
         loadChildFolders: true,
       });
     },
