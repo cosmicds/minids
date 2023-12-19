@@ -675,7 +675,7 @@ export default defineComponent({
     
     async loadHipsWTML () {
       return this.loadImageCollection({
-        url: "https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
+        url: "https://raw.githubusercontent.com/johnarban/cds-website/add-short-hips-list-for-radwave/public/wwt-content/radwave-wtml/hips.wtml",
         loadChildFolders: true,
       });
     },
