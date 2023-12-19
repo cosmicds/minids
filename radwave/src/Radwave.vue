@@ -12,7 +12,7 @@
     
     
     <wwt-hud
-      v-if="false"
+      v-if="true"
       :wwt-namespace="wwtNamespace"
       :location="{top: '5rem', right: '1rem'}"
       :offset-center="{x: 0, y: 0}"
@@ -93,7 +93,7 @@
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
     <div class="top-content">
-      <div id="left-buttons">
+      <div v-if="modeReactive != null" id="left-buttons">
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
@@ -115,20 +115,21 @@
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
-          v-if="false"
+          v-if="true"
           md-icon="mdi-sine-wave"
-          @activate="fullwaveMode()"
+          @activate="toggleFullwaveMode()"
           :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
         >
         <template v-slot:button>
-          <span class="no-select">View the Full Radcliffe Wave</span>
+          <span v-if="modeReactive != 'full'" class="no-select">View the Full Radcliffe Wave</span>
+          <v-icon v-if="modeReactive == 'full'">mdi-arrow-left</v-icon>
         </template>
         </icon-button>
         
         <icon-button
-          v-if="playCount > 0"
+          v-if="(playCount > 0) ?? (modeReactive == 'full')"
           @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
           :color="buttonColor"
           tooltip-text="Switch modes"
@@ -391,7 +392,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
-let mode = "3D" as "2D" | "3D" | null;
+let mode = "3D" as "2D" | "3D" | "full" | null;
 
 const phaseRowCount = 300;
 
@@ -483,6 +484,15 @@ export default defineComponent({
       decRad: 1,
       zoomDeg: 360
     } as Omit<GotoRADecZoomParams,'instant'>;
+    
+    const fullwavePosition = {
+      raRad: 0.6984155220905679, 
+      decRad: 0.7132099678793872, 
+      rollRad: 0.183,
+      zoomDeg: 360,
+      instant: true
+    }  as GotoRADecZoomParams;
+    
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -513,7 +523,7 @@ export default defineComponent({
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
-      modeReactive: mode as "2D" | "3D" | null,
+      modeReactive: mode as "2D" | "3D" | "full" | null,
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Deep Star Maps 2020",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
@@ -526,7 +536,9 @@ export default defineComponent({
         'unWISE color, from W2 and W1 bands',
         "Gaia DR2",
         "Deep Star Maps 2020",
-      ]
+      ],
+      previousMode: mode as "2D" | "3D" | "full" | null,
+      fullwavePosition: fullwavePosition,
 
     };
   },
@@ -716,26 +728,32 @@ export default defineComponent({
       
     },
     
-    async fullwaveMode() {
+    async toggleFullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
+      let old3D = null as unknown as Omit<GotoRADecZoomParams,'instant'>;
+      if (this.modeReactive == 'full') {
+        this.modeReactive = this.previousMode;
+        this.positionReset();
+        return;
+      } else if (this.modeReactive == '3D') {
+        old3D = this.wwtPosition;
+      }
+      
       return this.set2DMode().then(() => {
-
-        this.modeReactive = null;
-        phase=3;
-        const cameraParams = { 
-          raRad: 0.6984155220905679, 
-          decRad: 0.7132099678793872, 
-          rollRad: 0.183,
-          zoomDeg: 360};
+        this.previousMode = this.modeReactive;
+        this.modeReactive = "full";
+        phase=0;
         
         this.shinkWWT();
         this.resizeObserver?.observe(document.body);
         
         return this.gotoRADecZoom({
-          ...cameraParams, 
+          ...this.fullwavePosition, 
           instant: false}).catch((err) => {
           console.log(err);
+        }).then(() => {
+          if (old3D) {this.position3D = old3D;}
         });
       });
       
@@ -750,6 +768,15 @@ export default defineComponent({
       } else {
         bottomContent.style.opacity = "0";
       }
+      
+      // now for top-content
+      const topContent = document.querySelector(".top-content") as HTMLElement;
+      const op2 = topContent.style.opacity;
+      if (op2 == "0") {
+        topContent.style.opacity = "1";
+      } else {
+        topContent.style.opacity = "0";
+      }
     },
     
     positionReset() {
@@ -759,16 +786,18 @@ export default defineComponent({
       // so we let's do this manually. 
       
       // only reset the current mode
+      let pos = null as unknown as Omit<GotoRADecZoomParams, "instant">;
       if (this.modeReactive == "2D") {
         this.position2D = this.initial2DPosition;
+        pos = this.position2D;
+        
       } else if (this.modeReactive == "3D") {
         this.position3D = this.initialCameraParams;
-      } else {
-        // don't reset anything if mode is null
-        return;
+        pos = this.position3D;
+      } else if (this.modeReactive == 'full') {
+        pos = this.fullwavePosition;
       }
-      // grab the mode correct position
-      const pos = this.modeReactive == "2D" ? this.position2D : this.position3D;
+      
       // we will move nicely. 
       this.gotoRADecZoom({
         ...pos,
@@ -989,15 +1018,19 @@ export default defineComponent({
         if (newVal == "3D") {
           this.set3DMode();
         }
+        if (newVal == "full") {
+          this.toggleFullwaveMode();
+        }
       } else {
       
         if (oldVal == "2D") {
           this.position2D = this.wwtPosition;
         } else if (oldVal == "3D") {
           this.position3D = this.wwtPosition;
-        } else if (oldVal == null) {
+        } else if (oldVal == "full") {
           this.resizeObserver?.disconnect();
           this.growWWT();
+          this.toggleUI();
         }
       }
       
