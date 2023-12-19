@@ -43,7 +43,7 @@
         <div id="splash-screen-text">
           <p>
             Want to surf a <span 
-            :style="{'color': clusterColor}"
+            :style="{'color': accentColor}"
             >giant wave</span> in the Milky Way Galaxy? 
             <!-- see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy? -->
           </p>
