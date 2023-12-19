@@ -115,7 +115,7 @@
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
-          v-if="true"
+          v-if="false"
           md-icon="mdi-sine-wave"
           @activate="toggleFullwaveMode()"
           :color="buttonColor"
