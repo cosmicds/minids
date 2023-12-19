@@ -971,6 +971,9 @@ export default defineComponent({
 
   watch: {
     playing(play: boolean) {
+      if (!play) {
+        this.playCount += 1;
+      }
       this.setClockSync(play);
       this.setClockRate(play ? this.timeRate : 0);
     },
