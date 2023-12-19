@@ -508,6 +508,7 @@ export default defineComponent({
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
+      defaultClusterDecay: 15,
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
@@ -565,7 +566,6 @@ export default defineComponent({
       });
       
     });
-    
     this.resizeObserver = new ResizeObserver((_entries) => {
       this.shinkWWT();
     });
@@ -665,6 +665,9 @@ export default defineComponent({
     set2DMode() {
       
       bestFitOffsets = bestFitOffsets2D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(1);
+      });
       
       this.setBackgroundImageByName(this.background2DImageset);
       this.applySetting(["showSolarSystem", false]);
@@ -692,6 +695,9 @@ export default defineComponent({
 
       
       bestFitOffsets = bestFitOffsets3D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(this.defaultClusterDecay);
+      });
       
 
       this.setBackgroundImageByName("Solar System");
@@ -819,7 +825,7 @@ export default defineComponent({
         layer.set_startDateColumn(4);
         layer.set_endDateColumn(5);
         layer.set_timeSeries(true);
-        layer.set_decay(15);
+        layer.set_decay(this.defaultClusterDecay);
       }
     },
 
