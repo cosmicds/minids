@@ -42,7 +42,9 @@
         </div>
         <div id="splash-screen-text">
           <p>
-            Want to surf a <span style="color: red;">giant wave</span> in the Milky Way Galaxy? 
+            Want to surf a <span 
+            :style="{'color': accentColor}"
+            >giant wave</span> in the Milky Way Galaxy? 
             <!-- see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy? -->
           </p>
         </div>
@@ -75,8 +77,9 @@
           <v-btn
             v-if="!showSplashScreen"
             id="loading-button"
+            color="white"
             :disabled="isLoading"
-            :color="accentColor"
+            variant="outlined"
             @click="userNotReady = false"
             @keyup.enter="userNotReady = false"
             elevation="10"
@@ -530,12 +533,15 @@ export default defineComponent({
       position2D: initial2DPosition as Omit<GotoRADecZoomParams,'instant'>,
       initial2DPosition,
       allSkyImagesets: [
-        'Mellinger color optical survey', 
-        'Digitized Sky Survey (Color)',
-        'WISE All Sky (Infrared)',
-        'unWISE color, from W2 and W1 bands',
+        'Deep Star Maps 2020', 
+        'Mellinger color optical survey',  // HIPS
         "Gaia DR2",
-        "Deep Star Maps 2020",
+        'Digitized Sky Survey (Color)',
+        'unWISE color, from W2 and W1 bands', // HIPS
+        'WISE All Sky (Infrared)',
+        'Planck Thermal Dust',
+        'Hydrogen Alpha Full Sky Map',
+        "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
       previousMode: mode as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
@@ -669,7 +675,7 @@ export default defineComponent({
     
     async loadHipsWTML () {
       return this.loadImageCollection({
-        url: "https://www.worldwidetelescope.org/wwtweb/catalog.aspx?W=hips",
+        url: "https://raw.githubusercontent.com/cosmicds/cds-website/main/public/wwt-content/radwave-wtml/hips.wtml",
         loadChildFolders: true,
       });
     },
@@ -965,6 +971,9 @@ export default defineComponent({
 
   watch: {
     playing(play: boolean) {
+      if (!play) {
+        this.playCount += 1;
+      }
       this.setClockSync(play);
       this.setClockRate(play ? this.timeRate : 0);
     },
@@ -1120,6 +1129,10 @@ export default defineComponent({
 
 #splash-screen {
   color: #ffffff;
+}
+
+#loading-button {
+  background-color: black;
 }
 
 .color-span {
