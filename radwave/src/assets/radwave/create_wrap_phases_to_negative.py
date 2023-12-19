@@ -17,29 +17,29 @@ start_time = df['start_times'][0]
 end_time = df['end_times'][0]
 
 
-def subtract_one_day(time):
+def subtract_one_day(n,time):
     """
     given a string date in the format 2023-10-17T11:55:55Z
     subtract one day and return the new string date
     """
     fmt = '%Y-%m-%dT%H:%M:%SZ'
     dt = pd.to_datetime(time)
-    dt = dt - timedelta(days=1)
+    dt = dt - timedelta(days=n)
     return dt.strftime(fmt)
 
-def end_time_for_negative_phase(phase):
+def end_time_for_negative_phase(negphase):
     # use phase 0 to get the start time
     # subtract phase number of days from the start time
     # return the date in the format 2023-10-17T11:55:55Z
     fmt = '%Y-%m-%dT%H:%M:%SZ'
-    dt0 = pd.to_datetime(start_time)
+    dt0 = pd.to_datetime(start_time) + timedelta(days=negphase+1)
     return dt0.strftime(fmt)
 
 
 # create files with negative phases
 # so phase 0 = 360, -1 = 359, -2 = 358, etc.
 
-for negphase in range(-10, 0):
+for negphase in range(-15, 0):
     # create the filename
     filename = filename_template.format(360 + negphase)
     # read in the file
@@ -47,7 +47,7 @@ for negphase in range(-10, 0):
     
     # subtract one day from the start time and end time
     df['end_times'] = end_time_for_negative_phase(negphase)
-    df['start_times'] = df['end_times'].apply(subtract_one_day)
+    df['start_times'] = df['end_times'].apply(lambda x: subtract_one_day(1, x))
     
     # write out the file
     outfile = filename_template.format(negphase)
