@@ -77,8 +77,9 @@
           <v-btn
             v-if="!showSplashScreen"
             id="loading-button"
+            color="white"
             :disabled="isLoading"
-            :color="accentColor"
+            variant="outlined"
             @click="userNotReady = false"
             @keyup.enter="userNotReady = false"
             elevation="10"
