@@ -12,7 +12,7 @@
     
     
     <wwt-hud
-      v-if="true"
+      v-if="false"
       :wwt-namespace="wwtNamespace"
       :location="{top: '5rem', right: '1rem'}"
       :offset-center="{x: 0, y: 0}"
