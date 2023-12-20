@@ -346,18 +346,40 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, D2R } from "@minids/common";
-import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Annotation, Color, PolyLine, RenderContext, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 
 // Coordinates isn't exposed to TypeScript, but it IS exported at the JS module level,
 // so it's enough to do this. We just won't get any LSP help from an editor.
+// Same with LineShaderNormalDates
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Coordinates } from "@wwtelescope/engine";
+import { Coordinates, LineShaderNormalDates } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
+
+// Let's (maybe) do some shader hacking!
+const originalShaderUse = LineShaderNormalDates.use;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const gl: WebGL2RenderingContext = WWTControl.singleton.renderContext.gl;
+const lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);  // Has the form [min, max]
+const maxLineWidth = lineWidthRange[1];
+
+// I'm not sure exactly what type most of these get passed in as
+// and since we're just going to forward them along, it really doesn't matter
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function newShaderUse(renderContext: RenderContext, vertex: any, lineColor: any, zBuffer: any, jNow: any, decay: any) {
+  originalShaderUse(renderContext, vertex, lineColor, zBuffer, jNow, decay);
+  gl.lineWidth(Math.min(maxLineWidth, 5));
+}
+
+if (maxLineWidth > 3) {  // At what value do we want to switch over?
+  LineShaderNormalDates.use = newShaderUse;
+}
+
 
 function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
   return new Promise((resolve) => {
