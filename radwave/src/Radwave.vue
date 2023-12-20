@@ -360,27 +360,6 @@ import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-t
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
-// Let's (maybe) do some shader hacking!
-const originalShaderUse = LineShaderNormalDates.use;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const gl: WebGL2RenderingContext = WWTControl.singleton.renderContext.gl;
-const lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);  // Has the form [min, max]
-const maxLineWidth = lineWidthRange[1];
-
-// I'm not sure exactly what type most of these get passed in as
-// and since we're just going to forward them along, it really doesn't matter
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function newShaderUse(renderContext: RenderContext, vertex: any, lineColor: any, zBuffer: any, jNow: any, decay: any) {
-  originalShaderUse(renderContext, vertex, lineColor, zBuffer, jNow, decay);
-  gl.lineWidth(Math.min(maxLineWidth, 5));
-}
-
-if (maxLineWidth > 3) {  // At what value do we want to switch over?
-  LineShaderNormalDates.use = newShaderUse;
-}
-
-
 function asyncSetTimeout<R>(func: () => R , ms: number): Promise<R> {
   return new Promise((resolve) => {
     setTimeout(() => resolve(func()), ms);
@@ -406,7 +385,7 @@ type Row = Record<string, number>;
 const SECONDS_PER_DAY = 86400;
 
 let bestFitAnnotations: PolyLine[] = [];
-const bestFitOffsets3D = [-2, -1, 0, 1, 2];
+let bestFitOffsets3D = [-2, -1, 0, 1, 2];
 const bestFitOffsets2D = [0];
 let bestFitOffsets = bestFitOffsets3D ;
 const bestFitLayer = new SpreadSheetLayer();
@@ -471,7 +450,6 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
     annotation._points$1.push(pos);
   }
 }
-
 
 
 function updateSlider(value: number) {
@@ -579,6 +557,28 @@ export default defineComponent({
 
   mounted() {
     this.waitForReady().then(async () => {
+
+      // Let's (maybe) do some shader hacking!
+      const originalShaderUse = LineShaderNormalDates.use;
+      // The WebGL context is not exposed to TypeScript
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const gl: WebGLRenderingContextBase = WWTControl.singleton.renderContext.gl;
+      const lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);  // Has the form [min, max]
+      const maxLineWidth = lineWidthRange[1];
+
+      // I'm not sure exactly what type most of these get passed in as
+      // and since we're just going to forward them along, it really doesn't matter
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function newShaderUse(renderContext: RenderContext, vertex: any, lineColor: any, zBuffer: any, jNow: any, decay: any) {
+        originalShaderUse(renderContext, vertex, lineColor, zBuffer, jNow, decay);
+        gl.lineWidth(Math.min(maxLineWidth, 5));
+      }
+
+      if (maxLineWidth > 3) {  // At what value do we want to switch over?
+        LineShaderNormalDates.use = newShaderUse;
+        bestFitOffsets3D = [0];
+      }
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
       
