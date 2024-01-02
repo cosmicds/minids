@@ -13,7 +13,7 @@
     "build": "./patch.sh; vue-cli-service build",
     "clean": "rimraf dist",
     "lint": "vue-cli-service lint src --no-fix",
-    "serve": "vue-cli-service serve"
+    "serve": "./patch.sh; vue-cli-service serve"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.13.2",
