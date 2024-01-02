@@ -352,9 +352,9 @@ import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer, WWT
 // so it's enough to do this. We just won't get any LSP help from an editor.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Coordinates } from "@wwtelescope/engine";
+import { Coordinates, PushPin, Texture, tilePrepDevice } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
-import { AltTypes, AltUnits, ImageSetType, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
+import { AltTypes, AltUnits, ImageSetType, MarkerScales, PlotTypes, RAUnits } from "@wwtelescope/engine-types";
 
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
@@ -459,6 +459,39 @@ function updateSlider(value: number) {
   }
 }
 
+let sunSquareTexture: Texture | null = null;
+const originalGetPPT = PushPin.getPushPinTexture;
+let gotSquareImage = false;
+
+export function updatedGetPushPinTexture(pinId: number) {
+  if (pinId === 35) {  // This is the push pin ID for squares
+    if (gotSquareImage) {
+      return PushPin._pinTextureCache[pinId];
+    }
+    const texture = tilePrepDevice.createTexture();
+    tilePrepDevice.bindTexture(tilePrepDevice.TEXTURE_2D, texture);
+    const temp = document.createElement('canvas');
+    temp.height = 32;
+    temp.width = 32;
+    const ctx = temp.getContext('2d') as CanvasRenderingContext2D;
+    //Substitute the resized image
+    ctx.drawImage(sunSquareTexture.imageElement, 0, 0);
+    const image = temp;
+    tilePrepDevice.texParameteri(tilePrepDevice.TEXTURE_2D, tilePrepDevice.TEXTURE_WRAP_S, tilePrepDevice.CLAMP_TO_EDGE);
+    tilePrepDevice.texParameteri(tilePrepDevice.TEXTURE_2D, tilePrepDevice.TEXTURE_WRAP_T, tilePrepDevice.CLAMP_TO_EDGE);
+    tilePrepDevice.texImage2D(tilePrepDevice.TEXTURE_2D, 0, tilePrepDevice.RGBA, tilePrepDevice.RGBA, tilePrepDevice.UNSIGNED_BYTE, image);
+    tilePrepDevice.texParameteri(tilePrepDevice.TEXTURE_2D, tilePrepDevice.TEXTURE_MIN_FILTER, tilePrepDevice.LINEAR_MIPMAP_NEAREST);
+    tilePrepDevice.generateMipmap(tilePrepDevice.TEXTURE_2D);
+    tilePrepDevice.bindTexture(tilePrepDevice.TEXTURE_2D, null);
+    PushPin._pinTextureCache[pinId] = texture;
+    gotSquareImage = true;
+    return texture;
+  } else {
+    return originalGetPPT(pinId);
+  }
+}
+
+
 export default defineComponent({
   extends: MiniDSBase,
   
@@ -530,6 +563,7 @@ export default defineComponent({
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
+      sunSquareLayer: null as SpreadSheetLayer | null,
       
       mode: "3D" as "2D" | "3D" | "full" | null,
       resizeObserver: null as ResizeObserver | null,
@@ -548,7 +582,7 @@ export default defineComponent({
         'Hydrogen Alpha Full Sky Map',
         "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
-      previousMode: mode as "2D" | "3D" | "full" | null,
+      previousMode: null as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
 
     };
@@ -556,7 +590,14 @@ export default defineComponent({
 
   mounted() {
     this.waitForReady().then(async () => {
-      
+
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      sunSquareTexture = Texture.fromUrl(require("./assets/sun_square.png"));
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      PushPin.getPushPinTexture = updatedGetPushPinTexture;
+
       this.backgroundImagesets = [...skyBackgroundImagesets];
       
       // initialize the view to black so that we don't flicker DSS
@@ -576,11 +617,11 @@ export default defineComponent({
       this.setClockSync(false);
 
       this.setupBestFitLayer();
-      const sunPromise = this.setupSunLayer();
+      const sunPromise = this.setupSunLayers();
       const clusterPromise = this.setupClusterLayers();
 
-      Promise.all([sunPromise, clusterPromise]).then(([sunLayer, clusterLayers]) => {
-        this.sunLayer = sunLayer;
+      Promise.all([sunPromise, clusterPromise]).then(([sunLayers, clusterLayers]) => {
+        [this.sunLayer, this.sunSquareLayer] = sunLayers;
         this.clusterLayers = clusterLayers;
         this.setTime(startDate);
         updateSlider(phase);
@@ -871,9 +912,9 @@ export default defineComponent({
       }
     },
 
-    async setupSunLayer(): Promise<SpreadSheetLayer> {
+    async setupSunLayers(): Promise<SpreadSheetLayer[]> {
       const text = sunCsv.replace(/\n/g, "\r\n");
-      return this.createTableLayer({
+      const sunLayerProm = this.createTableLayer({
         referenceFrame: "Sky",
         name: "Radcliffe Wave Sun",
         dataCsv: text
@@ -884,11 +925,31 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["color", Color.load(this.sunColor)],
-            ["scaleFactor", 100]
+            ["scaleFactor", 100],
           ]
         });
         return layer;
       });
+
+      const sunSquareLayerProm = this.createTableLayer({
+        referenceFrame: "Sky",
+        name: "Radcliffe Wave Sun Square",
+        dataCsv: text
+      }).then(layer => {
+        this.basicLayerSetup(layer);
+        this.applyTableLayerSettings({
+          id: layer.id.toString(),
+          settings: [
+            ["color", Color.load(this.sunColor)],
+            ["scaleFactor", 12000000000],
+            ["plotType", PlotTypes.square],
+            ["markerScale", MarkerScales.world]
+          ]
+        });
+        return layer;
+      });
+
+      return Promise.all([sunLayerProm, sunSquareLayerProm]);
     },
 
     // Note that we are NOT going to show this layer
@@ -932,7 +993,6 @@ export default defineComponent({
             layer.set_opacity(this.opacityForPhase(phase));
             layer.set_color(color);
             layer.set_scaleFactor(70);
-            //console.log(layer);
             return layer;
           });
         });

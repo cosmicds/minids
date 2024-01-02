@@ -10,7 +10,7 @@
     "webpack-plugin-vuetify": "^2.0.1"
   },
   "scripts": {
-    "build": "vue-cli-service build",
+    "build": "./patch.sh; vue-cli-service build",
     "clean": "rimraf dist",
     "lint": "vue-cli-service lint src --no-fix",
     "serve": "vue-cli-service serve"
