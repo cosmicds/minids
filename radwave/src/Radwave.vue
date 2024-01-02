@@ -631,7 +631,7 @@ export default defineComponent({
       
     });
     this.resizeObserver = new ResizeObserver((_entries) => {
-      this.shinkWWT();
+      this.shrinkWWT();
     });
     
   },
@@ -797,7 +797,7 @@ export default defineComponent({
         this.mode = "full";
         phase = 0;
         
-        this.shinkWWT();
+        this.shrinkWWT();
         this.resizeObserver?.observe(document.body);
         
         return this.gotoRADecZoom({
@@ -863,12 +863,12 @@ export default defineComponent({
       
     },
     
-    shinkWWT(aspect: number = null as unknown as number) {
+    shrinkWWT(aspect: number = null as unknown as number) {
       // default aspect = 5.7
       if (aspect == null) {
         aspect = 5.7;
       }
-      console.log('shinkWWT');
+      console.log('shrinkWWT');
       
       const mainContent = document.querySelector(".wwtelescope-component") as HTMLElement;
       const width = mainContent.clientWidth;
