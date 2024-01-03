@@ -727,7 +727,7 @@ export default defineComponent({
 
       this.setBackgroundImageByName("Solar System");
       this.setForegroundImageByName("Solar System");
-      this.sunLayer?.set_opacity(1);
+      this.sunLayer?.set_opacity(0);
       updateBestFitAnnotations(phase);
 
 
@@ -886,7 +886,8 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["color", Color.load(this.sunColor)],
-            ["scaleFactor", 100]
+            ["scaleFactor", 100],
+            ["opacity", 0]
           ]
         });
         return layer;
@@ -908,7 +909,7 @@ export default defineComponent({
       let alt = row[dCol];
       alt = (altFactor * alt);
       const sunPos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
-      const squareSideLength = 30000000;
+      const squareSideLength = 10000000;
       const halfSideLength = squareSideLength / 2;
       const threeD = WWTControl.singleton.renderType == ImageSetType.solarSystem;
       const pts = [
