@@ -346,13 +346,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets, D2R } from "@minids/common";
-import { Annotation, Color, PolyLine, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
+import { Annotation, Color, Poly, PolyLine, SpaceTimeController, SpreadSheetLayer, WWTControl } from "@wwtelescope/engine";
 
 // Coordinates isn't exposed to TypeScript, but it IS exported at the JS module level,
 // so it's enough to do this. We just won't get any LSP help from an editor.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Coordinates } from "@wwtelescope/engine";
+import { Coordinates, Vector3d } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, ImageSetType, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
@@ -530,6 +530,7 @@ export default defineComponent({
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
+      sunAnnotation: null as Poly | null,
       
       mode: "3D" as "2D" | "3D" | "full" | null,
       resizeObserver: null as ResizeObserver | null,
@@ -548,7 +549,7 @@ export default defineComponent({
         'Hydrogen Alpha Full Sky Map',
         "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
-      previousMode: mode as "2D" | "3D" | "full" | null,
+      previousMode: null as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
 
     };
@@ -582,6 +583,7 @@ export default defineComponent({
       Promise.all([sunPromise, clusterPromise]).then(([sunLayer, clusterLayers]) => {
         this.sunLayer = sunLayer;
         this.clusterLayers = clusterLayers;
+        this.setupSunSquareAnnotation();
         this.setTime(startDate);
         updateSlider(phase);
         window.requestAnimationFrame(this.onAnimationFrame);
@@ -889,6 +891,52 @@ export default defineComponent({
         });
         return layer;
       });
+    },
+
+    setupSunSquareAnnotation() {
+      if (this.sunLayer === null) {
+        return;
+      }
+      const lngCol = this.sunLayer.get_lngColumn();
+      const latCol = this.sunLayer.get_latColumn();
+      const dCol = this.sunLayer.get_altColumn();
+
+      const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const row: Row = this.sunLayer.get__table().rows[0];
+      let alt = row[dCol];
+      alt = (altFactor * alt);
+      const sunPos = Coordinates.geoTo3dRad(row[latCol], row[lngCol], alt);
+      const squareSideLength = 30000000;
+      const halfSideLength = squareSideLength / 2;
+      const threeD = WWTControl.singleton.renderType == ImageSetType.solarSystem;
+      const pts = [
+        Vector3d.create(sunPos.x - halfSideLength, sunPos.y, sunPos.z + halfSideLength),
+        Vector3d.create(sunPos.x + halfSideLength, sunPos.y, sunPos.z + halfSideLength),
+        Vector3d.create(sunPos.x + halfSideLength, sunPos.y, sunPos.z - halfSideLength),
+        Vector3d.create(sunPos.x - halfSideLength, sunPos.y, sunPos.z - halfSideLength)
+      ];
+
+      if (threeD) {
+        pts.forEach(pt => {
+          // See https://github.com/WorldWideTelescope/wwt-webgl-engine/blob/master/engine/esm/grids.js#L90
+          // These rotations are to put the square in the plane of the Milky Way
+          pt.rotateY(213 / 180 * Math.PI);
+          pt.rotateZ((-62.87175) / 180 * Math.PI);
+          pt.rotateY((-192.8595083) / 180 * Math.PI);
+          pt.rotateX(ecliptic);
+        });
+      }
+
+      this.sunAnnotation = new Poly();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      pts.forEach(pt => this.sunAnnotation._points$1.push(pt));
+
+      this.sunAnnotation.set_lineColor(this.sunColor);
+
+      this.addAnnotation(this.sunAnnotation);
     },
 
     // Note that we are NOT going to show this layer
