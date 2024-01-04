@@ -552,6 +552,9 @@ export default defineComponent({
       previousMode: mode as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
 
+
+      minZoom: 260763995.5927744,
+      maxZoom: 7328103718.39476
     };
   },
 
@@ -1058,6 +1061,21 @@ export default defineComponent({
         return;
       }
       
+    },
+
+    wwtZoomDeg(zoom: number) {
+      if (mode !== "3D") {
+        return;
+      }
+      const pinnedZoom = Math.min(Math.max(zoom, this.minZoom), this.maxZoom);
+      if (pinnedZoom !== zoom) {
+        this.gotoRADecZoom({
+          raRad: this.wwtRARad,
+          decRad: this.wwtDecRad,
+          zoomDeg: pinnedZoom,
+          instant: true
+        });
+      }
     }
     
   }
