@@ -941,9 +941,9 @@ export default defineComponent({
           id: layer.id.toString(),
           settings: [
             ["color", Color.load(this.sunColor)],
-            ["scaleFactor", 12000000000],
+            ["scaleFactor", 30],
             ["plotType", PlotTypes.square],
-            ["markerScale", MarkerScales.world]
+            ["markerScale", MarkerScales.screen]
           ]
         });
         return layer;
