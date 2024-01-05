@@ -596,6 +596,10 @@ export default defineComponent({
     this.resizeObserver = new ResizeObserver((_entries) => {
       this.shinkWWT();
     });
+
+    // Pin the min and max zoom in 3D mode
+    WWTControl.singleton.setSolarSystemMinZoom(this.minZoom);
+    WWTControl.singleton.setSolarSystemMaxZoom(this.maxZoom);
     
   },
 
@@ -1061,21 +1065,6 @@ export default defineComponent({
         return;
       }
       
-    },
-
-    wwtZoomDeg(zoom: number) {
-      if (mode !== "3D") {
-        return;
-      }
-      const pinnedZoom = Math.min(Math.max(zoom, this.minZoom), this.maxZoom);
-      if (pinnedZoom !== zoom) {
-        this.gotoRADecZoom({
-          raRad: this.wwtRARad,
-          decRad: this.wwtDecRad,
-          zoomDeg: pinnedZoom,
-          instant: true
-        });
-      }
     }
     
   }
