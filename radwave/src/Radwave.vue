@@ -555,8 +555,8 @@ export default defineComponent({
       fullwavePosition: fullwavePosition,
 
 
-      minZoom: 260763995.5927744,
-      maxZoom: 7328103718.39476
+      minZoom: 160763995.5927744,
+      maxZoom: 22328103718.39476
     };
   },
 
