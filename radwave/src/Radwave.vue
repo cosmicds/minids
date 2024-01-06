@@ -356,6 +356,8 @@ import { Coordinates } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
+import { zoom } from "./wwt-hacks";
+
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
@@ -552,6 +554,9 @@ export default defineComponent({
       previousMode: mode as "2D" | "3D" | "full" | null,
       fullwavePosition: fullwavePosition,
 
+
+      minZoom: 160763995.5927744,
+      maxZoom: 22328103718.39476
     };
   },
 
@@ -593,6 +598,14 @@ export default defineComponent({
     this.resizeObserver = new ResizeObserver((_entries) => {
       this.shinkWWT();
     });
+
+    // Pin the min and max zoom in 3D mode
+    WWTControl.singleton.setSolarSystemMinZoom(this.minZoom);
+    WWTControl.singleton.setSolarSystemMaxZoom(this.maxZoom);
+
+    // Patch the zoom function to account for min zoom as well
+    // See upstream fix at https://github.com/WorldWideTelescope/wwt-webgl-engine/pull/292
+    WWTControl.singleton.zoom = zoom.bind(WWTControl.singleton);
     
   },
 
