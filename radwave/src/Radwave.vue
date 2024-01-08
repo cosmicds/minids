@@ -43,7 +43,7 @@
         <div id="splash-screen-text">
           <p>
             Want to surf a <span 
-            :style="{'color': clusterColor}"
+            :style="{'color': accentColor}"
             >giant wave</span> in the Milky Way Galaxy? 
             <!-- see the <span style="color: red;">Radcliffe Wave</span> <span class="color-span">oscillating</span> through our Galaxy? -->
           </p>
@@ -357,6 +357,8 @@ import { Coordinates } from "@wwtelescope/engine";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 import { AltTypes, AltUnits, MarkerScales, RAUnits } from "@wwtelescope/engine-types";
 
+import { zoom } from "./wwt-hacks";
+
 import sunCsv from "./assets/Sun_radec.csv";
 import bestFitCsv from "./assets/radwave/RW_best_fit_oscillation_phase_radec_downsampled.csv";
 
@@ -484,8 +486,11 @@ export default defineComponent({
     }
   },
   data() {
-    const phaseOpacitySlope = -1 / 80;
-    const phaseOpacityIntercept = 1 - phaseOpacitySlope * 100;
+    const initialOpacity = 0.5;
+    const fadeStartPhase = 100;
+    const fadeEndPhase = 180;
+    const phaseOpacitySlope = -initialOpacity / (fadeEndPhase - fadeStartPhase);
+    const phaseOpacityIntercept = initialOpacity * fadeEndPhase / (fadeEndPhase - fadeStartPhase);
     const initial2DPosition = {
       raRad: 6,
       decRad: 1,
@@ -526,10 +531,13 @@ export default defineComponent({
       phaseCol: 3,
       clusterLayers: [] as SpreadSheetLayer[],
 
+      initialOpacity,
+      fadeStartPhase,
+      fadeEndPhase,
       phaseOpacitySlope,
       phaseOpacityIntercept,
       clusterColor: "#1f3cf1",
-      defaultClusterDecay: 15,
+      defaultClusterDecay: 5,
 
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
@@ -554,6 +562,9 @@ export default defineComponent({
       previousMode: mode as  ModeType,
       fullwavePosition: fullwavePosition,
 
+
+      minZoom: 160763995.5927744,
+      maxZoom: 22328103718.39476
     };
   },
   
@@ -619,6 +630,19 @@ export default defineComponent({
       });
       
     });
+
+    this.resizeObserver = new ResizeObserver((_entries) => {
+      this.shinkWWT();
+    });
+
+    // Pin the min and max zoom in 3D mode
+    WWTControl.singleton.setSolarSystemMinZoom(this.minZoom);
+    WWTControl.singleton.setSolarSystemMaxZoom(this.maxZoom);
+
+    // Patch the zoom function to account for min zoom as well
+    // See upstream fix at https://github.com/WorldWideTelescope/wwt-webgl-engine/pull/292
+    WWTControl.singleton.zoom = zoom.bind(WWTControl.singleton);
+
     
   },
 
@@ -930,10 +954,7 @@ export default defineComponent({
 
     opacityForPhase(phase: number): number {
       const adjustedPhase = 180 - Math.abs(180 - phase);
-      if (adjustedPhase <= 100) {
-        return 1;
-      }
-      return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), 1);
+      return Math.min(Math.max(this.phaseOpacitySlope * adjustedPhase + this.phaseOpacityIntercept, 0), this.initialOpacity);
     },
 
     setupClusterLayers(): Promise<SpreadSheetLayer[]> {
@@ -952,6 +973,7 @@ export default defineComponent({
             layer.set_opacity(this.opacityForPhase(phase));
             layer.set_color(color);
             layer.set_scaleFactor(70);
+            //console.log(layer);
             return layer;
           });
         });
@@ -1095,7 +1117,16 @@ export default defineComponent({
 }
 
 #modal-loading {
-  background-image: url("./assets/radwave_landing.png");
+
+
+  @media (max-width: 699px) {
+    background-image: url("./assets/radwave_landing_mobile.png");
+  }
+
+  @media (min-width: 700px) {
+    background-image: url("./assets/radwave_landing_desktop.png");
+  }
+
   background-position: center;
   background-size: 100%;
   background-repeat: no-repeat;
@@ -1157,6 +1188,10 @@ export default defineComponent({
 
 #splash-screen {
   color: #ffffff;
+}
+
+#loading-button {
+  background-color: black;
 }
 
 .color-span {
