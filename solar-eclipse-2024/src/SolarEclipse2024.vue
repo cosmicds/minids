@@ -326,6 +326,9 @@
                 <div id="info-text-box">
 
                   <div id="main-info-text">
+                    <h3 class="pb-5" style="color: magenta">
+                      Don't forget to include relevant data sources (currently in Datasources.md) into onscreen text.
+                    </h3>
                     <p>
                     On April 8, 2024, North America will be treated to an awe-inspiring total eclipse. 
                     </p>
