@@ -433,7 +433,6 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
   const latCol = layer.get_latColumn();
   const dCol = layer.get_altColumn();
   const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
-  console.log('adding points to annotation', mode);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const rows: Row[] = layer.get__table().rows.slice(phase * phaseRowCount, (phase + 1) * phaseRowCount);
@@ -629,10 +628,6 @@ export default defineComponent({
       
     });
 
-    this.resizeObserver = new ResizeObserver((_entries) => {
-      this.shinkWWT();
-    });
-
     // Pin the min and max zoom in 3D mode
     WWTControl.singleton.setSolarSystemMinZoom(this.minZoom);
     WWTControl.singleton.setSolarSystemMaxZoom(this.maxZoom);
@@ -640,7 +635,6 @@ export default defineComponent({
     // Patch the zoom function to account for min zoom as well
     // See upstream fix at https://github.com/WorldWideTelescope/wwt-webgl-engine/pull/292
     WWTControl.singleton.zoom = zoom.bind(WWTControl.singleton);
-
     
   },
 
@@ -823,8 +817,6 @@ export default defineComponent({
         });
       }, 100);
       
-
-      
     }, 
     
     enterFullWaveMode() {
@@ -833,28 +825,6 @@ export default defineComponent({
     
     exitFullWaveMode() {
       this.modeReactive = this.previousMode;
-    },
-    
-    toggleUI(val='off') {
-      // toggle visibility of class .bottom-content using opacity
-      if (val != 'on') {return ;}
-      
-      const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
-      const op = bottomContent.style.opacity;
-      if (op == "0" || val == 'on') {
-        bottomContent.style.opacity = "1";
-      } else {
-        bottomContent.style.opacity = "0";
-      }
-      
-      // now for top-content
-      const topContent = document.querySelector(".top-content") as HTMLElement;
-      const op2 = topContent.style.opacity;
-      if (op2 == "0" || val == 'on') {
-        topContent.style.opacity = "1";
-      } else {
-        topContent.style.opacity = "0";
-      }
     },
     
     positionReset() {
