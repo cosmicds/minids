@@ -592,7 +592,9 @@ export default defineComponent({
           return this.set2DMode();
         } else if (this.modeReactive == 'full') {
           console.log('init setFullwaveMode');
-          return this.enterFullWaveMode();
+          this.userNotReady = false;
+          this.showSplashScreen = false;
+          return this.setFullwaveMode();
         } else {
           return;
         }
