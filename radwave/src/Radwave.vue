@@ -95,9 +95,8 @@
 
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
-    <div 
-    :class="['top-content',modeReactive=='full' ? 'hidden' : '']">
-      <div v-if="modeReactive != null" id="left-buttons">
+    <div class="top-content">
+      <div id="left-buttons" :class="[modeReactive=='full' ? 'hidden' : '']">
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
@@ -119,9 +118,8 @@
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
-          v-if="true"
           md-icon="mdi-sine-wave"
-          @activate="setFullwaveMode()"
+          @activate="() => modeReactive == 'full' ? exitFullWaveMode() : enterFullWaveMode()"
           :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
@@ -133,7 +131,7 @@
         </icon-button>
         
         <icon-button
-          v-if="(playCount > 0) ?? (modeReactive == 'full')"
+          v-if="(playCount > 0) && (modeReactive != 'full')"
           @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
           :color="buttonColor"
           tooltip-text="Switch modes"
@@ -435,7 +433,7 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
   const latCol = layer.get_latColumn();
   const dCol = layer.get_altColumn();
   const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
-
+  console.log('adding points to annotation', mode);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const rows: Row[] = layer.get__table().rows.slice(phase * phaseRowCount, (phase + 1) * phaseRowCount);
@@ -595,7 +593,7 @@ export default defineComponent({
           return this.set2DMode();
         } else if (this.modeReactive == 'full') {
           console.log('init setFullwaveMode');
-          return this.setFullwaveMode();
+          return this.enterFullWaveMode();
         } else {
           return;
         }
@@ -625,7 +623,7 @@ export default defineComponent({
       }).then(() => {
         if (this.modeReactive == 'full') {
           console.log('init Full Wave Mode');
-          this.setFullwaveMode();
+          this.enterFullWaveMode();
         }
       });
       
@@ -795,26 +793,52 @@ export default defineComponent({
     async setFullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
-      return this.set2DMode().then(() => {
-        this.previousMode = this.modeReactive;
-        this.modeReactive = "full";
-        phase=0;
+      
+      // enter 2D mode
+      bestFitOffsets = bestFitOffsets2D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(1);
+      });
+      
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.applySetting(["showSolarSystem", false]);
+      this.sunLayer?.set_opacity(0);
+      this.playing = false;
+      phase=0;
+      updateSlider(phase);
+      updateBestFitAnnotations(phase);    
+      this.setTime(startDate);
+      
+      // setup the ui
+      this.closeSplashScreen(); // needed if we use query param
+      this.shinkWWT();
+      this.resizeObserver?.observe(document.body);
+      
+      return asyncSetTimeout(() => {
         
-        this.closeSplashScreen();
-        this.shinkWWT();
-        this.toggleUI('off');
-        this.resizeObserver?.observe(document.body);
-        return this.gotoRADecZoom({
+        this.gotoRADecZoom({
           ...this.fullwavePosition, 
           instant: true}).catch((err) => {
           console.log(err);
         });
-      });
+      }, 100);
+      
+
       
     }, 
     
+    enterFullWaveMode() {
+      this.modeReactive = 'full';
+    },
+    
+    exitFullWaveMode() {
+      this.modeReactive = this.previousMode;
+    },
+    
     toggleUI(val='off') {
       // toggle visibility of class .bottom-content using opacity
+      if (val != 'on') {return ;}
+      
       const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
       const op = bottomContent.style.opacity;
       if (op == "0" || val == 'on') {
@@ -1066,6 +1090,7 @@ export default defineComponent({
     
     modeReactive(newVal, oldVal) {
       mode = newVal;
+      this.previousMode = oldVal;
       if (oldVal == newVal) {
         if (newVal == "2D") {
           this.set2DMode();
@@ -1078,14 +1103,13 @@ export default defineComponent({
         }
       } else {
       
-        if (oldVal == "2D") {
+        if (oldVal == "2D" && newVal == "3D") {
           this.position2D = this.wwtPosition;
-        } else if (oldVal == "3D") {
+        } else if (oldVal == "3D" && newVal == "2D") {
           this.position3D = this.wwtPosition;
         } else if (oldVal == "full") {
-          this.resizeObserver?.disconnect();
           this.growWWT();
-          this.toggleUI('on');
+          this.resizeObserver?.unobserve(document.body as HTMLElement);
         }
       }
       
@@ -1096,8 +1120,7 @@ export default defineComponent({
       } else if (newVal == "3D") {
         this.set3DMode();
       } else {
-        // don't do anything if mode is null
-        return;
+        this.setFullwaveMode();
       }
       
     }
