@@ -3092,6 +3092,10 @@ export default defineComponent({
       }
     },
 
+    wwtZoomDeg(_zoom: number) {
+      this.updateIntersection();
+    },
+
     useRegularMoon(_show: boolean) {
       this.updateMoonTexture();
       this.updateFrontAnnotations(this.dateTime);
