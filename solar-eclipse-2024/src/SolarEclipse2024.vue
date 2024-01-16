@@ -52,9 +52,6 @@
               <span v-if="learnerPath=='Explore'"
                 >Watch and Compare
               </span>
-              <span v-if="learnerPath=='Answer'"
-                >Identify Eclipse Path
-              </span>
               <span v-if="learnerPath=='Choose'"
                 >Choose Any Location
               </span>
@@ -68,83 +65,11 @@
               <span class="description">
                 <p v-if="!queryData"><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> <font-awesome-icon icon="play" class="bullet-icon"/> to "watch" the eclipse at the location marked by the red dot.</p>
 
-                <p><strong>{{ touchscreen ? "Tap" : "Click" }} highlighted cities</strong> on the map to switch locations and view the eclipse from there.</p>
-                <p><strong>Explore</strong> until you can identify which locations will see an annular eclipse!</p>
+                <p><strong>{{ touchscreen ? "Tap" : "Click" }}</strong> on the map to switch locations and view the eclipse from there.</p>
+                <p>The <strong><span class="highlighted bg-red">red</span></strong> line shows the path of the total eclipse, and the <span class="highlighted bg-grey text-black">Grey</span> band shows where the total eclipse will be visible (the umbra)</p>
               </span>
             </div>
             
-            <div class="instructions-text" v-if="learnerPath=='Answer'">
-              <span class="description">
-                <p>Have you determined the eclipse path? <strong>{{ touchscreen ? "Tap" : "Click" }} a card</strong> to select it.</p>
-                <p>If you are not sure, {{ touchscreen ? "tap" : "click" }} <font-awesome-icon icon="rocket" class="bullet-icon"/> to keep exploring.</p>
-              </span>
-              <mc-radiogroup
-                v-if="learnerPath=='Answer'"
-                id = "mc-radiogroup-container"
-                row
-                hide-input
-                :preselected="quizAnswer"
-                :radio-options="['A', 'B','C']"
-                :feedbacks="['Not that one.<br/>Try again!', 'Not that one.<br/>Try again!', 'Yes! It passes from Oregon to Texas']"
-                :correct-answers="[2]"
-                @select="onAnswerSelected"
-                colorWrong="transparent"
-                colorRight="transparent"
-                > 
-                <!-- for images width=100px, height=58px for correct aspect ratio -->
-                <template #default="{index, text, selected, color, feedback}">
-                    <flip-transition
-                      :id="text"
-                      :width="(xSmallSize ? `21vw` : `12vw`)"
-                      height="9vh"
-                      duration="0.8s"
-                      :flipBackAfter="3000" 
-                      tabindex="0"
-                      role="button"
-                      borderRadius="5px"
-                      >
-                      <template v-slot:front>
-                      <image-label 
-                        id="front"
-                        :alt-text="longAnswers[index]"
-                        :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
-                        :background-color="(selected ? `${color}` : '#F0DCB9')"
-                        :background-opacity="1"
-                        fontSize="5vh"
-                        fontWeight="bold"
-                        :width="(xSmallSize ? `21vw` : `12vw`)"
-                        height="9vh"
-                        :border="'1px solid white'"
-                        borderRadius="5px"
-                        @click="() => { console.log('clicked'); quizAnswer = index;}"
-                      >
-                      {{ text }}
-                      </image-label>
-                      </template>
-                      <template v-slot:back>
-                        <image-label
-                          id="front" 
-                          :color="['rgb(0,180,200)','rgb(255, 110,0)','#f0f'][index]"
-                          background-color="black"
-                          :background-opacity="1"
-                          :width="(xSmallSize ? `21vw` : `12vw`)"
-                          height="9vh"
-                          :fontSize="(xSmallSize ? `min(2vh,2.5vw)` : `min(1.6vh,1.6vw)`)"
-                          fontWeight="bold"
-                          lineHeight="(xSmallSize ? `min(2.2vh,2.7vw)` : `min(1.8vh,1.8vw)`)"
-                          :border="'1px solid white'"
-                          borderRadius="5px"
-                        >
-                        <span v-html="feedback"></span>
-                        </image-label>
-                      </template>
-                  </flip-transition>
-                </template>
-              </mc-radiogroup>
-              <div v-if="showLinkToPath" class="my-1">
-                See NASA's map with the October annular eclipse path <a href="https://science.nasa.gov/eclipses/future-eclipses/eclipse-2024/where-when/" target="_blank" rel="noopener noreferrer">here.</a>
-              </div>
-            </div>
             
             <!-- Choose Path -->
             <div class="instructions-text" v-if="learnerPath=='Choose'">
@@ -194,18 +119,6 @@
                 @activate="() => { learnerPath = 'Choose'}"
               ></icon-button>
               <icon-button
-                :model-value="learnerPath == 'Answer'"
-                fa-icon="puzzle-piece"
-                fa-size="xl"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :tooltip-text="'Identify eclipse path'"
-                :tooltip-location="'bottom'"
-                :show-tooltip="!mobile"
-                :box-shadow="false"
-                @activate="() => { learnerPath = 'Answer'}"
-              ></icon-button>   
-              <icon-button
                 v-model="showInfoSheet"
                 fa-icon="book-open"
                 fa-size="xl"
@@ -238,29 +151,12 @@
           :disabled="smAndUp"
         >
           <div v-if="!smAndUp || smAndUp" id="map-container" >
+            <!-- :places="places" -->
             <location-selector
-              v-if="learnerPath == 'Explore'"
-              :model-value="locationDeg"
-              @place="(place: typeof places[number]) => updateLocation(place.name)"
-              :detect-location="false"
-              :map-options="presetMapOptions"
-              :places="places"
-              :initial-place="places.find(p => p.name === 'selectedLocation')"
-              :place-circle-options="placeCircleOptions"
-              :selected-circle-options="selectedCircleOptions"
-              :selectable="false"
-              class="leaflet-map"
-              :geo-json-files="geojson"
-            ></location-selector>
-
-            <span id="eclipse-path-map" v-if="learnerPath=='Answer'">
-              <img alt="This is a map of the US with three possible paths for the April 2024 solar eclipse. In choice A, the eclipse moves North to South from Bismarck, ND through Denver, CO and Albuquerque, NM. In choice B, the eclipse moves West to East from Los Angeles, CA to Charlotte, NC. In Choice C, the eclipse moves Northwest to South from Eugene, OR to San Antonio, TX." src="./assets/AnnularEclipseMap.png"/>
-            </span>
-
-            <location-selector
-              v-if="learnerPath == 'Choose'"
               :model-value="locationDeg"
               @update:modelValue="updateLocationFromMap"
+              :initial-place="places.find(p => p.name === 'selectedLocation')"
+              :place-circle-options="placeCircleOptions"
               :detect-location="false"
               :map-options="userSelectedMapOptions"
               :selected-circle-options="selectedCircleOptions"
@@ -1306,7 +1202,7 @@ import { v4 } from "uuid";
 import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParameters, renderOneFrame } from "./wwt-hacks";
 
 type SheetType = "text" | "video" | null;
-type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
+type LearnerPath = "Explore" | "Choose" | "Learn";
 type ViewerMode = "Horizon" | "SunScope";
 type MoonImageFile = "moon.png" | "moon-dark-gray-overlay.png" | "moon-sky-blue-overlay.png";
 
@@ -1443,7 +1339,7 @@ function parseEclipsePath(csv: string) {
 const eclipsePath = parseEclipsePath(eclipse);
 
 // convert the eclipse path to a GeoJson feature collection
-const eclipsePathGeoJson = {
+const _eclipsePathGeoJson = {
   "name": "Eclipse Path",
   "type": "FeatureCollection",
   "features": eclipsePath.map((d) => {
@@ -1802,10 +1698,10 @@ export default defineComponent({
           url: 'https://raw.githubusercontent.com/johnarban/wwt_interactives/main/images/center.json',
           style: {color: '#ff0000', weight: 2, opacity: 1, fillOpacity: 0}
         },
-        {
-          'geojson': eclipsePathGeoJson as GeoJSON.FeatureCollection,
-          'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
-        }
+        // { // individual places
+        //   'geojson': eclipsePathGeoJson as GeoJSON.FeatureCollection,
+        //   'style': {radius:3,fillColor: '#ccc', color:'#222', weight: 2, opacity: 1, fillOpacity: 1}
+        // }
       ],
       
 
@@ -4262,6 +4158,13 @@ video, #info-video {
   
   @media (max-width: 600px) and (max-aspect-ratio: 1) {
     flex-direction: column;
+  }
+  
+  
+  span.highlighted {
+    font-weight: bold;
+    padding-inline: 0.5em;
+    border-radius: 0.25em;;
   }
   
   #scrollButton-button {
