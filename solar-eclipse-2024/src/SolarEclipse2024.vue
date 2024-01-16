@@ -2269,11 +2269,13 @@ export default defineComponent({
       const dSq = sunMoonDistance * sunMoonDistance;
       const rMoonSq = rMoonPx * rMoonPx;
       const rSunSq = rSunPx * rSunPx;
+      console.log(rMoonSq, rSunSq);
 
       const moonArea = Math.PI * rMoonSq;
       const sunArea = Math.PI * rSunSq;
+      let fractionEclipsed = 0;
       if (moonInsideSun || sunInsideMoon) {
-        this.currentPercentEclipsed = moonArea / sunArea;
+        fractionEclipsed = moonArea / sunArea;
       } else {
         // See https://mathworld.wolfram.com/Circle-CircleIntersection.html
         const intersectionArea =
@@ -2282,9 +2284,9 @@ export default defineComponent({
           0.5 * Math.sqrt(
             (rSunPx + rMoonPx - sunMoonDistance) * (sunMoonDistance + rMoonPx - rSunPx) * (sunMoonDistance - rMoonPx + rSunPx) * (sunMoonDistance + rSunPx + rMoonPx)
           );
-        const percentEclipsed = intersectionArea / sunArea;
-        this.currentPercentEclipsed = isNaN(percentEclipsed) ? 1 : percentEclipsed;
+        fractionEclipsed = intersectionArea / sunArea;
       }
+      this.currentPercentEclipsed = isNaN(fractionEclipsed) ? 1 : Math.max(Math.min(fractionEclipsed, 1), 0);
 
       // If we're using the regular WWT moon, or in sun scope mode, we don't want the overlay but did want the percentage eclipsed
       if (this.useRegularMoon || this.viewerMode === "SunScope") {
