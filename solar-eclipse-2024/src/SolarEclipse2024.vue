@@ -1308,7 +1308,7 @@ import { drawSkyOverlays, makeAltAzGridText, layerManagerDraw, updateViewParamet
 type SheetType = "text" | "video" | null;
 type LearnerPath = "Explore" | "Choose" | "Learn" | "Answer";
 type ViewerMode = "Horizon" | "SunScope";
-type MoonImageFile = "moon.png" | "moon-dark-gray-overlay.png" | "moon-sky-blue-overlay.png";
+type MoonImageFile = "moon.png" | "moon-dark-gray-overlay.png" | "moon-sky-blue-overlay.png" | "empty.png";
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -2226,7 +2226,7 @@ export default defineComponent({
       return distance(ra1, dec1, ra2, dec2);
     },
     
-    updateIntersection() {
+    updateMoonAnnotations() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -2254,6 +2254,7 @@ export default defineComponent({
       const rSunPx = 6 * thetaSun * canvasHeight / (this.wwtZoomDeg * D2R);
 
       const points: { x: number; y: number }[] = [];
+      const moonCoverPoints: { x: number; y: number }[] = [];
       const sunMoonAngle = this.greatCircleDistance(sunPosition, moonPosition);
       const sunMoonDistance = 6 * sunMoonAngle * canvasHeight / (this.wwtZoomDeg * D2R);
 
@@ -2269,7 +2270,6 @@ export default defineComponent({
       const dSq = sunMoonDistance * sunMoonDistance;
       const rMoonSq = rMoonPx * rMoonPx;
       const rSunSq = rSunPx * rSunPx;
-      console.log(rMoonSq, rSunSq);
 
       const moonArea = Math.PI * rMoonSq;
       const sunArea = Math.PI * rSunSq;
@@ -2372,7 +2372,6 @@ export default defineComponent({
           points.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) });
         }
 
-
         // We now need to somewhat repeat this analysis in the Sun frame
 
         let thetaS1 = Math.atan2((y1 - sunPoint.y) / rSunPx, (x1 - sunPoint.x) / rSunPx);
@@ -2394,12 +2393,37 @@ export default defineComponent({
           const angle = thetaS1 + (i / n) * rangeSizeS;
           points.push({ x: rSunPx * Math.cos(angle) + sunPoint.x, y: rSunPx * Math.sin(angle) + sunPoint.y });
         }
+
+        if (this.skyOpacity < 1) {
+          for (let i = 0; i <= n; i++) {
+            const angle = (i / n) * 2 * Math.PI;
+            moonCoverPoints.push({ x: rMoonPx * Math.cos(angle), y: rMoonPx * Math.sin(angle) }); 
+          }
+        }
       }
 
       // We made a translation into the moon's frame, so undo that
       for (let i = 0; i < points.length; i++) {
         points[i].x += moonPoint.x;
         points[i].y += moonPoint.y;
+      }
+      for (let i = 0; i < moonCoverPoints.length; i++) {
+        moonCoverPoints[i].x += moonPoint.x;
+        moonCoverPoints[i].y += moonPoint.y;
+      }
+
+      this.updateMoonTexture();
+
+      if (this.skyOpacity < 1) {
+        const moonCover = new Poly2();
+        moonCoverPoints.sort((p1, p2) => - Math.atan2(p2.y - moonPoint.y, p2.x - moonPoint.x) + Math.atan2(p1.y - moonPoint.y, p1.x - moonPoint.x));
+        const coverLocations = moonCoverPoints.map(pt => this.findRADecForScreenPoint({ x: pt.x, y: canvasHeight - pt.y }));
+        moonCover.set_fill(true);
+        moonCover.set_fillColor(this.skyColor);
+        moonCover.set_lineColor(this.skyColor);
+        moonCover.set_opacity(this.skyOpacity);
+        coverLocations.forEach(pt => moonCover.addPoint(pt.ra, pt.dec));
+        Annotation2.addAnnotation(moonCover);
       }
 
       const centroidX = points.reduce((s, p) => s + p.x, 0) / points.length;
@@ -2433,6 +2457,11 @@ export default defineComponent({
     updateMoonTexture(force=false) {
       let filename: MoonImageFile = "moon.png";
       if (!this.useRegularMoon) {
+        if (this.skyOpacity < 1) {
+          this.moonTexture = "empty.png";
+          Planets._planetTextures[9] = this.textureFromAssetImage(this.moonTexture);
+          return;
+        }
         // Are we even using showSky?
         const blueMoon = (this.showHorizon && this.showSky) &&
                           this.moonPosition.altRad > 0 &&
@@ -2816,7 +2845,7 @@ export default defineComponent({
         this.removeAnnotations();
       }
       finally {
-        this.updateIntersection();
+        this.updateMoonAnnotations();
         if (this.showHorizon) {
           this.createHorizon(when);
           if (this.showSky) {
@@ -3095,7 +3124,7 @@ export default defineComponent({
     },
 
     wwtZoomDeg(_zoom: number) {
-      this.updateIntersection();
+      this.updateMoonAnnotations();
     },
 
     useRegularMoon(_show: boolean) {
