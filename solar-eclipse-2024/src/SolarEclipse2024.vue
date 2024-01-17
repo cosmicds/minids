@@ -1471,13 +1471,16 @@ import { csvParseRows } from "d3-dsv";
 // the first row is the longitude values
 // the first column is the latitude values
 // the data lies in the interior of the matrix
-const cloudData = csvParseRows(cloudCover, (d, _i) => {
+let cloudData: number[][] = csvParseRows(cloudCover, (d, _i) => {
   // loop over the row and convert each value to a number ("+v")
   return d.map((v) => +v);
 });
 
-const minLat = Math.min(...cloudData.map((d) => d[0]));
-const minLon = Math.min(...cloudData[0]);
+// lon and lat are first col and row (dropping the first value)
+const minLat = Math.min(...cloudData.map(d => d[0]).slice(1));
+const minLon = Math.min(...cloudData[0].slice(1));
+// get just the inner data grid
+cloudData = cloudData.slice(1).map(row => row.slice(1));
 
 console.log("cloud cover data loaded");
 
@@ -1970,7 +1973,7 @@ export default defineComponent({
           return `Cloud Cover: ${(cc * 100).toFixed(0)}%`;
         }
       }
-      return "Cloud Cover: N/A";
+      return "Outside Range";
 
     },
 
