@@ -754,16 +754,15 @@
           <v-window-item :value="1">
             <div class="intro-text">
               <p class="mb-5">
-              On October 14, 2023, the Americas will experience
-              a partial solar eclipse, where the Moon 
-              will appear to travel across the Sun and 
-              block a portion of it.
+              On April 8, 2024, North America will experience
+              a total solar eclipse, where the Moon 
+              will appear to travel across the Sun, blocking out it's lightt
               </p>
               <p  class="mb-5">
-              A lucky segment of the U.S., Central, and South America will experience a dazzling <b>"Ring of Fire"</b> created by an <b>annular eclipse</b>.
+              A lucky segment of Mexico, the U.S., and Cander will experience an aweinspiring <b>total eclipse</b>, and the rest will get to glimpse a <em>partial</em> eclipse.
               </p>
               <p class="mb-5">
-              Use your detective skills to identify where those lucky people are in our map quiz.
+              See where the eclipse will be visible, and if clouds are likely to interfere with seeing the eclipse.
               </p>
             </div>
           </v-window-item>
@@ -786,12 +785,6 @@
                     <font-awesome-icon icon="location-dot" size="xl" class="bullet-icon"></font-awesome-icon>
                   </template>
                     <strong>Select any location</strong> around the world. See and share how the eclipse would look from there.
-                </v-list-item>
-                <v-list-item density="compact">
-                  <template v-slot:prepend>
-                    <font-awesome-icon icon="puzzle-piece" size="xl" class="bullet-icon"></font-awesome-icon>
-                  </template>
-                    Identify the path of the annular eclipse for the U.S. in our <strong>Map Quiz</strong>.
                 </v-list-item>
                 <v-list-item density="compact">
                   <template v-slot:prepend>
