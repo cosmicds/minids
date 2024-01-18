@@ -10,7 +10,9 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended'
+    'plugin:@typescript-eslint/recommended',
+    'plugin:vue/essential',
+    '@vue/typescript/recommended'
   ],
   rules: {
     "indent": ["error", 2],
@@ -53,6 +55,7 @@ module.exports = {
         "varsIgnorePattern": "^_"
       }
     ],
-    "@typescript-eslint/semi": "error"
+    "@typescript-eslint/semi": "error",
+    "vue/multi-word-component-names": "off"
   }
 };
