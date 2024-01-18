@@ -22,7 +22,7 @@ interface MapOptions extends TileLayerOptions {
 interface GeoJSONProp {
   url?: string;
   geojson?: GeoJSON.FeatureCollection | GeoJSON.Feature | GeoJSON.GeometryCollection;
-  style: Record<string,any>;
+  style: Record<string,any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface Place extends LocationDeg { 
@@ -81,7 +81,7 @@ export default defineComponent({
       }
     },
     placeCircleOptions: {
-      type: Object as PropType<Record<string, any>>,
+      type: Object as PropType<Record<string, any>>,  // eslint-disable-line @typescript-eslint/no-explicit-any
       default() {
         return {
           color: "#0000FF",
@@ -100,7 +100,7 @@ export default defineComponent({
       default: true
     },
     selectedCircleOptions: {
-      type: Object as PropType<Record<string,any>>,
+      type: Object as PropType<Record<string,any>>,  // eslint-disable-line @typescript-eslint/no-explicit-any
       default() {
         return {
           color: "#FF0000",
@@ -180,6 +180,7 @@ export default defineComponent({
       );
     },
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     circleForLocation(location: LocationDeg, circleOptions: Record<string,any>): L.CircleMarker {
       return this.circleMaker([location.latitudeDeg, location.longitudeDeg], circleOptions);
     },
