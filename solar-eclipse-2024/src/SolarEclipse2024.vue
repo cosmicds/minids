@@ -2310,9 +2310,11 @@ export default defineComponent({
 
         if (sunPoint.x === 0) {
 
-          const ysh = 0.5 * sunPoint.y;
+          let ysh = 0.5 * sunPoint.y;
           if (ysh >= rMoonPx) {
             return;
+          } else if (ysh === 0) {
+            ysh = Math.min(rMoonPx, rSunPx);
           }
           x1 = Math.sqrt(rMoonPx * rMoonPx - ysh * ysh);
           if (isNaN(x1)) {
