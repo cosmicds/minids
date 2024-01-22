@@ -7,7 +7,7 @@ import { Annotation2 } from "./Annotation2";
 
 import {
   Annotation, Color, Colors, Constellations, Coordinates, Grids,
-  LayerManager, Planets, PushPin, RenderTriangle, Settings, SpaceTimeController,
+  LayerManager, Planets, PushPin, RenderContext, RenderTriangle, Settings, SpaceTimeController,
   SpreadSheetLayer, Text3d, Text3dBatch, Tile, TileCache, TourPlayer, URLHelpers,
   Vector3d, WWTControl
 } from "@wwtelescope/engine";
@@ -447,4 +447,41 @@ export function renderOneFrame() {
     this.renderFrameCallback(this);
   }
 
+}
+
+export function drawPlanets(renderContext: RenderContext, opacity: number, fraction: number) {
+  if (Planets._planetTextures == null) {
+      Planets._loadPlanetTextures();
+    }
+    var elong = Planets._geocentricElongation(Planets._planetLocations[9].RA, Planets._planetLocations[9].dec, Planets._planetLocations[0].RA, Planets._planetLocations[0].dec);
+    var raDif = Planets._planetLocations[9].RA - Planets._planetLocations[0].RA;
+    if (Planets._planetLocations[9].RA < Planets._planetLocations[0].RA) {
+      raDif += 24;
+    }
+    var phaseAngle = Planets._phaseAngle(elong, Planets._planetLocations[9].distance, Planets._planetLocations[0].distance);
+    var limbAngle = Planets._positionAngle(Planets._planetLocations[9].RA, Planets._planetLocations[9].dec, Planets._planetLocations[0].RA, Planets._planetLocations[0].dec);
+    if (raDif < 12) {
+      phaseAngle += 180;
+    }
+    var dista = (Math.abs(Planets._planetLocations[9].RA - Planets._planetLocations[0].RA) * 15) * Math.cos(Coordinates.degreesToRadians(Planets._planetLocations[0].dec));
+    var distb = Math.abs(Planets._planetLocations[9].dec - Planets._planetLocations[0].dec);
+    var sunMoonDist = Math.sqrt(dista * dista + distb * distb);
+    var eclipse = false;
+    var coronaOpacity = 0;
+    var moonEffect = (Planets._planetScales[9] / 2 - sunMoonDist);
+    var darkLimb = Math.min(32, sunMoonDist * 32);
+    if (fraction == 1) {
+      eclipse = true;
+      coronaOpacity = Math.min(1, (moonEffect - (Planets._planetScales[0] / 2)) / 0.001);
+      Planets._drawPlanet(renderContext, 18, coronaOpacity);
+    }
+    for (const key in Planets._planetDrawOrder) {
+      // 0: Sun, 9: Moon, 19: Earth
+      var planetId = Planets._planetDrawOrder[key];
+      if (fraction > 0 && planetId === 9) {
+        continue;
+      }
+      Planets._drawPlanet(renderContext, planetId, 1);
+    }
+    return true;
 }
