@@ -1,1 +1,0 @@
-"use strict";(self["webpackChunk_minids_radwave"]=self["webpackChunk_minids_radwave"]||[]).push([[7294],{7294:e=>{e.exports="ra,dec,d,phase,start_times,end_times\n"}}]);
