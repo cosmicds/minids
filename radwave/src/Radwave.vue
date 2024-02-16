@@ -207,6 +207,8 @@
       id="video-container"
       v-model="showVideoSheet"
       transition="slide-y-transition"
+      close-on-back
+      close-on-content-click
       fullscreen
     >
       <div class="video-wrapper">
@@ -214,7 +216,7 @@
           id="video-close-icon"
           class="close-icon"
           icon="times"
-          size="lg"
+          size="xlg"
           @click="showVideoSheet = false"
           @keyup.enter="showVideoSheet = false"
           tabindex="0"
@@ -269,8 +271,45 @@
         <v-window v-model="tab" id="tab-items" class="pb-2 no-bottom-border-radius">
           <v-window-item>
             <v-card class="no-bottom-border-radius scrollable">
-              <v-card-text class="info-text no-bottom-border-radius">
-                Information goes here
+              <v-card-text class="info-text no-bottom-border-radius d-flex-column">
+                <h2>Seeing a Wave in the Milky Way</h2>
+                <p>
+                  For most of human history, we have not known how far the stars are from us.
+                  It wasn't until the 20<sup>th</sup> century that we developed the tools to measure distances to stars. 
+                  By studying the distances to stars astronomers can learn a great deal about the structure of our galaxy. 
+                </p>
+                <p>
+                  In and amongst the stars are star forming regions - clouds of gas and dust where stars form. 
+                  Because dust is between us and the stars, astronomers can also measure the distances to these star forming regions. 
+                  It was by looking at the distances to nearby star forming regions that astronomers discovered a large structure which they called 
+                    the <a href="https://sites.google.com/cfa.harvard.edu/radcliffewave/"><strong>Radcliffe Wave</strong></a>. 
+                  While shaped like a wave, the question remained&hellip;phot
+                </p>
+                  <h2>Is the &ldquo;wave&rdquo; actually waving?</h2>
+                
+                <p>After a great deal of work, the answer is yes. 
+                  By analyzing the velocities of young star clusters associated with the star forming regions,
+                  they determined that their motions match what one would expect if they were riding on a wave as it travels through the galaxy.
+                  The wave goes up and down every 95 million years or so! 
+                  However, the clusters and star forming clouds we see surfing the wave right now will dispers before a full cycle is complete
+                </p>
+                  The clusters follow a "damped traveling wave" pattern. This type of wave motion is practically visualized below by two of the astronomers involved in this discovery, 
+                  Catherine Zucker and Ralf Konietzka.
+                  <figure>
+                    <gif-play-pause
+                      :still="require('./assets/traveling_wave.gif')"
+                      :gif="require('./assets/traveling_wave.gif')"
+                      alt="Image of two scientists demonstrating a damped traveling wave. A traveling wave is like a wave on the ocean, where in the crests and troughs move forward, but the water itself (and also a boat in the water) does not. In a damped traveling wave the height of the waves decreases from one end to the other"
+                      />
+                  </figure>
+                <h2>Where is the Radcliffe Wave</h2>
+                <p>
+                  The Radcliffe Wave spans about 100&deg; of the sky between the constellations of Cygnus (The Swan) and Orion (The Hunter).
+                  It is about 1000 lightyears away at it's closest point, with a length of about 9000 lightyears. 
+                  Despite ~100 clusters and star forming regions being associated with the wave, their connection is not obvious from the view point on Earth.
+                  It was not until astronomers looked at the positions and distances in 3D that the structure became apparent. 
+                </p>
+                <p>&nbsp;</p>
               </v-card-text>
             </v-card>
           </v-window-item>
@@ -1139,6 +1178,46 @@ export default defineComponent({
   pointer-events: none;
   align-items: center;
   gap: 5px;
+}
+
+#text-bottom-sheet {
+  
+  overflow-y: scroll;
+  
+  h2 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+  }
+  
+  h2 {
+    font-weight: bold;
+    margin-inline: auto;
+    width: fit-content;
+    
+  }
+  
+  
+  figure {
+    position: relative;
+    padding-top: 1rem;
+    width: fit-content;
+    margin-inline: auto;
+    
+    #wcag-gif {
+      width: fit-content;
+      
+      img {
+        max-height: 400px;
+        width: 50vw;
+      }
+    
+    }
+    
+  }
+  
 }
 
 #left-buttons, #right-buttons {

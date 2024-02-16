@@ -4,6 +4,8 @@ import { FundingAcknowledgment, IconButton, CreditLogos, wwtHUD } from "@minids/
 import Radwave from "./Radwave.vue";
 import "../../assets/common.less";
 
+import GifPlayPause from "./GifPlayPause.vue";
+
 import vuetify from "../plugins/vuetify";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -60,6 +62,7 @@ createApp(Radwave, {
   .component('funding-acknowledgement', FundingAcknowledgment)
   .component('credit-logos', CreditLogos)
   .component('wwt-hud', wwtHUD)
+  .component('gif-play-pause', GifPlayPause)
 
   // Mount
   .mount("#app");
