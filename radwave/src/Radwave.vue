@@ -67,7 +67,7 @@
         v-else
         :class="['modal', showSplashScreen ? 'no-background' : '']"
         id="modal-loading"
-        v-show="isLoading || userNotReady"
+        v-show="(isLoading || userNotReady) && (modeReactive != 'full')"
       >
         <div v-if="isLoading" class="container">
           <div  class="spinner"></div>
@@ -96,7 +96,7 @@
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
     <div class="top-content">
-      <div v-if="modeReactive != null" id="left-buttons">
+      <div id="left-buttons" :class="[modeReactive=='full' ? 'hidden' : '']">
         <icon-button
           v-model="showTextSheet"
           fa-icon="book-open"
@@ -118,9 +118,8 @@
       <div id="center-buttons">
 <!-- <p class="pointer-events"> {{ wwtPosition }} </p> -->
         <icon-button
-          v-if="false"
           md-icon="mdi-sine-wave"
-          @activate="toggleFullwaveMode()"
+          @activate="() => modeReactive == 'full' ? exitFullWaveMode() : enterFullWaveMode()"
           :color="buttonColor"
           tooltip-text="Full Wave Mode"
           tooltip-location="bottom"
@@ -132,7 +131,7 @@
         </icon-button>
         
         <icon-button
-          v-if="(playCount > 0) ?? (modeReactive == 'full')"
+          v-if="(playCount > 0) && (modeReactive != 'full')"
           @activate="modeReactive = modeReactive == '3D' ? '2D' : '3D'"
           :color="buttonColor"
           tooltip-text="Switch modes"
@@ -161,7 +160,7 @@
 
     <!-- This block contains the elements (e.g. the project icons) displayed along the bottom of the screen -->
 
-    <div class="bottom-content">
+    <div :class="['bottom-content',modeReactive=='full' ? 'hidden' : '']">
       <div v-if="modeReactive != '2D'" id="time-controls">
         <icon-button
           v-model="playing"
@@ -209,7 +208,7 @@
       transition="slide-y-transition"
       fullscreen
     >
-      <div class="video-wrapper">
+      <div class="video-wrapper" :class="[modeReactive=='full' ? 'hidden' : '']">
         <font-awesome-icon
           id="video-close-icon"
           class="close-icon"
@@ -379,9 +378,12 @@ function asyncWaitForCondition(func: () => boolean, ms: number): Promise<void> {
 }
 
 type SheetType = "text" | "video" | null;
+type ModeType = "2D" | "3D" | "full" | null;
 
 // A hack, but we don't need anything more than this
 type Row = Record<string, number>;
+
+let queryMode: ModeType = null;
 
 const SECONDS_PER_DAY = 86400;
 
@@ -397,7 +399,7 @@ const endTime = endDate.getTime();
 
 let phase = 0;
 let altFactor = 1;
-let mode = "3D" as "2D" | "3D" | "full" | null;
+let mode = "3D" as ModeType;
 
 const phaseRowCount = 300;
 
@@ -431,7 +433,6 @@ function addPhasePointsToAnnotation(layer: SpreadSheetLayer, annotation: Annotat
   const latCol = layer.get_latColumn();
   const dCol = layer.get_altColumn();
   const ecliptic = Coordinates.meanObliquityOfEcliptic(SpaceTimeController.get_jNow()) / 180 * Math.PI;
-
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const rows: Row[] = layer.get__table().rows.slice(phase * phaseRowCount, (phase + 1) * phaseRowCount);
@@ -501,6 +502,10 @@ export default defineComponent({
       instant: true
     }  as GotoRADecZoomParams;
     
+    if (queryMode) {
+      mode = queryMode;
+    }
+    
     return {
       showSplashScreen: true,
       backgroundImagesets: [] as BackgroundImageset[],
@@ -534,7 +539,7 @@ export default defineComponent({
       sunColor: "#ffff0a",
       sunLayer: null as SpreadSheetLayer | null,
       
-      modeReactive: mode as "2D" | "3D" | "full" | null,
+      modeReactive: mode as ModeType,
       resizeObserver: null as ResizeObserver | null,
       background2DImageset: "Deep Star Maps 2020",
       position3D: this.initialCameraParams as Omit<GotoRADecZoomParams,'instant'>,
@@ -551,7 +556,7 @@ export default defineComponent({
         'Hydrogen Alpha Full Sky Map',
         "PLANCK R2 HFI color composition 353-545-857 GHz", // HIPS
       ],
-      previousMode: mode as "2D" | "3D" | "full" | null,
+      previousMode: mode as  ModeType,
       fullwavePosition: fullwavePosition,
 
 
@@ -559,8 +564,19 @@ export default defineComponent({
       maxZoom: 22328103718.39476
     };
   },
+  
+  beforeCreate() {
+    const searchParams = new URLSearchParams(window.location.search);
+    // check for mode
+    queryMode = searchParams.get('mode') as ModeType;
+    
+  },
 
   mounted() {
+    this.resizeObserver = new ResizeObserver((_entries) => {
+      this.shinkWWT();
+    });
+    
     this.waitForReady().then(async () => {
       
       this.backgroundImagesets = [...skyBackgroundImagesets];
@@ -568,8 +584,21 @@ export default defineComponent({
       // initialize the view to black so that we don't flicker DSS
       this.applySetting(["galacticMode", true]);
       this.loadHipsWTML().then(() => {
-        console.log('init set3DMode');
-        return this.set3DMode();
+        if (this.modeReactive == '3D') {
+          console.log('init set3DMode');
+          return this.set3DMode();
+        } else if (this.modeReactive == '2D') {
+          console.log('init set2DMode');
+          return this.set2DMode();
+        } else if (this.modeReactive == 'full') {
+          console.log('init setFullwaveMode');
+          this.userNotReady = false;
+          this.showSplashScreen = false;
+          return this.setFullwaveMode();
+        } else {
+          return;
+        }
+        
       }).then(() => this.positionSet = true);
 
       this.applySetting(["showConstellationBoundries", false]);  // Note that the typo here is intentional
@@ -592,11 +621,13 @@ export default defineComponent({
         updateSlider(phase);
         window.requestAnimationFrame(this.onAnimationFrame);
         this.layersLoaded = true;
+      }).then(() => {
+        if (this.modeReactive == 'full') {
+          console.log('init Full Wave Mode');
+          this.enterFullWaveMode();
+        }
       });
       
-    });
-    this.resizeObserver = new ResizeObserver((_entries) => {
-      this.shinkWWT();
     });
 
     // Pin the min and max zoom in 3D mode
@@ -684,11 +715,13 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
       // Promise based wait for isLoading to be false
-      asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
-        setTimeout(() => {
-          this.playing = true;
-        }, 500);
-      });
+      if (this.modeReactive == '3D') {
+        asyncWaitForCondition(() => (!this.isLoading && !this.userNotReady), 100).then(() => {
+          setTimeout(() => {
+            this.playing = true;
+          }, 500);
+        });
+      }
       
     },
     
@@ -753,55 +786,47 @@ export default defineComponent({
       
     },
     
-    async toggleFullwaveMode() {
+    async setFullwaveMode() {
       // to view in the full wave you need to adjust the height
       // of the window/canvas to have an W:H ration of 5.7
-      let old3D = null as unknown as Omit<GotoRADecZoomParams,'instant'>;
-      if (this.modeReactive == 'full') {
-        this.modeReactive = this.previousMode;
-        this.positionReset();
-        return;
-      } else if (this.modeReactive == '3D') {
-        old3D = this.wwtPosition;
-      }
       
-      return this.set2DMode().then(() => {
-        this.previousMode = this.modeReactive;
-        this.modeReactive = "full";
-        phase=0;
-        
-        this.shinkWWT();
-        this.resizeObserver?.observe(document.body);
-        
-        return this.gotoRADecZoom({
-          ...this.fullwavePosition, 
-          instant: false}).catch((err) => {
-          console.log(err);
-        }).then(() => {
-          if (old3D) {this.position3D = old3D;}
-        });
+      // enter 2D mode
+      bestFitOffsets = bestFitOffsets2D;
+      this.clusterLayers.forEach(layer => {
+        layer.set_decay(1);
       });
+      
+      this.setBackgroundImageByName(this.background2DImageset);
+      this.applySetting(["showSolarSystem", false]);
+      this.sunLayer?.set_opacity(0);
+      this.playing = false;
+      phase=0;
+      updateSlider(phase);
+      updateBestFitAnnotations(phase);    
+      this.setTime(startDate);
+      
+      // setup the ui
+      this.closeSplashScreen(); // needed if we use query param
+      this.shinkWWT();
+      this.resizeObserver?.observe(document.body);
+      
+      return asyncSetTimeout(() => {
+        
+        this.gotoRADecZoom({
+          ...this.fullwavePosition, 
+          instant: true}).catch((err) => {
+          console.log(err);
+        });
+      }, 100);
       
     }, 
     
-    toggleUI() {
-      // toggle visibility of class .bottom-content using opacity
-      const bottomContent = document.querySelector(".bottom-content") as HTMLElement;
-      const op = bottomContent.style.opacity;
-      if (op == "0") {
-        bottomContent.style.opacity = "1";
-      } else {
-        bottomContent.style.opacity = "0";
-      }
-      
-      // now for top-content
-      const topContent = document.querySelector(".top-content") as HTMLElement;
-      const op2 = topContent.style.opacity;
-      if (op2 == "0") {
-        topContent.style.opacity = "1";
-      } else {
-        topContent.style.opacity = "0";
-      }
+    enterFullWaveMode() {
+      this.modeReactive = 'full';
+    },
+    
+    exitFullWaveMode() {
+      this.modeReactive = this.previousMode;
     },
     
     positionReset() {
@@ -1037,6 +1062,7 @@ export default defineComponent({
     
     modeReactive(newVal, oldVal) {
       mode = newVal;
+      this.previousMode = oldVal;
       if (oldVal == newVal) {
         if (newVal == "2D") {
           this.set2DMode();
@@ -1045,18 +1071,17 @@ export default defineComponent({
           this.set3DMode();
         }
         if (newVal == "full") {
-          this.toggleFullwaveMode();
+          this.setFullwaveMode();
         }
       } else {
       
-        if (oldVal == "2D") {
+        if (oldVal == "2D" && newVal == "3D") {
           this.position2D = this.wwtPosition;
-        } else if (oldVal == "3D") {
+        } else if (oldVal == "3D" && newVal == "2D") {
           this.position3D = this.wwtPosition;
         } else if (oldVal == "full") {
-          this.resizeObserver?.disconnect();
           this.growWWT();
-          this.toggleUI();
+          this.resizeObserver?.unobserve(document.body as HTMLElement);
         }
       }
       
@@ -1067,8 +1092,7 @@ export default defineComponent({
       } else if (newVal == "3D") {
         this.set3DMode();
       } else {
-        // don't do anything if mode is null
-        return;
+        this.setFullwaveMode();
       }
       
     }
@@ -1078,6 +1102,10 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+
+.hidden {
+  display: none !important;
+}
 
 .no-background {
   background-image: none!important;
